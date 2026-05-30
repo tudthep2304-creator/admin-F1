@@ -15,24 +15,29 @@
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col">
 
-  <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
+  <header class="bg-slate-900 border-b border-slate-800 px-4 py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
     <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center text-xl border border-green-500/30">
-            <i class="fas fa-cogs"></i>
-        </div>
-        <div>
-            <h1 class="text-xl font-black text-white tracking-wide">F1 DRIVER</h1>
-            <p class="text-xs text-green-400 font-bold flex items-center gap-1">
-                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> แผงควบคุมระบบส่วนกลาง
-            </p>
+        <button onclick="toggleMenu()" class="text-slate-300 hover:text-white text-2xl focus:outline-none p-2 bg-slate-800 rounded-lg border border-slate-700 transition active:scale-90">
+            <i class="fas fa-bars" id="menu-icon"></i>
+        </button>
+
+        <div class="flex items-center gap-2">
+            <div class="hidden sm:flex w-9 h-9 bg-green-500/10 text-green-400 rounded-xl items-center justify-center text-lg border border-green-500/30">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <div>
+                <h1 class="text-lg sm:text-xl font-black text-white tracking-wide flex items-center gap-2">
+                    F1 DRIVER <span class="text-slate-500 font-normal hidden sm:inline">|</span> 
+                    <span id="current-page-title" class="text-green-400 text-sm sm:text-base">แดชบอร์ด</span>
+                </h1>
+                <p class="text-[10px] sm:text-xs text-slate-400 font-bold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> แผงควบคุมระบบส่วนกลาง
+                </p>
+            </div>
         </div>
     </div>
     
-    <button onclick="toggleMenu()" class="text-slate-300 hover:text-white text-2xl focus:outline-none p-2 bg-slate-800 rounded-lg border border-slate-700 transition active:scale-90">
-        <i class="fas fa-bars" id="menu-icon"></i>
-    </button>
-
-    <nav id="dropdown-menu" class="hidden absolute top-full left-0 w-full bg-slate-900 border-b border-slate-800 shadow-2xl flex flex-col p-4 gap-2 transition-all origin-top">
+    <nav id="dropdown-menu" class="hidden absolute top-full left-0 w-full sm:w-72 bg-slate-900 border-b sm:border border-slate-800 shadow-2xl flex flex-col p-4 gap-2 transition-all origin-top">
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-3 bg-green-600 text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-chart-pie w-5 text-center"></i> แดชบอร์ด
         </button>
@@ -51,21 +56,38 @@
     </nav>
   </header>
 
-  <main class="flex-1 p-6 max-w-7xl w-full mx-auto" onclick="closeMenuOnClickOutside()">
+  <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto" onclick="closeMenuOnClickOutside()">
       
       <section id="content-dashboard" class="tab-content space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">คนขับออนไลน์ตอนนี้</p>
-                  <h3 class="text-3xl font-black text-green-400" id="stat-online-count">0 คน</h3>
+              <div onclick="openModal('modalOnlineDrivers')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-green-500/50 transition transform hover:-translate-y-1">
+                  <div class="flex justify-between items-start">
+                      <div>
+                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">คนขับออนไลน์ตอนนี้</p>
+                          <h3 class="text-3xl font-black text-green-400" id="stat-online-count">0 คน</h3>
+                      </div>
+                      <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
+                  </div>
               </div>
-              <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
-                  <h3 class="text-3xl font-black text-yellow-500" id="stat-pending-count">0 งาน</h3>
+
+              <div onclick="openModal('modalPendingJobs')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-yellow-500/50 transition transform hover:-translate-y-1">
+                  <div class="flex justify-between items-start">
+                      <div>
+                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
+                          <h3 class="text-3xl font-black text-yellow-500" id="stat-pending-count">0 งาน</h3>
+                      </div>
+                      <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
+                  </div>
               </div>
-              <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-                  <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">เบอร์ที่ถูกบล็อกทั้งหมด</p>
-                  <h3 class="text-3xl font-black text-red-400" id="stat-block-count">0 เบอร์</h3>
+
+              <div onclick="openModal('modalBlacklist')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-red-500/50 transition transform hover:-translate-y-1">
+                  <div class="flex justify-between items-start">
+                      <div>
+                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">เบอร์ที่ถูกบล็อกทั้งหมด</p>
+                          <h3 class="text-3xl font-black text-red-400" id="stat-block-count">0 เบอร์</h3>
+                      </div>
+                      <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
+                  </div>
               </div>
           </div>
 
@@ -95,7 +117,7 @@
               <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-plus text-green-400 mr-1"></i> ลงทะเบียน / แก้ไขคนขับ</h2>
               <div class="space-y-4 text-slate-800">
                   <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-1">รหัส PIN 4 หลัก (ใช้ล็อกอินและกู้คืนงาน)</label>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">รหัส PIN 4 หลัก</label>
                       <input type="text" id="drv-pin" maxlength="4" placeholder="เช่น 2304" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold text-center tracking-widest">
                   </div>
                   <div>
@@ -148,14 +170,14 @@
 
       <section id="content-history" class="tab-content hidden space-y-4">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <div class="flex justify-between items-center mb-4">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                   <h2 class="text-lg font-bold text-white"><i class="fas fa-history text-green-400 mr-1"></i> ประวัติงานวิ่งและข้อมูลลูกค้า</h2>
-                  <button onclick="syncToGoogleSheet()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 transition">
+                  <button onclick="syncToGoogleSheet(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition">
                       <i class="fas fa-file-excel"></i> สำรองข้อมูลลง Google Sheet
                   </button>
               </div>
               <div class="overflow-x-auto">
-                  <table class="w-full text-left border-collapse">
+                  <table class="w-full text-left border-collapse min-w-[700px]">
                       <thead>
                           <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold">
                               <th class="pb-3">ลูกค้า / เบอร์โทร</th>
@@ -177,18 +199,18 @@
 
       <section id="content-pricing" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-sliders-h text-green-400 mr-1"></i> ปรับแต่งอัตราค่าบริการเดินทาง</h2>
+              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-sliders-h text-green-400 mr-1"></i> ปรับแต่งอัตราค่าบริการ</h2>
               <div class="space-y-4">
                   <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-1">ราคาเริ่มต้น (บาท) [Base Fare]</label>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">ราคาเริ่มต้น (บาท)</label>
                       <input type="number" id="cfg-base-fare" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold">
                   </div>
                   <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการกิโลเมตรละ (บาท) [จากจุดรับไปจุดส่ง]</label>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการกิโลเมตรละ (บาท)</label>
                       <input type="number" id="cfg-km-rate" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold">
                   </div>
                   <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการคำนวณระยะวิ่งไปรับ (บาท/กม.) [จากตัวคนขับไปจุดรับ]</label>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการวิ่งไปรับ (บาท/กม.)</label>
                       <input type="number" id="cfg-pickup-rate" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold">
                   </div>
                   <button onclick="savePricingConfig()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition">
@@ -200,8 +222,8 @@
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
               <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-ticket-alt text-green-400 mr-1"></i> สร้างโค้ดส่วนลดโปรโมชั่น</h2>
               <div class="grid grid-cols-2 gap-2 mb-4">
-                  <input type="text" id="promo-code" placeholder="โค้ดส่วนลด เช่น F1NEW" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none uppercase font-bold text-center tracking-wider">
-                  <input type="number" id="promo-value" placeholder="จำนวนส่วนลด (บาท)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold">
+                  <input type="text" id="promo-code" placeholder="โค้ดส่วนลด (เช่น F1NEW)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none uppercase font-bold text-center tracking-wider text-sm">
+                  <input type="number" id="promo-value" placeholder="ส่วนลด (บาท)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-sm">
               </div>
               <button onclick="addPromoCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl mb-4 transition">
                   <i class="fas fa-plus mr-1"></i> เพิ่มโค้ดส่วนลดใหม่
@@ -218,10 +240,10 @@
 
       <section id="content-blacklist" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> บล็อกเบอร์โทรลูกค้า</h2>
+              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> บล็อกเบอร์ลูกค้า</h2>
               <div class="space-y-4">
                   <input type="tel" id="block-phone" placeholder="ระบุเบอร์โทรศัพท์ (10 หลัก)" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-center">
-                  <input type="text" id="block-reason" placeholder="เหตุผลการบล็อกเบอร์..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm">
+                  <input type="text" id="block-reason" placeholder="เหตุผลการบล็อก..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm">
                   <button onclick="addNumberToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">
                       <i class="fas fa-ban mr-1"></i> บล็อกเบอร์โทรนี้
                   </button>
@@ -229,19 +251,19 @@
           </div>
 
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อเบอร์โทรศัพท์ที่ติดแบล็กลิสต์</h2>
+              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อเบอร์ที่ติดแบล็กลิสต์</h2>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse">
                       <thead>
                           <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold">
                               <th class="pb-3">เบอร์โทรศัพท์</th>
-                              <th class="pb-3">เหตุผลที่แบน</th>
+                              <th class="pb-3">เหตุผล</th>
                               <th class="pb-3">วันที่เวลา</th>
                               <th class="pb-3 text-right">ปลดบล็อก</th>
                           </tr>
                       </thead>
                       <tbody id="blacklist-table-body" class="text-sm divide-y divide-slate-800">
-                          </tbody>
+                      </tbody>
                   </table>
               </div>
           </div>
@@ -249,11 +271,72 @@
 
   </main>
 
+  <div id="modalOnlineDrivers" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[80vh]">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-radar"></i> ข้อมูลคนขับออนไลน์ทั้งหมด</h2>
+              <button onclick="closeModal('modalOnlineDrivers')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto flex-1">
+              <table class="w-full text-left border-collapse">
+                  <thead>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold"><th class="pb-3">PIN</th><th class="pb-3">เบอร์โทร</th><th class="pb-3">พิกัดล่าสุด</th></tr>
+                  </thead>
+                  <tbody id="modal-online-list" class="text-sm divide-y divide-slate-800"></tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalPendingJobs" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[80vh]">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-yellow-500"><i class="fas fa-clock"></i> งานที่กำลังรอดำเนินการ</h2>
+              <button onclick="closeModal('modalPendingJobs')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto flex-1">
+              <table class="w-full text-left border-collapse">
+                  <thead>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold"><th class="pb-3">ลูกค้า</th><th class="pb-3">จุดรับ-ส่ง</th><th class="pb-3 text-right">ราคา</th></tr>
+                  </thead>
+                  <tbody id="modal-pending-list" class="text-sm divide-y divide-slate-800"></tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalBlacklist" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[80vh]">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-red-500"><i class="fas fa-ban"></i> ข้อมูลแบล็กลิสต์ทั้งหมด</h2>
+              <button onclick="closeModal('modalBlacklist')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto flex-1">
+              <table class="w-full text-left border-collapse">
+                  <thead>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold"><th class="pb-3">เบอร์โทร</th><th class="pb-3">เหตุผล</th><th class="pb-3 text-right">วันที่</th></tr>
+                  </thead>
+                  <tbody id="modal-blacklist-list" class="text-sm divide-y divide-slate-800"></tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
   <script>
-    // 🌟 ตั้งค่าลิงก์ Apps Script ของคุณที่นี่
+    // 🌟 1. ลิงก์ Apps Script
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
 
+    // 🌟 2. ตัวแปรเก็บข้อมูล
     let allBookings = null;
+
+    // ตั้งชื่อภาษาไทยของแต่ละแท็บ
+    const tabTitles = {
+        'dashboard': 'แดชบอร์ด',
+        'drivers': 'จัดการคนขับรถ',
+        'history': 'ประวัติงานทั้งหมด',
+        'pricing': 'ตั้งค่าราคา & โปรโมชั่น',
+        'blacklist': 'ระบบบล็อกเบอร์โทร'
+    };
 
     firebase.initializeApp({
       apiKey: "AIzaSyBNtaYaX1OW-86_9EGiVN9EpgPzWOX_twQ",
@@ -266,7 +349,7 @@
     });
     const db = firebase.database();
 
-    // ================= ฟังก์ชันเมนู Hamburger =================
+    // ================= ระบบ UI ทั่วไป =================
     function toggleMenu() {
         const menu = document.getElementById('dropdown-menu');
         const icon = document.getElementById('menu-icon');
@@ -279,7 +362,6 @@
         }
     }
 
-    // แตะพื้นที่ว่างเพื่อปิดเมนู
     function closeMenuOnClickOutside() {
         const menu = document.getElementById('dropdown-menu');
         const icon = document.getElementById('menu-icon');
@@ -295,14 +377,21 @@
             el.classList.remove('bg-green-600', 'text-white');
             el.classList.add('bg-slate-800', 'text-slate-400');
         });
+        
         document.getElementById('content-' + tabId).classList.remove('hidden');
         document.getElementById('tab-' + tabId).classList.replace('bg-slate-800', 'bg-green-600');
         document.getElementById('tab-' + tabId).classList.replace('text-slate-400', 'text-white');
         
-        // เมื่อกดเปลี่ยนหน้า ให้ซ่อนเมนูอัตโนมัติ
+        // อัปเดตชื่อหน้าตรง Header
+        document.getElementById('current-page-title').innerText = tabTitles[tabId];
+        
+        // ซ่อนเมนู
         document.getElementById('dropdown-menu').classList.add('hidden');
         document.getElementById('menu-icon').classList.replace('fa-times', 'fa-bars');
     }
+
+    function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
+    function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
     // ================= ระบบจัดการคนขับ (Driver Management) =================
     function saveDriverProfile() {
@@ -344,7 +433,6 @@
         }
     }
 
-    // โหลดข้อมูลคนขับทั้งหมดมาแสดงที่ทำเนียบคนขับ
     db.ref('drivers_profile').on('value', snap => {
         let list = snap.val(); let html = '';
         if(!list) { document.getElementById('all-drivers-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีข้อมูลพนักงานขับรถ</td></tr>`; return; }
@@ -364,24 +452,37 @@
         document.getElementById('all-drivers-table').innerHTML = html;
     });
 
-    // ดึงสถานะคนขับออนไลน์ Real-time
     db.ref('driver').on('value', snap => {
-        let d = snap.val(); let html = '';
+        let d = snap.val(); let htmlMain = ''; let htmlModal = '';
         let statOnline = document.getElementById('stat-online-count');
+        
         if(!d || d.status !== "ออนไลน์") {
             statOnline.innerText = "0 คน";
             document.getElementById('live-drivers-list').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีคนขับออนไลน์ในขณะนี้</td></tr>`;
+            document.getElementById('modal-online-list').innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500">ออฟไลน์ทั้งหมด</td></tr>`;
             return;
         }
+        
         statOnline.innerText = "1 คน";
-        html = `<tr class="text-slate-200">
+        
+        // ข้อมูลลงตารางหลัก
+        htmlMain = `<tr class="text-slate-200">
             <td class="py-3 font-bold text-green-400">${d.pin || '-'}</td>
             <td class="py-3 text-white font-bold">พนักงานประจำรถ</td>
             <td class="py-3 text-xs text-slate-400">รถรับจ้างส่วนบุคคล</td>
             <td class="py-3">${d.driverPhone || '0946379669'}</td>
             <td class="py-3 text-xs font-mono text-green-400">${d.lat.toFixed(5)}, ${d.lng.toFixed(5)}</td>
         </tr>`;
-        document.getElementById('live-drivers-list').innerHTML = html;
+        
+        // ข้อมูลลง Modal
+        htmlModal = `<tr class="text-slate-200">
+            <td class="py-3 font-bold text-green-400">${d.pin || '-'}</td>
+            <td class="py-3">${d.driverPhone || '0946379669'}</td>
+            <td class="py-3 text-xs font-mono text-slate-400">${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}</td>
+        </tr>`;
+
+        document.getElementById('live-drivers-list').innerHTML = htmlMain;
+        document.getElementById('modal-online-list').innerHTML = htmlModal;
     });
 
     // ================= ระบบจัดการแบล็กลิสต์ (Blacklist Management) =================
@@ -406,15 +507,20 @@
     }
 
     db.ref('blacklist').on('value', snap => {
-        let list = snap.val(); let html = ''; let count = 0;
+        let list = snap.val(); let htmlMain = ''; let htmlModal = ''; let count = 0;
+        
         if(!list) {
             document.getElementById('stat-block-count').innerText = "0 เบอร์";
             document.getElementById('blacklist-table-body').innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">ไม่มีประวัติการบล็อกเบอร์โทรศัพท์</td></tr>`;
+            document.getElementById('modal-blacklist-list').innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีเบอร์ที่ถูกบล็อก</td></tr>`;
             return;
         }
+        
         for (let key in list) {
             count++; let b = list[key];
-            html += `<tr class="border-b border-slate-800 text-slate-300">
+            
+            // ข้อมูลตารางหลัก
+            htmlMain += `<tr class="border-b border-slate-800 text-slate-300">
                 <td class="py-3 font-bold text-red-400">${b.phone}</td>
                 <td class="py-3 text-xs text-slate-400">${b.reason}</td>
                 <td class="py-3 text-xs">${b.timestamp}</td>
@@ -422,9 +528,18 @@
                     <button onclick="removeFormBlacklist('${b.phone}')" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl text-xs font-bold border border-green-500/20 hover:bg-green-600/40 transition">ปลดแบน</button>
                 </td>
             </tr>`;
+            
+            // ข้อมูลลง Modal
+            htmlModal += `<tr class="border-b border-slate-800 text-slate-300">
+                <td class="py-3 font-bold text-red-400">${b.phone}</td>
+                <td class="py-3 text-xs text-slate-400">${b.reason}</td>
+                <td class="py-3 text-xs text-right">${b.timestamp.split(' ')[0]}</td>
+            </tr>`;
         }
+        
         document.getElementById('stat-block-count').innerText = count + " เบอร์";
-        document.getElementById('blacklist-table-body').innerHTML = html;
+        document.getElementById('blacklist-table-body').innerHTML = htmlMain;
+        document.getElementById('modal-blacklist-list').innerHTML = htmlModal;
     });
 
     // ================= ระบบปรับราคา & โค้ดส่วนลด =================
@@ -462,23 +577,25 @@
     db.ref('bookings').on('value', snap => {
         allBookings = snap.val(); 
         let list = allBookings; 
-        let html = ''; let count = 0;
+        let htmlMain = ''; let htmlModalPending = ''; let countPending = 0;
         
         if(!list) {
             document.getElementById('stat-pending-count').innerText = "0 งาน";
             document.getElementById('history-jobs-list').innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-500">ไม่มีประวัติงานบันทึกในระบบ</td></tr>`;
+            document.getElementById('modal-pending-list').innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีงานรอดำเนินการ</td></tr>`;
             return;
         }
         
         for (let key in list) {
             let j = list[key];
-            if(j.status === "รอผู้ขับขี่ตอบรับ") count++;
             
+            // แยกสีสถานะ
             let statusColor = "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
             if (j.status.includes("เสร็จสิ้น") || j.status.includes("เรียบร้อย")) statusColor = "text-green-400 bg-green-500/10 border-green-500/20";
             if (j.status.includes("ยกเลิก")) statusColor = "text-red-400 bg-red-500/10 border-red-500/20";
 
-            html += `<tr class="border-b border-slate-800 text-slate-300">
+            // ข้อมูลใส่ตารางหลัก (ทุกสถานะ)
+            htmlMain += `<tr class="border-b border-slate-800 text-slate-300">
                 <td class="py-3 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-xs text-slate-500 font-medium">${j.phone || '-'}</span></td>
                 <td class="py-3 text-xs max-w-[180px] truncate font-medium text-slate-400">${j.pName}</td>
                 <td class="py-3 text-xs max-w-[180px] truncate font-medium text-slate-400">${j.dName}</td>
@@ -487,13 +604,30 @@
                 <td class="py-3 font-bold">${j.driverPin || '-'}</td>
                 <td class="py-3 text-right"><span class="px-2 py-1 rounded-lg border text-xs font-bold ${statusColor}">${j.status}</span></td>
             </tr>`;
+
+            // ดึงเฉพาะงานที่กำลัง "รอผู้ขับขี่ตอบรับ" หรือกำลังวิ่งไปลง Modal
+            if(j.status === "รอผู้ขับขี่ตอบรับ" || j.status.includes("กำลังเดินทาง") || j.status.includes("รับงานแล้ว")) {
+                countPending++;
+                htmlModalPending += `<tr class="border-b border-slate-800 text-slate-300">
+                    <td class="py-3 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-[10px] ${statusColor} px-1.5 py-0.5 rounded">${j.status}</span></td>
+                    <td class="py-3 text-[10px] text-slate-400 truncate max-w-[150px]">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
+                    <td class="py-3 text-right font-black text-green-400">฿${j.price}</td>
+                </tr>`;
+            }
         }
-        document.getElementById('stat-pending-count').innerText = count + " งาน";
-        document.getElementById('history-jobs-list').innerHTML = html;
+        
+        document.getElementById('stat-pending-count').innerText = countPending + " งาน";
+        document.getElementById('history-jobs-list').innerHTML = htmlMain;
+        
+        if(countPending > 0) {
+            document.getElementById('modal-pending-list').innerHTML = htmlModalPending;
+        } else {
+            document.getElementById('modal-pending-list').innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีงานรอดำเนินการ</td></tr>`;
+        }
     });
 
     // ================= ฟังก์ชันส่งข้อมูลเข้า Google Sheets =================
-    function syncToGoogleSheet() {
+    function syncToGoogleSheet(event) {
         if(!allBookings || Object.keys(allBookings).length === 0) { 
             alert("ไม่มีข้อมูลประวัติให้สำรองขึ้นคลาวด์ครับ"); 
             return; 
@@ -505,6 +639,8 @@
         }
         
         let btn = event.currentTarget;
+        let originalContent = btn.innerHTML; // เก็บข้อความเดิมไว้
+        
         btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูล...`;
         btn.classList.replace('bg-emerald-600', 'bg-slate-600');
         
@@ -518,12 +654,12 @@
             btn.innerHTML = `<i class="fas fa-check"></i> ส่งข้อมูลสำเร็จ`;
             btn.classList.replace('bg-slate-600', 'bg-green-600');
             setTimeout(() => {
-                btn.innerHTML = `<i class="fas fa-file-excel"></i> สำรองข้อมูลลง Google Sheet`;
+                btn.innerHTML = originalContent;
                 btn.classList.replace('bg-green-600', 'bg-emerald-600');
             }, 3000);
         }).catch(e => {
             alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Cloud");
-            btn.innerHTML = `<i class="fas fa-file-excel"></i> สำรองข้อมูลลง Google Sheet`;
+            btn.innerHTML = originalContent;
             btn.classList.replace('bg-slate-600', 'bg-emerald-600');
         });
     }
