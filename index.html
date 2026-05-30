@@ -37,6 +37,11 @@
         </div>
     </div>
     
+    <button onclick="openModal('modalPricing')" class="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 hover:text-blue-300 px-3 py-2 sm:px-4 rounded-xl transition active:scale-95 text-xs sm:text-sm font-bold">
+        <i class="fas fa-tags"></i>
+        <span class="hidden sm:inline">ราคา & โปรโมชั่น</span>
+    </button>
+
     <nav id="dropdown-menu" class="hidden absolute top-full left-0 w-full sm:w-72 bg-slate-900 border-b sm:border border-slate-800 shadow-2xl flex flex-col p-4 gap-2 transition-all origin-top">
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-3 bg-green-600 text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-chart-pie w-5 text-center"></i> แดชบอร์ด
@@ -47,9 +52,6 @@
         <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-history w-5 text-center"></i> ประวัติงาน
         </button>
-        <button onclick="switchTab('pricing')" id="tab-pricing" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
-            <i class="fas fa-tags w-5 text-center"></i> ราคา & โปรโมชั่น
-        </button>
         <button onclick="switchTab('blacklist')" id="tab-blacklist" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-ban w-5 text-center"></i> บล็อกเบอร์
         </button>
@@ -59,7 +61,7 @@
   <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto" onclick="closeMenuOnClickOutside()">
       
       <section id="content-dashboard" class="tab-content space-y-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div onclick="openModal('modalOnlineDrivers')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-green-500/50 transition transform hover:-translate-y-1">
                   <div class="flex justify-between items-start">
                       <div>
@@ -85,15 +87,6 @@
                           <h3 class="text-3xl font-black text-red-400" id="stat-block-count">0 เบอร์</h3>
                       </div>
                       <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
-                  </div>
-              </div>
-              <div onclick="switchTab('pricing')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-blue-500/50 transition transform hover:-translate-y-1">
-                  <div class="flex justify-between items-start">
-                      <div>
-                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">ราคา & โปรโมชั่น</p>
-                          <h3 class="text-xl font-black text-blue-400 mt-2" id="stat-pricing-brief">เริ่มต้น 0฿</h3>
-                      </div>
-                      <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-tags"></i></div>
                   </div>
               </div>
           </div>
@@ -184,47 +177,6 @@
           </div>
       </section>
 
-      <section id="content-pricing" class="tab-content hidden grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-sliders-h text-green-400 mr-1"></i> ปรับแต่งอัตราค่าบริการ</h2>
-              <div class="space-y-4">
-                  <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-1">ราคาเริ่มต้น (บาท)</label>
-                      <input type="number" id="cfg-base-fare" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold">
-                  </div>
-                  <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการกิโลเมตรละ (บาท)</label>
-                      <input type="number" id="cfg-km-rate" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold">
-                  </div>
-                  <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการวิ่งไปรับ (บาท/กม.)</label>
-                      <input type="number" id="cfg-pickup-rate" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold">
-                  </div>
-                  <button onclick="savePricingConfig()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition">
-                      <i class="fas fa-check-circle mr-1"></i> อัปเดตราคาระบบใหม่
-                  </button>
-              </div>
-          </div>
-
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-ticket-alt text-green-400 mr-1"></i> สร้างโค้ดส่วนลดโปรโมชั่น</h2>
-              <div class="grid grid-cols-2 gap-2 mb-4">
-                  <input type="text" id="promo-code" placeholder="โค้ดส่วนลด (เช่น F1NEW)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none uppercase font-bold text-center tracking-wider text-sm">
-                  <input type="number" id="promo-value" placeholder="ส่วนลด (บาท)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-sm">
-              </div>
-              <button onclick="addPromoCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl mb-4 transition">
-                  <i class="fas fa-plus mr-1"></i> เพิ่มโค้ดส่วนลดใหม่
-              </button>
-
-              <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">รายการโค้ดที่เปิดใช้งานอยู่</h4>
-              <div class="bg-gray-900/50 rounded-xl p-2 border border-slate-800">
-                  <ul id="promo-codes-list" class="divide-y divide-slate-800 text-sm">
-                      <li class="py-2 text-center text-slate-500">ไม่มีโค้ดโปรโมชั่นในขณะนี้</li>
-                  </ul>
-              </div>
-          </div>
-      </section>
-
       <section id="content-blacklist" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
               <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> บล็อกเบอร์ลูกค้า</h2>
@@ -257,6 +209,57 @@
       </section>
 
   </main>
+
+  <div id="modalPricing" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh]">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-blue-400"><i class="fas fa-tags mr-1"></i> ตั้งค่าราคา & โค้ดส่วนลด</h2>
+              <button onclick="closeModal('modalPricing')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto flex-1 space-y-6">
+              
+              <div class="bg-slate-800/30 border border-slate-700 p-4 rounded-xl">
+                  <h3 class="text-sm font-bold text-white mb-3"><i class="fas fa-sliders-h text-green-400 mr-1"></i> ปรับแต่งอัตราค่าบริการ</h3>
+                  <div class="space-y-3">
+                      <div>
+                          <label class="block text-xs font-bold text-slate-400 mb-1">ราคาเริ่มต้น (บาท)</label>
+                          <input type="number" id="cfg-base-fare" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold">
+                      </div>
+                      <div>
+                          <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการกิโลเมตรละ (บาท)</label>
+                          <input type="number" id="cfg-km-rate" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold">
+                      </div>
+                      <div>
+                          <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการวิ่งไปรับ (บาท/กม.)</label>
+                          <input type="number" id="cfg-pickup-rate" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold">
+                      </div>
+                      <button onclick="savePricingConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition mt-2">
+                          อัปเดตราคาเข้าระบบ
+                      </button>
+                  </div>
+              </div>
+
+              <div class="bg-slate-800/30 border border-slate-700 p-4 rounded-xl">
+                  <h3 class="text-sm font-bold text-white mb-3"><i class="fas fa-ticket-alt text-green-400 mr-1"></i> จัดการโค้ดส่วนลดโปรโมชั่น</h3>
+                  <div class="grid grid-cols-2 gap-2 mb-3">
+                      <input type="text" id="promo-code" placeholder="โค้ดส่วนลด (เช่น F1NEW)" class="p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center tracking-wider text-xs sm:text-sm">
+                      <input type="number" id="promo-value" placeholder="ส่วนลด (บาท)" class="p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-xs sm:text-sm">
+                  </div>
+                  <button onclick="addPromoCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-lg mb-4 transition text-sm">
+                      <i class="fas fa-plus mr-1"></i> เพิ่มโค้ด
+                  </button>
+
+                  <h4 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">รายการโค้ดที่เปิดใช้งานอยู่</h4>
+                  <div class="bg-slate-900 rounded-lg p-2 border border-slate-700">
+                      <ul id="promo-codes-list" class="divide-y divide-slate-800 text-sm">
+                          <li class="py-2 text-center text-slate-500">ไม่มีโค้ดโปรโมชั่นในขณะนี้</li>
+                      </ul>
+                  </div>
+              </div>
+              
+          </div>
+      </div>
+  </div>
 
   <div id="modalOnlineDrivers" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh]">
@@ -351,13 +354,12 @@
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
 
     let allBookings = null;
-    let allProfiles = {}; // เก็บความจำโปรไฟล์ไว้ชั่วคราว
+    let allProfiles = {}; 
 
     const tabTitles = {
         'dashboard': 'แดชบอร์ด',
         'drivers': 'จัดการคนขับรถ',
         'history': 'ประวัติงานทั้งหมด',
-        'pricing': 'ตั้งค่าราคา & โปรโมชั่น',
         'blacklist': 'ระบบบล็อกเบอร์โทร'
     };
 
@@ -442,7 +444,6 @@
         document.getElementById('all-drivers-table').innerHTML = html;
     });
 
-    // 🌟 ดึงข้อมูลเจาะลึกรายได้และจำนวนงานของคนขับ
     function showDriverDetails(pin) {
         let d = allProfiles[pin];
         if(!d) return;
@@ -543,7 +544,6 @@
         let driverName = "พนักงานประจำรถ";
         if(d.pin && allProfiles[d.pin]) driverName = allProfiles[d.pin].name;
         
-        // ข้อมูลลง Modal (คลิกที่ชื่อเพื่อเปิดดูรายได้ได้)
         let htmlModal = `<tr class="text-slate-200">
             <td class="py-3 font-bold text-white cursor-pointer hover:text-green-400 transition" onclick="showDriverDetails('${d.pin || '2304'}')">
                <u>${driverName}</u>
@@ -607,13 +607,14 @@
         document.getElementById('modal-blacklist-list').innerHTML = htmlModal;
     });
 
-    // ================= ระบบปรับราคา & โค้ดส่วนลด =================
+    // ================= ระบบปรับราคา & โค้ดส่วนลด (ใน Modal) =================
     function savePricingConfig() {
         let base = document.getElementById('cfg-base-fare').value;
         let km = document.getElementById('cfg-km-rate').value;
         let pick = document.getElementById('cfg-pickup-rate').value;
         db.ref('config/pricing').set({ base: base, km: km, pick: pick }).then(()=>{
             alert("อัปเดตราคาสำเร็จ!");
+            closeModal('modalPricing');
         });
     }
 
@@ -623,8 +624,6 @@
             document.getElementById('cfg-base-fare').value = p.base || 0;
             document.getElementById('cfg-km-rate').value = p.km || 0;
             document.getElementById('cfg-pickup-rate').value = p.pick || 0;
-            let stat = document.getElementById('stat-pricing-brief');
-            if(stat) stat.innerText = `เริ่มต้น ฿${p.base || 0}`;
         }
     });
 
