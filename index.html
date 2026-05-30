@@ -246,7 +246,12 @@
   </main>
 
   <script>
-    // 🌟 เชื่อมต่อฐานข้อมูล Firebase โปรเจกต์ตัวเดียวกับคนขับและผู้โดยสาร
+    // 🌟 1. ตั้งค่าลิงก์ Apps Script ของคุณที่นี่
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
+
+    // 🌟 2. ตัวแปรเก็บข้อมูลงานทั้งหมด (แก้บั๊ก ReferenceError)
+    let allBookings = null;
+
     firebase.initializeApp({
       apiKey: "AIzaSyBNtaYaX1OW-86_9EGiVN9EpgPzWOX_twQ",
       authDomain: "myride-chiangrai.firebaseapp.com",
@@ -258,7 +263,6 @@
     });
     const db = firebase.database();
 
-    // ฟังก์ชันสลับแท็บเมนูหน้าจอหลัก
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(el => {
@@ -270,7 +274,6 @@
         document.getElementById('tab-' + tabId).classList.replace('text-slate-400', 'text-white');
     }
 
-    // ================= ระบบจัดการคนขับ (Driver Management) =================
     function saveDriverProfile() {
         let pin = document.getElementById('drv-pin').value.trim();
         let name = document.getElementById('drv-name').value.trim();
@@ -285,7 +288,6 @@
             pin: pin, name: name, brand: brand, color: color, plate: plate, phone: phone
         }).then(() => {
             alert("บันทึกข้อมูลพนักงานเรียบร้อยแล้ว!");
-            // รีเซ็ตฟอร์มกรอก
             ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(id => document.getElementById(id).value = '');
         });
     }
@@ -311,7 +313,6 @@
         }
     }
 
-    // โหลดข้อมูลคนขับทั้งหมดมาแสดงที่ทำเนียบคนขับ
     db.ref('drivers_profile').on('value', snap => {
         let list = snap.val(); let html = '';
         if(!list) { document.getElementById('all-drivers-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีข้อมูลพนักงานขับรถ</td></tr>`; return; }
@@ -331,7 +332,6 @@
         document.getElementById('all-drivers-table').innerHTML = html;
     });
 
-    // ดึงสถานะคนขับออนไลน์ Real-time (ดึงพิกัดจาก Firebase Node `driver`)
     db.ref('driver').on('value', snap => {
         let d = snap.val(); let html = '';
         let statOnline = document.getElementById('stat-online-count');
@@ -342,7 +342,7 @@
         }
         statOnline.innerText = "1 คน";
         html = `<tr class="text-slate-200">
-            <td class="py-3 font-bold text-green-400">${d.pin || '2304'}</td>
+            <td class="py-3 font-bold text-green-400">${d.pin || '-'}</td>
             <td class="py-3 text-white font-bold">พนักงานประจำรถหลัก</td>
             <td class="py-3 text-xs text-slate-400">F1 Fast Car</td>
             <td class="py-3">${d.driverPhone || '0946379669'}</td>
@@ -351,7 +351,6 @@
         document.getElementById('live-drivers-list').innerHTML = html;
     });
 
-    // ================= ระบบจัดการแบล็กลิสต์ (Blacklist Management) =================
     function addNumberToBlacklist() {
         let phone = document.getElementById('block-phone').value.trim();
         let reason = document.getElementById('block-reason').value.trim();
@@ -394,7 +393,6 @@
         document.getElementById('blacklist-table-body').innerHTML = html;
     });
 
-    // ================= ระบบปรับราคา & โค้ดส่วนลด =================
     function addPromoCode() {
         let code = document.getElementById('promo-code').value.trim().toUpperCase();
         let value = document.getElementById('promo-value').value.trim();
@@ -425,9 +423,12 @@
         document.getElementById('promo-codes-list').innerHTML = html;
     });
 
-    // ================= ระบบประวัติงานวิ่ง (Job History Log) =================
+    // 🌟 ดึงข้อมูลงาน (และเก็บลงตัวแปร allBookings)
     db.ref('bookings').on('value', snap => {
-        let list = snap.val(); let html = ''; let count = 0;
+        allBookings = snap.val(); // เก็บลงกล่องความจำเพื่อให้ซิงค์ชีตทำงานได้
+        let list = allBookings; 
+        let html = ''; let count = 0;
+        
         if(!list) {
             document.getElementById('stat-pending-count').innerText = "0 งาน";
             document.getElementById('history-jobs-list').innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-500">ไม่มีประวัติงานบันทึกในระบบ</td></tr>`;
@@ -456,21 +457,40 @@
         document.getElementById('history-jobs-list').innerHTML = html;
     });
 
-    // 🌟 ระบบเชื่อมต่อ Google Sheets: ส่งออกสำรองข้อมูลประวัติขึ้น Google Excel ชีตอัตโนมัติ
+    // 🌟 ฟังก์ชันส่งข้อมูลเข้า Google Sheets
     function syncToGoogleSheet() {
-        if(!allBookings || Object.keys(allBookings).length === 0) { alert("ไม่มีข้อมูลประวัติให้สำรองขึ้นคลาวด์ครับ"); return; }
-        if(!APPS_SCRIPT_URL) { alert("กรุณาใส่ลิงก์ Google Apps Script URL ที่หัวสคริปต์ก่อนเปิดใช้งานระบบชีตครับ"); return; }
-        
-        if(confirm("ต้องการอัปโหลดสำรองข้อมูลงานวิ่งทั้งหมดเข้าไฟล์ Google Sheets ใช่หรือไม่?")) {
-            fetch(APPS_SCRIPT_URL + "?action=sync_sheets", {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(allBookings)
-            }).then(() => {
-                alert("🚀 ส่งข้อมูลไปที่คลาวด์ Google Sheet สำเร็จแล้วครับ!");
-            }).catch(e => alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Cloud"));
+        if(!allBookings || Object.keys(allBookings).length === 0) { 
+            alert("ไม่มีข้อมูลประวัติให้สำรองขึ้นคลาวด์ครับ"); 
+            return; 
         }
+        
+        if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "") { 
+            alert("กรุณาใส่ลิงก์ Google Apps Script URL ที่หัวสคริปต์ก่อนเปิดใช้งานระบบชีตครับ"); 
+            return; 
+        }
+        
+        let btn = event.currentTarget;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูล...`;
+        btn.classList.replace('bg-emerald-600', 'bg-slate-600');
+        
+        fetch(APPS_SCRIPT_URL + "?action=sync_sheets", {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(allBookings)
+        }).then(() => {
+            alert("🚀 ส่งข้อมูลไปที่คลาวด์ Google Sheet สำเร็จแล้วครับ!");
+            btn.innerHTML = `<i class="fas fa-check"></i> ส่งข้อมูลสำเร็จ`;
+            btn.classList.replace('bg-slate-600', 'bg-green-600');
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fas fa-file-excel"></i> สำรองข้อมูลลง Google Sheet`;
+                btn.classList.replace('bg-green-600', 'bg-emerald-600');
+            }, 3000);
+        }).catch(e => {
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Cloud");
+            btn.innerHTML = `<i class="fas fa-file-excel"></i> สำรองข้อมูลลง Google Sheet`;
+            btn.classList.replace('bg-slate-600', 'bg-emerald-600');
+        });
     }
   </script>
 </body>
