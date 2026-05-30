@@ -59,7 +59,7 @@
   <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto" onclick="closeMenuOnClickOutside()">
       
       <section id="content-dashboard" class="tab-content space-y-6">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div onclick="openModal('modalOnlineDrivers')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-green-500/50 transition transform hover:-translate-y-1">
                   <div class="flex justify-between items-start">
                       <div>
@@ -69,7 +69,6 @@
                       <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
                   </div>
               </div>
-
               <div onclick="openModal('modalPendingJobs')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-yellow-500/50 transition transform hover:-translate-y-1">
                   <div class="flex justify-between items-start">
                       <div>
@@ -79,35 +78,23 @@
                       <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
                   </div>
               </div>
-
               <div onclick="openModal('modalBlacklist')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-red-500/50 transition transform hover:-translate-y-1">
                   <div class="flex justify-between items-start">
                       <div>
-                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">เบอร์ที่ถูกบล็อกทั้งหมด</p>
+                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">เบอร์แบล็กลิสต์</p>
                           <h3 class="text-3xl font-black text-red-400" id="stat-block-count">0 เบอร์</h3>
                       </div>
                       <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
                   </div>
               </div>
-          </div>
-
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-md">
-              <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-radar text-green-400"></i> รายชื่อคนขับที่กำลังออนไลน์ (Real-time)</h2>
-              <div class="overflow-x-auto">
-                  <table class="w-full text-left border-collapse">
-                      <thead>
-                          <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold">
-                              <th class="pb-3">รหัส PIN</th>
-                              <th class="pb-3">ชื่อพนักงาน</th>
-                              <th class="pb-3">ยานพาหนะ</th>
-                              <th class="pb-3">เบอร์โทรศัพท์</th>
-                              <th class="pb-3">พิกัดล่าสุด</th>
-                          </tr>
-                      </thead>
-                      <tbody id="live-drivers-list" class="text-sm divide-y divide-slate-800">
-                          <tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีคนขับออนไลน์ในขณะนี้</td></tr>
-                      </tbody>
-                  </table>
+              <div onclick="switchTab('pricing')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-blue-500/50 transition transform hover:-translate-y-1">
+                  <div class="flex justify-between items-start">
+                      <div>
+                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">ราคา & โปรโมชั่น</p>
+                          <h3 class="text-xl font-black text-blue-400 mt-2" id="stat-pricing-brief">เริ่มต้น 0฿</h3>
+                      </div>
+                      <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-tags"></i></div>
+                  </div>
               </div>
           </div>
       </section>
@@ -162,7 +149,7 @@
                           </tr>
                       </thead>
                       <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800">
-                          </tbody>
+                      </tbody>
                   </table>
               </div>
           </div>
@@ -272,15 +259,18 @@
   </main>
 
   <div id="modalOnlineDrivers" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[80vh]">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh]">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-radar"></i> ข้อมูลคนขับออนไลน์ทั้งหมด</h2>
+              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-radar"></i> คนขับออนไลน์</h2>
               <button onclick="closeModal('modalOnlineDrivers')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-4 overflow-y-auto flex-1">
               <table class="w-full text-left border-collapse">
                   <thead>
-                      <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold"><th class="pb-3">PIN</th><th class="pb-3">เบอร์โทร</th><th class="pb-3">พิกัดล่าสุด</th></tr>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold">
+                          <th class="pb-3">ชื่อคนขับ</th>
+                          <th class="pb-3 text-right">เบอร์โทร</th>
+                      </tr>
                   </thead>
                   <tbody id="modal-online-list" class="text-sm divide-y divide-slate-800"></tbody>
               </table>
@@ -306,9 +296,9 @@
   </div>
 
   <div id="modalBlacklist" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[80vh]">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[80vh]">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-red-500"><i class="fas fa-ban"></i> ข้อมูลแบล็กลิสต์ทั้งหมด</h2>
+              <h2 class="text-lg font-bold text-red-500"><i class="fas fa-ban"></i> ข้อมูลแบล็กลิสต์</h2>
               <button onclick="closeModal('modalBlacklist')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-4 overflow-y-auto flex-1">
@@ -322,14 +312,47 @@
       </div>
   </div>
 
+  <div id="modalDriverDetails" class="hidden fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-start bg-slate-800/50 rounded-t-2xl relative overflow-hidden">
+              <div class="absolute right-0 top-0 opacity-10 text-6xl p-2"><i class="fas fa-id-badge"></i></div>
+              <div class="relative z-10">
+                  <h2 class="text-xl font-black text-white" id="det-name">ชื่อคนขับ</h2>
+                  <p class="text-xs font-bold text-green-400 mt-1" id="det-pin">รหัส: 0000</p>
+                  <p class="text-[11px] text-slate-400 mt-1" id="det-phone">เบอร์: -</p>
+                  <p class="text-[11px] text-slate-400" id="det-car">รถ: -</p>
+              </div>
+              <button onclick="closeModal('modalDriverDetails')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center relative z-10"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-5 space-y-4">
+              <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                  <p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานของวันนี้</p>
+                  <div class="flex justify-between items-end">
+                      <h3 class="text-2xl font-black text-green-400" id="det-today-earn">฿0</h3>
+                      <p class="text-sm font-bold text-slate-300" id="det-today-jobs">0 งาน</p>
+                  </div>
+              </div>
+              <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                  <p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานสัปดาห์นี้</p>
+                  <div class="flex justify-between items-end">
+                      <h3 class="text-xl font-black text-blue-400" id="det-week-earn">฿0</h3>
+                      <p class="text-sm font-bold text-slate-300" id="det-week-jobs">0 งาน</p>
+                  </div>
+              </div>
+              <div class="flex justify-between items-center border-t border-slate-800 pt-3">
+                  <p class="text-xs font-bold text-slate-500">รายได้รวมทั้งหมดในระบบ:</p>
+                  <p class="text-base font-black text-white" id="det-total-earn">฿0</p>
+              </div>
+          </div>
+      </div>
+  </div>
+
   <script>
-    // 🌟 1. ลิงก์ Apps Script
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
 
-    // 🌟 2. ตัวแปรเก็บข้อมูล
     let allBookings = null;
+    let allProfiles = {}; // เก็บความจำโปรไฟล์ไว้ชั่วคราว
 
-    // ตั้งชื่อภาษาไทยของแต่ละแท็บ
     const tabTitles = {
         'dashboard': 'แดชบอร์ด',
         'drivers': 'จัดการคนขับรถ',
@@ -379,13 +402,14 @@
         });
         
         document.getElementById('content-' + tabId).classList.remove('hidden');
-        document.getElementById('tab-' + tabId).classList.replace('bg-slate-800', 'bg-green-600');
-        document.getElementById('tab-' + tabId).classList.replace('text-slate-400', 'text-white');
+        let activeTab = document.getElementById('tab-' + tabId);
+        if(activeTab) {
+            activeTab.classList.replace('bg-slate-800', 'bg-green-600');
+            activeTab.classList.replace('text-slate-400', 'text-white');
+        }
         
-        // อัปเดตชื่อหน้าตรง Header
         document.getElementById('current-page-title').innerText = tabTitles[tabId];
         
-        // ซ่อนเมนู
         document.getElementById('dropdown-menu').classList.add('hidden');
         document.getElementById('menu-icon').classList.replace('fa-times', 'fa-bars');
     }
@@ -393,7 +417,80 @@
     function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
-    // ================= ระบบจัดการคนขับ (Driver Management) =================
+    // ================= โหลดโปรไฟล์คนขับ & โชว์ข้อมูลเจาะลึก =================
+    db.ref('drivers_profile').on('value', snap => {
+        allProfiles = snap.val() || {};
+        let list = allProfiles; 
+        let html = '';
+        if(Object.keys(list).length === 0) { 
+            document.getElementById('all-drivers-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีข้อมูลพนักงานขับรถ</td></tr>`; 
+            return; 
+        }
+        for (let key in list) {
+            let d = list[key];
+            html += `<tr class="border-b border-slate-800 text-slate-300">
+                <td class="py-3 font-bold text-green-400 tracking-wider">${d.pin}</td>
+                <td class="py-3 font-medium text-white cursor-pointer hover:text-green-400 transition" onclick="showDriverDetails('${d.pin}')"><u>${d.name}</u></td>
+                <td class="py-3 text-xs text-slate-400">${d.brand || '-'} ${d.color || ''}<br><span class="text-gray-300 font-bold">${d.plate || ''}</span></td>
+                <td class="py-3 text-sm">${d.phone}</td>
+                <td class="py-3 text-right">
+                    <button onclick="editDriver('${d.pin}')" class="bg-blue-600/20 text-blue-400 px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-500/20 mr-1"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteDriver('${d.pin}')" class="bg-red-600/20 text-red-400 px-2.5 py-1 rounded-lg text-xs font-bold border border-red-500/20"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+        }
+        document.getElementById('all-drivers-table').innerHTML = html;
+    });
+
+    // 🌟 ดึงข้อมูลเจาะลึกรายได้และจำนวนงานของคนขับ
+    function showDriverDetails(pin) {
+        let d = allProfiles[pin];
+        if(!d) return;
+
+        document.getElementById('det-name').innerText = d.name;
+        document.getElementById('det-pin').innerText = "รหัสคนขับ: " + d.pin;
+        document.getElementById('det-phone').innerText = "เบอร์โทร: " + d.phone;
+        document.getElementById('det-car').innerText = "รถ: " + (d.brand||'-') + " " + (d.color||'') + " (" + (d.plate||'-') + ")";
+
+        let todayEarn = 0, todayJobs = 0;
+        let weekEarn = 0, weekJobs = 0;
+        let totalEarn = 0, totalJobs = 0;
+
+        let now = new Date();
+        let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        let startOfWeek = startOfDay - (now.getDay() * 86400000); 
+
+        if(allBookings) {
+            for(let k in allBookings) {
+                let j = allBookings[k];
+                if(j.driverPin === pin && (j.status.includes("ถึงที่หมาย") || j.status.includes("เสร็จสิ้น"))) {
+                    let price = parseInt(j.price) || 0;
+                    let time = j.timestamp || 0;
+
+                    totalEarn += price;
+                    totalJobs++;
+
+                    if(time >= startOfDay) {
+                        todayEarn += price;
+                        todayJobs++;
+                    }
+                    if(time >= startOfWeek) {
+                        weekEarn += price;
+                        weekJobs++;
+                    }
+                }
+            }
+        }
+
+        document.getElementById('det-today-earn').innerText = "฿" + todayEarn;
+        document.getElementById('det-today-jobs').innerText = todayJobs + " งาน";
+        document.getElementById('det-week-earn').innerText = "฿" + weekEarn;
+        document.getElementById('det-week-jobs').innerText = weekJobs + " งาน";
+        document.getElementById('det-total-earn').innerText = "฿" + totalEarn.toLocaleString();
+
+        openModal('modalDriverDetails');
+    }
+
     function saveDriverProfile() {
         let pin = document.getElementById('drv-pin').value.trim();
         let name = document.getElementById('drv-name').value.trim();
@@ -413,17 +510,15 @@
     }
 
     function editDriver(pin) {
-        db.ref('drivers_profile/' + pin).once('value', snap => {
-            let d = snap.val();
-            if(d) {
-                document.getElementById('drv-pin').value = d.pin;
-                document.getElementById('drv-name').value = d.name;
-                document.getElementById('drv-brand').value = d.brand || '';
-                document.getElementById('drv-color').value = d.color || '';
-                document.getElementById('drv-plate').value = d.plate || '';
-                document.getElementById('drv-phone').value = d.phone;
-            }
-        });
+        let d = allProfiles[pin];
+        if(d) {
+            document.getElementById('drv-pin').value = d.pin;
+            document.getElementById('drv-name').value = d.name;
+            document.getElementById('drv-brand').value = d.brand || '';
+            document.getElementById('drv-color').value = d.color || '';
+            document.getElementById('drv-plate').value = d.plate || '';
+            document.getElementById('drv-phone').value = d.phone;
+        }
     }
 
     function deleteDriver(pin) {
@@ -433,59 +528,33 @@
         }
     }
 
-    db.ref('drivers_profile').on('value', snap => {
-        let list = snap.val(); let html = '';
-        if(!list) { document.getElementById('all-drivers-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีข้อมูลพนักงานขับรถ</td></tr>`; return; }
-        for (let key in list) {
-            let d = list[key];
-            html += `<tr class="border-b border-slate-800 text-slate-300">
-                <td class="py-3 font-bold text-green-400 tracking-wider">${d.pin}</td>
-                <td class="py-3 font-medium text-white">${d.name}</td>
-                <td class="py-3 text-xs text-slate-400">${d.brand || '-'} ${d.color || ''}<br><span class="text-gray-300 font-bold">${d.plate || ''}</span></td>
-                <td class="py-3 text-sm">${d.phone}</td>
-                <td class="py-3 text-right">
-                    <button onclick="editDriver('${d.pin}')" class="bg-blue-600/20 text-blue-400 px-2.5 py-1 rounded-lg text-xs font-bold border border-blue-500/20 mr-1"><i class="fas fa-edit"></i></button>
-                    <button onclick="deleteDriver('${d.pin}')" class="bg-red-600/20 text-red-400 px-2.5 py-1 rounded-lg text-xs font-bold border border-red-500/20"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>`;
-        }
-        document.getElementById('all-drivers-table').innerHTML = html;
-    });
-
+    // ================= อัปเดตตารางคนขับออนไลน์ =================
     db.ref('driver').on('value', snap => {
-        let d = snap.val(); let htmlMain = ''; let htmlModal = '';
+        let d = snap.val(); 
         let statOnline = document.getElementById('stat-online-count');
         
         if(!d || d.status !== "ออนไลน์") {
             statOnline.innerText = "0 คน";
-            document.getElementById('live-drivers-list').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีคนขับออนไลน์ในขณะนี้</td></tr>`;
-            document.getElementById('modal-online-list').innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500">ออฟไลน์ทั้งหมด</td></tr>`;
+            document.getElementById('modal-online-list').innerHTML = `<tr><td colspan="2" class="py-4 text-center text-slate-500">ไม่มีคนขับออนไลน์</td></tr>`;
             return;
         }
         
         statOnline.innerText = "1 คน";
+        let driverName = "พนักงานประจำรถ";
+        if(d.pin && allProfiles[d.pin]) driverName = allProfiles[d.pin].name;
         
-        // ข้อมูลลงตารางหลัก
-        htmlMain = `<tr class="text-slate-200">
-            <td class="py-3 font-bold text-green-400">${d.pin || '-'}</td>
-            <td class="py-3 text-white font-bold">พนักงานประจำรถ</td>
-            <td class="py-3 text-xs text-slate-400">รถรับจ้างส่วนบุคคล</td>
-            <td class="py-3">${d.driverPhone || '0946379669'}</td>
-            <td class="py-3 text-xs font-mono text-green-400">${d.lat.toFixed(5)}, ${d.lng.toFixed(5)}</td>
-        </tr>`;
-        
-        // ข้อมูลลง Modal
-        htmlModal = `<tr class="text-slate-200">
-            <td class="py-3 font-bold text-green-400">${d.pin || '-'}</td>
-            <td class="py-3">${d.driverPhone || '0946379669'}</td>
-            <td class="py-3 text-xs font-mono text-slate-400">${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}</td>
+        // ข้อมูลลง Modal (คลิกที่ชื่อเพื่อเปิดดูรายได้ได้)
+        let htmlModal = `<tr class="text-slate-200">
+            <td class="py-3 font-bold text-white cursor-pointer hover:text-green-400 transition" onclick="showDriverDetails('${d.pin || '2304'}')">
+               <u>${driverName}</u>
+            </td>
+            <td class="py-3 text-right text-slate-400">${d.driverPhone || '-'}</td>
         </tr>`;
 
-        document.getElementById('live-drivers-list').innerHTML = htmlMain;
         document.getElementById('modal-online-list').innerHTML = htmlModal;
     });
 
-    // ================= ระบบจัดการแบล็กลิสต์ (Blacklist Management) =================
+    // ================= ระบบจัดการแบล็กลิสต์ =================
     function addNumberToBlacklist() {
         let phone = document.getElementById('block-phone').value.trim();
         let reason = document.getElementById('block-reason').value.trim();
@@ -518,8 +587,6 @@
         
         for (let key in list) {
             count++; let b = list[key];
-            
-            // ข้อมูลตารางหลัก
             htmlMain += `<tr class="border-b border-slate-800 text-slate-300">
                 <td class="py-3 font-bold text-red-400">${b.phone}</td>
                 <td class="py-3 text-xs text-slate-400">${b.reason}</td>
@@ -528,8 +595,6 @@
                     <button onclick="removeFormBlacklist('${b.phone}')" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl text-xs font-bold border border-green-500/20 hover:bg-green-600/40 transition">ปลดแบน</button>
                 </td>
             </tr>`;
-            
-            // ข้อมูลลง Modal
             htmlModal += `<tr class="border-b border-slate-800 text-slate-300">
                 <td class="py-3 font-bold text-red-400">${b.phone}</td>
                 <td class="py-3 text-xs text-slate-400">${b.reason}</td>
@@ -543,6 +608,26 @@
     });
 
     // ================= ระบบปรับราคา & โค้ดส่วนลด =================
+    function savePricingConfig() {
+        let base = document.getElementById('cfg-base-fare').value;
+        let km = document.getElementById('cfg-km-rate').value;
+        let pick = document.getElementById('cfg-pickup-rate').value;
+        db.ref('config/pricing').set({ base: base, km: km, pick: pick }).then(()=>{
+            alert("อัปเดตราคาสำเร็จ!");
+        });
+    }
+
+    db.ref('config/pricing').on('value', snap => {
+        let p = snap.val();
+        if(p) {
+            document.getElementById('cfg-base-fare').value = p.base || 0;
+            document.getElementById('cfg-km-rate').value = p.km || 0;
+            document.getElementById('cfg-pickup-rate').value = p.pick || 0;
+            let stat = document.getElementById('stat-pricing-brief');
+            if(stat) stat.innerText = `เริ่มต้น ฿${p.base || 0}`;
+        }
+    });
+
     function addPromoCode() {
         let code = document.getElementById('promo-code').value.trim().toUpperCase();
         let value = document.getElementById('promo-value').value.trim();
@@ -573,7 +658,7 @@
         document.getElementById('promo-codes-list').innerHTML = html;
     });
 
-    // ================= ระบบประวัติงานวิ่ง (Job History Log) =================
+    // ================= ระบบประวัติงานวิ่ง =================
     db.ref('bookings').on('value', snap => {
         allBookings = snap.val(); 
         let list = allBookings; 
@@ -589,12 +674,10 @@
         for (let key in list) {
             let j = list[key];
             
-            // แยกสีสถานะ
             let statusColor = "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
             if (j.status.includes("เสร็จสิ้น") || j.status.includes("เรียบร้อย")) statusColor = "text-green-400 bg-green-500/10 border-green-500/20";
             if (j.status.includes("ยกเลิก")) statusColor = "text-red-400 bg-red-500/10 border-red-500/20";
 
-            // ข้อมูลใส่ตารางหลัก (ทุกสถานะ)
             htmlMain += `<tr class="border-b border-slate-800 text-slate-300">
                 <td class="py-3 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-xs text-slate-500 font-medium">${j.phone || '-'}</span></td>
                 <td class="py-3 text-xs max-w-[180px] truncate font-medium text-slate-400">${j.pName}</td>
@@ -605,7 +688,6 @@
                 <td class="py-3 text-right"><span class="px-2 py-1 rounded-lg border text-xs font-bold ${statusColor}">${j.status}</span></td>
             </tr>`;
 
-            // ดึงเฉพาะงานที่กำลัง "รอผู้ขับขี่ตอบรับ" หรือกำลังวิ่งไปลง Modal
             if(j.status === "รอผู้ขับขี่ตอบรับ" || j.status.includes("กำลังเดินทาง") || j.status.includes("รับงานแล้ว")) {
                 countPending++;
                 htmlModalPending += `<tr class="border-b border-slate-800 text-slate-300">
@@ -626,20 +708,13 @@
         }
     });
 
-    // ================= ฟังก์ชันส่งข้อมูลเข้า Google Sheets =================
+    // ================= สำรองข้อมูลลงชีต =================
     function syncToGoogleSheet(event) {
-        if(!allBookings || Object.keys(allBookings).length === 0) { 
-            alert("ไม่มีข้อมูลประวัติให้สำรองขึ้นคลาวด์ครับ"); 
-            return; 
-        }
-        
-        if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "") { 
-            alert("กรุณาใส่ลิงก์ Google Apps Script URL ที่หัวสคริปต์ก่อนเปิดใช้งานระบบชีตครับ"); 
-            return; 
-        }
+        if(!allBookings || Object.keys(allBookings).length === 0) { alert("ไม่มีข้อมูลประวัติให้สำรองขึ้นคลาวด์ครับ"); return; }
+        if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "") { alert("กรุณาใส่ลิงก์ Google Apps Script URL ที่หัวสคริปต์ก่อนเปิดใช้งานระบบชีตครับ"); return; }
         
         let btn = event.currentTarget;
-        let originalContent = btn.innerHTML; // เก็บข้อความเดิมไว้
+        let originalContent = btn.innerHTML; 
         
         btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูล...`;
         btn.classList.replace('bg-emerald-600', 'bg-slate-600');
