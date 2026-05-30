@@ -39,7 +39,7 @@
     
     <button onclick="openModal('modalPricing')" class="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 hover:text-blue-300 px-3 py-2 sm:px-4 rounded-xl transition active:scale-95 text-xs sm:text-sm font-bold">
         <i class="fas fa-tags"></i>
-        <span class="hidden sm:inline">ราคา & โปรโมชั่น</span>
+        <span id="header-pricing-display">ราคาเริ่มต้น --฿</span>
     </button>
 
     <nav id="dropdown-menu" class="hidden absolute top-full left-0 w-full sm:w-72 bg-slate-900 border-b sm:border border-slate-800 shadow-2xl flex flex-col p-4 gap-2 transition-all origin-top">
@@ -211,52 +211,74 @@
   </main>
 
   <div id="modalPricing" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh]">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
               <h2 class="text-lg font-bold text-blue-400"><i class="fas fa-tags mr-1"></i> ตั้งค่าราคา & โค้ดส่วนลด</h2>
               <button onclick="closeModal('modalPricing')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
-          <div class="p-4 overflow-y-auto flex-1 space-y-6">
+          <div class="p-4 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              <div class="bg-slate-800/30 border border-slate-700 p-4 rounded-xl">
-                  <h3 class="text-sm font-bold text-white mb-3"><i class="fas fa-sliders-h text-green-400 mr-1"></i> ปรับแต่งอัตราค่าบริการ</h3>
-                  <div class="space-y-3">
+              <div class="bg-slate-800/30 border border-slate-700 p-5 rounded-2xl h-fit">
+                  <h3 class="text-sm font-bold text-white mb-4"><i class="fas fa-sliders-h text-green-400 mr-1"></i> 1. ปรับแต่งอัตราค่าบริการ</h3>
+                  <div class="space-y-4">
                       <div>
                           <label class="block text-xs font-bold text-slate-400 mb-1">ราคาเริ่มต้น (บาท)</label>
-                          <input type="number" id="cfg-base-fare" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold">
+                          <input type="number" id="cfg-base-fare" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 font-bold">
                       </div>
                       <div>
                           <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการกิโลเมตรละ (บาท)</label>
-                          <input type="number" id="cfg-km-rate" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold">
+                          <input type="number" id="cfg-km-rate" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 font-bold">
                       </div>
                       <div>
                           <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการวิ่งไปรับ (บาท/กม.)</label>
-                          <input type="number" id="cfg-pickup-rate" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold">
+                          <input type="number" id="cfg-pickup-rate" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 font-bold">
                       </div>
-                      <button onclick="savePricingConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition mt-2">
+                      <button onclick="savePricingConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2">
                           อัปเดตราคาเข้าระบบ
                       </button>
                   </div>
               </div>
 
-              <div class="bg-slate-800/30 border border-slate-700 p-4 rounded-xl">
-                  <h3 class="text-sm font-bold text-white mb-3"><i class="fas fa-ticket-alt text-green-400 mr-1"></i> จัดการโค้ดส่วนลดโปรโมชั่น</h3>
+              <div class="bg-slate-800/30 border border-slate-700 p-5 rounded-2xl flex flex-col h-full">
+                  <h3 class="text-sm font-bold text-white mb-4"><i class="fas fa-ticket-alt text-green-400 mr-1"></i> 2. สร้างและจัดการโค้ดส่วนลด</h3>
                   <div class="grid grid-cols-2 gap-2 mb-3">
-                      <input type="text" id="promo-code" placeholder="โค้ดส่วนลด (เช่น F1NEW)" class="p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center tracking-wider text-xs sm:text-sm">
-                      <input type="number" id="promo-value" placeholder="ส่วนลด (บาท)" class="p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-xs sm:text-sm">
+                      <input type="text" id="promo-code" placeholder="ใส่โค้ด (เช่น SALE50)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none uppercase font-bold text-center tracking-wider text-xs sm:text-sm">
+                      <input type="number" id="promo-value" placeholder="ส่วนลด (บาท)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-xs sm:text-sm text-center">
                   </div>
-                  <button onclick="addPromoCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-lg mb-4 transition text-sm">
-                      <i class="fas fa-plus mr-1"></i> เพิ่มโค้ด
+                  <button onclick="addPromoCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl mb-4 transition text-sm">
+                      <i class="fas fa-plus mr-1"></i> สร้างโค้ดส่วนลดใหม่
                   </button>
 
                   <h4 class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">รายการโค้ดที่เปิดใช้งานอยู่</h4>
-                  <div class="bg-slate-900 rounded-lg p-2 border border-slate-700">
+                  <div class="bg-slate-900 rounded-xl p-2 border border-slate-700 flex-1 overflow-y-auto">
                       <ul id="promo-codes-list" class="divide-y divide-slate-800 text-sm">
                           <li class="py-2 text-center text-slate-500">ไม่มีโค้ดโปรโมชั่นในขณะนี้</li>
                       </ul>
                   </div>
               </div>
               
+          </div>
+      </div>
+  </div>
+
+  <div id="modalPromoHistory" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[80vh]">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-yellow-400"><i class="fas fa-list-alt mr-1"></i> <span id="history-promo-title">ประวัติการใช้โค้ด</span></h2>
+              <button onclick="closeModal('modalPromoHistory')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto flex-1">
+              <table class="w-full text-left border-collapse">
+                  <thead>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold">
+                          <th class="pb-3">วันที่ใช้</th>
+                          <th class="pb-3">ลูกค้า / เบอร์โทร</th>
+                          <th class="pb-3 text-right">ส่วนลดที่ได้</th>
+                      </tr>
+                  </thead>
+                  <tbody id="modal-promo-history-list" class="text-sm divide-y divide-slate-800">
+                      </tbody>
+              </table>
           </div>
       </div>
   </div>
@@ -374,7 +396,6 @@
     });
     const db = firebase.database();
 
-    // ================= ระบบ UI ทั่วไป =================
     function toggleMenu() {
         const menu = document.getElementById('dropdown-menu');
         const icon = document.getElementById('menu-icon');
@@ -418,6 +439,96 @@
 
     function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
+
+    // ================= ระบบจัดการราคาที่ Header =================
+    db.ref('config/pricing').on('value', snap => {
+        let p = snap.val();
+        if(p) {
+            document.getElementById('cfg-base-fare').value = p.base || 0;
+            document.getElementById('cfg-km-rate').value = p.km || 0;
+            document.getElementById('cfg-pickup-rate').value = p.pick || 0;
+            
+            // อัปเดตราคาบนปุ่ม Header ให้โชว์ค้างไว้
+            document.getElementById('header-pricing-display').innerText = `เริ่มต้น ฿${p.base || 0}`;
+        }
+    });
+
+    function savePricingConfig() {
+        let base = document.getElementById('cfg-base-fare').value;
+        let km = document.getElementById('cfg-km-rate').value;
+        let pick = document.getElementById('cfg-pickup-rate').value;
+        db.ref('config/pricing').set({ base: base, km: km, pick: pick }).then(()=>{
+            alert("อัปเดตราคาสำเร็จ!");
+        });
+    }
+
+    function addPromoCode() {
+        let code = document.getElementById('promo-code').value.trim().toUpperCase();
+        let value = document.getElementById('promo-value').value.trim();
+        if(!code || !value) { alert("กรุณากรอกโค้ดและจำนวนเงินส่วนลดให้ครบถ้วน"); return; }
+        
+        db.ref('promotions/' + code).set({ 
+            code: code, 
+            value: parseInt(value),
+            usageCount: 0 
+        }).then(() => {
+            alert("เพิ่มโค้ดส่วนลดโปรโมชั่นสำเร็จ!");
+            document.getElementById('promo-code').value = '';
+            document.getElementById('promo-value').value = '';
+        });
+    }
+
+    function removePromoCode(code) {
+        if(confirm("ต้องการยกเลิกโค้ดโปรโมชั่น " + code + "?")) { db.ref('promotions/' + code).remove(); }
+    }
+
+    // 🌟 ระบบดึงและจัดการโค้ดโปรโมชั่นแบบใหม่ (มีปุ่มดูประวัติและยอดใช้)
+    db.ref('promotions').on('value', snap => {
+        let list = snap.val(); let html = '';
+        if(!list) { document.getElementById('promo-codes-list').innerHTML = `<li class="py-4 text-center text-slate-500">ไม่มีโค้ดโปรโมชั่นในขณะนี้</li>`; return; }
+        for (let key in list) {
+            let p = list[key];
+            let count = p.usageCount || 0;
+            html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-2">
+                <div>
+                    <span class="font-mono bg-green-950 text-green-400 font-bold px-2 py-0.5 rounded border border-green-500/20 tracking-wider">${p.code}</span>
+                    <p class="text-[10px] text-slate-400 mt-1.5">ใช้งานแล้ว: <span class="text-white font-bold">${count}</span> ครั้ง</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-medium text-blue-400 bg-blue-900/20 px-2 py-1 rounded">ลด ฿${p.value}</span>
+                    <button onclick="viewPromoHistory('${p.code}')" class="text-slate-400 hover:text-white bg-slate-800 px-2.5 py-1 rounded-lg text-xs transition border border-slate-700"><i class="fas fa-list"></i></button>
+                    <button onclick="removePromoCode('${p.code}')" class="text-red-400 hover:text-white bg-red-900/30 hover:bg-red-600 px-2.5 py-1 rounded-lg text-xs transition border border-red-900/50"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </li>`;
+        }
+        document.getElementById('promo-codes-list').innerHTML = html;
+    });
+
+    // 🌟 ฟังก์ชันเปิดหน้าต่างดูประวัติคนใช้โค้ดส่วนลด
+    function viewPromoHistory(code) {
+        document.getElementById('history-promo-title').innerText = `ประวัติการใช้โค้ด: ${code}`;
+        openModal('modalPromoHistory');
+        
+        db.ref('promotions/' + code + '/history').on('value', snap => {
+            let hist = snap.val();
+            let html = '';
+            if(!hist) {
+                html = `<tr><td colspan="3" class="py-8 text-center text-slate-500">ยังไม่มีลูกค้าใช้งานโค้ดส่วนลดนี้</td></tr>`;
+            } else {
+                // ย้อนกลับลำดับให้คนล่าสุดอยู่บนสุด
+                let keys = Object.keys(hist).reverse();
+                for(let i=0; i<keys.length; i++) {
+                    let h = hist[keys[i]];
+                    html += `<tr class="border-b border-slate-800 text-slate-300">
+                        <td class="py-3 text-xs text-slate-400">${h.date || '-'}</td>
+                        <td class="py-3 font-bold text-white">${h.userName || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-normal">${h.phone || '-'}</span></td>
+                        <td class="py-3 text-right text-xs font-bold text-green-400">ประหยัด ฿${h.discount || 0}</td>
+                    </tr>`;
+                }
+            }
+            document.getElementById('modal-promo-history-list').innerHTML = html;
+        });
+    }
 
     // ================= โหลดโปรไฟล์คนขับ & โชว์ข้อมูลเจาะลึก =================
     db.ref('drivers_profile').on('value', snap => {
@@ -492,44 +603,6 @@
         openModal('modalDriverDetails');
     }
 
-    function saveDriverProfile() {
-        let pin = document.getElementById('drv-pin').value.trim();
-        let name = document.getElementById('drv-name').value.trim();
-        let brand = document.getElementById('drv-brand').value.trim();
-        let color = document.getElementById('drv-color').value.trim();
-        let plate = document.getElementById('drv-plate').value.trim();
-        let phone = document.getElementById('drv-phone').value.trim();
-
-        if (pin.length !== 4 || !name || !phone) { alert("กรุณากรอกข้อมูลสำคัญ (PIN, ชื่อ, เบอร์โทร) ให้ครบถ้วน"); return; }
-
-        db.ref('drivers_profile/' + pin).set({
-            pin: pin, name: name, brand: brand, color: color, plate: plate, phone: phone
-        }).then(() => {
-            alert("บันทึกข้อมูลพนักงานเรียบร้อยแล้ว!");
-            ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(id => document.getElementById(id).value = '');
-        });
-    }
-
-    function editDriver(pin) {
-        let d = allProfiles[pin];
-        if(d) {
-            document.getElementById('drv-pin').value = d.pin;
-            document.getElementById('drv-name').value = d.name;
-            document.getElementById('drv-brand').value = d.brand || '';
-            document.getElementById('drv-color').value = d.color || '';
-            document.getElementById('drv-plate').value = d.plate || '';
-            document.getElementById('drv-phone').value = d.phone;
-        }
-    }
-
-    function deleteDriver(pin) {
-        if(confirm("ยืนยันลบพนักงานรหัส " + pin + " ออกจากระบบถาวร?")) {
-            db.ref('drivers_profile/' + pin).remove();
-            db.ref('driver_sessions/' + pin).remove();
-        }
-    }
-
-    // ================= อัปเดตตารางคนขับออนไลน์ =================
     db.ref('driver').on('value', snap => {
         let d = snap.val(); 
         let statOnline = document.getElementById('stat-online-count');
@@ -605,56 +678,6 @@
         document.getElementById('stat-block-count').innerText = count + " เบอร์";
         document.getElementById('blacklist-table-body').innerHTML = htmlMain;
         document.getElementById('modal-blacklist-list').innerHTML = htmlModal;
-    });
-
-    // ================= ระบบปรับราคา & โค้ดส่วนลด (ใน Modal) =================
-    function savePricingConfig() {
-        let base = document.getElementById('cfg-base-fare').value;
-        let km = document.getElementById('cfg-km-rate').value;
-        let pick = document.getElementById('cfg-pickup-rate').value;
-        db.ref('config/pricing').set({ base: base, km: km, pick: pick }).then(()=>{
-            alert("อัปเดตราคาสำเร็จ!");
-            closeModal('modalPricing');
-        });
-    }
-
-    db.ref('config/pricing').on('value', snap => {
-        let p = snap.val();
-        if(p) {
-            document.getElementById('cfg-base-fare').value = p.base || 0;
-            document.getElementById('cfg-km-rate').value = p.km || 0;
-            document.getElementById('cfg-pickup-rate').value = p.pick || 0;
-        }
-    });
-
-    function addPromoCode() {
-        let code = document.getElementById('promo-code').value.trim().toUpperCase();
-        let value = document.getElementById('promo-value').value.trim();
-        if(!code || !value) { alert("กรุณากรอกโค้ดและจำนวนเงินส่วนลดให้ครบถ้วน"); return; }
-        
-        db.ref('promotions/' + code).set({ code: code, value: parseInt(value) }).then(() => {
-            alert("เพิ่มโค้ดส่วนลดโปรโมชั่นสำเร็จ!");
-            document.getElementById('promo-code').value = '';
-            document.getElementById('promo-value').value = '';
-        });
-    }
-
-    function removePromoCode(code) {
-        if(confirm("ต้องการยกเลิกโค้ดโปรโมชั่น " + code + "?")) { db.ref('promotions/' + code).remove(); }
-    }
-
-    db.ref('promotions').on('value', snap => {
-        let list = snap.val(); let html = '';
-        if(!list) { document.getElementById('promo-codes-list').innerHTML = `<li class="py-2 text-center text-slate-500">ไม่มีโค้ดโปรโมชั่นในขณะนี้</li>`; return; }
-        for (let key in list) {
-            let p = list[key];
-            html += `<li class="py-2.5 flex justify-between items-center text-slate-200">
-                <span class="font-mono bg-green-950 text-green-400 font-bold px-2 py-0.5 rounded border border-green-500/20 tracking-wider">${p.code}</span>
-                <span class="text-sm font-medium">ส่วนลด ฿${p.value}</span>
-                <button onclick="removePromoCode('${p.code}')" class="text-red-400 hover:text-red-500 text-xs"><i class="fas fa-trash-alt"></i></button>
-            </li>`;
-        }
-        document.getElementById('promo-codes-list').innerHTML = html;
     });
 
     // ================= ระบบประวัติงานวิ่ง =================
