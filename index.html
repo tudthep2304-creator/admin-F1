@@ -7,8 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap');
@@ -193,17 +191,13 @@
                     <span id="adminBannerPlaceholder"><i class="fas fa-image text-2xl mb-1"></i><br>ไม่มีรูปแบนเนอร์</span>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-2">อัปโหลดรูปภาพแบนเนอร์ใหม่</label>
-                    <input type="file" id="cms-banner-file" accept="image/*" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">ลิงก์รูปภาพ (Image URL)</label>
+                    <input type="text" id="cms-banner-url" placeholder="https://example.com/banner.jpg" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    <p class="text-[10px] text-slate-500 mt-1">* หากลบลิงก์ออก แบนเนอร์จะหายไปจากหน้าแรก</p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="uploadBannerImage()" id="btn-upload-banner" class="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">
-                        <i class="fas fa-upload mr-1"></i> อัปโหลดแบนเนอร์
-                    </button>
-                    <button onclick="removeBanner()" class="flex-1 bg-red-900/30 hover:bg-red-600 text-red-400 hover:text-white border border-red-900/50 font-bold py-3 rounded-xl transition">
-                        <i class="fas fa-trash-alt"></i> ลบ
-                    </button>
-                </div>
+                <button onclick="saveBannerConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">
+                    <i class="fas fa-save mr-1"></i> อัปเดตรูปแบนเนอร์
+                </button>
             </div>
         </div>
 
@@ -478,9 +472,7 @@
       messagingSenderId: "1048189690454",
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
-    
     const db = firebase.database();
-    const storage = firebase.storage(); // เปิดใช้งาน Storage API
 
     // ================= โหลด History ไว้คำนวณเงิน =================
     db.ref('completed_jobs').on('value', snap => {
@@ -548,69 +540,29 @@
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
     // ================= ระบบจัดการ CMS (Banner & News) =================
-    
-    // ดึงรูปแบนเนอร์มาโชว์ตอนโหลด
     db.ref('config/banners').on('value', snap => {
         let b = snap.val();
+        let input = document.getElementById('cms-banner-url');
         let img = document.getElementById('adminBannerImg');
         let placeholder = document.getElementById('adminBannerPlaceholder');
         
         if(b && b.imageUrl) {
+            input.value = b.imageUrl;
             img.src = b.imageUrl;
             img.classList.remove('hidden');
             placeholder.classList.add('hidden');
         } else {
+            input.value = '';
             img.classList.add('hidden');
             placeholder.classList.remove('hidden');
         }
     });
 
-    // 🌟 ฟังก์ชันอัปโหลดแบนเนอร์
-    function uploadBannerImage() {
-        const fileInput = document.getElementById('cms-banner-file');
-        const file = fileInput.files[0];
-        const btn = document.getElementById('btn-upload-banner');
-
-        if (!file) {
-            alert('กรุณาเลือกไฟล์รูปภาพก่อนกดอัปโหลดครับ');
-            return;
-        }
-
-        // แสดงสถานะ Loading
-        let originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลด...';
-        btn.disabled = true;
-
-        // สร้างชื่อไฟล์ไม่ซ้ำด้วย timestamp
-        const storageRef = storage.ref('banners/home_banner_' + Date.now() + '_' + file.name);
-
-        // ทำการอัปโหลดไฟล์ไปที่ Storage
-        storageRef.put(file).then((snapshot) => {
-            // ดึง URL กลับมา
-            return snapshot.ref.getDownloadURL();
-        }).then((downloadURL) => {
-            // บันทึก URL ที่ได้ลง Database 
-            return db.ref('config/banners').set({ imageUrl: downloadURL });
-        }).then(() => {
-            alert('อัปโหลดแบนเนอร์เข้าสู่หน้าแรกของผู้โดยสารเรียบร้อยแล้ว!');
-            fileInput.value = ''; // เคลียร์ช่องเลือกไฟล์
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }).catch((error) => {
-            alert('เกิดข้อผิดพลาดในการอัปโหลด: ' + error.message + '\n*โปรดตรวจสอบ Rule ใน Firebase Storage ว่าเปิดให้ Write แล้วหรือไม่');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+    function saveBannerConfig() {
+        let url = document.getElementById('cms-banner-url').value.trim();
+        db.ref('config/banners').set({ imageUrl: url }).then(()=>{
+            alert(url ? "อัปเดตรูปแบนเนอร์สำเร็จ" : "ลบแบนเนอร์ออกจากหน้าแรกสำเร็จ");
         });
-    }
-
-    // 🌟 ฟังก์ชันลบแบนเนอร์
-    function removeBanner() {
-        if(confirm("ต้องการลบแบนเนอร์ออกจากหน้าแอปผู้โดยสารใช่หรือไม่?")) {
-            db.ref('config/banners').remove().then(() => {
-                alert("ลบแบนเนอร์เรียบร้อยแล้ว");
-                document.getElementById('cms-banner-file').value = '';
-            });
-        }
     }
 
     function addNewsContent() {
@@ -828,6 +780,7 @@
         let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
         let startOfWeek = startOfDay - (now.getDay() * 86400000); 
 
+        // คำนวณรายได้จาก completed_jobs ที่โหลดมาตอนโหลดแอป
         if(allCompletedJobs) {
             for(let k in allCompletedJobs) {
                 let j = allCompletedJobs[k];
@@ -1004,6 +957,7 @@
             let priceDisplay = `฿${j.price}`;
             if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-green-400 bg-green-900/30 px-1 rounded border border-green-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
 
+            // ดึงประเภทรถเพื่อโชว์เป็นไอคอน
             let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-lg"></i>' : '<i class="fas fa-car-side text-green-400 text-lg"></i>';
 
             htmlMain += `<tr class="border-b border-slate-800 text-slate-300">
@@ -1057,7 +1011,7 @@
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(allCompletedJobs)
+            body: JSON.stringify(allCompletedJobs) // ส่ง allCompletedJobs ไปแทน
         }).then(() => {
             alert("🚀 ส่งข้อมูลประวัติงานที่จบแล้วไปที่คลาวด์ Google Sheet สำเร็จ!");
             btn.innerHTML = `<i class="fas fa-check"></i> ส่งข้อมูลสำเร็จ`;
