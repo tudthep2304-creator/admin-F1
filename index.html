@@ -7,12 +7,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap');
     body { font-family: 'Kanit', sans-serif; background-color: #0f172a; }
     .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* ปรับแต่งพื้นที่สำหรับครอปรูป */
+    .cropper-container { width: 100%; max-height: 400px; }
   </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col">
@@ -183,20 +190,34 @@
       </section>
 
       <section id="content-cms" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-image text-blue-400 mr-1"></i> จัดการรูปแบนเนอร์ (หน้าแรก)</h2>
+            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-image text-blue-400 mr-1"></i> จัดการรูปแบนเนอร์ (อัปโหลด & ตัดรูป)</h2>
             <div class="space-y-4">
+                
                 <div id="bannerPreview" class="w-full h-32 bg-slate-800 border border-slate-700 rounded-xl overflow-hidden flex items-center justify-center text-slate-500 mb-2 shadow-inner">
                     <img id="adminBannerImg" src="" class="hidden w-full h-full object-cover">
                     <span id="adminBannerPlaceholder"><i class="fas fa-image text-2xl mb-1"></i><br>ไม่มีรูปแบนเนอร์</span>
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">วางลิงก์รูปภาพ (รองรับ Google Drive)</label>
-                    <input type="text" id="cms-banner-url" placeholder="เช่น https://drive.google.com/file/d/xxxx" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm">
-                    <p class="text-[10px] text-slate-500 mt-1">* หากลบลิงก์ออก แบนเนอร์จะหายไปจากหน้าแรก</p>
+                    <label class="block text-xs font-bold text-slate-400 mb-2">เลือกรูปภาพจากเครื่อง</label>
+                    <input type="file" id="cms-banner-file" accept="image/*" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
                 </div>
-                <button onclick="saveBannerConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">
-                    <i class="fas fa-save mr-1"></i> อัปเดตรูปแบนเนอร์
+
+                <div id="cropArea" class="hidden bg-slate-800 p-3 rounded-xl border border-slate-700">
+                    <p class="text-xs font-bold text-yellow-400 mb-2"><i class="fas fa-crop"></i> เลื่อนและขยายกรอบเพื่อตัดรูป</p>
+                    <div class="w-full max-h-60 overflow-hidden bg-black rounded">
+                        <img id="imageToCrop" class="max-w-full">
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="cancelCrop()" class="flex-1 py-2 bg-slate-600 text-white font-bold rounded-lg text-sm hover:bg-slate-500">ยกเลิก</button>
+                        <button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-green-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-green-500">ตัดรูปและอัปโหลด <i class="fas fa-upload"></i></button>
+                    </div>
+                </div>
+
+                <button onclick="removeBanner()" class="w-full bg-red-900/30 hover:bg-red-600 text-red-400 hover:text-white border border-red-900/50 font-bold py-3 rounded-xl transition">
+                    <i class="fas fa-trash-alt"></i> ลบแบนเนอร์ปัจจุบันทิ้ง
                 </button>
             </div>
         </div>
@@ -470,6 +491,7 @@
     let allBookings = null;
     let allCompletedJobs = {}; 
     let allProfiles = {}; 
+    let cropper = null; // ตัวแปรสำหรับ Cropper
 
     const tabTitles = {
         'dashboard': 'แดชบอร์ด',
@@ -538,7 +560,6 @@
         document.getElementById('menu-icon').classList.replace('fa-times', 'fa-bars');
     }
 
-    // สลับหน้าใน Modal ราคา
     function switchPricingTab(tab) {
         if(tab === 'pricing') {
             document.getElementById('zone-pricing').classList.remove('hidden');
@@ -556,44 +577,80 @@
     function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
-    // ================= ระบบจัดการ CMS (Banner & News) =================
+    // ================= ระบบจัดการ CMS (Banner Upload & Crop & News) =================
     
-    // ดึงรูปแบนเนอร์มาโชว์ตอนโหลด
     db.ref('config/banners').on('value', snap => {
         let b = snap.val();
-        let input = document.getElementById('cms-banner-url');
         let img = document.getElementById('adminBannerImg');
         let placeholder = document.getElementById('adminBannerPlaceholder');
         
         if(b && b.imageUrl) {
-            input.value = b.imageUrl;
             img.src = b.imageUrl;
             img.classList.remove('hidden');
             placeholder.classList.add('hidden');
         } else {
-            input.value = '';
             img.classList.add('hidden');
             placeholder.classList.remove('hidden');
         }
     });
 
-    function saveBannerConfig() {
-        let url = document.getElementById('cms-banner-url').value.trim();
-        
-        // ✨ แปลงลิงก์ Google Drive อัตโนมัติ ✨
-        if (url.includes('drive.google.com/file/d/')) {
-            let match = url.match(/\/d\/(.*?)\//);
-            if (match && match[1]) {
-                url = `https://drive.google.com/uc?export=view&id=${match[1]}`;
-            }
+    // 🌟 ระบบ ครอปและอัปโหลดรูปภาพ 🌟
+    document.getElementById('cms-banner-file').addEventListener('change', function(e) {
+        let files = e.target.files;
+        if (files && files.length > 0) {
+            let file = files[0];
+            // โหลดรูปลงใน tag img สำหรับครอป
+            let url = URL.createObjectURL(file);
+            document.getElementById('imageToCrop').src = url;
+            
+            // เปิดหน้าต่างเครื่องมือครอป
+            document.getElementById('cropArea').classList.remove('hidden');
+            
+            // ถ้าเคยมี cropper อยู่ให้ทำลายทิ้งก่อน
+            if (cropper) { cropper.destroy(); }
+            
+            // สร้าง Cropper อัตราส่วน 16:9
+            let imageElement = document.getElementById('imageToCrop');
+            cropper = new Cropper(imageElement, {
+                aspectRatio: 16 / 9, // สัดส่วนแบนเนอร์แนวนอน
+                viewMode: 1,
+                autoCropArea: 1,
+            });
         }
+    });
+
+    function cancelCrop() {
+        document.getElementById('cropArea').classList.add('hidden');
+        document.getElementById('cms-banner-file').value = '';
+        if (cropper) { cropper.destroy(); cropper = null; }
+    }
+
+    function saveCroppedImage() {
+        if (!cropper) return;
         
-        db.ref('config/banners').set({ imageUrl: url }).then(()=>{
-            alert(url ? "อัปเดตรูปแบนเนอร์สำเร็จ" : "ลบแบนเนอร์ออกจากหน้าแรกสำเร็จ");
-            document.getElementById('cms-banner-url').value = ''; // เคลียร์ช่อง
+        // ดึงรูปที่ครอปมาเป็น Base64 (ปรับขนาดกว้างสุด 800px เพื่อไม่ให้ใหญ่เกินไป)
+        let canvas = cropper.getCroppedCanvas({ width: 800 });
+        let base64Image = canvas.toDataURL('image/jpeg', 0.7); // ย่อขนาดไฟล์ด้วย Quality 70%
+
+        // อัปโหลดเข้า Firebase Realtime Database ตรงๆ
+        db.ref('config/banners').set({ imageUrl: base64Image }).then(() => {
+            alert('ตัดรูปและอัปโหลดขึ้นแบนเนอร์สำเร็จแล้ว!');
+            cancelCrop();
+        }).catch((err) => {
+            alert('เกิดข้อผิดพลาด: ' + err.message);
         });
     }
 
+    function removeBanner() {
+        if(confirm("ต้องการลบแบนเนอร์ออกจากหน้าแอปผู้โดยสารใช่หรือไม่?")) {
+            db.ref('config/banners').remove().then(() => {
+                alert("ลบแบนเนอร์เรียบร้อยแล้ว");
+                cancelCrop();
+            });
+        }
+    }
+
+    // -- ระบบข่าวสาร --
     function addNewsContent() {
         let title = document.getElementById('cms-news-title').value.trim();
         let content = document.getElementById('cms-news-content').value.trim();
@@ -651,13 +708,11 @@
     db.ref('config/pricing').on('value', snap => {
         let p = snap.val() || {};
         
-        // รถยนต์
         let car = p.car || { base: 50, km: 10, pick: 5 };
         document.getElementById('cfg-car-base').value = car.base;
         document.getElementById('cfg-car-km').value = car.km;
         document.getElementById('cfg-car-pick').value = car.pick;
 
-        // มอเตอร์ไซค์
         let bike = p.bike || { base: 30, km: 8, pick: 5 };
         document.getElementById('cfg-bike-base').value = bike.base;
         document.getElementById('cfg-bike-km').value = bike.km;
@@ -682,7 +737,7 @@
         });
     }
 
-    // 🌟 ระบบเพิ่มโค้ดส่วนลด (ปกติ)
+    // 🌟 ระบบเพิ่มโค้ดส่วนลด 🌟
     function addPromoCode() {
         let code = document.getElementById('promo-code').value.trim().toUpperCase();
         let value = document.getElementById('promo-value').value.trim();
@@ -700,7 +755,6 @@
         });
     }
 
-    // 🌟 ระบบสุ่มโค้ดส่วนลด (ใช้ครั้งเดียว)
     function generateRandomPromos() {
         let prefix = document.getElementById('promo-rand-prefix').value.trim().toUpperCase();
         let amount = parseInt(document.getElementById('promo-rand-amount').value);
@@ -712,14 +766,14 @@
 
         let updates = {};
         for(let i=0; i<amount; i++) {
-            let randomNum = Math.floor(1000 + Math.random() * 9000); // สุ่มเลข 4 หลัก
+            let randomNum = Math.floor(1000 + Math.random() * 9000); 
             let code = prefix + randomNum.toString();
             updates['promotions/' + code] = {
                 code: code,
                 value: value,
                 usageCount: 0,
                 isActive: true,
-                isSingleUse: true // ตั้งแฟล็กให้รู้ว่าใช้ครั้งเดียว
+                isSingleUse: true 
             };
         }
 
@@ -755,7 +809,6 @@
             let statusText = isActive ? '<span class="text-[10px] bg-green-900/30 text-green-400 px-1.5 py-0.5 rounded ml-1">ใช้งานได้</span>' : '<span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">ถูกปิดไว้</span>';
             let opacityClass = isActive ? 'opacity-100' : 'opacity-60 grayscale-[50%]';
             
-            // โชว์ป้ายกำกับถ้าเป็นโค้ดใช้ครั้งเดียว
             let singleUseTag = p.isSingleUse ? '<i class="fas fa-bolt text-yellow-500 ml-1" title="ใช้ได้ครั้งเดียว"></i>' : '';
 
             html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-2 transition ${opacityClass}">
@@ -843,7 +896,6 @@
         let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
         let startOfWeek = startOfDay - (now.getDay() * 86400000); 
 
-        // คำนวณรายได้จาก completed_jobs ที่โหลดมาตอนโหลดแอป
         if(allCompletedJobs) {
             for(let k in allCompletedJobs) {
                 let j = allCompletedJobs[k];
@@ -997,7 +1049,7 @@
         document.getElementById('modal-blacklist-list').innerHTML = htmlModal;
     });
 
-    // ================= ระบบประวัติงานวิ่ง =================
+    // ================= ระบบประวัติงานวิ่ง (แสดงแยกประเภทรถ) =================
     db.ref('bookings').on('value', snap => {
         allBookings = snap.val(); 
         let list = allBookings; 
