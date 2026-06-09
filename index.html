@@ -191,8 +191,8 @@
                     <span id="adminBannerPlaceholder"><i class="fas fa-image text-2xl mb-1"></i><br>ไม่มีรูปแบนเนอร์</span>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">ลิงก์รูปภาพ (Image URL)</label>
-                    <input type="text" id="cms-banner-url" placeholder="https://example.com/banner.jpg" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">วางลิงก์รูปภาพ (รองรับ Google Drive)</label>
+                    <input type="text" id="cms-banner-url" placeholder="เช่น https://drive.google.com/file/d/xxxx" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm">
                     <p class="text-[10px] text-slate-500 mt-1">* หากลบลิงก์ออก แบนเนอร์จะหายไปจากหน้าแรก</p>
                 </div>
                 <button onclick="saveBannerConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">
@@ -319,13 +319,29 @@
               </div>
 
               <div id="zone-promo" class="hidden space-y-4 animate-fade-in">
-                  <div class="grid grid-cols-2 gap-2">
-                      <input type="text" id="promo-code" placeholder="ใส่โค้ด (SALE50)" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none uppercase font-bold text-center tracking-wider text-xs">
-                      <input type="number" id="promo-value" placeholder="ลดกี่บาท?" class="p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-center text-xs">
+                  
+                  <div class="bg-slate-800 p-3 rounded-xl border border-slate-700">
+                      <label class="block text-[10px] font-bold text-slate-400 mb-2 uppercase">สร้างโค้ดแบบกำหนดเอง</label>
+                      <div class="grid grid-cols-2 gap-2 mb-2">
+                          <input type="text" id="promo-code" placeholder="ใส่โค้ด (SALE50)" class="p-3 bg-slate-900 text-white border border-slate-700 rounded-xl outline-none uppercase font-bold text-center tracking-wider text-xs">
+                          <input type="number" id="promo-value" placeholder="ลดกี่บาท?" class="p-3 bg-slate-900 text-white border border-slate-700 rounded-xl outline-none font-bold text-center text-xs">
+                      </div>
+                      <button onclick="addPromoCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                          <i class="fas fa-plus mr-1"></i> เพิ่มโค้ดปกติ
+                      </button>
                   </div>
-                  <button onclick="addPromoCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition text-sm">
-                      <i class="fas fa-plus mr-1"></i> สร้างโค้ดส่วนลดใหม่
-                  </button>
+
+                  <div class="bg-slate-800 p-3 rounded-xl border border-yellow-500/30">
+                      <label class="block text-[10px] font-bold text-yellow-500 mb-2 uppercase"><i class="fas fa-bolt"></i> สร้างโค้ดสุ่ม (ใช้ได้ครั้งเดียวแล้วทิ้ง)</label>
+                      <div class="grid grid-cols-3 gap-2 mb-2">
+                          <input type="text" id="promo-rand-prefix" placeholder="นำหน้า (เช่น NEW)" class="p-2.5 bg-slate-900 text-white border border-slate-700 rounded-xl outline-none uppercase font-bold text-center text-xs">
+                          <input type="number" id="promo-rand-amount" placeholder="จำนวนโค้ด" class="p-2.5 bg-slate-900 text-white border border-slate-700 rounded-xl outline-none font-bold text-center text-xs">
+                          <input type="number" id="promo-rand-value" placeholder="ลดกี่บาท?" class="p-2.5 bg-slate-900 text-white border border-slate-700 rounded-xl outline-none font-bold text-center text-xs">
+                      </div>
+                      <button onclick="generateRandomPromos()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2.5 rounded-xl transition text-sm">
+                          <i class="fas fa-magic mr-1"></i> สุ่มสร้างโค้ดอัตโนมัติ
+                      </button>
+                  </div>
 
                   <div class="bg-slate-900 rounded-xl p-2 border border-slate-800 max-h-60 overflow-y-auto">
                       <h4 class="text-[10px] font-bold text-slate-500 uppercase px-2 py-1">รายการโค้ดในระบบ</h4>
@@ -472,6 +488,7 @@
       messagingSenderId: "1048189690454",
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
+    
     const db = firebase.database();
 
     // ================= โหลด History ไว้คำนวณเงิน =================
@@ -540,6 +557,8 @@
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
     // ================= ระบบจัดการ CMS (Banner & News) =================
+    
+    // ดึงรูปแบนเนอร์มาโชว์ตอนโหลด
     db.ref('config/banners').on('value', snap => {
         let b = snap.val();
         let input = document.getElementById('cms-banner-url');
@@ -560,8 +579,18 @@
 
     function saveBannerConfig() {
         let url = document.getElementById('cms-banner-url').value.trim();
+        
+        // ✨ แปลงลิงก์ Google Drive อัตโนมัติ ✨
+        if (url.includes('drive.google.com/file/d/')) {
+            let match = url.match(/\/d\/(.*?)\//);
+            if (match && match[1]) {
+                url = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+        }
+        
         db.ref('config/banners').set({ imageUrl: url }).then(()=>{
             alert(url ? "อัปเดตรูปแบนเนอร์สำเร็จ" : "ลบแบนเนอร์ออกจากหน้าแรกสำเร็จ");
+            document.getElementById('cms-banner-url').value = ''; // เคลียร์ช่อง
         });
     }
 
@@ -653,7 +682,7 @@
         });
     }
 
-    // 🌟 ระบบเพิ่มโค้ดส่วนลด
+    // 🌟 ระบบเพิ่มโค้ดส่วนลด (ปกติ)
     function addPromoCode() {
         let code = document.getElementById('promo-code').value.trim().toUpperCase();
         let value = document.getElementById('promo-value').value.trim();
@@ -668,6 +697,37 @@
             alert("เพิ่มโค้ดส่วนลดสำเร็จ!");
             document.getElementById('promo-code').value = '';
             document.getElementById('promo-value').value = '';
+        });
+    }
+
+    // 🌟 ระบบสุ่มโค้ดส่วนลด (ใช้ครั้งเดียว)
+    function generateRandomPromos() {
+        let prefix = document.getElementById('promo-rand-prefix').value.trim().toUpperCase();
+        let amount = parseInt(document.getElementById('promo-rand-amount').value);
+        let value = parseInt(document.getElementById('promo-rand-value').value);
+
+        if(!amount || !value || amount < 1 || value < 1) {
+            alert('กรุณากรอกจำนวนโค้ดและส่วนลดให้ถูกต้อง'); return;
+        }
+
+        let updates = {};
+        for(let i=0; i<amount; i++) {
+            let randomNum = Math.floor(1000 + Math.random() * 9000); // สุ่มเลข 4 หลัก
+            let code = prefix + randomNum.toString();
+            updates['promotions/' + code] = {
+                code: code,
+                value: value,
+                usageCount: 0,
+                isActive: true,
+                isSingleUse: true // ตั้งแฟล็กให้รู้ว่าใช้ครั้งเดียว
+            };
+        }
+
+        db.ref().update(updates).then(() => {
+            alert(`สร้างโค้ดแบบใช้ครั้งเดียวจำนวน ${amount} โค้ด สำเร็จ!`);
+            document.getElementById('promo-rand-prefix').value = '';
+            document.getElementById('promo-rand-amount').value = '';
+            document.getElementById('promo-rand-value').value = '';
         });
     }
 
@@ -694,11 +754,14 @@
             let toggleIcon = isActive ? 'fa-toggle-on' : 'fa-toggle-off';
             let statusText = isActive ? '<span class="text-[10px] bg-green-900/30 text-green-400 px-1.5 py-0.5 rounded ml-1">ใช้งานได้</span>' : '<span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded ml-1">ถูกปิดไว้</span>';
             let opacityClass = isActive ? 'opacity-100' : 'opacity-60 grayscale-[50%]';
+            
+            // โชว์ป้ายกำกับถ้าเป็นโค้ดใช้ครั้งเดียว
+            let singleUseTag = p.isSingleUse ? '<i class="fas fa-bolt text-yellow-500 ml-1" title="ใช้ได้ครั้งเดียว"></i>' : '';
 
             html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-2 transition ${opacityClass}">
                 <div>
                     <div class="flex items-center mb-1">
-                        <span class="font-mono bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-700 tracking-wider">${p.code}</span>
+                        <span class="font-mono bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-700 tracking-wider">${p.code} ${singleUseTag}</span>
                         ${statusText}
                     </div>
                     <p class="text-[10px] text-slate-400">ใช้ไปแล้ว <span class="text-white font-bold">${count}</span> ครั้ง</p>
@@ -934,7 +997,7 @@
         document.getElementById('modal-blacklist-list').innerHTML = htmlModal;
     });
 
-    // ================= ระบบประวัติงานวิ่ง (แสดงแยกประเภทรถ) =================
+    // ================= ระบบประวัติงานวิ่ง =================
     db.ref('bookings').on('value', snap => {
         allBookings = snap.val(); 
         let list = allBookings; 
@@ -957,7 +1020,6 @@
             let priceDisplay = `฿${j.price}`;
             if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-green-400 bg-green-900/30 px-1 rounded border border-green-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
 
-            // ดึงประเภทรถเพื่อโชว์เป็นไอคอน
             let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-lg"></i>' : '<i class="fas fa-car-side text-green-400 text-lg"></i>';
 
             htmlMain += `<tr class="border-b border-slate-800 text-slate-300">
