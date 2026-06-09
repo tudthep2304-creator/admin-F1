@@ -18,6 +18,8 @@
     .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .cropper-container { width: 100%; max-height: 400px; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col">
@@ -26,7 +28,7 @@
     <div class="flex items-center gap-3">
         <button onclick="toggleMenu()" class="text-slate-300 hover:text-white text-2xl focus:outline-none p-2 bg-slate-800 rounded-lg border border-slate-700 transition active:scale-90 relative">
             <i class="fas fa-bars" id="menu-icon"></i>
-            <span id="header-alert-badge" class="hidden absolute -top-1 -right-1 bg-red-500 w-3 h-3 rounded-full border-2 border-slate-800"></span>
+            <span id="header-alert-badge" class="hidden absolute -top-1 -right-1 bg-red-500 w-3 h-3 rounded-full border-2 border-slate-800 animate-pulse"></span>
         </button>
 
         <div class="flex items-center gap-2">
@@ -51,13 +53,13 @@
     </button>
 
     <nav id="dropdown-menu" class="hidden absolute top-full left-0 w-full sm:w-72 bg-slate-900 border-b sm:border border-slate-800 shadow-2xl flex flex-col p-4 gap-2 transition-all origin-top z-50">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-3 bg-green-600 text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-3 bg-green-600 text-white font-bold rounded-xl text-sm flex items-center justify-between transition shadow">
             <div class="flex items-center gap-3"><i class="fas fa-chart-pie w-5 text-center"></i> แดชบอร์ด</div>
-            <span id="menu-badge-pending" class="bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full hidden">0 งานรอ</span>
+            <span id="menu-badge-pending" class="bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0 งานรอ</span>
         </button>
         <button onclick="switchTab('drivers')" id="tab-drivers" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
-            <div class="flex items-center gap-3"><i class="fas fa-motorcycle w-5 text-center"></i> คนขับรถ</div>
-            <span id="menu-badge-online" class="bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0 ออนไลน์</span>
+            <div class="flex items-center gap-3"><i class="fas fa-motorcycle w-5 text-center"></i> จัดการคนขับ</div>
+            <span id="menu-badge-online" class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0 ออนไลน์</span>
         </button>
         <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-user-friends w-5 text-center"></i> ข้อมูลผู้โดยสาร
@@ -65,7 +67,7 @@
         <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-history w-5 text-center"></i> ประวัติงานทั้งหมด
         </button>
-        <div class="border-t border-slate-700 my-1"></div>
+        <div class="border-t border-slate-800 my-1"></div>
         <button onclick="switchTab('promos')" id="tab-promos" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-ticket-alt w-5 text-center"></i> โปรโมชั่น & คูปอง
         </button>
@@ -74,7 +76,7 @@
         </button>
         <button onclick="switchTab('blacklist')" id="tab-blacklist" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
             <div class="flex items-center gap-3"><i class="fas fa-ban w-5 text-center"></i> บล็อกเบอร์โทร</div>
-            <span id="menu-badge-block" class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full hidden">0</span>
+            <span id="menu-badge-block" class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
         </button>
     </nav>
   </header>
@@ -92,7 +94,7 @@
                       <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
                   </div>
               </div>
-              <div onclick="openModal('modalPendingJobs')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-yellow-500/50 transition transform hover:-translate-y-1 relative">
+              <div onclick="openModal('modalPendingJobs')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-yellow-500/50 transition transform hover:-translate-y-1">
                   <div class="flex justify-between items-start">
                       <div>
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
@@ -104,11 +106,22 @@
               <div onclick="openModal('modalBlacklist')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-red-500/50 transition transform hover:-translate-y-1">
                   <div class="flex justify-between items-start">
                       <div>
-                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">เบอร์แบล็กลิสต์</p>
+                          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">เบอร์แบล็กลิสต์ระบบ</p>
                           <h3 class="text-3xl font-black text-red-400" id="stat-block-count">0 เบอร์</h3>
                       </div>
                       <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
                   </div>
+              </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
+              <h2 class="text-base font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-shield-alt text-blue-400"></i> โหมดการจ่ายงานระบบ (Dispatch Strategy)</h2>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <p class="text-xs text-slate-400 leading-relaxed max-w-xl">แอดมินสามารถเปิดโหมด "จ่ายงานอัตโนมัติ" เพื่อให้ระบบเฉลี่ยคิวงานวิ่งเข้าหาคนขับที่ได้รายได้น้อยที่สุดก่อน หรือเลือกปรับเป็นโหมด "ควบคุมแมนนวล" เพื่อรอแอดมินกดยิงระบุงานรายบุคคลเองได้</p>
+                  <select id="dispatchModeSelect" onchange="changeDispatchMode(this.value)" class="bg-slate-800 text-white font-bold text-sm rounded-xl px-4 py-2.5 border border-slate-700 outline-none focus:border-blue-500">
+                      <option value="manual">คุมแมนนวล (แอดมินกดจ่ายงานรายตัว)</option>
+                      <option value="auto">ออโต้คิว (ระบบเฉลี่ยงานให้อัตโนมัติ)</option>
+                  </select>
               </div>
           </div>
       </section>
@@ -148,7 +161,6 @@
                   </button>
               </div>
           </div>
-          
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md lg:col-span-2">
               <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-address-book text-green-400 mr-1"></i> ทำเนียบคนขับทั้งหมดในระบบ</h2>
               <div class="overflow-x-auto">
@@ -162,8 +174,7 @@
                               <th class="pb-3 text-right">จัดการ</th>
                           </tr>
                       </thead>
-                      <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800">
-                      </tbody>
+                      <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800"></tbody>
                   </table>
               </div>
           </div>
@@ -173,33 +184,18 @@
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                   <div>
-                      <h2 class="text-lg font-bold text-white"><i class="fas fa-user-friends text-blue-400 mr-1"></i> ฐานข้อมูลผู้โดยสาร (CRM)</h2>
-                      <p class="text-xs text-slate-400 mt-1">วิเคราะห์จากประวัติการเรียกใช้งานทั้งหมด</p>
+                      <h2 class="text-lg font-bold text-white"><i class="fas fa-user-friends text-blue-400 mr-1"></i> ระบบรายงานประวัติและพฤติกรรมผู้โดยสาร</h2>
+                      <p class="text-xs text-slate-400 mt-1">วิเคราะห์คัดกรองจากระบบและประวัติการเดินทางจริง</p>
                   </div>
                   <div class="flex items-center gap-2">
                       <select id="filter-passenger" onchange="renderPassengers()" class="bg-slate-800 text-white text-xs border border-slate-700 rounded-lg px-3 py-2.5 outline-none font-bold">
-                          <option value="all">ดูทั้งหมด</option>
-                          <option value="new">ผู้ใช้ใหม่ (เรียก 0-1 ครั้ง)</option>
-                          <option value="regular">ลูกค้าประจำ (>1 ครั้ง)</option>
+                          <option value="all">แสดงลูกค้าทั้งหมด</option>
+                          <option value="new">คัดกรอง: ผู้ใช้งานรายใหม่ (เรียก 0-1 ครั้ง)</option>
+                          <option value="regular">คัดกรอง: ลูกค้าประจำ (>1 ครั้ง)</option>
                       </select>
                       <button onclick="exportPassengersCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg flex items-center gap-1.5 transition shadow-sm">
-                          <i class="fas fa-file-csv"></i> Export CSV
+                          <i class="fas fa-file-csv"></i> Export เป็นไฟล์ CSV
                       </button>
-                  </div>
-              </div>
-
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
-                      <p class="text-[10px] text-slate-400 font-bold mb-1">จำนวนผู้โดยสารทั้งหมด</p>
-                      <p class="text-xl font-black text-blue-400" id="stat-pass-total">0</p>
-                  </div>
-                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
-                      <p class="text-[10px] text-slate-400 font-bold mb-1">ผู้ใช้ใหม่ (เพิ่งลองใช้)</p>
-                      <p class="text-xl font-black text-green-400" id="stat-pass-new">0</p>
-                  </div>
-                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
-                      <p class="text-[10px] text-slate-400 font-bold mb-1">ลูกค้าประจำ</p>
-                      <p class="text-xl font-black text-yellow-400" id="stat-pass-vip">0</p>
                   </div>
               </div>
 
@@ -207,15 +203,15 @@
                   <table class="w-full text-left border-collapse min-w-[700px]">
                       <thead>
                           <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30">
-                              <th class="py-3 px-2 rounded-tl-lg">เบอร์โทร / LINE Name</th>
-                              <th class="py-3 px-2">ประเภทลูกค้า</th>
-                              <th class="py-3 px-2 text-center">จำนวนครั้งที่เรียก</th>
-                              <th class="py-3 px-2 text-right">ยอดรวมที่จ่าย (บาท)</th>
-                              <th class="py-3 px-2 rounded-tr-lg">โค้ดที่เคยใช้</th>
+                              <th class="py-3 px-2 rounded-tl-lg">เบอร์ติดต่อ / ชื่อสมาชิกลูกค้า</th>
+                              <th class="py-3 px-2">สถานะสถิติ</th>
+                              <th class="py-3 px-2 text-center">ความถี่การเรียกรถ</th>
+                              <th class="py-3 px-2 text-right">ยอดรวมค่าโดยสารรวม</th>
+                              <th class="py-3 px-2 rounded-tr-lg">รายการโค้ดส่วนลดที่เคยใช้งาน</th>
                           </tr>
                       </thead>
                       <tbody id="passengers-list" class="text-sm divide-y divide-slate-800">
-                          <tr><td colspan="5" class="py-6 text-center text-slate-500">กำลังประมวลผลข้อมูล...</td></tr>
+                          <tr><td colspan="5" class="py-6 text-center text-slate-500">กำลังประมวลผลข้อมูลโครงสร้าง...</td></tr>
                       </tbody>
                   </table>
               </div>
@@ -223,77 +219,73 @@
       </section>
 
       <section id="content-promos" class="tab-content hidden space-y-6">
-          
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-                  <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-ticket-alt text-green-400 mr-1"></i> สร้างโปรโมชั่น</h2>
+                  <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-ticket-alt text-green-400 mr-1"></i> ออกแบบโปรโมชั่นระบบ</h2>
                   
                   <div class="flex mb-4 bg-slate-800 p-1 rounded-lg">
-                      <button onclick="switchPromoBuilder('general')" id="pbtn-general" class="flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition">โค้ดปกติ / แคมเปญ</button>
-                      <button onclick="switchPromoBuilder('random')" id="pbtn-random" class="flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition">สุ่มโค้ด (ใช้ครั้งเดียว)</button>
+                      <button onclick="switchPromoBuilder('general')" id="pbtn-general" class="flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition">โค้ดปกติ / เฉพาะผู้ใช้ใหม่</button>
+                      <button onclick="switchPromoBuilder('random')" id="pbtn-random" class="flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition">สุ่มชุดโค้ดเยอะๆ</button>
                   </div>
 
                   <div id="pbuild-general" class="space-y-4 animate-fade-in">
                       <div>
-                          <label class="block text-xs font-bold text-slate-400 mb-1">กลุ่มเป้าหมาย</label>
-                          <select id="promo-target" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none focus:border-green-500 text-sm font-bold">
-                              <option value="all">ใช้งานได้ทุกคน (แคมเปญทั่วไป)</option>
-                              <option value="new_user">เฉพาะ "ผู้ใช้ใหม่" เท่านั้น (เรียก 0 ครั้ง)</option>
+                          <label class="block text-xs font-bold text-slate-400 mb-1">เงื่อนไขการเคลมสิทธิ์โค้ด</label>
+                          <select id="promo-target" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs font-bold">
+                              <option value="all">เปิดสิทธิ์ให้ผู้ใช้งานทุกคน</option>
+                              <option value="new_user">จำกัดเฉพาะ: "ผู้ใช้ใหม่" เท่านั้น (ประวัติสำเร็จ = 0)</option>
                           </select>
                       </div>
                       <div class="grid grid-cols-2 gap-2">
                           <div>
-                              <label class="block text-xs font-bold text-slate-400 mb-1">ชื่อโค้ด</label>
-                              <input type="text" id="promo-code" placeholder="เช่น NEW50" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center tracking-wider">
+                              <label class="block text-xs font-bold text-slate-400 mb-1">คำโค้ดส่วนลด</label>
+                              <input type="text" id="promo-code" placeholder="เช่น SALE50" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center tracking-wider text-sm">
                           </div>
                           <div>
                               <label class="block text-xs font-bold text-slate-400 mb-1">ส่วนลด (บาท)</label>
-                              <input type="number" id="promo-value" placeholder="ระบุตัวเลข" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center">
+                              <input type="number" id="promo-value" placeholder="ลดกี่บาท?" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-sm">
                           </div>
                       </div>
                       <button onclick="addPromoCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2">
-                          บันทึกโค้ด
+                          <i class="fas fa-plus mr-1"></i> ยืนยันสร้างคูปองแคมเปญ
                       </button>
                   </div>
 
                   <div id="pbuild-random" class="hidden space-y-4 animate-fade-in">
-                      <div class="bg-yellow-900/20 border border-yellow-500/30 p-3 rounded-lg mb-2">
-                          <p class="text-[10px] text-yellow-500 font-bold leading-relaxed"><i class="fas fa-info-circle"></i> โค้ดที่สุ่มออกมาจะใช้ได้เพียง <b>1 ครั้งต่อ 1 โค้ด</b> เหมาะสำหรับนำไปปริ้นท์ทำคูปองแจก หรือส่งให้ลูกค้ารายบุคคล</p>
-                      </div>
                       <div class="grid grid-cols-3 gap-2">
-                          <div class="col-span-1">
-                              <label class="block text-[10px] font-bold text-slate-400 mb-1">คำนำหน้า</label>
+                          <div>
+                              <label class="block text-[10px] font-bold text-slate-400 mb-1">คำนำหน้าโค้ด</label>
                               <input type="text" id="promo-rand-prefix" placeholder="F1VIP" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center text-xs">
                           </div>
-                          <div class="col-span-1">
-                              <label class="block text-[10px] font-bold text-slate-400 mb-1">จำนวนคูปอง</label>
-                              <input type="number" id="promo-rand-amount" placeholder="เช่น 20" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs">
+                          <div>
+                              <label class="block text-[10px] font-bold text-slate-400 mb-1">จำนวนที่เจน</label>
+                              <input type="number" id="promo-rand-amount" placeholder="กี่ใบ?" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs">
                           </div>
-                          <div class="col-span-1">
-                              <label class="block text-[10px] font-bold text-slate-400 mb-1">ลดกี่บาท?</label>
-                              <input type="number" id="promo-rand-value" placeholder="เช่น 50" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs">
+                          <div>
+                              <label class="block text-[10px] font-bold text-slate-400 mb-1">ส่วนลด (บาท)</label>
+                              <input type="number" id="promo-rand-value" placeholder="กี่บาท?" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs">
                           </div>
                       </div>
-                      <button onclick="generateRandomPromos()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2 flex items-center justify-center gap-2">
-                          <i class="fas fa-magic"></i> สุ่มสร้างโค้ด
+                      <button onclick="generateRandomPromos()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                          <i class="fas fa-magic"></i> ประมวลผลสุ่มสร้างสิทธิ์
                       </button>
                   </div>
               </div>
 
               <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md lg:col-span-2">
                   <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-                      <h2 class="text-lg font-bold text-white"><i class="fas fa-list text-blue-400 mr-1"></i> โค้ดโปรโมชั่นในระบบ</h2>
-                      <button onclick="exportRandomCodes()" class="bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                          <i class="fas fa-download"></i> Export โค้ดสุ่ม (สำหรับปริ้นท์)
+                      <h2 class="text-lg font-bold text-white"><i class="fas fa-list text-blue-400 mr-1"></i> รายการสิทธิ์ส่วนลดคูปองในคลัง</h2>
+                      <button onclick="exportRandomCodes()" class="bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                          <i class="fas fa-download"></i> ดาวน์โหลดโค้ดสุ่ม (พิมพ์แจก)
                       </button>
                   </div>
                   
                   <div class="flex gap-4 mb-3 border-b border-slate-800 pb-1">
-                      <button onclick="filterPromoList('all')" id="flt-promo-all" class="text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1">โค้ดปกติ</button>
-                      <button onclick="filterPromoList('random')" id="flt-promo-random" class="text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1">โค้ดสุ่มแจก</button>
+                      <button onclick="filterPromoList('all')" id="flt-promo-all" class="text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1">คูปองหลัก / แคมเปญ</button>
+                      <button onclick="filterPromoList('random')" id="flt-promo-random" class="text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1">โค้ดสุ่มใบปลิว (ใช้แล้วทิ้ง)</button>
                   </div>
 
-                  <div class="max-h-[400px] overflow-y-auto pr-2">
+                  <div class="max-h-[380px] overflow-y-auto pr-2 slim-scroll">
                       <ul id="promo-codes-list" class="divide-y divide-slate-800"></ul>
                   </div>
               </div>
@@ -303,27 +295,25 @@
       <section id="content-history" class="tab-content hidden space-y-4">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h2 class="text-lg font-bold text-white"><i class="fas fa-history text-green-400 mr-1"></i> ประวัติงานวิ่งทั้งหมด</h2>
+                  <h2 class="text-lg font-bold text-white"><i class="fas fa-history text-green-400 mr-1"></i> ประวัติงานวิ่งทั้งหมดในสารบบ</h2>
                   <button onclick="syncToGoogleSheet(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg">
-                      <i class="fas fa-file-excel"></i> สำรองลง Google Sheet
+                      <i class="fas fa-file-excel"></i> สำรองฐานข้อมูลลง Google Sheet
                   </button>
               </div>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[700px]">
                       <thead>
                           <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30">
-                              <th class="py-3 px-2">ลูกค้า / เบอร์โทร</th>
-                              <th class="py-3 px-2">ประเภท</th>
-                              <th class="py-3 px-2">จุดรับ-ส่ง</th>
-                              <th class="py-3 px-2">ระยะทาง</th>
-                              <th class="py-3 px-2">ค่าโดยสาร</th>
-                              <th class="py-3 px-2">คนขับ</th>
-                              <th class="py-3 px-2 text-right">สถานะงาน</th>
+                              <th class="py-3 px-2">ข้อมูลผู้โดยสาร</th>
+                              <th class="py-3 px-2 text-center">ประเภทรถ</th>
+                              <th class="py-3 px-2">หมุดตำแหน่งการเดินทาง</th>
+                              <th class="py-3 px-2">ระยะรวม</th>
+                              <th class="py-3 px-2">สุทธิ</th>
+                              <th class="py-3 px-2">พนักงานขับ</th>
+                              <th class="pb-3 text-right">สถานะ</th>
                           </tr>
                       </thead>
-                      <tbody id="history-jobs-list" class="text-sm divide-y divide-slate-800">
-                          <tr><td colspan="7" class="py-4 text-center text-slate-500">ยังไม่มีประวัติงานบันทึกในระบบ</td></tr>
-                      </tbody>
+                      <tbody id="history-jobs-list" class="text-sm divide-y divide-slate-800"></tbody>
                   </table>
               </div>
           </div>
@@ -331,85 +321,87 @@
 
       <section id="content-cms" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-images text-blue-400 mr-1"></i> จัดการสไลด์แบนเนอร์</h2>
+            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-images text-blue-400 mr-1"></i> จัดการสไลด์โฆษณาแบนเนอร์</h2>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-2">อัปโหลดรูปภาพใหม่</label>
-                    <input type="file" id="cms-banner-file" accept="image/*" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1.5">เลือกระบุตำแหน่งจัดวางแบนเนอร์</label>
+                        <select id="cms-banner-position" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-xs font-bold">
+                            <option value="top">แบนเนอร์หลักส่วนบน (สัดส่วน 16:9)</option>
+                            <option value="bottom">แบนเนอร์แถบยาวส่วนล่าง (Slim Banner)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1.5">ดึงภาพแบนเนอร์เข้าระบบ</label>
+                        <input type="file" id="cms-banner-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white cursor-pointer">
+                    </div>
                 </div>
-                <div id="cropArea" class="hidden bg-slate-800 p-4 rounded-xl border border-blue-500/50">
-                    <p class="text-xs font-bold text-yellow-400 mb-2"><i class="fas fa-crop"></i> เลื่อนและขยายกรอบเพื่อตัดรูป</p>
+
+                <div id="cropArea" class="hidden bg-slate-800 p-4 rounded-xl border border-blue-500/30">
                     <div class="w-full max-h-60 overflow-hidden bg-black rounded mb-3">
                         <img id="imageToCrop" class="max-w-full">
                     </div>
-                    <div class="mb-3">
-                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">ลิงก์ปลายทาง (เมื่อกดแบนเนอร์)</label>
-                        <input type="text" id="cms-banner-link" placeholder="เช่น https://facebook.com/..." class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 text-xs">
-                        <p class="text-[9px] text-slate-500 mt-1">* หากไม่ต้องการให้กดได้ ปล่อยว่างไว้</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-1">ลิงก์ฝังเชื่อมภายนอก (Facebook / YouTube)</label>
+                            <input type="text" id="cms-banner-link" placeholder="https://..." class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 mb-1">เวลาเริ่มโชว์ภาพ</label>
+                                <input type="datetime-local" id="cms-banner-start" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-[10px] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 mb-1">เวลาหมดอายุภาพ</label>
+                                <input type="datetime-local" id="cms-banner-end" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-[10px] outline-none">
+                            </div>
+                        </div>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="cancelCrop()" class="flex-1 py-2 bg-slate-700 text-white font-bold rounded-lg text-sm hover:bg-slate-600 transition">ยกเลิก</button>
-                        <button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-green-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-green-500 transition">บันทึกและเพิ่มเข้าสไลด์</button>
+                        <button onclick="cancelCrop()" class="flex-1 py-2 bg-slate-700 text-white font-bold rounded-lg text-xs hover:bg-slate-600">ยกเลิก</button>
+                        <button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-green-600 text-white font-bold rounded-lg text-xs shadow-md hover:bg-green-500">ประมวลผลครอบภาพ & ยิงขึ้นสไลด์แอป 🚀</button>
                     </div>
                 </div>
 
                 <div class="border-t border-slate-800 pt-4">
-                    <h3 class="text-xs font-bold text-slate-500 mb-3 uppercase">แบนเนอร์ปัจจุบัน</h3>
-                    <div id="admin-banners-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
-                        <p class="text-slate-500 text-sm text-center py-4">กำลังโหลดข้อมูล...</p>
-                    </div>
+                    <h3 class="text-xs font-bold text-slate-500 mb-2 uppercase">แบนเนอร์ทั้งหมดในระบบ ณ ตอนนี้</h3>
+                    <div id="admin-banners-list" class="space-y-2 max-h-[250px] overflow-y-auto pr-1 slim-scroll"></div>
                 </div>
             </div>
         </div>
 
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-bullhorn text-yellow-400 mr-1"></i> เพิ่มข่าวสาร & โปรโมชั่น</h2>
-            <div class="space-y-4 mb-6">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">หัวข้อ (Title)</label>
-                    <input type="text" id="cms-news-title" placeholder="เช่น ประกาศอัปเดตแอป" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-yellow-500 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">รายละเอียด (Content)</label>
-                    <textarea id="cms-news-content" rows="3" placeholder="รายละเอียดเนื้อหา..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-yellow-500 text-sm"></textarea>
-                </div>
+            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-bullhorn text-yellow-400 mr-1"></i> โพสต์ข่าวสารระบบ</h2>
+            <div class="space-y-4 mb-4">
+                <input type="text" id="cms-news-title" placeholder="หัวข้อข่าว" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm focus:border-yellow-500">
+                <textarea id="cms-news-content" rows="3" placeholder="รายละเอียดเนื้อหา..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm focus:border-yellow-500"></textarea>
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" id="cms-news-ispromo" class="w-4 h-4 accent-red-500 bg-slate-800 border-slate-700 rounded">
-                    <label for="cms-news-ispromo" class="text-sm font-bold text-slate-300 cursor-pointer">ป้ายกำกับ: <span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">PROMO</span></label>
+                    <input type="checkbox" id="cms-news-ispromo" class="w-4 h-4 accent-red-500 rounded">
+                    <label for="cms-news-ispromo" class="text-xs font-bold text-slate-300">เปิดแท็กแจ้งเตือนเป็นแคมเปญโปรโมชั่น</label>
                 </div>
-                <button onclick="addNewsContent()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition">
-                    <i class="fas fa-paper-plane mr-1"></i> โพสต์ข่าวสาร
-                </button>
+                <button onclick="addNewsContent()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition">ยืนยันโพสต์ข่าว</button>
             </div>
-            <div class="border-t border-slate-800 pt-4">
-                <h3 class="text-xs font-bold text-slate-500 mb-2 uppercase">รายการที่โพสต์ไปแล้ว</h3>
-                <div id="admin-news-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1"></div>
+            <div class="border-t border-slate-800 pt-3">
+                <div id="admin-news-list" class="space-y-2 max-h-[180px] overflow-y-auto slim-scroll"></div>
             </div>
         </div>
       </section>
 
       <section id="content-blacklist" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> บล็อกเบอร์ลูกค้า</h2>
+              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> ระงับสิทธิ์การใช้งานเบอร์โทร</h2>
               <div class="space-y-4">
-                  <input type="tel" id="block-phone" placeholder="ระบุเบอร์โทรศัพท์ (10 หลัก)" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-center">
-                  <input type="text" id="block-reason" placeholder="เหตุผลการบล็อก..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm">
-                  <button onclick="addNumberToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">
-                      <i class="fas fa-ban mr-1"></i> บล็อกเบอร์โทรนี้
-                  </button>
+                  <input type="tel" id="block-phone" placeholder="กรอกเบอร์โทรศัพท์ (10 หลัก)" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-center">
+                  <input type="text" id="block-reason" placeholder="สาเหตุการขึ้นบัญชีดำ..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm">
+                  <button onclick="addNumberToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">ระงับสัญญาณเบอร์โทรนี้</button>
               </div>
           </div>
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อเบอร์ที่ติดแบล็กลิสต์</h2>
+              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อเบอร์โทรแบล็กลิสต์ทั้งหมด</h2>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse">
                       <thead>
-                          <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold">
-                              <th class="pb-3 px-2">เบอร์โทรศัพท์</th>
-                              <th class="pb-3 px-2">เหตุผล</th>
-                              <th class="pb-3 px-2">วันที่เวลา</th>
-                              <th class="pb-3 px-2 text-right">ปลดบล็อก</th>
-                          </tr>
+                          <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold bg-slate-800/20"><th class="py-2 px-2">เบอร์มือถือ</th><th class="py-2 px-2">เหตุผลการบล็อก</th><th class="py-2 px-2">วันที่เวลา</th><th class="py-2 px-2 text-right">ปลดล็อค</th></tr>
                       </thead>
                       <tbody id="blacklist-table-body" class="text-sm divide-y divide-slate-800"></tbody>
                   </table>
@@ -420,48 +412,63 @@
   </main>
 
   <div id="modalPricing" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-blue-400"><i class="fas fa-car mr-1"></i> ตั้งค่าเรทราคาค่าโดยสาร</h2>
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
+              <h2 class="text-lg font-bold text-blue-400"><i class="fas fa-tags mr-1"></i> กำหนดราคากลางแบ่งประเภทรถแยกกัน</h2>
               <button onclick="closeModal('modalPricing')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
-          <div class="p-5 overflow-y-auto flex-1">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div class="bg-slate-800/40 border border-green-500/20 p-4 rounded-xl space-y-3">
-                      <h3 class="font-bold text-green-400 border-b border-slate-700 pb-2 flex items-center gap-2"><i class="fas fa-car-side"></i> รถยนต์</h3>
+          <div class="p-5 overflow-y-auto flex-1 space-y-5">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="bg-slate-800/50 border border-green-500/20 p-4 rounded-xl space-y-3">
+                      <h3 class="font-bold text-green-400 border-b border-slate-700 pb-1.5 flex items-center gap-1.5"><i class="fas fa-car-side"></i> เรทราคารถยนต์</h3>
                       <div>
-                          <label class="block text-xs font-bold text-slate-400 mb-1">ราคาเริ่มต้น (Base)</label>
-                          <input type="number" id="cfg-car-base" class="w-full p-2.5 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-green-500 text-sm">
+                          <label class="block text-[10px] text-slate-400 font-bold mb-1">ราคาเริ่มต้นเปิดแอป (Base)</label>
+                          <input type="number" id="cfg-car-base" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm">
                       </div>
                       <div>
-                          <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการต่อ กม. (Distance)</label>
-                          <input type="number" id="cfg-car-km" class="w-full p-2.5 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-green-500 text-sm">
+                          <label class="block text-[10px] text-slate-400 font-bold mb-1">ค่าบริการวิ่งตามระยะทางต่อ กม.</label>
+                          <input type="number" id="cfg-car-km" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm">
                       </div>
                       <div>
-                          <label class="block text-xs font-bold text-slate-400 mb-1">ค่าวิ่งไปรับต่อ กม. (Pickup)</label>
-                          <input type="number" id="cfg-car-pick" class="w-full p-2.5 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-green-500 text-sm">
+                          <label class="block text-[10px] text-slate-400 font-bold mb-1">เรทค่าเสียเวลาไปรับต่อ กม. (Pickup)</label>
+                          <input type="number" id="cfg-car-pick" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm">
                       </div>
                   </div>
 
-                  <div class="bg-slate-800/40 border border-blue-500/20 p-4 rounded-xl space-y-3">
-                      <h3 class="font-bold text-blue-400 border-b border-slate-700 pb-2 flex items-center gap-2"><i class="fas fa-motorcycle"></i> มอเตอร์ไซค์</h3>
+                  <div class="bg-slate-800/50 border border-blue-500/20 p-4 rounded-xl space-y-3">
+                      <h3 class="font-bold text-blue-400 border-b border-slate-700 pb-1.5 flex items-center gap-1.5"><i class="fas fa-motorcycle"></i> เรทรถมอเตอร์ไซค์</h3>
                       <div>
-                          <label class="block text-xs font-bold text-slate-400 mb-1">ราคาเริ่มต้น (Base)</label>
-                          <input type="number" id="cfg-bike-base" class="w-full p-2.5 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 text-sm">
+                          <label class="block text-[10px] text-slate-400 font-bold mb-1">ราคาเริ่มต้นเปิดแอป (Base)</label>
+                          <input type="number" id="cfg-bike-base" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm">
                       </div>
                       <div>
-                          <label class="block text-xs font-bold text-slate-400 mb-1">ค่าบริการต่อ กม. (Distance)</label>
-                          <input type="number" id="cfg-bike-km" class="w-full p-2.5 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 text-sm">
+                          <label class="block text-[10px] text-slate-400 font-bold mb-1">ค่าบริการวิ่งตามระยะทางต่อ กม.</label>
+                          <input type="number" id="cfg-bike-km" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm">
                       </div>
                       <div>
-                          <label class="block text-xs font-bold text-slate-400 mb-1">ค่าวิ่งไปรับต่อ กม. (Pickup)</label>
-                          <input type="number" id="cfg-bike-pick" class="w-full p-2.5 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 text-sm">
+                          <label class="block text-[10px] text-slate-400 font-bold mb-1">เรทค่าเสียเวลาไปรับต่อ กม. (Pickup)</label>
+                          <input type="number" id="cfg-bike-pick" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm">
                       </div>
                   </div>
               </div>
-              <button onclick="savePricingConfig()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-6">
-                  <i class="fas fa-save mr-1"></i> บันทึกเรทราคา
-              </button>
+              <button onclick="savePricingConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">บันทึกอัตราเรทราคาใหม่</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalPendingJobs" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-yellow-500"><i class="fas fa-clock"></i> กระดานคิวงานเรียกรถของฝั่งผู้โดยสาร ณ ปัจจุบัน</h2>
+              <button onclick="closeModal('modalPendingJobs')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
+              <table class="w-full text-left border-collapse">
+                  <thead>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold"><th class="pb-2 px-2">ข้อมูลผู้โดยสาร</th><th class="pb-2 px-2">จุดรับ-จุดปลายทาง</th><th class="pb-2 px-2 text-center">ประเภทรถ</th><th class="pb-2 px-2">สุทธิ</th><th class="pb-2 px-2 text-right">การจัดสรรส่งงานให้คนขับ</th></tr>
+                  </thead>
+                  <tbody id="modal-pending-list" class="text-sm divide-y divide-slate-800"></tbody>
+              </table>
           </div>
       </div>
   </div>
@@ -469,20 +476,15 @@
   <div id="modalPromoHistory" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[80vh]">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-base font-bold text-yellow-400"><i class="fas fa-list-alt mr-1"></i> <span id="history-promo-title">ประวัติคนใช้โค้ด</span></h2>
+              <h2 class="text-base font-bold text-yellow-400" id="history-promo-title">ประวัติคนใช้โค้ด</h2>
               <button onclick="closeModal('modalPromoHistory')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
-          <div class="p-4 overflow-y-auto flex-1">
+          <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
               <table class="w-full text-left border-collapse">
                   <thead>
-                      <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold">
-                          <th class="pb-3 px-2">วันที่ใช้</th>
-                          <th class="pb-3 px-2">ลูกค้า</th>
-                          <th class="pb-3 px-2 text-right">ส่วนลด</th>
-                      </tr>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold"><th class="pb-2 px-1">วันที่ใช้</th><th class="pb-2 px-1">ลูกค้า</th><th class="pb-2 px-1 text-right">ส่วนลด</th></tr>
                   </thead>
-                  <tbody id="modal-promo-history-list" class="text-sm divide-y divide-slate-800">
-                  </tbody>
+                  <tbody id="modal-promo-history-list" class="text-sm divide-y divide-slate-800"></tbody>
               </table>
           </div>
       </div>
@@ -491,29 +493,15 @@
   <div id="modalOnlineDrivers" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh]">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-radar"></i> คนขับออนไลน์</h2>
+              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-radar"></i> คนขับรถที่เปิดระบบออนไลน์ตอนนี้</h2>
               <button onclick="closeModal('modalOnlineDrivers')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
-          <div class="p-4 overflow-y-auto flex-1">
-              <table class="w-full text-left border-collapse">
-                  <tbody id="modal-online-list" class="text-sm divide-y divide-slate-800"></tbody>
-              </table>
-          </div>
-      </div>
-  </div>
-
-  <div id="modalPendingJobs" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[80vh]">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-yellow-500"><i class="fas fa-clock"></i> งานที่กำลังรอดำเนินการ</h2>
-              <button onclick="closeModal('modalPendingJobs')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="p-4 overflow-y-auto flex-1">
+          <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
               <table class="w-full text-left border-collapse">
                   <thead>
-                      <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold"><th class="pb-3 px-2">ลูกค้า</th><th class="pb-3 px-2">จุดรับ-ส่ง</th><th class="pb-3 px-2 text-right">ราคา</th></tr>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold"><th class="pb-2">ชื่อพนักงาน</th><th class="pb-2 text-right">เบอร์ติดต่อ</th></tr>
                   </thead>
-                  <tbody id="modal-pending-list" class="text-sm divide-y divide-slate-800"></tbody>
+                  <tbody id="modal-online-list" class="text-sm divide-y divide-slate-800"></tbody>
               </table>
           </div>
       </div>
@@ -522,13 +510,13 @@
   <div id="modalBlacklist" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[80vh]">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-red-500"><i class="fas fa-ban"></i> ข้อมูลแบล็กลิสต์</h2>
+              <h2 class="text-lg font-bold text-red-500"><i class="fas fa-ban"></i> บัญชีดำผู้ใช้ที่ติดระงับสัญญาณ</h2>
               <button onclick="closeModal('modalBlacklist')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
-          <div class="p-4 overflow-y-auto flex-1">
+          <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
               <table class="w-full text-left border-collapse">
                   <thead>
-                      <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold"><th class="pb-3 px-2">เบอร์โทร</th><th class="pb-3 px-2">เหตุผล</th><th class="pb-3 px-2 text-right">วันที่</th></tr>
+                      <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold"><th class="pb-2">เบอร์โทร</th><th class="pb-2">เหตุผล</th><th class="pb-2 text-right">วันที่ขึ้นระบบ</th></tr>
                   </thead>
                   <tbody id="modal-blacklist-list" class="text-sm divide-y divide-slate-800"></tbody>
               </table>
@@ -550,21 +538,21 @@
           </div>
           <div class="p-5 space-y-4">
               <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                  <p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานของวันนี้</p>
+                  <p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานความสำเร็จของวันนี้</p>
                   <div class="flex justify-between items-end">
                       <h3 class="text-2xl font-black text-green-400" id="det-today-earn">฿0</h3>
-                      <p class="text-sm font-bold text-slate-300" id="det-today-jobs">0 งาน</p>
+                      <p class="text-sm font-bold text-slate-300" id="det-today-jobs">0 งานวิ่ง</p>
                   </div>
               </div>
               <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                  <p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานสัปดาห์นี้</p>
+                  <p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานความสำเร็จสัปดาห์นี้</p>
                   <div class="flex justify-between items-end">
                       <h3 class="text-xl font-black text-blue-400" id="det-week-earn">฿0</h3>
-                      <p class="text-sm font-bold text-slate-300" id="det-week-jobs">0 งาน</p>
+                      <p class="text-sm font-bold text-slate-300" id="det-week-jobs">0 งานวิ่ง</p>
                   </div>
               </div>
               <div class="flex justify-between items-center border-t border-slate-800 pt-3">
-                  <p class="text-xs font-bold text-slate-500">รายได้รวมทั้งหมดในระบบ:</p>
+                  <p class="text-xs font-bold text-slate-500">รวมรายรับสะสมทั้งหมดในประวัติ:</p>
                   <p class="text-base font-black text-white" id="det-total-earn">฿0</p>
               </div>
           </div>
@@ -572,24 +560,6 @@
   </div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
-
-    let allBookings = null;
-    let allCompletedJobs = {}; 
-    let allProfiles = {}; 
-    let allPromoData = {};
-    let cropper = null; 
-
-    const tabTitles = {
-        'dashboard': 'แดชบอร์ด',
-        'drivers': 'จัดการคนขับรถ',
-        'passengers': 'ข้อมูลผู้โดยสาร (CRM)',
-        'promos': 'จัดการโปรโมชั่น',
-        'history': 'ประวัติงานทั้งหมด',
-        'cms': 'จัดการเนื้อหาแอป',
-        'blacklist': 'ระบบบล็อกเบอร์โทร'
-    };
-
     firebase.initializeApp({
       apiKey: "AIzaSyBNtaYaX1OW-86_9EGiVN9EpgPzWOX_twQ",
       authDomain: "myride-chiangrai.firebaseapp.com",
@@ -599,44 +569,65 @@
       messagingSenderId: "1048189690454",
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
-    
     const db = firebase.database();
 
-    // ================= ระบบ UI ทั่วไป =================
+    let allBookings = null;
+    let allCompletedJobs = {}; 
+    let allProfiles = {}; 
+    let allPromoData = {};
+    let cropper = null;
+    let currentPromoFilter = 'all';
+    let dispatchMode = 'manual';
+
+    // ดักฟังโหมดจ่ายงานจากระบบหลังบ้าน
+    db.ref('config/dispatchMode').on('value', snap => {
+        if(snap.exists()) {
+            dispatchMode = snap.val();
+            document.getElementById('dispatchModeSelect').value = dispatchMode;
+        }
+    });
+
+    function changeDispatchMode(val) {
+        db.ref('config/dispatchMode').set(val).then(() => {
+            alert('ปรับเปลี่ยนกลยุทธ์การกระจายงานระบบเรียบร้อย!');
+        });
+    }
+
+    db.ref('completed_jobs').on('value', snap => {
+        allCompletedJobs = snap.val() || {};
+        if(!document.getElementById('content-passengers').classList.contains('hidden')) renderPassengers();
+    });
+
     function toggleMenu() {
         const menu = document.getElementById('dropdown-menu');
         const icon = document.getElementById('menu-icon');
-        if (menu.classList.contains('hidden')) {
-            menu.classList.remove('hidden');
+        menu.classList.toggle('hidden');
+        if(!menu.classList.contains('hidden')) {
+            document.getElementById('header-alert-badge').classList.add('hidden');
             icon.classList.replace('fa-bars', 'fa-times');
-            document.getElementById('header-alert-badge').classList.add('hidden'); // ซ่อนจุดแดงเมื่อเปิดเมนู
         } else {
-            menu.classList.add('hidden');
             icon.classList.replace('fa-times', 'fa-bars');
         }
     }
 
     function closeMenuOnClickOutside() {
         const menu = document.getElementById('dropdown-menu');
-        const icon = document.getElementById('menu-icon');
         if (!menu.classList.contains('hidden')) {
             menu.classList.add('hidden');
-            icon.classList.replace('fa-times', 'fa-bars');
+            document.getElementById('menu-icon').classList.replace('fa-times', 'fa-bars');
         }
     }
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(el => {
-            el.classList.remove('bg-green-600', 'text-white');
-            el.classList.add('bg-slate-800', 'text-slate-400');
+            el.className = "tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition";
         });
         
         document.getElementById('content-' + tabId).classList.remove('hidden');
         let activeTab = document.getElementById('tab-' + tabId);
         if(activeTab) {
-            activeTab.classList.replace('bg-slate-800', 'bg-green-600');
-            activeTab.classList.replace('text-slate-400', 'text-white');
+            activeTab.className = "tab-btn px-4 py-3 bg-green-600 text-white font-bold rounded-xl text-sm flex items-center justify-between transition shadow";
         }
         
         document.getElementById('current-page-title').innerText = tabTitles[tabId];
@@ -644,335 +635,174 @@
         document.getElementById('menu-icon').classList.replace('fa-times', 'fa-bars');
 
         if(tabId === 'passengers') renderPassengers();
+        if(tabId === 'promos') renderPromoList();
     }
 
-    function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
-    function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
-
-    // ================= ระบบดึงข้อมูลหลัก (Master Data Listeners) =================
-    db.ref('completed_jobs').on('value', snap => {
-        allCompletedJobs = snap.val() || {};
-        if(!document.getElementById('content-passengers').classList.contains('hidden')) {
-            renderPassengers();
+    function switchPricingTab(tab) {
+        if(tab === 'pricing') {
+            document.getElementById('zone-pricing').classList.remove('hidden');
+            document.getElementById('zone-promo').classList.add('hidden');
+            document.getElementById('ptab-pricing').className = "flex-1 py-3 text-sm font-bold text-green-400 border-b-2 border-green-400 transition";
+            document.getElementById('ptab-promo').className = "flex-1 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition";
+        } else {
+            document.getElementById('zone-pricing').classList.add('hidden');
+            document.getElementById('zone-promo').classList.remove('hidden');
+            document.getElementById('ptab-pricing').className = "flex-1 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition";
+            document.getElementById('ptab-promo').className = "flex-1 py-3 text-sm font-bold text-green-400 border-b-2 border-green-400 transition";
         }
-    });
+    }
 
-    // ================= ระบบข้อมูลผู้โดยสาร (Passenger CRM) =================
+    // ================= DATA REPORT & PASSENGER CRM SYSTEM =================
     function renderPassengers() {
         let passMap = {};
-        
-        // 1. รวมข้อมูลจากงานที่วิ่งจบแล้ว
         Object.values(allCompletedJobs).forEach(job => {
-            let uid = job.phone || job.userId; // ยึดเบอร์โทรเป็นหลัก
-            if(!passMap[uid]) {
-                passMap[uid] = { phone: job.phone || '-', name: job.name || 'ไม่ระบุ', rides: 0, spend: 0, promos: [] };
-            }
+            let uid = job.phone || job.userId;
+            if(!passMap[uid]) passMap[uid] = { phone: job.phone || '-', name: job.name || 'สมาชิกลูกค้า', rides: 0, spend: 0, promos: [] };
             passMap[uid].rides++;
             passMap[uid].spend += parseInt(job.price || 0);
-            if(job.promoCode && !passMap[uid].promos.includes(job.promoCode)) {
-                passMap[uid].promos.push(job.promoCode);
-            }
+            if(job.promoCode && !passMap[uid].promos.includes(job.promoCode)) passMap[uid].promos.push(job.promoCode);
         });
 
-        // 2. รวมข้อมูลจากคนที่กำลังวิ่งอยู่แต่ยังไม่เคยจบงาน (ดึงจาก active bookings)
-        if(allBookings) {
-            Object.values(allBookings).forEach(job => {
-                let uid = job.phone || job.userId;
-                if(!passMap[uid]) {
-                    passMap[uid] = { phone: job.phone || '-', name: job.name || 'ไม่ระบุ', rides: 0, spend: 0, promos: [] };
-                }
-                // (ถ้ายังไม่จบงาน ไม่นับเป็น rides และ spend)
-            });
-        }
-
         let passArray = Object.values(passMap);
-        
-        // ตัวเลขสรุป
-        let totalUsers = passArray.length;
-        let newUsers = passArray.filter(p => p.rides <= 1).length;
-        let vipUsers = passArray.filter(p => p.rides > 1).length;
-
-        document.getElementById('stat-pass-total').innerText = totalUsers;
-        document.getElementById('stat-pass-new').innerText = newUsers;
-        document.getElementById('stat-pass-vip').innerText = vipUsers;
-
-        // ระบบกรอง
         let filter = document.getElementById('filter-passenger').value;
-        let filteredArray = passArray;
-        if(filter === 'new') filteredArray = passArray.filter(p => p.rides <= 1);
-        if(filter === 'regular') filteredArray = passArray.filter(p => p.rides > 1);
+        if(filter === 'new') passArray = passArray.filter(p => p.rides <= 1);
+        if(filter === 'regular') passArray = passArray.filter(p => p.rides > 1);
 
-        // จัดเรียงยอดใช้จ่ายมากสุดขึ้นก่อน
-        filteredArray.sort((a,b) => b.spend - a.spend);
+        passArray.sort((a,b) => b.spend - a.spend);
 
         let html = '';
-        if(filteredArray.length === 0) {
-            html = `<tr><td colspan="5" class="py-6 text-center text-slate-500">ไม่มีข้อมูลลูกค้าในหมวดหมู่นี้</td></tr>`;
+        if(passArray.length === 0) {
+            html = `<tr><td colspan="5" class="py-6 text-center text-slate-500">ไม่มีข้อมูลลอลิสต์รายชื่อในกลุ่มนี้</td></tr>`;
         } else {
-            filteredArray.forEach(p => {
-                let isNew = p.rides <= 1;
-                let badge = isNew ? `<span class="bg-green-900/40 text-green-400 text-[10px] px-2 py-0.5 rounded border border-green-500/30">ผู้ใช้ใหม่</span>` : `<span class="bg-yellow-900/40 text-yellow-400 text-[10px] px-2 py-0.5 rounded border border-yellow-500/30">ลูกค้าประจำ</span>`;
-                let promoList = p.promos.length > 0 ? p.promos.join(', ') : '-';
-
-                html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/30 transition">
-                    <td class="py-3 px-2">
-                        <p class="font-bold text-white">${p.phone}</p>
-                        <p class="text-[10px] text-slate-500">${p.name}</p>
-                    </td>
+            passArray.forEach(p => {
+                let badge = p.rides <= 1 ? `<span class="bg-green-950 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded border border-green-500/20">ผู้ใช้ใหม่</span>` : `<span class="bg-yellow-950 text-yellow-400 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-500/20">ลูกค้าประจำ</span>`;
+                html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/20">
+                    <td class="py-3 px-2 font-bold text-white">${p.phone}<br><span class="text-xs text-slate-500 font-normal">${p.name}</span></td>
                     <td class="py-3 px-2">${badge}</td>
-                    <td class="py-3 px-2 text-center font-bold text-blue-400">${p.rides}</td>
-                    <td class="py-3 px-2 text-right font-black text-emerald-400">฿${p.spend.toLocaleString()}</td>
-                    <td class="py-3 px-2 text-[10px] text-slate-400 max-w-[100px] truncate">${promoList}</td>
+                    <td class="py-3 px-2 text-center font-bold text-blue-400">${p.rides} ครั้ง</td>
+                    <td class="py-3 px-2 text-right font-black text-green-400">฿${p.spend.toLocaleString()}</td>
+                    <td class="py-3 px-2 text-xs text-slate-400 max-w-[150px] truncate">${p.promos.length > 0 ? p.promos.join(', ') : '-'}</td>
                 </tr>`;
             });
         }
         document.getElementById('passengers-list').innerHTML = html;
-        window.currentPassengerData = filteredArray; // สำหรับใช้ Export
+        window.currentPassengerData = passArray;
     }
 
     function exportPassengersCSV() {
-        if(!window.currentPassengerData || window.currentPassengerData.length === 0) { alert('ไม่มีข้อมูลให้ Export'); return; }
-        
-        let csvContent = "\uFEFF"; // สำหรับภาษาไทยใน Excel (BOM)
-        csvContent += "เบอร์โทร,ชื่อ-นามสกุล,จำนวนครั้งที่ใช้บริการ,ยอดใช้จ่ายสะสม(บาท),ประวัติการใช้โค้ด\n";
-        
+        if(!window.currentPassengerData || window.currentPassengerData.length === 0) return alert('ไม่มีฐานข้อมูลเป้าหมาย');
+        let csv = "\uFEFFเบอร์โทร,ชื่อสมาชิก,จำนวนครั้งเดินทาง,ยอดเงินรวมสะสม,โค้ดส่วนลดที่ใช้\n";
         window.currentPassengerData.forEach(p => {
-            let promos = p.promos.length > 0 ? p.promos.join(';') : '-';
-            csvContent += `"${p.phone}","${p.name}","${p.rides}","${p.spend}","${promos}"\n`;
+            csv += `"${p.phone}","${p.name}","${p.rides}","${p.spend}","${p.promos.join(';')}"\n`;
         });
-
-        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        let url = URL.createObjectURL(blob);
-        let link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Passenger_Data_${Date.now()}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        triggerDownload(csv, `F1_Passengers_CRM_${Date.now()}.csv`);
     }
 
-    // ================= ระบบโปรโมชั่น (Promotion Management) =================
+    // ================= PROMOTIONS GENERATOR BLOCKS =================
     function switchPromoBuilder(type) {
-        if (type === 'general') {
-            document.getElementById('pbuild-general').classList.remove('hidden');
-            document.getElementById('pbuild-random').classList.add('hidden');
-            document.getElementById('pbtn-general').className = "flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition";
-            document.getElementById('pbtn-random').className = "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition";
-        } else {
-            document.getElementById('pbuild-general').classList.add('hidden');
-            document.getElementById('pbuild-random').classList.remove('hidden');
-            document.getElementById('pbtn-general').className = "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition";
-            document.getElementById('pbtn-random').className = "flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition";
-        }
+        document.getElementById('pbuild-general').classList.toggle('hidden', type !== 'general');
+        document.getElementById('pbuild-random').classList.toggle('hidden', type !== 'random');
     }
 
     function addPromoCode() {
         let code = document.getElementById('promo-code').value.trim().toUpperCase();
         let value = document.getElementById('promo-value').value.trim();
         let target = document.getElementById('promo-target').value;
+        if(!code || !value) return alert("กรอกฟิลด์รหัสและมูลค่าให้ครบถ้วนก่อนครับ");
 
-        if(!code || !value) { alert("กรุณากรอกโค้ดและจำนวนเงินให้ครบถ้วน"); return; }
-        
-        db.ref('promotions/' + code).set({ 
-            code: code, 
-            value: parseInt(value),
-            target: target,
-            usageCount: 0,
-            isActive: true,
-            isSingleUse: false
-        }).then(() => {
-            alert("เพิ่มโค้ดส่วนลดสำเร็จ!");
-            document.getElementById('promo-code').value = '';
-            document.getElementById('promo-value').value = '';
+        db.ref('promotions/' + code).set({ code: code, value: parseInt(value), target: target, usageCount: 0, isActive: true, isSingleUse: false }).then(() => {
+            alert("บันทึกโค้ดเข้าสู่ระบบจัดซื้อสำเร็จ!");
+            document.getElementById('promo-code').value = ''; document.getElementById('promo-value').value = '';
         });
     }
 
     function generateRandomPromos() {
-        let prefix = document.getElementById('promo-rand-prefix').value.trim().toUpperCase();
+        let prefix = document.getElementById('promo-rand-prefix').value.trim().toUpperCase() || "F1";
         let amount = parseInt(document.getElementById('promo-rand-amount').value);
         let value = parseInt(document.getElementById('promo-rand-value').value);
+        if(!amount || !value || amount < 1) return alert("ตรวจสอบฟิลด์ระบุจำนวนชุดข้อมูล");
 
-        if(!amount || !value || amount < 1 || value < 1) {
-            alert('กรุณากรอกจำนวนโค้ดและส่วนลดให้ถูกต้อง'); return;
-        }
-
-        let updates = {};
+        let batch = {};
         for(let i=0; i<amount; i++) {
-            let randomNum = Math.floor(1000 + Math.random() * 9000); 
-            let code = prefix + randomNum.toString();
-            updates['promotions/' + code] = {
-                code: code,
-                value: value,
-                target: 'all',
-                usageCount: 0,
-                isActive: true,
-                isSingleUse: true 
-            };
+            let rnd = Math.floor(1000 + Math.random() * 9000);
+            let code = prefix + rnd;
+            batch['promotions/' + code] = { code: code, value: value, target: 'all', usageCount: 0, isActive: true, isSingleUse: true };
         }
-
-        db.ref().update(updates).then(() => {
-            alert(`สุ่มสร้างโค้ด ${amount} ใบ สำเร็จ!`);
+        db.ref().update(batch).then(() => {
+            alert(`เจนชุดคูปองสุ่มจำนวน ${amount} ใบ พร้อมผูกแฟล็กใช้แล้วทิ้งเข้าระบบสำเร็จ!`);
             document.getElementById('promo-rand-amount').value = '';
         });
     }
 
-    let currentPromoFilter = 'all';
-    function filterPromoList(filterType) {
-        currentPromoFilter = filterType;
-        document.getElementById('flt-promo-all').className = filterType === 'all' ? "text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1 transition" : "text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1 transition";
-        document.getElementById('flt-promo-random').className = filterType === 'random' ? "text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1 transition" : "text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1 transition";
-        renderPromoList();
-    }
+    function filterPromoList(type) { currentPromoFilter = type; renderPromoList(); }
 
-    db.ref('promotions').on('value', snap => {
-        allPromoData = snap.val() || {};
-        renderPromoList();
-    });
+    db.ref('promotions').on('value', snap => { allPromoData = snap.val() || {}; renderPromoList(); });
 
     function renderPromoList() {
         let listContainer = document.getElementById('promo-codes-list');
-        if(Object.keys(allPromoData).length === 0) { listContainer.innerHTML = `<li class="py-4 text-center text-slate-500">ไม่มีโค้ดโปรโมชั่นในระบบ</li>`; return; }
-        
         let html = '';
         for (let key in allPromoData) {
             let p = allPromoData[key];
-            
-            // กรอง
             if(currentPromoFilter === 'random' && !p.isSingleUse) continue;
             if(currentPromoFilter === 'all' && p.isSingleUse) continue;
 
-            let count = p.usageCount || 0;
-            let isActive = p.isActive !== false; 
-            
-            let toggleClass = isActive ? 'text-green-400' : 'text-slate-500';
-            let toggleIcon = isActive ? 'fa-toggle-on' : 'fa-toggle-off';
-            let opacityClass = isActive ? 'opacity-100' : 'opacity-60 grayscale-[50%]';
-            
-            let badge = '';
-            if (p.isSingleUse) badge = '<span class="bg-yellow-900/40 text-yellow-400 text-[8px] px-1 rounded ml-1 border border-yellow-500/30">ใช้ครั้งเดียว</span>';
-            else if (p.target === 'new_user') badge = '<span class="bg-blue-900/40 text-blue-400 text-[8px] px-1 rounded ml-1 border border-blue-500/30">ผู้ใช้ใหม่</span>';
-            else badge = '<span class="bg-slate-700 text-white text-[8px] px-1 rounded ml-1">ทั่วไป</span>';
+            let isActive = p.isActive !== false;
+            let badge = p.isSingleUse ? `<span class="bg-yellow-950 text-yellow-400 border border-yellow-500/20 text-[9px] px-1.5 py-0.5 rounded">ตั๋วสุ่มจับแจก (ทิ้ง)</span>` : (p.target === 'new_user' ? `<span class="bg-blue-950 text-blue-400 border border-blue-500/20 text-[9px] px-1.5 py-0.5 rounded">แคมเปญผู้ใช้ใหม่</span>` : `<span class="bg-slate-800 text-slate-300 text-[9px] px-1.5 py-0.5 rounded">คูปองหลักทั่วไป</span>`);
 
-            html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-2 transition ${opacityClass}">
-                <div class="flex-1">
-                    <div class="flex items-center mb-1">
-                        <span class="font-mono bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-700 tracking-wider">${p.code}</span>
+            html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-1">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-mono bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-700 tracking-wide text-xs">${p.code}</span>
                         ${badge}
                     </div>
-                    <p class="text-[10px] text-slate-400">ใช้ไปแล้ว <span class="text-white font-bold">${count}</span> ครั้ง</p>
+                    <p class="text-[10px] text-slate-500">เปิดระบบเคลมไปแล้ว <span class="text-white font-bold">${p.usageCount || 0}</span> ครั้ง</p>
                 </div>
-                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                    <span class="text-xs font-medium text-green-400 bg-green-900/20 px-2 py-1 rounded hidden sm:inline">ลด ฿${p.value}</span>
-                    <button onclick="togglePromoStatus('${p.code}', ${isActive})" class="text-2xl ${toggleClass} hover:scale-110 transition" title="สวิตช์เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
-                    <button onclick="viewPromoHistory('${p.code}')" class="text-slate-400 hover:text-white bg-slate-800 w-8 h-8 rounded-lg flex items-center justify-center text-xs transition border border-slate-700" title="ประวัติการใช้"><i class="fas fa-list"></i></button>
-                    <button onclick="removePromoCode('${p.code}')" class="text-red-400 hover:text-white bg-red-900/30 hover:bg-red-600 w-8 h-8 rounded-lg flex items-center justify-center text-xs transition border border-red-900/50" title="ลบถาวร"><i class="fas fa-trash-alt"></i></button>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-green-400 mr-2">฿${p.value}</span>
+                    <button onclick="db.ref('promotions/${p.code}').update({isActive: ${!isActive}})" class="text-xl ${isActive ? 'text-green-400':'text-slate-600'}"><i class="fas ${isActive ? 'fa-toggle-on':'fa-toggle-off'}"></i></button>
+                    <button onclick="viewPromoHistory('${p.code}')" class="bg-slate-800 px-2 py-1 rounded border border-slate-700 text-xs"><i class="fas fa-list"></i></button>
+                    <button onclick="if(confirm('ยืนยันทำลายโค้ด?')) db.ref('promotions/${p.code}').remove()" class="text-red-400 bg-red-950/20 px-2 py-1 rounded border border-red-500/20 text-xs"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </li>`;
         }
-        
-        if (html === '') html = `<li class="py-4 text-center text-slate-500">ไม่มีโค้ดในหมวดหมู่นี้</li>`;
-        listContainer.innerHTML = html;
+        listContainer.innerHTML = html || `<p class="text-center text-slate-500 text-xs py-4">ไม่มีข้อมูลสิทธิ์ในแฟ้มนี้</p>`;
     }
 
     function exportRandomCodes() {
-        let csvContent = "\uFEFFรหัสโค้ด,ส่วนลด (บาท),สถานะ\n";
-        let hasCode = false;
+        let csv = "\uFEFFรหัสโค้ดโปรโมชั่นคูปอง,มูลค่าส่วนลด(บาท),ประวัติสิทธิ์การเคลม\n";
+        let found = false;
         for(let key in allPromoData) {
             let p = allPromoData[key];
             if(p.isSingleUse) {
-                let status = p.usageCount >= 1 ? 'ใช้แล้ว' : (p.isActive === false ? 'ถูกปิด' : 'ยังไม่ถูกใช้');
-                csvContent += `"${p.code}","${p.value}","${status}"\n`;
-                hasCode = true;
+                csv += `"${p.code}","${p.value}","${p.usageCount >= 1 ? 'ใช้แล้ว':'ยังไม่ถูกใช้'}"\n`;
+                found = true;
             }
         }
+        if(!found) return alert("ไม่มีสิทธิ์แบบกลุ่มรหัสสุ่มในระบบคลังพัสดุ");
+        triggerDownload(csv, `F1_Random_Coupons_PrintSheet_${Date.now()}.csv`);
+    }
 
-        if(!hasCode) { alert("ไม่มีโค้ดสุ่มในระบบให้ Export ครับ"); return; }
-
-        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        let url = URL.createObjectURL(blob);
+    function triggerDownload(content, filename) {
+        let blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
         let link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Random_Promo_Codes_${Date.now()}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        link.href = URL.createObjectURL(blob); link.setAttribute("download", filename);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    function removePromoCode(code) {
-        if(confirm("ต้องการลบโค้ดโปรโมชั่น '" + code + "' ทิ้งถาวรใช่หรือไม่?")) { 
-            db.ref('promotions/' + code).remove(); 
-        }
-    }
-
-    function togglePromoStatus(code, currentStatus) {
-        db.ref('promotions/' + code).update({ isActive: !currentStatus });
-    }
-
-    function viewPromoHistory(code) {
-        document.getElementById('history-promo-title').innerText = `ประวัติคนใช้โค้ด: ${code}`;
-        openModal('modalPromoHistory');
-        
-        db.ref('promotions/' + code + '/history').once('value', snap => {
-            let hist = snap.val();
-            let html = '';
-            if(!hist) {
-                html = `<tr><td colspan="3" class="py-8 text-center text-slate-500">ยังไม่มีประวัติการใช้งานโค้ดนี้</td></tr>`;
-            } else {
-                let keys = Object.keys(hist).reverse();
-                for(let i=0; i<keys.length; i++) {
-                    let h = hist[keys[i]];
-                    html += `<tr class="border-b border-slate-800 text-slate-300">
-                        <td class="py-3 px-2 text-[10px] sm:text-xs text-slate-400">${h.date || '-'}</td>
-                        <td class="py-3 px-2 font-bold text-white text-xs sm:text-sm">${h.userName || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-normal">${h.phone || '-'}</span></td>
-                        <td class="py-3 px-2 text-right text-xs sm:text-sm font-bold text-green-400">ประหยัด ฿${h.discount || 0}</td>
-                    </tr>`;
-                }
-            }
-            document.getElementById('modal-promo-history-list').innerHTML = html;
-        });
-    }
-
-    // ================= ระบบจัดการ CMS (Banner Multi Upload & Crop) =================
-    db.ref('config/banners').on('value', snap => {
-        let listContainer = document.getElementById('admin-banners-list');
-        if(!snap.exists()) {
-            listContainer.innerHTML = `<p class="text-slate-500 text-sm text-center py-4">ยังไม่มีรูปแบนเนอร์ในระบบ</p>`;
-            return;
-        }
-
-        let banners = [];
-        snap.forEach(child => { banners.push({ id: child.key, ...child.val() }); });
-
-        let html = '';
-        banners.forEach((b, index) => {
-            let linkText = b.linkUrl ? `<a href="${b.linkUrl}" target="_blank" class="text-[10px] text-blue-400 underline truncate block max-w-[200px] mt-1"><i class="fas fa-link"></i> ${b.linkUrl}</a>` : `<span class="text-[10px] text-slate-500 mt-1 block">ไม่มีลิงก์</span>`;
-            
-            html += `
-            <div class="flex gap-3 bg-slate-800/50 p-2 rounded-xl border border-slate-700 items-center">
-                <div class="w-20 h-12 shrink-0 bg-black rounded-lg overflow-hidden border border-slate-600">
-                    <img src="${b.imageUrl}" class="w-full h-full object-contain">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-white">แบนเนอร์ ${index + 1}</p>
-                    ${linkText}
-                </div>
-                <button onclick="removeBanner('${b.id}')" class="text-red-400 hover:text-white bg-red-900/30 w-8 h-8 rounded-lg flex items-center justify-center transition border border-red-900/50 shrink-0"><i class="fas fa-trash-alt text-xs"></i></button>
-            </div>`;
-        });
-        listContainer.innerHTML = html;
-    });
-
+    // ================= CMS BANNER ADVANCED CROP & TIMER SYSTEM =================
     document.getElementById('cms-banner-file').addEventListener('change', function(e) {
         let files = e.target.files;
         if (files && files.length > 0) {
             let file = files[0];
-            let url = URL.createObjectURL(file);
-            document.getElementById('imageToCrop').src = url;
+            document.getElementById('imageToCrop').src = URL.createObjectURL(file);
             document.getElementById('cropArea').classList.remove('hidden');
-            if (cropper) { cropper.destroy(); }
+            if (cropper) cropper.destroy();
             
-            let imageElement = document.getElementById('imageToCrop');
-            cropper = new Cropper(imageElement, { aspectRatio: 16 / 9, viewMode: 1, autoCropArea: 1 });
+            let pos = document.getElementById('cms-banner-position').value;
+            cropper = new Cropper(document.getElementById('imageToCrop'), {
+                aspectRatio: pos === 'bottom' ? (600 / 120) : (16 / 9),
+                viewMode: 1, autoCropArea: 1
+            });
         }
     });
 
@@ -980,186 +810,330 @@
         document.getElementById('cropArea').classList.add('hidden');
         document.getElementById('cms-banner-file').value = '';
         document.getElementById('cms-banner-link').value = '';
+        document.getElementById('cms-banner-start').value = '';
+        document.getElementById('cms-banner-end').value = '';
         if (cropper) { cropper.destroy(); cropper = null; }
     }
 
     function saveCroppedImage() {
         if (!cropper) return;
-        let canvas = cropper.getCroppedCanvas({ width: 600 });
-        let base64Image = canvas.toDataURL('image/jpeg', 0.6); 
+        let pos = document.getElementById('cms-banner-position').value;
+        let canvas = cropper.getCroppedCanvas(pos === 'bottom' ? { width: 600, height: 120 } : { width: 600 });
+        let base64 = canvas.toDataURL('image/jpeg', 0.6);
+        
         let linkUrl = document.getElementById('cms-banner-link').value.trim();
+        let startTime = document.getElementById('cms-banner-start').value;
+        let endTime = document.getElementById('cms-banner-end').value;
 
-        db.ref('config/banners').push({ 
-            imageUrl: base64Image, linkUrl: linkUrl, timestamp: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-            alert('เพิ่มรูปลงสไลด์แบนเนอร์สำเร็จแล้ว!');
+        let path = pos === 'bottom' ? 'config/bottom_banners' : 'config/banners';
+        db.ref(path).push({ imageUrl: base64, linkUrl: linkUrl, startTime: startTime || null, endTime: endTime || null, timestamp: firebase.database.ServerValue.TIMESTAMP }).then(() => {
+            alert('อัปเดตสไลด์ภาพและฝังข้อมูลเวลาเริ่ม-หมดอายุโครงสร้างเรียบร้อย!');
             cancelCrop();
         });
     }
 
-    function removeBanner(key) {
-        if(confirm("ต้องการลบแบนเนอร์นี้ออกใช่หรือไม่?")) {
-            db.ref('config/banners/' + key).remove();
+    function loadAdminBannersList() {
+        let listContainer = document.getElementById('admin-banners-list');
+        if(!listContainer) return;
+        listContainer.innerHTML = '';
+
+        const drawItem = (snap, lbl, path) => {
+            if(snap.exists()) {
+                snap.forEach(child => {
+                    let b = child.val();
+                    let timer = (b.startTime || b.endTime) ? `<p class="text-[9px] text-yellow-500">⏱️ ตั้งเวลา: ${b.startTime ? b.startTime.replace('T',' '):'เปิดทันที'} ถึง ${b.endTime ? b.endTime.replace('T',' '):'ยาวๆ'}</p>` : `<p class="text-[9px] text-green-400">✅ แสดงผลตลอดเวลา</p>`;
+                    listContainer.innerHTML += `
+                    <div class="flex gap-3 bg-slate-800/40 p-2 rounded-xl border border-slate-700 items-center">
+                        <div class="w-16 h-10 bg-black rounded border border-slate-600 overflow-hidden shrink-0">
+                            <img src="${b.imageUrl}" class="w-full h-full object-contain">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-bold text-white truncate">ตำแหน่ง: ${lbl}</p>
+                            ${b.linkUrl ? `<p class="text-[9px] text-blue-400 truncate">${b.linkUrl}</p>`:''}
+                            ${timer}
+                        </div>
+                        <button onclick="if(confirm('ลบรูปนี้?')) db.ref('${path}/${child.key}').remove()" class="text-red-400 bg-red-950/20 w-7 h-7 rounded-lg border border-red-500/20 text-xs flex items-center justify-center shrink-0"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
+                });
+            }
+        };
+
+        db.ref('config/banners').once('value', snap => { drawItem(snap, 'บน (16:9)', 'config/banners'); 
+            db.ref('config/bottom_banners').once('value', snap2 => { drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); 
+                if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-slate-500 text-xs py-4">ไม่มีรูปภาพในสไลด์</p>';
+            });
+        });
+    }
+
+    db.ref('config/banners').on('value', () => loadAdminBannersList());
+    db.ref('config/bottom_banners').on('value', () => loadAdminBannersList());
+
+    // ================= CENTRAL CONTROL MANUAL DISPATCH FUNCTIONS =================
+    function assignDriverToJob(jobId, driverPin) {
+        if(!driverPin) return;
+        if(confirm(`ต้องการสั่งมอบหมายจ่ายงานใบนี้ให้คนขับรหัส [${driverPin}] ดึงคิวตรงหน้าแอปใช่หรือไม่?`)) {
+            db.ref('bookings/' + jobId).update({
+                assignedDriver: driverPin
+            }).then(() => {
+                alert(`จ่ายระบบสั่งงานให้คนขับรหัส ${driverPin} เรียบร้อยแล้ว!`);
+            });
         }
     }
 
-    // ================= อัปเดตเมนู Badges (คนขับออนไลน์ & งานรอ) =================
+    // ================= CORE SYSTEM DATABASE LISTENERS & COUNTERS =================
     db.ref('active_drivers').on('value', snap => {
-        let statOnline = document.getElementById('stat-online-count');
-        let badgeMenu = document.getElementById('menu-badge-online');
-        let htmlModal = ''; let count = 0;
-        
+        let count = 0; let modalHtml = '';
         if(snap.exists()) {
             snap.forEach(child => {
                 let d = child.val();
                 if(d.status === "ออนไลน์") {
                     count++;
-                    let driverName = (d.pin && allProfiles[d.pin]) ? allProfiles[d.pin].name : "พนักงาน";
-                    htmlModal += `<tr class="border-b border-slate-800 last:border-0"><td class="py-3 text-white cursor-pointer hover:text-green-400" onclick="showDriverDetails('${d.pin||''}')"><u>${driverName}</u></td><td class="py-3 text-right text-slate-400">${d.driverPhone || '-'}</td></tr>`;
+                    let name = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงานประจำฟลีท";
+                    modalHtml += `<tr class="border-b border-slate-800 last:border-0"><td class="py-2.5 font-bold text-white cursor-pointer hover:text-green-400" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td><td class="py-2.5 text-right text-slate-400">${d.driverPhone || '-'}</td></tr>`;
                 }
             });
         }
-        
-        statOnline.innerText = count + " คน";
-        if (count > 0) {
-            badgeMenu.innerText = count + " ออนไลน์"; badgeMenu.classList.remove('hidden');
-        } else {
-            badgeMenu.classList.add('hidden');
-            htmlModal = `<tr><td colspan="2" class="py-4 text-center text-slate-500">ไม่มีคนขับออนไลน์</td></tr>`;
-        }
-        document.getElementById('modal-online-list').innerHTML = htmlModal;
+        document.getElementById('stat-online-count').innerText = count + " คน";
+        let badge = document.getElementById('menu-badge-online');
+        if(count > 0) { badge.innerText = count + " ออนไลน์"; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
+        document.getElementById('modal-online-list').innerHTML = modalHtml || '<tr><td colspan="2" class="py-4 text-center text-slate-500">ไม่มีคนขับสแตนบายระบุออนไลน์ในขณะนี้</td></tr>';
     });
 
     db.ref('bookings').on('value', snap => {
-        allBookings = snap.val(); 
-        let htmlMain = ''; let htmlModalPending = ''; let countPending = 0;
+        allBookings = snap.val();
+        let countPending = 0; let mainHistoryHtml = ''; let modalPendingHtml = '';
         let badgeMenu = document.getElementById('menu-badge-pending');
         let headerAlert = document.getElementById('header-alert-badge');
-        
+
+        // สคริปต์กรองดึงรายชื่อคนขับออนไลน์มาทำ Dropdown บอร์ดกลางจัดสรรงาน
+        let driverOptions = '<option value="">-- เลือกจ่ายงานให้คนขับ --</option>';
+        if(windowContext.onlineDrivers && windowContext.onlineDrivers.length > 0) {
+            windowContext.onlineDrivers.forEach(d => {
+                let dName = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงาน";
+                driverOptions += `<option value="${d.pin}">${d.pin} - ${dName}</option>`;
+            });
+        }
+
         if(allBookings) {
             for (let key in allBookings) {
                 let j = allBookings[key];
-                let statusColor = "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
-                if (j.status.includes("เสร็จสิ้น") || j.status.includes("เรียบร้อย")) statusColor = "text-green-400 bg-green-500/10 border-green-500/20";
-                if (j.status.includes("ยกเลิก")) statusColor = "text-red-400 bg-red-500/10 border-red-500/20";
+                let isWaiting = j.status === "รอผู้ขับขี่ตอบรับ" || j.status.includes("กำลังเดินทาง") || j.status.includes("รับงานแล้ว");
+                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-green-400 text-base" title="รถยนต์"></i>';
+                
+                let statusColor = j.status.includes("ยกเลิก") ? "text-red-400 bg-red-500/10 border-red-500/20" : "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
 
-                let priceDisplay = `฿${j.price}`;
-                if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-green-400 bg-green-900/30 px-1 rounded border border-green-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
-
-                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400"></i>' : '<i class="fas fa-car-side text-green-400"></i>';
-
-                htmlMain += `<tr class="border-b border-slate-800 text-slate-300">
-                    <td class="py-3 px-2 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-medium">${j.phone || '-'}</span></td>
-                    <td class="py-3 px-2 text-center" title="${j.serviceType === 'bike' ? 'มอเตอร์ไซค์' : 'รถยนต์'}">${srvIcon}</td>
-                    <td class="py-3 px-2 text-[10px] max-w-[150px] truncate text-slate-400">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
-                    <td class="py-3 px-2 text-sm">${j.distance || '0'} กม.</td>
-                    <td class="py-3 px-2 text-sm font-black text-green-400">${priceDisplay}</td>
+                mainHistoryHtml += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/20">
+                    <td class="py-3 px-2 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-normal">${j.phone || '-'}</span></td>
+                    <td class="py-3 px-2 text-center">${srvIcon}</td>
+                    <td class="py-3 px-2 text-xs text-slate-400 max-w-[150px] truncate">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
+                    <td class="py-3 px-2">${j.distance || '0'} กม.</td>
+                    <td class="py-3 px-2 font-bold text-green-400">฿${j.price}</td>
                     <td class="py-3 px-2 font-bold cursor-pointer hover:text-green-400" onclick="showDriverDetails('${j.driverPin}')"><u>${j.driverPin || '-'}</u></td>
-                    <td class="py-3 px-2 text-right"><span class="px-2 py-1 rounded-lg border text-[10px] font-bold ${statusColor}">${j.status}</span></td>
+                    <td class="py-3 px-2 text-right"><span class="px-2 py-0.5 rounded border text-[10px] font-bold ${statusColor}">${j.status}</span></td>
                 </tr>`;
 
-                if(j.status === "รอผู้ขับขี่ตอบรับ" || j.status.includes("กำลังเดินทาง") || j.status.includes("รับงานแล้ว")) {
+                if(isWaiting) {
                     countPending++;
-                    htmlModalPending += `<tr class="border-b border-slate-800 text-slate-300">
-                        <td class="py-3 px-2 font-bold text-white flex items-center gap-2">${srvIcon} <div>${j.name || 'ลูกค้า'}<br><span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded inline-block mt-0.5">${j.status}</span></div></td>
-                        <td class="py-3 px-2 text-[10px] text-slate-400 truncate max-w-[150px] leading-tight">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
-                        <td class="py-3 px-2 text-right font-black text-green-400">${priceDisplay}</td>
+                    
+                    // ส่วนควบคุมเมนูกระจายงานแบบระบุรายตัว (ถ้าเป็นโหมดออโต้คิวจะซ่อนไว้ระบบจะโยนเอง)
+                    let dispatchControl = dispatchMode === 'auto' 
+                        ? `<span class="text-xs font-bold text-green-400"><i class="fas fa-robot"></i> กำลังจับคู่อัตโนมัติ</span>`
+                        : `<select onchange="assignDriverToJob('${key}', this.value)" class="bg-slate-800 text-white text-xs border border-slate-700 rounded px-2 py-1 outline-none font-bold">${driverOptions}</select>`;
+                    
+                    // ปักหมุดบอกกรณีแอดมินยิงเจาะจงไปแล้ว
+                    if(j.assignedDriver && dispatchMode === 'manual') {
+                        dispatchControl = `<div class="text-xs text-slate-400">ยิงงานไปที่รหัส <b class="text-yellow-400">#${j.assignedDriver}</b> แล้ว<br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-[10px] text-red-400 underline mt-0.5">ดึงงานกลับบ่อรวม</button></div>`;
+                    }
+
+                    modalPendingHtml += `<tr class="border-b border-slate-800 text-slate-300">
+                        <td class="py-3 px-2 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-[9px] bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded inline-block mt-0.5 text-slate-400">${j.status}</span></td>
+                        <td class="py-3 px-2 text-[11px] text-slate-400 max-w-[160px] truncate leading-tight">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
+                        <td class="py-3 px-2 text-center">${srvIcon}</td>
+                        <td class="py-3 px-2 font-black text-green-400">฿${j.price}</td>
+                        <td class="py-3 px-2 text-right">${dispatchControl}</td>
                     </tr>`;
                 }
             }
+
+            // 🤖 ระบบ AUTO DISPATCH ENGINE (คิวสมดุลกระจายรายได้เท่าเทียม) 🤖
+            if(dispatchMode === 'auto') {
+                for (let key in allBookings) {
+                    let job = allBookings[key];
+                    // ค้นหางานบ่อรวมในลูปที่ยังไม่มีการ Assign และยังไม่มีคนขับรับ
+                    if(job.status === "รอผู้ขับขี่ตอบรับ" && !job.assignedDriver) {
+                        executeAutoDispatchBalancing(key, job);
+                    }
+                }
+            }
         }
-        
+
         document.getElementById('stat-pending-count').innerText = countPending + " งาน";
-        
-        if (countPending > 0) {
+        if(countPending > 0) {
             badgeMenu.innerText = countPending + " งานรอ"; badgeMenu.classList.remove('hidden');
             headerAlert.classList.remove('hidden');
-            document.getElementById('modal-pending-list').innerHTML = htmlModalPending;
+            document.getElementById('modal-pending-list').innerHTML = modalPendingHtml;
         } else {
-            badgeMenu.classList.add('hidden');
-            headerAlert.classList.add('hidden');
-            document.getElementById('modal-pending-list').innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีงานรอดำเนินการ</td></tr>`;
+            badgeMenu.classList.add('hidden'); headerAlert.classList.add('hidden');
+            document.getElementById('modal-pending-list').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีงานเรียกรถค้างคิวขณะนี้</td></tr>';
         }
 
-        let historyContainer = document.getElementById('history-jobs-list');
-        if(htmlMain === '') historyContainer.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-500">ยังไม่มีประวัติงานบันทึกในระบบ</td></tr>`;
-        else historyContainer.innerHTML = htmlMain;
+        let historyTable = document.getElementById('history-jobs-list');
+        if(mainHistoryHtml !== '') historyTable.innerHTML = mainHistoryHtml;
+        else historyTable.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-500">ยังไม่มีข้อมูลในประวัติสารบบคิว</td></tr>`;
     });
 
-    // ================= ระบบจัดการแบล็กลิสต์ =================
+    // ฟังก์ชันประมวลผลกระจายงานออโต้คิว บาลานซ์รายได้คนขับให้เท่าๆ กันประจำวัน
+    function executeAutoDispatchBalancing(jobId, jobData) {
+        if(!windowContext.onlineDrivers || windowContext.onlineDrivers.length === 0) return;
+        
+        let todayStart = new Date().setHours(0,0,0,0);
+        
+        // กรองหาคนขับออนไลน์ที่ตรงประเภทรถ (เช่น ลูกค้าเรียกรถยนต์ คนขับต้องขับรถยนต์)
+        // เพื่อความยืดหยุ่นในเวอร์ชันปัจจุบัน ถ้าระบบยังไม่บันทึกประเภทรถคนขับ จะให้รวมหมดก่อนครับ
+        let targets = windowContext.onlineDrivers;
+
+        if(targets.length === 0) return;
+
+        // คำนวณหาจำนวนครั้งที่แต่ละคนวิ่งงานสำเร็จไปแล้วในวันนี้
+        let pool = targets.map(d => {
+            let countToday = 0;
+            for(let k in allCompletedJobs) {
+                let c = allCompletedJobs[k];
+                if(c.driverPin === d.pin && (c.completedAt || 0) >= todayStart) {
+                    countToday++;
+                }
+            }
+            return { pin: d.pin, jobsCount: countToday };
+        });
+
+        // เรียงลำดับจากคนที่มีรอบงานวิ่งวันนี้น้อยที่สุดขึ้นมาเป็นอันดับแรก (Load Balancing)
+        pool.sort((a,b) => a.jobsCount - b.jobsCount);
+        let selectedDriverPin = pool[0].pin;
+
+        // ทำการยิงระบุตัวคนขับออโต้ทันที
+        db.ref('bookings/' + jobId).update({
+            assignedDriver: selectedDriverPin
+        });
+    }
+
     db.ref('blacklist').on('value', snap => {
-        let list = snap.val(); let count = 0;
-        let htmlMain = ''; let htmlModal = '';
-        let badgeMenu = document.getElementById('menu-badge-block');
-        
-        if(!list) {
-            document.getElementById('stat-block-count').innerText = "0 เบอร์"; badgeMenu.classList.add('hidden');
-            document.getElementById('blacklist-table-body').innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">ไม่มีประวัติการบล็อก</td></tr>`;
-            document.getElementById('modal-blacklist-list').innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีประวัติการบล็อก</td></tr>`;
-            return;
-        }
-        
-        for (let key in list) {
-            count++; let b = list[key];
-            htmlMain += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-3 px-2 font-bold text-red-400">${b.phone}</td><td class="py-3 px-2 text-xs text-slate-400">${b.reason}</td><td class="py-3 px-2 text-xs">${b.timestamp}</td><td class="py-3 px-2 text-right"><button onclick="removeFormBlacklist('${b.phone}')" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl text-xs font-bold border border-green-500/20 hover:bg-green-600/40">ปลดแบน</button></td></tr>`;
-            htmlModal += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-3 px-2 font-bold text-red-400">${b.phone}</td><td class="py-3 px-2 text-xs text-slate-400">${b.reason}</td><td class="py-3 px-2 text-xs text-right">${b.timestamp.split(' ')[0]}</td></tr>`;
+        let list = snap.val(); let count = 0; let mainHtml = ''; let modalHtml = '';
+        let badge = document.getElementById('menu-badge-block');
+        if(list) {
+            for(let k in list) { count++; let b = list[k];
+                mainHtml += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-2.5 px-2 font-bold text-red-400">${b.phone}</td><td class="py-2.5 px-2 text-xs text-slate-400">${b.reason}</td><td class="py-2.5 px-2 text-xs">${b.timestamp}</td><td class="py-2.5 px-2 text-right"><button onclick="db.ref('blacklist/${b.phone}').remove()" class="bg-green-600/20 text-green-400 px-3 py-1 rounded-xl text-xs font-bold border border-green-500/20">ปลดแบน</button></td></tr>`;
+                modalHtml += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-2.5 px-2 font-bold text-red-400">${b.phone}</td><td class="py-2.5 px-2 text-xs text-slate-400">${b.reason}</td><td class="py-2.5 px-2 text-right text-xs text-slate-500">${b.timestamp.split(' ')[0]}</td></tr>`;
+            }
         }
         document.getElementById('stat-block-count').innerText = count + " เบอร์";
-        badgeMenu.innerText = count; badgeMenu.classList.remove('hidden');
-        document.getElementById('blacklist-table-body').innerHTML = htmlMain;
-        document.getElementById('modal-blacklist-list').innerHTML = htmlModal;
+        if(count > 0) { badge.innerText = count; badge.classList.remove('hidden'); } else badge.classList.add('hidden');
+        document.getElementById('blacklist-table-body').innerHTML = mainHtml || '<tr><td colspan="4" class="py-4 text-center text-slate-500">ทำเนียบบัญชีดำว่างเปล่า</td></tr>';
+        document.getElementById('modal-blacklist-list').innerHTML = modalHtml || '<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีเบอร์ถูกแบน</td></tr>';
     });
+
+    function saveDriverProfile() {
+        let pin = document.getElementById('drv-pin').value.trim();
+        let name = document.getElementById('drv-name').value.trim();
+        let brand = document.getElementById('drv-brand').value.trim();
+        let color = document.getElementById('drv-color').value.trim();
+        let plate = document.getElementById('drv-plate').value.trim();
+        let phone = document.getElementById('drv-phone').value.trim();
+        if(pin.length !== 4 || !name || !phone) return alert("กรอก PIN ชื่อ และเบอร์โทรพนักงานขับเป็นหลักสำคัญครับ");
+
+        db.ref('drivers_profile/' + pin).set({ pin, name, brand, color, plate, phone }).then(() => {
+            alert('บันทึกแฟ้มประวัติกำลังพลเรียบร้อย!');
+            ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(id => document.getElementById(id).value = '');
+        });
+    }
 
     function addNumberToBlacklist() {
         let phone = document.getElementById('block-phone').value.trim();
         let reason = document.getElementById('block-reason').value.trim();
-        if(phone.length < 10) return alert("กรุณาระบุเบอร์โทรให้ครบ");
-        db.ref('blacklist/' + phone).set({ phone: phone, reason: reason || 'ไม่ระบุ', timestamp: new Date().toLocaleString('th-TH') }).then(() => {
-            alert("บล็อกเบอร์โทรสำเร็จ!"); document.getElementById('block-phone').value = ''; document.getElementById('block-reason').value = '';
+        if(phone.length < 10) return alert('กรอกตัวเลขเบอร์โทรสิบหลักให้ครบถ้วนครับ');
+        db.ref('blacklist/' + phone).set({ phone, reason: reason || 'ไม่ระบุสาเหตุพฤติกรรม', timestamp: new Date().toLocaleString('th-TH') }).then(() => {
+            alert('ระงับสัญญาณถาวรเสร็จสิ้น!'); document.getElementById('block-phone').value = ''; document.getElementById('block-reason').value = '';
         });
     }
-    function removeFormBlacklist(phone) { if(confirm("คุณต้องการปลดบล็อกเบอร์โทร " + phone + " ใช่หรือไม่?")) db.ref('blacklist/' + phone).remove(); }
 
-    // ================= ระบบแสดงประวัติใน Modal (เหมือนเดิม) =================
-    db.ref('drivers_profile').on('value', snap => {
-        allProfiles = snap.val() || {};
-        let html = '';
-        if(Object.keys(allProfiles).length === 0) { document.getElementById('all-drivers-table').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีข้อมูลคนขับ</td></tr>`; return; }
-        for (let key in allProfiles) {
-            let d = allProfiles[key];
-            html += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-3 px-2 font-bold text-green-400">${d.pin}</td><td class="py-3 px-2 font-medium text-white cursor-pointer hover:text-green-400" onclick="showDriverDetails('${d.pin}')"><u>${d.name}</u></td><td class="py-3 px-2 text-xs text-slate-400">${d.brand||'-'} ${d.color||''}<br><span class="text-white font-bold">${d.plate||''}</span></td><td class="py-3 px-2 text-sm">${d.phone}</td><td class="py-3 px-2 text-right"><button onclick="editDriver('${d.pin}')" class="text-blue-400 px-2 py-1 mr-1"><i class="fas fa-edit"></i></button><button onclick="deleteDriver('${d.pin}')" class="text-red-400 px-2 py-1"><i class="fas fa-trash"></i></button></td></tr>`;
-        }
-        document.getElementById('all-drivers-table').innerHTML = html;
+    // -- คัดลอกระบบบันทึกเรทราคาส่งต่อ --
+    function savePricingConfig() {
+        let car = { base: parseInt(document.getElementById('cfg-car-base').value)||50, km: parseInt(document.getElementById('cfg-car-km').value)||10, pick: parseInt(document.getElementById('cfg-car-pick').value)||5 };
+        let bike = { base: parseInt(document.getElementById('cfg-bike-base').value)||30, km: parseInt(document.getElementById('cfg-bike-km').value)||8, pick: parseInt(document.getElementById('cfg-bike-pick').value)||5 };
+        db.ref('config/pricing').set({ car, bike }).then(() => { alert('อัปเดตแกนราคากลางแยกประเภทเข้าสู่ดาต้าหน้าแอปผู้โดยสารเรียบร้อยครับ!'); closeModal('modalPricing'); });
+    }
+
+    // ================= CONFIG DATA INITIALIZERS =================
+    db.ref('config/pricing').once('value', snap => {
+        let p = snap.val() || {};
+        let car = p.car || { base: 50, km: 10, pick: 5 };
+        let bike = p.bike || { base: 30, km: 8, pick: 5 };
+        document.getElementById('cfg-car-base').value = car.base; document.getElementById('cfg-car-km').value = car.km; document.getElementById('cfg-car-pick').value = car.pick;
+        document.getElementById('cfg-bike-base').value = bike.base; document.getElementById('cfg-bike-km').value = bike.km; document.getElementById('cfg-bike-pick').value = bike.pick;
     });
 
-    function showDriverDetails(pin) {
-        let d = allProfiles[pin]; if(!d) return;
-        document.getElementById('det-name').innerText = d.name; document.getElementById('det-pin').innerText = "รหัสคนขับ: " + d.pin; document.getElementById('det-phone').innerText = "เบอร์โทร: " + d.phone; document.getElementById('det-car').innerText = "รถ: " + (d.brand||'-') + " " + (d.color||'') + " (" + (d.plate||'-') + ")";
-        openModal('modalDriverDetails');
-    }
-
-    function saveDriverProfile() {
-        let pin = document.getElementById('drv-pin').value.trim(); let name = document.getElementById('drv-name').value.trim(); let brand = document.getElementById('drv-brand').value.trim(); let color = document.getElementById('drv-color').value.trim(); let plate = document.getElementById('drv-plate').value.trim(); let phone = document.getElementById('drv-phone').value.trim();
-        if (pin.length !== 4 || !name || !phone) return alert("ข้อมูลไม่ครบ");
-        db.ref('drivers_profile/' + pin).set({ pin: pin, name: name, brand: brand, color: color, plate: plate, phone: phone }).then(() => {
-            alert("บันทึกสำเร็จ!"); ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(id => document.getElementById(id).value = '');
+    function addNewsContent() {
+        let title = document.getElementById('cms-news-title').value.trim();
+        let content = document.getElementById('cms-news-content').value.trim();
+        let isPromo = document.getElementById('cms-news-ispromo').checked;
+        if(!title || !content) return alert('ใส่หัวข้อและเนื้อความข่าวสาร');
+        db.ref('news_promotions').push({ title, content, isPromo, timestamp: firebase.database.ServerValue.TIMESTAMP, dateStr: new Date().toLocaleDateString('th-TH',{day:'numeric', month:'short', year:'numeric'}) }).then(() => {
+            alert('กระจายบอร์ดแจ้งข่าวสารหน้าแอปเรียบร้อย!'); document.getElementById('cms-news-title').value=''; document.getElementById('cms-news-content').value=''; document.getElementById('cms-news-ispromo').checked=false;
         });
     }
+
+    db.ref('news_promotions').on('value', snap => {
+        let container = document.getElementById('admin-news-list'); if(!container) return;
+        let html = '';
+        if(snap.exists()) {
+            snap.forEach(child => { let n = child.val();
+                html += `<div class="flex justify-between items-center bg-slate-800/40 p-2.5 border border-slate-700 rounded-xl"><div class="min-w-0 flex-1"><p class="text-xs font-bold text-white truncate">${n.title} ${n.isPromo ? '<span class="bg-red-500 text-white text-[8px] px-1 rounded">PROMO</span>':''}</p><p class="text-[9px] text-slate-500 mt-0.5">${n.dateStr}</p></div><button onclick="db.ref('news_promotions/${child.key}').remove()" class="text-red-400 bg-red-950/20 w-7 h-7 rounded-lg border border-red-500/20 text-xs shrink-0 flex items-center justify-center ml-2"><i class="fas fa-trash-alt"></i></button></div>`;
+            });
+        }
+        container.innerHTML = html || '<p class="text-slate-500 text-[11px] text-center py-2">ไม่มีกระดานบอร์ดข่าว</p>';
+    });
+
+    db.ref('drivers_profile').on('value', snap => {
+        let table = document.getElementById('all-drivers-table'); let html = '';
+        if(snap.exists()) {
+            snap.forEach(child => { let d = child.val();
+                html += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-2.5 px-2 font-bold text-green-400">${d.pin}</td><td class="py-2.5 px-2 font-medium text-white cursor-pointer hover:text-green-400" onclick="showDriverDetails('${d.pin}')"><u>${d.name}</u></td><td class="py-2.5 px-2 text-xs text-slate-400">${d.brand||'-'} ${d.color||''}<br><b class="text-white">${d.plate||''}</b></td><td class="py-2.5 px-2 text-xs">${d.phone}</td><td class="py-2.5 px-2 text-right"><button onclick="editDriver('${d.pin}')" class="text-blue-400 text-xs p-1 mr-1"><i class="fas fa-edit"></i></button><button onclick="deleteDriver('${d.pin}')" class="text-red-400 text-xs p-1"><i class="fas fa-trash-alt"></i></button></td></tr>`;
+            });
+        }
+        table.innerHTML = html || '<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีทำเนียบคนขับ</td></tr>';
+    });
 
     function editDriver(pin) {
         let d = allProfiles[pin];
-        if(d) { ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(k => document.getElementById(k.replace('_','-')).value = d[k.replace('drv_','')] || ''); }
+        if(d) {
+            document.getElementById('drv-pin').value = d.pin; document.getElementById('drv-name').value = d.name;
+            document.getElementById('drv-brand').value = d.brand||''; document.getElementById('drv-color').value = d.color||'';
+            document.getElementById('drv-plate').value = d.plate||''; document.getElementById('drv-phone').value = d.phone;
+        }
     }
-    function deleteDriver(pin) { if(confirm("ลบพนักงาน?")) { db.ref('drivers_profile/' + pin).remove(); db.ref('driver_sessions/' + pin).remove(); } }
+    function deleteDriver(pin) { if(confirm('ต้องการถอดพนักงานถาวร?')) { db.ref('drivers_profile/'+pin).remove(); db.ref('driver_sessions/'+pin).remove(); } }
+
+    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'drivers': 'ทำเนียบพนักงานคนขับ', 'passengers':'ระบบฐานข้อมูลรายงานลูกค้า', 'promos':'คลังคูปองและสิทธิ์ส่วนลด', 'history': 'แฟ้มงานประวัติคิวระบบทั้งหมด', 'cms': 'บอร์ดข่าวและสไลด์เนื้อหาแอป', 'blacklist': 'แฟ้มเบอร์โทรระงับสัญญาณ' };
+    
+    // ระบบดึงข้อมูลพิกัดคนขับออนไลน์แบบกลุ่ม (Realtime Sync Engine)
+    windowContext.onlineDrivers = [];
+    db.ref('active_drivers').on('value', snap => {
+        let activeArr = [];
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let v = child.val();
+                if(v.status === 'ออนไลน์') activeArr.push(v);
+            });
+        }
+        windowContext.onlineDrivers = activeArr;
+    });
 
     function syncToGoogleSheet(event) {
-        if(!allCompletedJobs || Object.keys(allCompletedJobs).length === 0) return alert("ไม่มีข้อมูลให้สำรอง");
-        let btn = event.currentTarget; let originalContent = btn.innerHTML; 
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูล...`; btn.classList.replace('bg-emerald-600', 'bg-slate-600');
-        fetch(APPS_SCRIPT_URL + "?action=sync_sheets", { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(allCompletedJobs) }).then(() => {
-            alert("ส่งข้อมูลสำเร็จ!"); btn.innerHTML = `<i class="fas fa-check"></i> สำเร็จ`; btn.classList.replace('bg-slate-600', 'bg-green-600');
-            setTimeout(() => { btn.innerHTML = originalContent; btn.classList.replace('bg-green-600', 'bg-emerald-600'); }, 3000);
-        }).catch(e => { alert("Error"); btn.innerHTML = originalContent; btn.classList.replace('bg-slate-600', 'bg-emerald-600'); });
+        if(Object.keys(allCompletedJobs).length === 0) return alert("ไม่มีข้อมูลทำรายการเคลียร์ประวัติสำเร็จ");
+        let btn = event.currentTarget; let orig = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งขึ้่นระบบ...';
+        fetch(APPS_SCRIPT_URL + "?action=sync_sheets", { method:"POST", mode:"no-cors", headers:{"Content-Type":"application/json"}, body:JSON.stringify(allCompletedJobs) }).then(() => {
+            alert("สำรองเก็บข้อมูลลงคลาวด์แผ่นชีตเรียบร้อยครับ!"); btn.innerHTML = '<i class="fas fa-check"></i> สำรองสำเร็จ';
+            setTimeout(() => { btn.innerHTML = orig; btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg"; }, 2500);
+        });
     }
   </script>
 </body>
