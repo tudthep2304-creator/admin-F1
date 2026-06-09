@@ -18,7 +18,6 @@
     .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     
-    /* ปรับแต่งพื้นที่สำหรับครอปรูป */
     .cropper-container { width: 100%; max-height: 400px; }
   </style>
 </head>
@@ -192,37 +191,43 @@
       <section id="content-cms" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-image text-blue-400 mr-1"></i> จัดการรูปแบนเนอร์ (อัปโหลด & ตัดรูป)</h2>
+            <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-images text-blue-400 mr-1"></i> จัดการสไลด์แบนเนอร์ (หน้าแรก)</h2>
             <div class="space-y-4">
                 
-                <div id="bannerPreview" class="w-full h-32 bg-slate-800 border border-slate-700 rounded-xl overflow-hidden flex items-center justify-center text-slate-500 mb-2 shadow-inner">
-                    <img id="adminBannerImg" src="" class="hidden w-full h-full object-cover">
-                    <span id="adminBannerPlaceholder"><i class="fas fa-image text-2xl mb-1"></i><br>ไม่มีรูปแบนเนอร์</span>
-                </div>
-
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-2">เลือกรูปภาพจากเครื่อง</label>
+                    <label class="block text-xs font-bold text-slate-400 mb-2">อัปโหลดรูปภาพใหม่</label>
                     <input type="file" id="cms-banner-file" accept="image/*" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
                 </div>
 
-                <div id="cropArea" class="hidden bg-slate-800 p-3 rounded-xl border border-slate-700">
+                <div id="cropArea" class="hidden bg-slate-800 p-4 rounded-xl border border-blue-500/50">
                     <p class="text-xs font-bold text-yellow-400 mb-2"><i class="fas fa-crop"></i> เลื่อนและขยายกรอบเพื่อตัดรูป</p>
-                    <div class="w-full max-h-60 overflow-hidden bg-black rounded">
+                    <div class="w-full max-h-60 overflow-hidden bg-black rounded mb-3">
                         <img id="imageToCrop" class="max-w-full">
                     </div>
-                    <div class="flex gap-2 mt-3">
-                        <button onclick="cancelCrop()" class="flex-1 py-2 bg-slate-600 text-white font-bold rounded-lg text-sm hover:bg-slate-500">ยกเลิก</button>
-                        <button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-green-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-green-500">ตัดรูปและอัปโหลด <i class="fas fa-upload"></i></button>
+                    
+                    <div class="mb-3">
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">ลิงก์ปลายทาง (เมื่อกดแบนเนอร์)</label>
+                        <input type="text" id="cms-banner-link" placeholder="เช่น https://facebook.com/..." class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none focus:border-blue-500 text-xs">
+                        <p class="text-[9px] text-slate-500 mt-1">* หากไม่ต้องการให้กดได้ ปล่อยว่างไว้</p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="cancelCrop()" class="flex-1 py-2.5 bg-slate-700 text-white font-bold rounded-lg text-sm hover:bg-slate-600 transition">ยกเลิก</button>
+                        <button onclick="saveCroppedImage()" class="flex-[2] py-2.5 bg-green-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-green-500 transition">บันทึกและเพิ่มเข้าสไลด์ <i class="fas fa-check ml-1"></i></button>
                     </div>
                 </div>
 
-                <button onclick="removeBanner()" class="w-full bg-red-900/30 hover:bg-red-600 text-red-400 hover:text-white border border-red-900/50 font-bold py-3 rounded-xl transition">
-                    <i class="fas fa-trash-alt"></i> ลบแบนเนอร์ปัจจุบันทิ้ง
-                </button>
+                <div class="border-t border-slate-800 pt-4">
+                    <h3 class="text-xs font-bold text-slate-500 mb-3 uppercase">แบนเนอร์ปัจจุบันในระบบ</h3>
+                    <div id="admin-banners-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                        <p class="text-slate-500 text-sm text-center py-4">กำลังโหลดข้อมูล...</p>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
             <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-bullhorn text-yellow-400 mr-1"></i> เพิ่มข่าวสาร & โปรโมชั่น</h2>
             <div class="space-y-4 mb-6">
                 <div>
@@ -299,7 +304,6 @@
           <div class="p-5 overflow-y-auto flex-1">
               
               <div id="zone-pricing" class="space-y-6 animate-fade-in">
-                  
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div class="bg-slate-800/40 border border-green-500/20 p-4 rounded-xl space-y-3">
                           <h3 class="font-bold text-green-400 border-b border-slate-700 pb-2 flex items-center gap-2"><i class="fas fa-car-side"></i> รถยนต์</h3>
@@ -491,7 +495,7 @@
     let allBookings = null;
     let allCompletedJobs = {}; 
     let allProfiles = {}; 
-    let cropper = null; // ตัวแปรสำหรับ Cropper
+    let cropper = null; 
 
     const tabTitles = {
         'dashboard': 'แดชบอร์ด',
@@ -513,7 +517,6 @@
     
     const db = firebase.database();
 
-    // ================= โหลด History ไว้คำนวณเงิน =================
     db.ref('completed_jobs').on('value', snap => {
         allCompletedJobs = snap.val() || {};
     });
@@ -577,21 +580,36 @@
     function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
-    // ================= ระบบจัดการ CMS (Banner Upload & Crop & News) =================
+    // ================= ระบบจัดการ CMS (Banner Multi Upload & Crop) =================
     
+    // ดึงรายการแบนเนอร์มาโชว์ในแอดมิน
     db.ref('config/banners').on('value', snap => {
-        let b = snap.val();
-        let img = document.getElementById('adminBannerImg');
-        let placeholder = document.getElementById('adminBannerPlaceholder');
-        
-        if(b && b.imageUrl) {
-            img.src = b.imageUrl;
-            img.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-        } else {
-            img.classList.add('hidden');
-            placeholder.classList.remove('hidden');
+        let listContainer = document.getElementById('admin-banners-list');
+        if(!snap.exists()) {
+            listContainer.innerHTML = `<p class="text-slate-500 text-sm text-center py-4">ยังไม่มีรูปแบนเนอร์ในระบบ</p>`;
+            return;
         }
+
+        let banners = [];
+        snap.forEach(child => { banners.push({ id: child.key, ...child.val() }); });
+
+        let html = '';
+        banners.forEach((b, index) => {
+            let linkText = b.linkUrl ? `<a href="${b.linkUrl}" target="_blank" class="text-[10px] text-blue-400 underline truncate block max-w-xs mt-1"><i class="fas fa-link"></i> ${b.linkUrl}</a>` : `<span class="text-[10px] text-slate-500 mt-1 block">ไม่มีลิงก์</span>`;
+            
+            html += `
+            <div class="flex gap-3 bg-slate-800/50 p-2 rounded-xl border border-slate-700 items-center">
+                <div class="w-20 h-12 shrink-0 bg-black rounded-lg overflow-hidden border border-slate-600">
+                    <img src="${b.imageUrl}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold text-white">แบนเนอร์ที่ ${index + 1}</p>
+                    ${linkText}
+                </div>
+                <button onclick="removeBanner('${b.id}')" class="text-red-400 hover:text-white bg-red-900/30 w-8 h-8 rounded-lg flex items-center justify-center transition border border-red-900/50 shrink-0"><i class="fas fa-trash-alt text-xs"></i></button>
+            </div>`;
+        });
+        listContainer.innerHTML = html;
     });
 
     // 🌟 ระบบ ครอปและอัปโหลดรูปภาพ 🌟
@@ -599,20 +617,15 @@
         let files = e.target.files;
         if (files && files.length > 0) {
             let file = files[0];
-            // โหลดรูปลงใน tag img สำหรับครอป
             let url = URL.createObjectURL(file);
             document.getElementById('imageToCrop').src = url;
             
-            // เปิดหน้าต่างเครื่องมือครอป
             document.getElementById('cropArea').classList.remove('hidden');
-            
-            // ถ้าเคยมี cropper อยู่ให้ทำลายทิ้งก่อน
             if (cropper) { cropper.destroy(); }
             
-            // สร้าง Cropper อัตราส่วน 16:9
             let imageElement = document.getElementById('imageToCrop');
             cropper = new Cropper(imageElement, {
-                aspectRatio: 16 / 9, // สัดส่วนแบนเนอร์แนวนอน
+                aspectRatio: 16 / 9, 
                 viewMode: 1,
                 autoCropArea: 1,
             });
@@ -622,31 +635,35 @@
     function cancelCrop() {
         document.getElementById('cropArea').classList.add('hidden');
         document.getElementById('cms-banner-file').value = '';
+        document.getElementById('cms-banner-link').value = '';
         if (cropper) { cropper.destroy(); cropper = null; }
     }
 
     function saveCroppedImage() {
         if (!cropper) return;
         
-        // ดึงรูปที่ครอปมาเป็น Base64 (ปรับขนาดกว้างสุด 800px เพื่อไม่ให้ใหญ่เกินไป)
-        let canvas = cropper.getCroppedCanvas({ width: 800 });
-        let base64Image = canvas.toDataURL('image/jpeg', 0.7); // ย่อขนาดไฟล์ด้วย Quality 70%
+        // ย่อรูปเหลือ 600px เพื่อลดขนาด base64 ให้ทำงานเร็วที่สุด
+        let canvas = cropper.getCroppedCanvas({ width: 600 });
+        let base64Image = canvas.toDataURL('image/jpeg', 0.6); 
+        
+        let linkUrl = document.getElementById('cms-banner-link').value.trim();
 
-        // อัปโหลดเข้า Firebase Realtime Database ตรงๆ
-        db.ref('config/banners').set({ imageUrl: base64Image }).then(() => {
-            alert('ตัดรูปและอัปโหลดขึ้นแบนเนอร์สำเร็จแล้ว!');
+        // ใช้วิธี push เพื่อให้สามารถมีได้หลายแบนเนอร์
+        db.ref('config/banners').push({ 
+            imageUrl: base64Image,
+            linkUrl: linkUrl,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            alert('เพิ่มรูปลงสไลด์แบนเนอร์สำเร็จแล้ว!');
             cancelCrop();
         }).catch((err) => {
             alert('เกิดข้อผิดพลาด: ' + err.message);
         });
     }
 
-    function removeBanner() {
-        if(confirm("ต้องการลบแบนเนอร์ออกจากหน้าแอปผู้โดยสารใช่หรือไม่?")) {
-            db.ref('config/banners').remove().then(() => {
-                alert("ลบแบนเนอร์เรียบร้อยแล้ว");
-                cancelCrop();
-            });
+    function removeBanner(key) {
+        if(confirm("ต้องการลบแบนเนอร์นี้ออกใช่หรือไม่?")) {
+            db.ref('config/banners/' + key).remove();
         }
     }
 
