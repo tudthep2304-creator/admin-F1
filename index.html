@@ -67,7 +67,7 @@
         <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-history w-5 text-center"></i> ประวัติงานทั้งหมด
         </button>
-        <div class="border-t border-slate-800 my-1"></div>
+        <div class="border-t border-slate-700 my-1"></div>
         <button onclick="switchTab('promos')" id="tab-promos" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-ticket-alt w-5 text-center"></i> โปรโมชั่น & คูปอง
         </button>
@@ -94,7 +94,7 @@
                       <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400"><i class="fas fa-search"></i></div>
                   </div>
               </div>
-              <div onclick="openModal('modalPendingJobs')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-yellow-500/50 transition transform hover:-translate-y-1">
+              <div onclick="openModal('modalPendingJobs')" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md cursor-pointer hover:bg-slate-800 hover:border-yellow-500/50 transition transform hover:-translate-y-1 relative">
                   <div class="flex justify-between items-start">
                       <div>
                           <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
@@ -118,7 +118,7 @@
               <h2 class="text-base font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-shield-alt text-blue-400"></i> โหมดการจ่ายงานระบบ (Dispatch Strategy)</h2>
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <p class="text-xs text-slate-400 leading-relaxed max-w-xl">แอดมินสามารถเปิดโหมด "จ่ายงานอัตโนมัติ" เพื่อให้ระบบเฉลี่ยคิวงานวิ่งเข้าหาคนขับที่ได้รายได้น้อยที่สุดก่อน หรือเลือกปรับเป็นโหมด "ควบคุมแมนนวล" เพื่อรอแอดมินกดยิงระบุงานรายบุคคลเองได้</p>
-                  <select id="dispatchModeSelect" onchange="changeDispatchMode(this.value)" class="bg-slate-800 text-white font-bold text-sm rounded-xl px-4 py-2.5 border border-slate-700 outline-none focus:border-blue-500">
+                  <select id="dispatchModeSelect" onchange="changeDispatchMode(this.value)" class="bg-slate-800 text-white font-bold text-sm rounded-xl px-4 py-2.5 border border-slate-700 outline-none focus:border-blue-500 shrink-0">
                       <option value="manual">คุมแมนนวล (แอดมินกดจ่ายงานรายตัว)</option>
                       <option value="auto">ออโต้คิว (ระบบเฉลี่ยงานให้อัตโนมัติ)</option>
                   </select>
@@ -161,6 +161,7 @@
                   </button>
               </div>
           </div>
+          
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md lg:col-span-2">
               <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-address-book text-green-400 mr-1"></i> ทำเนียบคนขับทั้งหมดในระบบ</h2>
               <div class="overflow-x-auto">
@@ -174,7 +175,8 @@
                               <th class="pb-3 text-right">จัดการ</th>
                           </tr>
                       </thead>
-                      <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800"></tbody>
+                      <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800">
+                      </tbody>
                   </table>
               </div>
           </div>
@@ -193,9 +195,24 @@
                           <option value="new">คัดกรอง: ผู้ใช้งานรายใหม่ (เรียก 0-1 ครั้ง)</option>
                           <option value="regular">คัดกรอง: ลูกค้าประจำ (>1 ครั้ง)</option>
                       </select>
-                      <button onclick="exportPassengersCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg flex items-center gap-1.5 transition shadow-sm">
+                      <button onclick="exportPassengersCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg flex items-center gap-1.5 transition shadow-sm shrink-0">
                           <i class="fas fa-file-csv"></i> Export เป็นไฟล์ CSV
                       </button>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
+                      <p class="text-[10px] text-slate-400 font-bold mb-1">จำนวนผู้โดยสารทั้งหมด</p>
+                      <p class="text-xl font-black text-blue-400" id="stat-pass-total">0</p>
+                  </div>
+                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
+                      <p class="text-[10px] text-slate-400 font-bold mb-1">ผู้ใช้ใหม่ (เพิ่งลองใช้)</p>
+                      <p class="text-xl font-black text-green-400" id="stat-pass-new">0</p>
+                  </div>
+                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center">
+                      <p class="text-[10px] text-slate-400 font-bold mb-1">ลูกค้าประจำ</p>
+                      <p class="text-xl font-black text-yellow-400" id="stat-pass-vip">0</p>
                   </div>
               </div>
 
@@ -252,21 +269,24 @@
                   </div>
 
                   <div id="pbuild-random" class="hidden space-y-4 animate-fade-in">
+                      <div class="bg-yellow-900/20 border border-yellow-500/30 p-3 rounded-lg mb-2">
+                          <p class="text-[10px] text-yellow-500 font-bold leading-relaxed"><i class="fas fa-info-circle"></i> โค้ดที่สุ่มออกมาจะใช้ได้เพียง <b>1 ครั้งต่อ 1 โค้ด</b> เหมาะสำหรับนำไปปริ้นท์ทำคูปองแจก หรือส่งให้ลูกค้ารายบุคคล</p>
+                      </div>
                       <div class="grid grid-cols-3 gap-2">
-                          <div>
+                          <div class="col-span-1">
                               <label class="block text-[10px] font-bold text-slate-400 mb-1">คำนำหน้าโค้ด</label>
                               <input type="text" id="promo-rand-prefix" placeholder="F1VIP" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center text-xs">
                           </div>
-                          <div>
+                          <div class="col-span-1">
                               <label class="block text-[10px] font-bold text-slate-400 mb-1">จำนวนที่เจน</label>
                               <input type="number" id="promo-rand-amount" placeholder="กี่ใบ?" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs">
                           </div>
-                          <div>
+                          <div class="col-span-1">
                               <label class="block text-[10px] font-bold text-slate-400 mb-1">ส่วนลด (บาท)</label>
                               <input type="number" id="promo-rand-value" placeholder="กี่บาท?" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs">
                           </div>
                       </div>
-                      <button onclick="generateRandomPromos()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                      <button onclick="generateRandomPromos()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2 flex items-center justify-center gap-2 text-sm">
                           <i class="fas fa-magic"></i> ประมวลผลสุ่มสร้างสิทธิ์
                       </button>
                   </div>
@@ -275,7 +295,7 @@
               <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md lg:col-span-2">
                   <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
                       <h2 class="text-lg font-bold text-white"><i class="fas fa-list text-blue-400 mr-1"></i> รายการสิทธิ์ส่วนลดคูปองในคลัง</h2>
-                      <button onclick="exportRandomCodes()" class="bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                      <button onclick="exportRandomCodes()" class="bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm shrink-0">
                           <i class="fas fa-download"></i> ดาวน์โหลดโค้ดสุ่ม (พิมพ์แจก)
                       </button>
                   </div>
@@ -296,7 +316,7 @@
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                   <h2 class="text-lg font-bold text-white"><i class="fas fa-history text-green-400 mr-1"></i> ประวัติงานวิ่งทั้งหมดในสารบบ</h2>
-                  <button onclick="syncToGoogleSheet(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg">
+                  <button onclick="syncToGoogleSheet(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0">
                       <i class="fas fa-file-excel"></i> สำรองฐานข้อมูลลง Google Sheet
                   </button>
               </div>
@@ -560,6 +580,17 @@
   </div>
 
   <script>
+    const windowContext = window;
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
+
+    let allBookings = null;
+    let allCompletedJobs = {}; 
+    let allProfiles = {}; 
+    let allPromoData = {};
+    let cropper = null;
+    let currentPromoFilter = 'all';
+    let dispatchMode = 'manual';
+
     firebase.initializeApp({
       apiKey: "AIzaSyBNtaYaX1OW-86_9EGiVN9EpgPzWOX_twQ",
       authDomain: "myride-chiangrai.firebaseapp.com",
@@ -571,31 +602,23 @@
     });
     const db = firebase.database();
 
-    let allBookings = null;
-    let allCompletedJobs = {}; 
-    let allProfiles = {}; 
-    let allPromoData = {};
-    let cropper = null;
-    let currentPromoFilter = 'all';
-    let dispatchMode = 'manual';
-
     // ดักฟังโหมดจ่ายงานจากระบบหลังบ้าน
     db.ref('config/dispatchMode').on('value', snap => {
         if(snap.exists()) {
             dispatchMode = snap.val();
-            document.getElementById('dispatchModeSelect').value = dispatchMode;
+            let ds = document.getElementById('dispatchModeSelect');
+            if(ds) ds.value = dispatchMode;
         }
     });
 
     function changeDispatchMode(val) {
-        db.ref('config/dispatchMode').set(val).then(() => {
-            alert('ปรับเปลี่ยนกลยุทธ์การกระจายงานระบบเรียบร้อย!');
-        });
+        db.ref('config/dispatchMode').set(val).then(() => { alert('ปรับเปลี่ยนกลยุทธ์การกระจายงานระบบเรียบร้อย!'); });
     }
 
     db.ref('completed_jobs').on('value', snap => {
         allCompletedJobs = snap.val() || {};
-        if(!document.getElementById('content-passengers').classList.contains('hidden')) renderPassengers();
+        let cp = document.getElementById('content-passengers');
+        if(cp && !cp.classList.contains('hidden')) renderPassengers();
     });
 
     function toggleMenu() {
@@ -612,45 +635,61 @@
 
     function closeMenuOnClickOutside() {
         const menu = document.getElementById('dropdown-menu');
-        if (!menu.classList.contains('hidden')) {
+        if (menu && !menu.classList.contains('hidden')) {
             menu.classList.add('hidden');
             document.getElementById('menu-icon').classList.replace('fa-times', 'fa-bars');
         }
     }
 
+    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'drivers': 'ทำเนียบพนักงานคนขับ', 'passengers':'ระบบฐานข้อมูลรายงานลูกค้า', 'promos':'คลังคูปองและสิทธิ์ส่วนลด', 'history': 'แฟ้มงานประวัติคิวระบบทั้งหมด', 'cms': 'บอร์ดข่าวและสไลด์เนื้อหาแอป', 'blacklist': 'แฟ้มเบอร์โทรระงับสัญญาณ' };
+    
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(el => {
             el.className = "tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition";
         });
         
-        document.getElementById('content-' + tabId).classList.remove('hidden');
+        let targetContent = document.getElementById('content-' + tabId);
+        if(targetContent) targetContent.classList.remove('hidden');
+        
         let activeTab = document.getElementById('tab-' + tabId);
         if(activeTab) {
             activeTab.className = "tab-btn px-4 py-3 bg-green-600 text-white font-bold rounded-xl text-sm flex items-center justify-between transition shadow";
         }
         
-        document.getElementById('current-page-title').innerText = tabTitles[tabId];
-        document.getElementById('dropdown-menu').classList.add('hidden');
-        document.getElementById('menu-icon').classList.replace('fa-times', 'fa-bars');
+        let titleEl = document.getElementById('current-page-title');
+        if(titleEl) titleEl.innerText = tabTitles[tabId] || 'แดชบอร์ด';
+        
+        let menu = document.getElementById('dropdown-menu');
+        if(menu) menu.classList.add('hidden');
+        let icon = document.getElementById('menu-icon');
+        if(icon) icon.classList.replace('fa-times', 'fa-bars');
 
         if(tabId === 'passengers') renderPassengers();
         if(tabId === 'promos') renderPromoList();
     }
 
     function switchPricingTab(tab) {
+        let p1 = document.getElementById('ptab-pricing');
+        let p2 = document.getElementById('ptab-promo');
+        let z1 = document.getElementById('zone-pricing');
+        let z2 = document.getElementById('zone-promo');
+        
+        if(!p1 || !p2 || !z1 || !z2) return;
+
         if(tab === 'pricing') {
-            document.getElementById('zone-pricing').classList.remove('hidden');
-            document.getElementById('zone-promo').classList.add('hidden');
-            document.getElementById('ptab-pricing').className = "flex-1 py-3 text-sm font-bold text-green-400 border-b-2 border-green-400 transition";
-            document.getElementById('ptab-promo').className = "flex-1 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition";
+            z1.classList.remove('hidden'); z2.classList.add('hidden');
+            p1.className = "flex-1 py-3 text-sm font-bold text-green-400 border-b-2 border-green-400 transition";
+            p2.className = "flex-1 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition";
         } else {
-            document.getElementById('zone-pricing').classList.add('hidden');
-            document.getElementById('zone-promo').classList.remove('hidden');
-            document.getElementById('ptab-pricing').className = "flex-1 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition";
-            document.getElementById('ptab-promo').className = "flex-1 py-3 text-sm font-bold text-green-400 border-b-2 border-green-400 transition";
+            z1.classList.add('hidden'); z2.classList.remove('hidden');
+            p1.className = "flex-1 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-300 transition";
+            p2.className = "flex-1 py-3 text-sm font-bold text-green-400 border-b-2 border-green-400 transition";
         }
     }
+
+    function openModal(modalId) { let m = document.getElementById(modalId); if(m) m.classList.remove('hidden'); }
+    function closeModal(modalId) { let m = document.getElementById(modalId); if(m) m.classList.add('hidden'); }
 
     // ================= DATA REPORT & PASSENGER CRM SYSTEM =================
     function renderPassengers() {
@@ -664,7 +703,8 @@
         });
 
         let passArray = Object.values(passMap);
-        let filter = document.getElementById('filter-passenger').value;
+        let filterEl = document.getElementById('filter-passenger');
+        let filter = filterEl ? filterEl.value : 'all';
         if(filter === 'new') passArray = passArray.filter(p => p.rides <= 1);
         if(filter === 'regular') passArray = passArray.filter(p => p.rides > 1);
 
@@ -685,14 +725,18 @@
                 </tr>`;
             });
         }
-        document.getElementById('passengers-list').innerHTML = html;
-        window.currentPassengerData = passArray;
+        
+        let tTotal = document.getElementById('stat-pass-total'); if(tTotal) tTotal.innerText = Object.values(passMap).length;
+        let tNew = document.getElementById('stat-pass-new'); if(tNew) tNew.innerText = Object.values(passMap).filter(p => p.rides <= 1).length;
+        let tVip = document.getElementById('stat-pass-vip'); if(tVip) tVip.innerText = Object.values(passMap).filter(p => p.rides > 1).length;
+        let listEl = document.getElementById('passengers-list'); if(listEl) listEl.innerHTML = html;
+        windowContext.currentPassengerData = passArray;
     }
 
     function exportPassengersCSV() {
-        if(!window.currentPassengerData || window.currentPassengerData.length === 0) return alert('ไม่มีฐานข้อมูลเป้าหมาย');
+        if(!windowContext.currentPassengerData || windowContext.currentPassengerData.length === 0) return alert('ไม่มีฐานข้อมูลเป้าหมาย');
         let csv = "\uFEFFเบอร์โทร,ชื่อสมาชิก,จำนวนครั้งเดินทาง,ยอดเงินรวมสะสม,โค้ดส่วนลดที่ใช้\n";
-        window.currentPassengerData.forEach(p => {
+        windowContext.currentPassengerData.forEach(p => {
             csv += `"${p.phone}","${p.name}","${p.rides}","${p.spend}","${p.promos.join(';')}"\n`;
         });
         triggerDownload(csv, `F1_Passengers_CRM_${Date.now()}.csv`);
@@ -700,8 +744,13 @@
 
     // ================= PROMOTIONS GENERATOR BLOCKS =================
     function switchPromoBuilder(type) {
-        document.getElementById('pbuild-general').classList.toggle('hidden', type !== 'general');
-        document.getElementById('pbuild-random').classList.toggle('hidden', type !== 'random');
+        let gen = document.getElementById('pbuild-general'); let rnd = document.getElementById('pbuild-random');
+        let bGen = document.getElementById('pbtn-general'); let bRnd = document.getElementById('pbtn-random');
+        if(!gen || !rnd || !bGen || !bRnd) return;
+        gen.classList.toggle('hidden', type !== 'general');
+        rnd.classList.toggle('hidden', type !== 'random');
+        bGen.className = type === 'general' ? "flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition";
+        bRnd.className = type === 'random' ? "flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition";
     }
 
     function addPromoCode() {
@@ -734,12 +783,21 @@
         });
     }
 
-    function filterPromoList(type) { currentPromoFilter = type; renderPromoList(); }
+    function filterPromoList(type) { 
+        currentPromoFilter = type; 
+        let a = document.getElementById('flt-promo-all'); let r = document.getElementById('flt-promo-random');
+        if(a && r) {
+            a.className = type === 'all' ? "text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1 transition" : "text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1 transition";
+            r.className = type === 'random' ? "text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1 transition" : "text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1 transition";
+        }
+        renderPromoList(); 
+    }
 
     db.ref('promotions').on('value', snap => { allPromoData = snap.val() || {}; renderPromoList(); });
 
     function renderPromoList() {
         let listContainer = document.getElementById('promo-codes-list');
+        if(!listContainer) return;
         let html = '';
         for (let key in allPromoData) {
             let p = allPromoData[key];
@@ -749,16 +807,16 @@
             let isActive = p.isActive !== false;
             let badge = p.isSingleUse ? `<span class="bg-yellow-950 text-yellow-400 border border-yellow-500/20 text-[9px] px-1.5 py-0.5 rounded">ตั๋วสุ่มจับแจก (ทิ้ง)</span>` : (p.target === 'new_user' ? `<span class="bg-blue-950 text-blue-400 border border-blue-500/20 text-[9px] px-1.5 py-0.5 rounded">แคมเปญผู้ใช้ใหม่</span>` : `<span class="bg-slate-800 text-slate-300 text-[9px] px-1.5 py-0.5 rounded">คูปองหลักทั่วไป</span>`);
 
-            html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-1">
+            html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-1 ${isActive ? 'opacity-100' : 'opacity-50'}">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
                         <span class="font-mono bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-700 tracking-wide text-xs">${p.code}</span>
                         ${badge}
                     </div>
-                    <p class="text-[10px] text-slate-500">เปิดระบบเคลมไปแล้ว <span class="text-white font-bold">${p.usageCount || 0}</span> ครั้ง</p>
+                    <p class="text-[10px] text-slate-400">เปิดระบบเคลมไปแล้ว <span class="text-white font-bold">${p.usageCount || 0}</span> ครั้ง</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-green-400 mr-2">฿${p.value}</span>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-xs font-bold text-green-400 mr-2 hidden sm:inline">฿${p.value}</span>
                     <button onclick="db.ref('promotions/${p.code}').update({isActive: ${!isActive}})" class="text-xl ${isActive ? 'text-green-400':'text-slate-600'}"><i class="fas ${isActive ? 'fa-toggle-on':'fa-toggle-off'}"></i></button>
                     <button onclick="viewPromoHistory('${p.code}')" class="bg-slate-800 px-2 py-1 rounded border border-slate-700 text-xs"><i class="fas fa-list"></i></button>
                     <button onclick="if(confirm('ยืนยันทำลายโค้ด?')) db.ref('promotions/${p.code}').remove()" class="text-red-400 bg-red-950/20 px-2 py-1 rounded border border-red-500/20 text-xs"><i class="fas fa-trash-alt"></i></button>
@@ -789,29 +847,57 @@
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
+    function viewPromoHistory(code) {
+        let titleEl = document.getElementById('history-promo-title'); if(titleEl) titleEl.innerText = `ประวัติคนใช้โค้ด: ${code}`;
+        openModal('modalPromoHistory');
+        
+        db.ref('promotions/' + code + '/history').once('value', snap => {
+            let hist = snap.val();
+            let html = '';
+            let lst = document.getElementById('modal-promo-history-list');
+            if(!hist) {
+                html = `<tr><td colspan="3" class="py-8 text-center text-slate-500">ยังไม่มีประวัติการใช้งานโค้ดนี้</td></tr>`;
+            } else {
+                let keys = Object.keys(hist).reverse();
+                for(let i=0; i<keys.length; i++) {
+                    let h = hist[keys[i]];
+                    html += `<tr class="border-b border-slate-800 text-slate-300">
+                        <td class="py-3 px-2 text-[10px] sm:text-xs text-slate-400">${h.date || '-'}</td>
+                        <td class="py-3 px-2 font-bold text-white text-xs sm:text-sm">${h.userName || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-normal">${h.phone || '-'}</span></td>
+                        <td class="py-3 px-2 text-right text-xs sm:text-sm font-bold text-green-400">ประหยัด ฿${h.discount || 0}</td>
+                    </tr>`;
+                }
+            }
+            if(lst) lst.innerHTML = html;
+        });
+    }
+
     // ================= CMS BANNER ADVANCED CROP & TIMER SYSTEM =================
-    document.getElementById('cms-banner-file').addEventListener('change', function(e) {
-        let files = e.target.files;
-        if (files && files.length > 0) {
-            let file = files[0];
-            document.getElementById('imageToCrop').src = URL.createObjectURL(file);
-            document.getElementById('cropArea').classList.remove('hidden');
-            if (cropper) cropper.destroy();
-            
-            let pos = document.getElementById('cms-banner-position').value;
-            cropper = new Cropper(document.getElementById('imageToCrop'), {
-                aspectRatio: pos === 'bottom' ? (600 / 120) : (16 / 9),
-                viewMode: 1, autoCropArea: 1
-            });
-        }
-    });
+    let cmsFile = document.getElementById('cms-banner-file');
+    if(cmsFile) {
+        cmsFile.addEventListener('change', function(e) {
+            let files = e.target.files;
+            if (files && files.length > 0) {
+                let file = files[0];
+                document.getElementById('imageToCrop').src = URL.createObjectURL(file);
+                document.getElementById('cropArea').classList.remove('hidden');
+                if (cropper) cropper.destroy();
+                
+                let pos = document.getElementById('cms-banner-position').value;
+                cropper = new Cropper(document.getElementById('imageToCrop'), {
+                    aspectRatio: pos === 'bottom' ? (600 / 120) : (16 / 9),
+                    viewMode: 1, autoCropArea: 1
+                });
+            }
+        });
+    }
 
     function cancelCrop() {
-        document.getElementById('cropArea').classList.add('hidden');
-        document.getElementById('cms-banner-file').value = '';
-        document.getElementById('cms-banner-link').value = '';
-        document.getElementById('cms-banner-start').value = '';
-        document.getElementById('cms-banner-end').value = '';
+        let area = document.getElementById('cropArea'); if(area) area.classList.add('hidden');
+        let f = document.getElementById('cms-banner-file'); if(f) f.value = '';
+        let lnk = document.getElementById('cms-banner-link'); if(lnk) lnk.value = '';
+        let s = document.getElementById('cms-banner-start'); if(s) s.value = '';
+        let e = document.getElementById('cms-banner-end'); if(e) e.value = '';
         if (cropper) { cropper.destroy(); cropper = null; }
     }
 
@@ -843,7 +929,7 @@
                     let b = child.val();
                     let timer = (b.startTime || b.endTime) ? `<p class="text-[9px] text-yellow-500">⏱️ ตั้งเวลา: ${b.startTime ? b.startTime.replace('T',' '):'เปิดทันที'} ถึง ${b.endTime ? b.endTime.replace('T',' '):'ยาวๆ'}</p>` : `<p class="text-[9px] text-green-400">✅ แสดงผลตลอดเวลา</p>`;
                     listContainer.innerHTML += `
-                    <div class="flex gap-3 bg-slate-800/40 p-2 rounded-xl border border-slate-700 items-center">
+                    <div class="flex gap-3 bg-slate-800/40 p-2 rounded-xl border border-slate-700 items-center shrink-0">
                         <div class="w-16 h-10 bg-black rounded border border-slate-600 overflow-hidden shrink-0">
                             <img src="${b.imageUrl}" class="w-full h-full object-contain">
                         </div>
@@ -858,8 +944,10 @@
             }
         };
 
-        db.ref('config/banners').once('value', snap => { drawItem(snap, 'บน (16:9)', 'config/banners'); 
-            db.ref('config/bottom_banners').once('value', snap2 => { drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); 
+        db.ref('config/banners').once('value', snap => { 
+            drawItem(snap, 'บน (16:9)', 'config/banners'); 
+            db.ref('config/bottom_banners').once('value', snap2 => { 
+                drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); 
                 if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-slate-500 text-xs py-4">ไม่มีรูปภาพในสไลด์</p>';
             });
         });
@@ -869,34 +957,38 @@
     db.ref('config/bottom_banners').on('value', () => loadAdminBannersList());
 
     // ================= CENTRAL CONTROL MANUAL DISPATCH FUNCTIONS =================
-    function assignDriverToJob(jobId, driverPin) {
+    windowContext.assignDriverToJob = function(jobId, driverPin) {
         if(!driverPin) return;
         if(confirm(`ต้องการสั่งมอบหมายจ่ายงานใบนี้ให้คนขับรหัส [${driverPin}] ดึงคิวตรงหน้าแอปใช่หรือไม่?`)) {
             db.ref('bookings/' + jobId).update({
                 assignedDriver: driverPin
-            }).then(() => {
-                alert(`จ่ายระบบสั่งงานให้คนขับรหัส ${driverPin} เรียบร้อยแล้ว!`);
-            });
+            }).then(() => { alert(`จ่ายระบบสั่งงานให้คนขับรหัส ${driverPin} เรียบร้อยแล้ว!`); });
         }
     }
 
     // ================= CORE SYSTEM DATABASE LISTENERS & COUNTERS =================
+    windowContext.onlineDrivers = [];
     db.ref('active_drivers').on('value', snap => {
-        let count = 0; let modalHtml = '';
+        let count = 0; let modalHtml = ''; let activeArr = [];
         if(snap.exists()) {
             snap.forEach(child => {
                 let d = child.val();
                 if(d.status === "ออนไลน์") {
-                    count++;
+                    count++; activeArr.push(d);
                     let name = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงานประจำฟลีท";
                     modalHtml += `<tr class="border-b border-slate-800 last:border-0"><td class="py-2.5 font-bold text-white cursor-pointer hover:text-green-400" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td><td class="py-2.5 text-right text-slate-400">${d.driverPhone || '-'}</td></tr>`;
                 }
             });
         }
-        document.getElementById('stat-online-count').innerText = count + " คน";
+        windowContext.onlineDrivers = activeArr;
+        
+        let cEl = document.getElementById('stat-online-count'); if(cEl) cEl.innerText = count + " คน";
         let badge = document.getElementById('menu-badge-online');
-        if(count > 0) { badge.innerText = count + " ออนไลน์"; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
-        document.getElementById('modal-online-list').innerHTML = modalHtml || '<tr><td colspan="2" class="py-4 text-center text-slate-500">ไม่มีคนขับสแตนบายระบุออนไลน์ในขณะนี้</td></tr>';
+        if(badge) {
+            if(count > 0) { badge.innerText = count + " ออนไลน์"; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
+        }
+        let mList = document.getElementById('modal-online-list');
+        if(mList) mList.innerHTML = modalHtml || '<tr><td colspan="2" class="py-4 text-center text-slate-500">ไม่มีคนขับสแตนบายระบุออนไลน์ในขณะนี้</td></tr>';
     });
 
     db.ref('bookings').on('value', snap => {
@@ -905,7 +997,6 @@
         let badgeMenu = document.getElementById('menu-badge-pending');
         let headerAlert = document.getElementById('header-alert-badge');
 
-        // สคริปต์กรองดึงรายชื่อคนขับออนไลน์มาทำ Dropdown บอร์ดกลางจัดสรรงาน
         let driverOptions = '<option value="">-- เลือกจ่ายงานให้คนขับ --</option>';
         if(windowContext.onlineDrivers && windowContext.onlineDrivers.length > 0) {
             windowContext.onlineDrivers.forEach(d => {
@@ -921,6 +1012,7 @@
                 let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-green-400 text-base" title="รถยนต์"></i>';
                 
                 let statusColor = j.status.includes("ยกเลิก") ? "text-red-400 bg-red-500/10 border-red-500/20" : "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
+                if (j.status.includes("เสร็จสิ้น") || j.status.includes("ถึงที่หมาย")) statusColor = "text-green-400 bg-green-500/10 border-green-500/20";
 
                 mainHistoryHtml += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/20">
                     <td class="py-3 px-2 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-normal">${j.phone || '-'}</span></td>
@@ -934,17 +1026,10 @@
 
                 if(isWaiting) {
                     countPending++;
-                    
-                    // ส่วนควบคุมเมนูกระจายงานแบบระบุรายตัว (ถ้าเป็นโหมดออโต้คิวจะซ่อนไว้ระบบจะโยนเอง)
-                    let dispatchControl = dispatchMode === 'auto' 
-                        ? `<span class="text-xs font-bold text-green-400"><i class="fas fa-robot"></i> กำลังจับคู่อัตโนมัติ</span>`
-                        : `<select onchange="assignDriverToJob('${key}', this.value)" class="bg-slate-800 text-white text-xs border border-slate-700 rounded px-2 py-1 outline-none font-bold">${driverOptions}</select>`;
-                    
-                    // ปักหมุดบอกกรณีแอดมินยิงเจาะจงไปแล้ว
+                    let dispatchControl = dispatchMode === 'auto' ? `<span class="text-xs font-bold text-green-400"><i class="fas fa-robot"></i> กำลังจับคู่อัตโนมัติ</span>` : `<select onchange="assignDriverToJob('${key}', this.value)" class="bg-slate-800 text-white text-xs border border-slate-700 rounded px-2 py-1 outline-none font-bold">${driverOptions}</select>`;
                     if(j.assignedDriver && dispatchMode === 'manual') {
                         dispatchControl = `<div class="text-xs text-slate-400">ยิงงานไปที่รหัส <b class="text-yellow-400">#${j.assignedDriver}</b> แล้ว<br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-[10px] text-red-400 underline mt-0.5">ดึงงานกลับบ่อรวม</button></div>`;
                     }
-
                     modalPendingHtml += `<tr class="border-b border-slate-800 text-slate-300">
                         <td class="py-3 px-2 font-bold text-white">${j.name || 'ลูกค้า'}<br><span class="text-[9px] bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded inline-block mt-0.5 text-slate-400">${j.status}</span></td>
                         <td class="py-3 px-2 text-[11px] text-slate-400 max-w-[160px] truncate leading-tight">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
@@ -955,11 +1040,9 @@
                 }
             }
 
-            // 🤖 ระบบ AUTO DISPATCH ENGINE (คิวสมดุลกระจายรายได้เท่าเทียม) 🤖
             if(dispatchMode === 'auto') {
                 for (let key in allBookings) {
                     let job = allBookings[key];
-                    // ค้นหางานบ่อรวมในลูปที่ยังไม่มีการ Assign และยังไม่มีคนขับรับ
                     if(job.status === "รอผู้ขับขี่ตอบรับ" && !job.assignedDriver) {
                         executeAutoDispatchBalancing(key, job);
                     }
@@ -967,53 +1050,41 @@
             }
         }
 
-        document.getElementById('stat-pending-count').innerText = countPending + " งาน";
-        if(countPending > 0) {
-            badgeMenu.innerText = countPending + " งานรอ"; badgeMenu.classList.remove('hidden');
-            headerAlert.classList.remove('hidden');
-            document.getElementById('modal-pending-list').innerHTML = modalPendingHtml;
-        } else {
-            badgeMenu.classList.add('hidden'); headerAlert.classList.add('hidden');
-            document.getElementById('modal-pending-list').innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีงานเรียกรถค้างคิวขณะนี้</td></tr>';
+        let pCountEl = document.getElementById('stat-pending-count'); if(pCountEl) pCountEl.innerText = countPending + " งาน";
+        if(badgeMenu && headerAlert) {
+            if(countPending > 0) {
+                badgeMenu.innerText = countPending + " งานรอ"; badgeMenu.classList.remove('hidden');
+                headerAlert.classList.remove('hidden');
+                let mpList = document.getElementById('modal-pending-list'); if(mpList) mpList.innerHTML = modalPendingHtml;
+            } else {
+                badgeMenu.classList.add('hidden'); headerAlert.classList.add('hidden');
+                let mpList = document.getElementById('modal-pending-list'); if(mpList) mpList.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีงานเรียกรถค้างคิวขณะนี้</td></tr>';
+            }
         }
 
         let historyTable = document.getElementById('history-jobs-list');
-        if(mainHistoryHtml !== '') historyTable.innerHTML = mainHistoryHtml;
-        else historyTable.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-500">ยังไม่มีข้อมูลในประวัติสารบบคิว</td></tr>`;
+        if(historyTable) {
+            if(mainHistoryHtml !== '') historyTable.innerHTML = mainHistoryHtml;
+            else historyTable.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-500">ยังไม่มีข้อมูลในประวัติสารบบคิว</td></tr>`;
+        }
     });
 
-    // ฟังก์ชันประมวลผลกระจายงานออโต้คิว บาลานซ์รายได้คนขับให้เท่าๆ กันประจำวัน
     function executeAutoDispatchBalancing(jobId, jobData) {
         if(!windowContext.onlineDrivers || windowContext.onlineDrivers.length === 0) return;
-        
         let todayStart = new Date().setHours(0,0,0,0);
-        
-        // กรองหาคนขับออนไลน์ที่ตรงประเภทรถ (เช่น ลูกค้าเรียกรถยนต์ คนขับต้องขับรถยนต์)
-        // เพื่อความยืดหยุ่นในเวอร์ชันปัจจุบัน ถ้าระบบยังไม่บันทึกประเภทรถคนขับ จะให้รวมหมดก่อนครับ
         let targets = windowContext.onlineDrivers;
-
         if(targets.length === 0) return;
-
-        // คำนวณหาจำนวนครั้งที่แต่ละคนวิ่งงานสำเร็จไปแล้วในวันนี้
         let pool = targets.map(d => {
             let countToday = 0;
             for(let k in allCompletedJobs) {
                 let c = allCompletedJobs[k];
-                if(c.driverPin === d.pin && (c.completedAt || 0) >= todayStart) {
-                    countToday++;
-                }
+                if(c.driverPin === d.pin && (c.completedAt || 0) >= todayStart) { countToday++; }
             }
             return { pin: d.pin, jobsCount: countToday };
         });
-
-        // เรียงลำดับจากคนที่มีรอบงานวิ่งวันนี้น้อยที่สุดขึ้นมาเป็นอันดับแรก (Load Balancing)
         pool.sort((a,b) => a.jobsCount - b.jobsCount);
         let selectedDriverPin = pool[0].pin;
-
-        // ทำการยิงระบุตัวคนขับออโต้ทันที
-        db.ref('bookings/' + jobId).update({
-            assignedDriver: selectedDriverPin
-        });
+        db.ref('bookings/' + jobId).update({ assignedDriver: selectedDriverPin });
     }
 
     db.ref('blacklist').on('value', snap => {
@@ -1025,56 +1096,43 @@
                 modalHtml += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-2.5 px-2 font-bold text-red-400">${b.phone}</td><td class="py-2.5 px-2 text-xs text-slate-400">${b.reason}</td><td class="py-2.5 px-2 text-right text-xs text-slate-500">${b.timestamp.split(' ')[0]}</td></tr>`;
             }
         }
-        document.getElementById('stat-block-count').innerText = count + " เบอร์";
-        if(count > 0) { badge.innerText = count; badge.classList.remove('hidden'); } else badge.classList.add('hidden');
-        document.getElementById('blacklist-table-body').innerHTML = mainHtml || '<tr><td colspan="4" class="py-4 text-center text-slate-500">ทำเนียบบัญชีดำว่างเปล่า</td></tr>';
-        document.getElementById('modal-blacklist-list').innerHTML = modalHtml || '<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีเบอร์ถูกแบน</td></tr>';
+        let sBlock = document.getElementById('stat-block-count'); if(sBlock) sBlock.innerText = count + " เบอร์";
+        if(badge) { if(count > 0) { badge.innerText = count; badge.classList.remove('hidden'); } else badge.classList.add('hidden'); }
+        
+        let tMain = document.getElementById('blacklist-table-body'); if(tMain) tMain.innerHTML = mainHtml || '<tr><td colspan="4" class="py-4 text-center text-slate-500">ทำเนียบบัญชีดำว่างเปล่า</td></tr>';
+        let tModal = document.getElementById('modal-blacklist-list'); if(tModal) tModal.innerHTML = modalHtml || '<tr><td colspan="3" class="py-4 text-center text-slate-500">ไม่มีเบอร์ถูกแบน</td></tr>';
     });
 
     function saveDriverProfile() {
-        let pin = document.getElementById('drv-pin').value.trim();
-        let name = document.getElementById('drv-name').value.trim();
-        let brand = document.getElementById('drv-brand').value.trim();
-        let color = document.getElementById('drv-color').value.trim();
-        let plate = document.getElementById('drv-plate').value.trim();
-        let phone = document.getElementById('drv-phone').value.trim();
+        let pin = document.getElementById('drv-pin').value.trim(); let name = document.getElementById('drv-name').value.trim(); let brand = document.getElementById('drv-brand').value.trim(); let color = document.getElementById('drv-color').value.trim(); let plate = document.getElementById('drv-plate').value.trim(); let phone = document.getElementById('drv-phone').value.trim();
         if(pin.length !== 4 || !name || !phone) return alert("กรอก PIN ชื่อ และเบอร์โทรพนักงานขับเป็นหลักสำคัญครับ");
-
         db.ref('drivers_profile/' + pin).set({ pin, name, brand, color, plate, phone }).then(() => {
-            alert('บันทึกแฟ้มประวัติกำลังพลเรียบร้อย!');
-            ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(id => document.getElementById(id).value = '');
+            alert('บันทึกแฟ้มประวัติกำลังพลเรียบร้อย!'); ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(id => document.getElementById(id).value = '');
         });
     }
 
     function addNumberToBlacklist() {
-        let phone = document.getElementById('block-phone').value.trim();
-        let reason = document.getElementById('block-reason').value.trim();
+        let phone = document.getElementById('block-phone').value.trim(); let reason = document.getElementById('block-reason').value.trim();
         if(phone.length < 10) return alert('กรอกตัวเลขเบอร์โทรสิบหลักให้ครบถ้วนครับ');
         db.ref('blacklist/' + phone).set({ phone, reason: reason || 'ไม่ระบุสาเหตุพฤติกรรม', timestamp: new Date().toLocaleString('th-TH') }).then(() => {
             alert('ระงับสัญญาณถาวรเสร็จสิ้น!'); document.getElementById('block-phone').value = ''; document.getElementById('block-reason').value = '';
         });
     }
 
-    // -- คัดลอกระบบบันทึกเรทราคาส่งต่อ --
     function savePricingConfig() {
         let car = { base: parseInt(document.getElementById('cfg-car-base').value)||50, km: parseInt(document.getElementById('cfg-car-km').value)||10, pick: parseInt(document.getElementById('cfg-car-pick').value)||5 };
         let bike = { base: parseInt(document.getElementById('cfg-bike-base').value)||30, km: parseInt(document.getElementById('cfg-bike-km').value)||8, pick: parseInt(document.getElementById('cfg-bike-pick').value)||5 };
         db.ref('config/pricing').set({ car, bike }).then(() => { alert('อัปเดตแกนราคากลางแยกประเภทเข้าสู่ดาต้าหน้าแอปผู้โดยสารเรียบร้อยครับ!'); closeModal('modalPricing'); });
     }
 
-    // ================= CONFIG DATA INITIALIZERS =================
     db.ref('config/pricing').once('value', snap => {
-        let p = snap.val() || {};
-        let car = p.car || { base: 50, km: 10, pick: 5 };
-        let bike = p.bike || { base: 30, km: 8, pick: 5 };
-        document.getElementById('cfg-car-base').value = car.base; document.getElementById('cfg-car-km').value = car.km; document.getElementById('cfg-car-pick').value = car.pick;
-        document.getElementById('cfg-bike-base').value = bike.base; document.getElementById('cfg-bike-km').value = bike.km; document.getElementById('cfg-bike-pick').value = bike.pick;
+        let p = snap.val() || {}; let car = p.car || { base: 50, km: 10, pick: 5 }; let bike = p.bike || { base: 30, km: 8, pick: 5 };
+        let cBase = document.getElementById('cfg-car-base'); if(cBase) cBase.value = car.base; let cKm = document.getElementById('cfg-car-km'); if(cKm) cKm.value = car.km; let cPick = document.getElementById('cfg-car-pick'); if(cPick) cPick.value = car.pick;
+        let bBase = document.getElementById('cfg-bike-base'); if(bBase) bBase.value = bike.base; let bKm = document.getElementById('cfg-bike-km'); if(bKm) bKm.value = bike.km; let bPick = document.getElementById('cfg-bike-pick'); if(bPick) bPick.value = bike.pick;
     });
 
     function addNewsContent() {
-        let title = document.getElementById('cms-news-title').value.trim();
-        let content = document.getElementById('cms-news-content').value.trim();
-        let isPromo = document.getElementById('cms-news-ispromo').checked;
+        let title = document.getElementById('cms-news-title').value.trim(); let content = document.getElementById('cms-news-content').value.trim(); let isPromo = document.getElementById('cms-news-ispromo').checked;
         if(!title || !content) return alert('ใส่หัวข้อและเนื้อความข่าวสาร');
         db.ref('news_promotions').push({ title, content, isPromo, timestamp: firebase.database.ServerValue.TIMESTAMP, dateStr: new Date().toLocaleDateString('th-TH',{day:'numeric', month:'short', year:'numeric'}) }).then(() => {
             alert('กระจายบอร์ดแจ้งข่าวสารหน้าแอปเรียบร้อย!'); document.getElementById('cms-news-title').value=''; document.getElementById('cms-news-content').value=''; document.getElementById('cms-news-ispromo').checked=false;
@@ -1093,7 +1151,8 @@
     });
 
     db.ref('drivers_profile').on('value', snap => {
-        let table = document.getElementById('all-drivers-table'); let html = '';
+        let table = document.getElementById('all-drivers-table'); if(!table) return; 
+        let html = ''; allProfiles = snap.val() || {};
         if(snap.exists()) {
             snap.forEach(child => { let d = child.val();
                 html += `<tr class="border-b border-slate-800 text-slate-300"><td class="py-2.5 px-2 font-bold text-green-400">${d.pin}</td><td class="py-2.5 px-2 font-medium text-white cursor-pointer hover:text-green-400" onclick="showDriverDetails('${d.pin}')"><u>${d.name}</u></td><td class="py-2.5 px-2 text-xs text-slate-400">${d.brand||'-'} ${d.color||''}<br><b class="text-white">${d.plate||''}</b></td><td class="py-2.5 px-2 text-xs">${d.phone}</td><td class="py-2.5 px-2 text-right"><button onclick="editDriver('${d.pin}')" class="text-blue-400 text-xs p-1 mr-1"><i class="fas fa-edit"></i></button><button onclick="deleteDriver('${d.pin}')" class="text-red-400 text-xs p-1"><i class="fas fa-trash-alt"></i></button></td></tr>`;
@@ -1102,37 +1161,51 @@
         table.innerHTML = html || '<tr><td colspan="5" class="py-4 text-center text-slate-500">ไม่มีทำเนียบคนขับ</td></tr>';
     });
 
+    function showDriverDetails(pin) {
+        let d = allProfiles[pin]; if(!d) return;
+        let dName = document.getElementById('det-name'); if(dName) dName.innerText = d.name;
+        let dPin = document.getElementById('det-pin'); if(dPin) dPin.innerText = "รหัสคนขับ: " + d.pin;
+        let dPhone = document.getElementById('det-phone'); if(dPhone) dPhone.innerText = "เบอร์โทร: " + d.phone;
+        let dCar = document.getElementById('det-car'); if(dCar) dCar.innerText = "รถ: " + (d.brand||'-') + " " + (d.color||'') + " (" + (d.plate||'-') + ")";
+
+        let todayEarn = 0, todayJobs = 0; let weekEarn = 0, weekJobs = 0; let totalEarn = 0, totalJobs = 0;
+        let now = new Date(); let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(); let startOfWeek = startOfDay - (now.getDay() * 86400000); 
+
+        if(allCompletedJobs) {
+            for(let k in allCompletedJobs) {
+                let j = allCompletedJobs[k];
+                if(j.driverPin === pin && (j.status.includes("ถึงที่หมาย") || j.status.includes("เสร็จสิ้น"))) {
+                    let price = parseInt(j.price) || 0; let time = j.completedAt || j.timestamp || 0;
+                    totalEarn += price; totalJobs++;
+                    if(time >= startOfDay) { todayEarn += price; todayJobs++; }
+                    if(time >= startOfWeek) { weekEarn += price; weekJobs++; }
+                }
+            }
+        }
+        let tEarn = document.getElementById('det-today-earn'); if(tEarn) tEarn.innerText = "฿" + todayEarn;
+        let tJob = document.getElementById('det-today-jobs'); if(tJob) tJob.innerText = todayJobs + " งาน";
+        let wEarn = document.getElementById('det-week-earn'); if(wEarn) wEarn.innerText = "฿" + weekEarn;
+        let wJob = document.getElementById('det-week-jobs'); if(wJob) wJob.innerText = weekJobs + " งาน";
+        let toEarn = document.getElementById('det-total-earn'); if(toEarn) toEarn.innerText = "฿" + totalEarn.toLocaleString();
+        openModal('modalDriverDetails');
+    }
+
     function editDriver(pin) {
         let d = allProfiles[pin];
         if(d) {
-            document.getElementById('drv-pin').value = d.pin; document.getElementById('drv-name').value = d.name;
-            document.getElementById('drv-brand').value = d.brand||''; document.getElementById('drv-color').value = d.color||'';
-            document.getElementById('drv-plate').value = d.plate||''; document.getElementById('drv-phone').value = d.phone;
+            let pInp = document.getElementById('drv-pin'); if(pInp) pInp.value = d.pin; let nInp = document.getElementById('drv-name'); if(nInp) nInp.value = d.name;
+            let bInp = document.getElementById('drv-brand'); if(bInp) bInp.value = d.brand||''; let cInp = document.getElementById('drv-color'); if(cInp) cInp.value = d.color||'';
+            let plInp = document.getElementById('drv-plate'); if(plInp) plInp.value = d.plate||''; let phInp = document.getElementById('drv-phone'); if(phInp) phInp.value = d.phone;
         }
     }
     function deleteDriver(pin) { if(confirm('ต้องการถอดพนักงานถาวร?')) { db.ref('drivers_profile/'+pin).remove(); db.ref('driver_sessions/'+pin).remove(); } }
-
-    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'drivers': 'ทำเนียบพนักงานคนขับ', 'passengers':'ระบบฐานข้อมูลรายงานลูกค้า', 'promos':'คลังคูปองและสิทธิ์ส่วนลด', 'history': 'แฟ้มงานประวัติคิวระบบทั้งหมด', 'cms': 'บอร์ดข่าวและสไลด์เนื้อหาแอป', 'blacklist': 'แฟ้มเบอร์โทรระงับสัญญาณ' };
-    
-    // ระบบดึงข้อมูลพิกัดคนขับออนไลน์แบบกลุ่ม (Realtime Sync Engine)
-    windowContext.onlineDrivers = [];
-    db.ref('active_drivers').on('value', snap => {
-        let activeArr = [];
-        if(snap.exists()) {
-            snap.forEach(child => {
-                let v = child.val();
-                if(v.status === 'ออนไลน์') activeArr.push(v);
-            });
-        }
-        windowContext.onlineDrivers = activeArr;
-    });
 
     function syncToGoogleSheet(event) {
         if(Object.keys(allCompletedJobs).length === 0) return alert("ไม่มีข้อมูลทำรายการเคลียร์ประวัติสำเร็จ");
         let btn = event.currentTarget; let orig = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งขึ้่นระบบ...';
         fetch(APPS_SCRIPT_URL + "?action=sync_sheets", { method:"POST", mode:"no-cors", headers:{"Content-Type":"application/json"}, body:JSON.stringify(allCompletedJobs) }).then(() => {
             alert("สำรองเก็บข้อมูลลงคลาวด์แผ่นชีตเรียบร้อยครับ!"); btn.innerHTML = '<i class="fas fa-check"></i> สำรองสำเร็จ';
-            setTimeout(() => { btn.innerHTML = orig; btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg"; }, 2500);
+            setTimeout(() => { btn.innerHTML = orig; btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"; }, 2500);
         });
     }
   </script>
