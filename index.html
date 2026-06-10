@@ -63,7 +63,7 @@
         </button>
         <button onclick="switchTab('drivers')" id="tab-drivers" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
             <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-motorcycle w-6 text-left"></i> จัดการคนขับ</div>
-            <span id="menu-badge-online" class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden shrink-0">0 ออนไลน์</span>
+            <span id="menu-badge-online" class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden shrink-0">0</span>
         </button>
         <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
             <i class="fas fa-user-friends w-6 text-left"></i> ข้อมูลผู้โดยสาร
@@ -155,7 +155,8 @@
                               <th class="py-3 px-2 text-right">จัดการ</th>
                           </tr>
                       </thead>
-                      <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800"></tbody>
+                      <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800">
+                      </tbody>
                   </table>
               </div>
           </div>
@@ -571,13 +572,19 @@
   <div id="modalPendingJobs" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-yellow-500"><i class="fas fa-clock"></i> กระดานคิวงานเรียกรถ (รอดำเนินการ)</h2>
+              <h2 class="text-lg font-bold text-yellow-500"><i class="fas fa-clock"></i> กระดานคิวงานเรียกรถ (รอผู้ขับขี่)</h2>
               <button onclick="closeModal('modalPendingJobs')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
               <table class="w-full text-left border-collapse min-w-[700px]">
                   <thead>
-                      <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase font-bold bg-slate-800/20"><th class="py-3 px-2 text-left">ผู้โดยสาร</th><th class="py-3 px-2 text-left">จุดรับ-ปลายทาง</th><th class="py-3 px-2 text-center">รถ</th><th class="py-3 px-2 text-left font-bold">ราคา</th><th class="py-3 px-2 text-right">การจ่ายงาน</th></tr>
+                      <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase font-bold bg-slate-800/20">
+                          <th class="py-3 px-2 text-left">ผู้โดยสาร</th>
+                          <th class="py-3 px-2 text-left">จุดรับ-ปลายทาง</th>
+                          <th class="py-3 px-2 text-center">รถ</th>
+                          <th class="py-3 px-2 text-left font-bold">ราคา</th>
+                          <th class="py-3 px-2 text-right">การจ่ายงาน</th>
+                      </tr>
                   </thead>
                   <tbody id="modal-pending-list" class="text-sm divide-y divide-slate-800"></tbody>
               </table>
@@ -659,7 +666,7 @@
                   <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2">
                           <h2 class="text-lg font-black text-white truncate" id="pdet-name">ชื่อลูกค้า</h2>
-                          <span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span>
+                          <span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> <span id="pdet-rating">5.0</span></span>
                       </div>
                       <p class="text-xs font-bold text-blue-400 mt-0.5" id="pdet-phone">เบอร์โทร: -</p>
                       <p class="text-[10px] text-slate-400 mt-1" id="pdet-join">ใช้งานครั้งแรก: -</p>
@@ -690,6 +697,9 @@
 
   <script>
     const windowContext = window;
+    // 🌟 ประกาศ tabTitles ไว้ระดับ Global เพื่อป้องกัน Error การเรียกใช้งานไม่เจอ
+    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'drivers': 'ทำเนียบพนักงานคนขับ', 'passengers':'ระบบฐานข้อมูลรายงานลูกค้า', 'promos':'คลังคูปองและสิทธิ์ส่วนลด', 'history': 'แฟ้มงานประวัติคิวระบบทั้งหมด', 'banners': 'จัดการสไลด์แบนเนอร์', 'news': 'บอร์ดประกาศข่าวสารระบบ', 'blacklist': 'แฟ้มเบอร์โทรระงับสัญญาณ' };
+
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
 
     let allBookings = null;
@@ -801,7 +811,7 @@
         });
     }
 
-    // ดึงประวัติที่จบแล้วเป็น Master Data
+    // ดึงประวัติที่จบแล้วเป็น Master Data (รวมถึง active bookings ที่ยังวิ่งอยู่ให้แสดงใน CRM ด้วย)
     db.ref('completed_jobs').on('value', snap => {
         allCompletedJobs = snap.val() || {};
         let cp = document.getElementById('content-passengers');
@@ -822,7 +832,7 @@
              return;
         }
         jobsArr.forEach(j => {
-            let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400"></i>' : '<i class="fas fa-car-side text-green-400"></i>';
+            let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-base"></i>' : '<i class="fas fa-car-side text-green-400 text-base"></i>';
             html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/20">
                 <td class="py-3 px-2 font-bold text-white text-left">${j.name || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-normal">${j.phone || '-'}</span></td>
                 <td class="py-3 px-2 text-center">${srvIcon}</td>
@@ -837,6 +847,7 @@
         if(lst) lst.innerHTML = html;
     }
 
+    // ================= ระบบ UI เมนูหลัก =================
     function toggleMenu() {
         const menu = document.getElementById('dropdown-menu');
         const icon = document.getElementById('menu-icon');
@@ -891,14 +902,27 @@
     // ================= ระบบฐานข้อมูลลูกค้า CRM =================
     function renderPassengers() {
         let passMap = {};
+        
         Object.values(allCompletedJobs).forEach(job => {
             let uid = job.phone || job.userId;
-            if(!passMap[uid]) passMap[uid] = { phone: job.phone || '-', name: job.name || 'สมาชิกลูกค้า', rides: 0, spend: 0, promos: [], firstRide: job.completedAt || job.timestamp };
+            if(!uid) return;
+            if(!passMap[uid]) passMap[uid] = { phone: job.phone || '-', name: job.name || 'สมาชิกลูกค้า', rides: 0, spend: 0, promos: [], firstRide: job.completedAt || job.timestamp || Date.now() };
             passMap[uid].rides++;
             passMap[uid].spend += parseInt(job.price || 0);
             if(job.promoCode && !passMap[uid].promos.includes(job.promoCode)) passMap[uid].promos.push(job.promoCode);
-            if((job.completedAt || job.timestamp) < passMap[uid].firstRide) passMap[uid].firstRide = job.completedAt || job.timestamp;
+            if((job.completedAt || job.timestamp || Date.now()) < passMap[uid].firstRide) passMap[uid].firstRide = job.completedAt || job.timestamp;
         });
+
+        // ดึงจากงานที่กำลังรอด้วย เพื่อให้ลูกค้าใหม่เห็น
+        if(allBookings) {
+            Object.values(allBookings).forEach(job => {
+                let uid = job.phone || job.userId;
+                if(!uid) return;
+                if(!passMap[uid]) {
+                    passMap[uid] = { phone: job.phone || '-', name: job.name || 'สมาชิกลูกค้า', rides: 0, spend: 0, promos: [], firstRide: job.timestamp || Date.now() };
+                }
+            });
+        }
 
         let passArray = Object.values(passMap);
         let filterEl = document.getElementById('filter-passenger');
@@ -910,18 +934,18 @@
 
         let html = '';
         if(passArray.length === 0) {
-            html = `<tr><td colspan="5" class="py-6 text-center text-slate-500">ไม่มีข้อมูลลอลิสต์รายชื่อในกลุ่มนี้</td></tr>`;
+            html = `<tr><td colspan="5" class="py-6 text-center text-slate-500">ไม่มีข้อมูลลิสต์รายชื่อในกลุ่มนี้</td></tr>`;
         } else {
             passArray.forEach(p => {
                 let isNew = p.rides <= 1;
                 let badge = isNew ? `<span class="bg-green-950 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded border border-green-500/20">ผู้ใช้ใหม่</span>` : `<span class="bg-yellow-950 text-yellow-400 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-500/20">ลูกค้าประจำ</span>`;
                 let pDataStr = encodeURIComponent(JSON.stringify(p));
 
-                html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/50 transition cursor-pointer" onclick="viewPassengerDetails('${pDataStr}')">
+                html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/50 transition cursor-pointer text-left" onclick="viewPassengerDetails('${pDataStr}')">
                     <td class="py-3 px-3 text-left">
                         <p class="font-bold text-white hover:text-blue-400 transition flex items-center gap-2">
                            ${p.phone} 
-                           <span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1"><i class="fas fa-star"></i> 5.0</span>
+                           <span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span>
                         </p>
                         <p class="text-[10px] text-slate-500">${p.name}</p>
                     </td>
@@ -1107,7 +1131,7 @@
         
         db.ref('promotions/' + code + '/history').once('value', snap => {
             let hist = snap.val(); let html = ''; let lst = document.getElementById('modal-promo-history-list');
-            if(!hist) { html = `<tr><td colspan="3" class="py-8 text-center text-slate-500">ยังไม่มีประวัติการใช้งานโค้ดนี้</td></tr>`; } 
+            if(!hist) { html = `<tr><td colspan="3" class="py-8 text-center text-slate-500">ยังไม่มีการเคลมใช้งานโค้ดนี้</td></tr>`; } 
             else {
                 let keys = Object.keys(hist).reverse();
                 for(let i=0; i<keys.length; i++) {
@@ -1254,6 +1278,54 @@
     });
 
     // ================= CENTRAL CONTROL MANUAL DISPATCH =================
+    windowContext.activeNodeDrivers = [];
+    windowContext.singleNodeDriver = [];
+    
+    function mergeAdminDrivers() {
+        let count = 0; let modalHtml = '';
+        let merged = [...windowContext.activeNodeDrivers, ...windowContext.singleNodeDriver];
+        
+        let unique = []; let pins = new Set();
+        for(let d of merged) {
+            if(!pins.has(d.pin)) { pins.add(d.pin); unique.push(d); }
+        }
+        windowContext.onlineDrivers = unique;
+        
+        unique.forEach(d => {
+            count++;
+            let name = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงานประจำฟลีท";
+            let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="text-green-400 bg-green-900/30 px-2 py-1 rounded-lg text-xs hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
+            modalHtml += `<tr class="border-b border-slate-800 last:border-0 hover:bg-slate-800/30 transition text-left">
+                <td class="py-3 px-2 font-bold text-white cursor-pointer hover:text-blue-400 transition" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td>
+                <td class="py-3 px-2 text-right flex items-center justify-end gap-2 text-slate-400">${d.driverPhone || '-'}${callBtn}</td>
+            </tr>`;
+        });
+        
+        let cEl = document.getElementById('stat-online-count'); if(cEl) cEl.innerText = count + " คน";
+        let badge = document.getElementById('menu-badge-online');
+        if(badge) { if(count > 0) { badge.innerText = count + " ออนไลน์"; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
+        let mList = document.getElementById('modal-online-list');
+        if(mList) mList.innerHTML = modalHtml || '<tr><td colspan="2" class="py-6 text-center text-slate-500">ไม่มีคนขับสแตนบายออนไลน์ในขณะนี้</td></tr>';
+    }
+
+    db.ref('active_drivers').on('value', snap => {
+        windowContext.activeNodeDrivers = [];
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let d = child.val();
+                if(d.status === "ออนไลน์") windowContext.activeNodeDrivers.push(d);
+            });
+        }
+        mergeAdminDrivers();
+    });
+
+    db.ref('driver').on('value', snap => {
+        windowContext.singleNodeDriver = [];
+        let d = snap.val();
+        if(d && d.status === "ออนไลน์" && d.lat) windowContext.singleNodeDriver.push(d);
+        mergeAdminDrivers();
+    });
+
     function openAssignModal(jobId) {
         window.activeJobToAssign = jobId;
         let listContainer = document.getElementById('assign-driver-list');
@@ -1291,33 +1363,6 @@
             });
         });
     }
-
-    // ================= CORE SYSTEM DATABASE LISTENERS & COUNTERS =================
-    windowContext.onlineDrivers = [];
-    db.ref('active_drivers').on('value', snap => {
-        let count = 0; let modalHtml = ''; let activeArr = [];
-        if(snap.exists()) {
-            snap.forEach(child => {
-                let d = child.val();
-                if(d.status === "ออนไลน์") {
-                    count++; activeArr.push(d);
-                    let name = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงานประจำฟลีท";
-                    let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="text-green-400 bg-green-900/30 px-2 py-1 rounded text-xs hover:text-green-300"><i class="fas fa-phone-alt"></i></a>` : '';
-                    modalHtml += `<tr class="border-b border-slate-800 last:border-0 hover:bg-slate-800/30 transition text-left">
-                        <td class="py-3 px-2 font-bold text-white cursor-pointer hover:text-blue-400 transition" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td>
-                        <td class="py-3 px-2 text-right flex items-center justify-end gap-2 text-slate-400">${d.driverPhone || '-'}${callBtn}</td>
-                    </tr>`;
-                }
-            });
-        }
-        windowContext.onlineDrivers = activeArr;
-        
-        let cEl = document.getElementById('stat-online-count'); if(cEl) cEl.innerText = count + " คน";
-        let badge = document.getElementById('menu-badge-online');
-        if(badge) { if(count > 0) { badge.innerText = count + " ออนไลน์"; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
-        let mList = document.getElementById('modal-online-list');
-        if(mList) mList.innerHTML = modalHtml || '<tr><td colspan="2" class="py-6 text-center text-slate-500">ไม่มีคนขับสแตนบายออนไลน์ในขณะนี้</td></tr>';
-    });
 
     db.ref('bookings').on('value', snap => {
         let countPending = 0; let modalPendingHtml = '';
