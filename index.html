@@ -22,6 +22,8 @@
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .slim-scroll::-webkit-scrollbar { width: 4px; }
     .slim-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    
+    /* Custom Radio Button for Promo */
     .radio-label input[type="radio"]:checked + div { background-color: #2563eb; border-color: #3b82f6; color: white; }
   </style>
 </head>
@@ -65,21 +67,21 @@
             <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-motorcycle w-6 text-left"></i> จัดการคนขับ</div>
             <span id="menu-badge-online" class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden shrink-0">0</span>
         </button>
-        <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
-            <i class="fas fa-user-friends w-6 text-left"></i> ข้อมูลผู้โดยสาร
+        <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-user-friends w-6 text-left"></i> ข้อมูลผู้โดยสาร</div>
         </button>
-        <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
-            <i class="fas fa-history w-6 text-left"></i> ประวัติงานทั้งหมด
+        <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-history w-6 text-left"></i> ประวัติงานทั้งหมด</div>
         </button>
         <div class="border-t border-slate-700 my-1"></div>
-        <button onclick="switchTab('promos')" id="tab-promos" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
-            <i class="fas fa-ticket-alt w-6 text-left"></i> โปรโมชั่น & คูปอง
+        <button onclick="switchTab('promos')" id="tab-promos" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-ticket-alt w-6 text-left"></i> โปรโมชั่น & คูปอง</div>
         </button>
-        <button onclick="switchTab('banners')" id="tab-banners" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
-            <i class="fas fa-images w-6 text-left"></i> จัดการรูปแบนเนอร์
+        <button onclick="switchTab('banners')" id="tab-banners" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-images w-6 text-left"></i> จัดการรูปแบนเนอร์</div>
         </button>
-        <button onclick="switchTab('news')" id="tab-news" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center gap-3 transition justify-start">
-            <i class="fas fa-bullhorn w-6 text-left"></i> บอร์ดข่าวสาร
+        <button onclick="switchTab('news')" id="tab-news" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-bullhorn w-6 text-left"></i> บอร์ดข่าวสาร</div>
         </button>
         <button onclick="switchTab('blacklist')" id="tab-blacklist" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
             <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-ban w-6 text-left"></i> บล็อกเบอร์โทร</div>
@@ -492,8 +494,8 @@
                       </div>
                   </div>
                   <div class="flex gap-2">
-                      <button onclick="cancelCrop()" class="flex-1 py-2 bg-slate-700 text-white font-bold rounded-lg text-sm hover:bg-slate-600 transition">ยกเลิก</button>
-                      <button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-green-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-green-500 transition">อัปโหลดสไลด์ 🚀</button>
+                          <button onclick="cancelCrop()" class="flex-1 py-2 bg-slate-700 text-white font-bold rounded-lg text-sm hover:bg-slate-600 transition">ยกเลิก</button>
+                          <button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-green-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-green-500 transition">อัปโหลดสไลด์ 🚀</button>
                   </div>
               </div>
           </div>
@@ -622,7 +624,7 @@
       <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col">
           <div class="p-4 border-b border-slate-800 flex justify-between items-start bg-slate-800/50 rounded-t-2xl relative overflow-hidden">
               <div class="absolute right-0 top-0 opacity-10 text-6xl p-2"><i class="fas fa-id-badge"></i></div>
-              <div class="relative z-10 w-full pr-8">
+              <div class="relative z-10 w-full pr-8 text-left">
                   <div class="flex justify-between items-start">
                       <div>
                           <h2 class="text-xl font-black text-white" id="det-name">ชื่อคนขับ</h2>
@@ -658,7 +660,7 @@
   </div>
 
   <div id="modalPassengerDetails" class="hidden fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-blue-500/30 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col overflow-hidden">
+      <div class="bg-slate-900 border border-blue-500/30 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col overflow-hidden text-left">
           <div class="p-5 border-b border-slate-800 bg-slate-800/50 relative">
               <button onclick="closeModal('modalPassengerDetails')" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fas fa-times"></i></button>
               <div class="flex items-center gap-4">
@@ -666,7 +668,7 @@
                   <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2">
                           <h2 class="text-lg font-black text-white truncate" id="pdet-name">ชื่อลูกค้า</h2>
-                          <span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> <span id="pdet-rating">5.0</span></span>
+                          <span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span>
                       </div>
                       <p class="text-xs font-bold text-blue-400 mt-0.5" id="pdet-phone">เบอร์โทร: -</p>
                       <p class="text-[10px] text-slate-400 mt-1" id="pdet-join">ใช้งานครั้งแรก: -</p>
@@ -1297,7 +1299,7 @@
             let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="text-green-400 bg-green-900/30 px-2 py-1 rounded-lg text-xs hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
             modalHtml += `<tr class="border-b border-slate-800 last:border-0 hover:bg-slate-800/30 transition text-left">
                 <td class="py-3 px-2 font-bold text-white cursor-pointer hover:text-blue-400 transition" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td>
-                <td class="py-3 px-2 text-right flex items-center justify-end gap-2 text-slate-400">${d.driverPhone || '-'}${callBtn}</td>
+                <td class="py-3 px-2 text-right flex items-center justify-end gap-2 text-slate-400">${d.driverPhone || '-'} ${callBtn}</td>
             </tr>`;
         });
         
@@ -1373,35 +1375,36 @@
             let allBookings = snap.val();
             for (let key in allBookings) {
                 let j = allBookings[key];
-                let isWaiting = j.status === "รอผู้ขับขี่ตอบรับ";
+                
+                // ถ้ารถรับงานไปแล้ว หรือ กำลังเดินทาง หรือ เสร็จสิ้น จะไม่แสดงในช่อง "รอดำเนินการ"
+                if (j.status !== "รอผู้ขับขี่ตอบรับ") continue; 
+
                 let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-green-400 text-base" title="รถยนต์"></i>';
                 let statusColor = "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
                 
                 let priceDisplay = `฿${j.price}`;
                 if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-green-400 bg-green-900/30 px-1 rounded border border-green-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
 
-                if(isWaiting) {
-                    countPending++;
-                    let dispatchControl = dispatchMode === 'auto' 
-                        ? `<span class="text-[10px] font-bold text-blue-400 bg-blue-900/20 border border-blue-500/30 px-2 py-1 rounded-lg"><i class="fas fa-robot"></i> จัดการออโต้คิว</span>` 
-                        : `<button onclick="openAssignModal('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition">เลือกคนขับ</button>`;
-                    
-                    if(j.assignedDriver && dispatchMode === 'manual') {
-                        dispatchControl = `<div class="text-[10px] text-slate-400">ยิงงานให้ PIN <b class="text-yellow-400 text-xs ml-1">#${j.assignedDriver}</b><br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-red-400 underline mt-1 hover:text-red-300">ดึงงานกลับมาจ่ายใหม่</button></div>`;
-                    }
-
-                    let callCusBtn = j.phone ? `<a href="tel:${j.phone}" class="ml-2 text-green-400 bg-green-900/30 p-1.5 rounded-lg hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
-
-                    modalPendingHtml += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/40 transition">
-                        <td class="py-3 px-2 font-bold text-white text-left flex flex-col items-start gap-1">
-                            <div class="flex items-center">${srvIcon} <span class="ml-2">${j.name || 'ลูกค้า'}</span> ${callCusBtn}</div>
-                            <span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded border inline-block mt-0.5">${j.status}</span>
-                        </td>
-                        <td class="py-3 px-2 text-[11px] text-slate-400 max-w-[200px] truncate leading-relaxed text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
-                        <td class="py-3 px-2 font-black text-green-400 text-sm text-left"> ${priceDisplay}</td>
-                        <td class="py-3 px-2 text-right">${dispatchControl}</td>
-                    </tr>`;
+                countPending++;
+                let dispatchControl = dispatchMode === 'auto' 
+                    ? `<span class="text-[10px] font-bold text-blue-400 bg-blue-900/20 border border-blue-500/30 px-2 py-1 rounded-lg"><i class="fas fa-robot"></i> จัดการออโต้คิว</span>` 
+                    : `<button onclick="openAssignModal('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition">เลือกคนขับ</button>`;
+                
+                if(j.assignedDriver && dispatchMode === 'manual') {
+                    dispatchControl = `<div class="text-[10px] text-slate-400">ยิงงานให้ PIN <b class="text-yellow-400 text-xs ml-1">#${j.assignedDriver}</b><br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-red-400 underline mt-1 hover:text-red-300">ดึงงานกลับมาจ่ายใหม่</button></div>`;
                 }
+
+                let callCusBtn = j.phone ? `<a href="tel:${j.phone}" class="ml-2 text-green-400 bg-green-900/30 p-1.5 rounded-lg hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
+
+                modalPendingHtml += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/40 transition">
+                    <td class="py-3 px-2 font-bold text-white text-left flex flex-col items-start gap-1">
+                        <div class="flex items-center">${srvIcon} <span class="ml-2">${j.name || 'ลูกค้า'}</span> ${callCusBtn}</div>
+                        <span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded border inline-block mt-0.5">${j.status}</span>
+                    </td>
+                    <td class="py-3 px-2 text-[11px] text-slate-400 max-w-[200px] truncate leading-relaxed text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
+                    <td class="py-3 px-2 font-black text-green-400 text-sm text-left"> ${priceDisplay}</td>
+                    <td class="py-3 px-2 text-right">${dispatchControl}</td>
+                </tr>`;
 
                 if(dispatchMode === 'auto' && j.status === "รอผู้ขับขี่ตอบรับ" && !j.assignedDriver) {
                     executeAutoDispatchBalancing(key, j);
