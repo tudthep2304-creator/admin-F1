@@ -1222,7 +1222,7 @@
         });
     }
 
-    // 🌟 ฟังก์ชันสลับอัตราส่วนตอนแอดมินเปลี่ยนตัวเลือก dropdown
+    // ================= CMS BANNERS & NEWS =================
     let cmsFile = document.getElementById('cms-banner-file');
     if(cmsFile) {
         cmsFile.addEventListener('change', function(e) {
@@ -1233,10 +1233,11 @@
                 document.getElementById('cropArea').classList.remove('hidden');
                 if (cropper) cropper.destroy();
                 
+                // 🌟 กำหนดสัดส่วนตามประเภทที่เลือก
                 let pos = document.getElementById('cms-banner-position').value;
                 let aspect = (16 / 9);
                 if (pos === 'bottom') aspect = (600 / 120);
-                if (pos === 'popup') aspect = (4 / 5);
+                if (pos === 'popup') aspect = (4 / 5); // สัดส่วนทองคำของโฆษณาคั่นแนวตั้ง
                 
                 cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio: aspect, viewMode: 1, autoCropArea: 1 });
                 
@@ -1315,6 +1316,11 @@
         });
     }
 
+    // 🌟 ดักจับข้อมูลแบบเรียลไทม์ทั้ง 3 ถังข้อมูล
+    db.ref('config/banners').on('value', () => loadAdminBannersList());
+    db.ref('config/bottom_banners').on('value', () => loadAdminBannersList());
+    db.ref('config/popup_ad').on('value', () => loadAdminBannersList());
+
     function loadAdminBannersList() {
         let listContainer = document.getElementById('admin-banners-list'); if(!listContainer) return;
         listContainer.innerHTML = '';
@@ -1344,18 +1350,6 @@
             }
         };
         
-        db.ref('config/banners').once('value', snap => { 
-            drawItem(snap, 'บน (16:9)', 'config/banners'); 
-            db.ref('config/bottom_banners').once('value', snap2 => { 
-                drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); 
-                db.ref('config/popup_ad').once('value', snap3 => {
-                    drawItem(snap3, '💥 ป๊อปอัปโฆษณาคั่น', 'config/popup_ad');
-                    if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-slate-500 text-xs py-4">ไม่มีรูปแบนเนอร์ในระบบ</p>';
-                });
-            }); 
-        });
-    }
-        
         // รัน Loop รวมประวัติสื่อทั้งสามก้อนมาโชว์ในตารางเดียว
         db.ref('config/banners').once('value', snap => { 
             drawItem(snap, 'บน (16:9)', 'config/banners'); 
@@ -1367,28 +1361,6 @@
                 });
             }); 
         });
-    }
-
-    // ข่าวสารอัปโหลดรูป
-    function addNewsContent() {
-        let title = document.getElementById('cms-news-title').value.trim();
-        let content = document.getElementById('cms-news-content').value.trim();
-        let isPromo = document.getElementById('cms-news-ispromo').checked;
-        let startTime = document.getElementById('cms-news-start').value;
-        let endTime = document.getElementById('cms-news-end').value;
-        let fileInput = document.getElementById('cms-news-file');
-
-        if(!title || !content) return showCustomAlert('ข้อมูลไม่ครบ', 'ใส่หัวข้อและเนื้อความข่าวสารด้วยครับ', 'error');
-        
-        let file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
-
-        if (file) {
-            let reader = new FileReader();
-            reader.onload = function(e) { saveNewsToDb(title, content, isPromo, startTime, endTime, e.target.result); }
-            reader.readAsDataURL(file);
-        } else {
-            saveNewsToDb(title, content, isPromo, startTime, endTime, null);
-        }
     }
 
     function saveNewsToDb(title, content, isPromo, startTime, endTime, imageUrl) {
