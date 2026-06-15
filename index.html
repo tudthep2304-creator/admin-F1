@@ -1218,28 +1218,6 @@
                 if (pos === 'popup') aspect = (4 / 5); // สัดส่วนทองคำของโฆษณาคั่นแนวตั้ง
                 
                 cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio: aspect, viewMode: 1, autoCropArea: 1 });
-            }
-        });
-    }
-
-    // ================= CMS BANNERS & NEWS =================
-    let cmsFile = document.getElementById('cms-banner-file');
-    if(cmsFile) {
-        cmsFile.addEventListener('change', function(e) {
-            let files = e.target.files;
-            if (files && files.length > 0) {
-                let file = files[0];
-                document.getElementById('imageToCrop').src = URL.createObjectURL(file);
-                document.getElementById('cropArea').classList.remove('hidden');
-                if (cropper) cropper.destroy();
-                
-                // 🌟 กำหนดสัดส่วนตามประเภทที่เลือก
-                let pos = document.getElementById('cms-banner-position').value;
-                let aspect = (16 / 9);
-                if (pos === 'bottom') aspect = (600 / 120);
-                if (pos === 'popup') aspect = (4 / 5); // สัดส่วนทองคำของโฆษณาคั่นแนวตั้ง
-                
-                cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio: aspect, viewMode: 1, autoCropArea: 1 });
                 
                 // 🌟 เปิด/ซ่อนกล่องตั้งค่าพิเศษ
                 let popSet = document.getElementById('popup-only-settings');
