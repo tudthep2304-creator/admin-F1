@@ -499,9 +499,10 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                       <label class="block text-xs font-bold text-slate-400 mb-1.5">ตำแหน่งจัดวางแบนเนอร์</label>
-                      <select id="cms-banner-position" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-xs font-bold">
+                      <select id="cms-banner-position" onchange="window.updateCropperRatio()" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-xs font-bold">
                           <option value="top">แบนเนอร์หลักส่วนบน (สัดส่วน 16:9)</option>
                           <option value="bottom">แบนเนอร์แถบยาวส่วนล่าง (Slim Banner)</option>
+                          <option value="popup">โฆษณาคั่นแบบป๊อปอัปเมื่อเปิดแอป (สัดส่วน 4:5)</option>
                       </select>
                   </div>
                   <div>
@@ -1196,10 +1197,26 @@
                 document.getElementById('imageToCrop').src = URL.createObjectURL(file);
                 document.getElementById('cropArea').classList.remove('hidden');
                 if (cropper) cropper.destroy();
+                
+                // 🌟 กำหนดสัดส่วนตามประเภทที่เลือก
                 let pos = document.getElementById('cms-banner-position').value;
-                cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio: pos === 'bottom' ? (600 / 120) : (16 / 9), viewMode: 1, autoCropArea: 1 });
+                let aspect = (16 / 9);
+                if (pos === 'bottom') aspect = (600 / 120);
+                if (pos === 'popup') aspect = (4 / 5); // สัดส่วนทองคำของโฆษณาคั่นแนวตั้ง
+                
+                cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio: aspect, viewMode: 1, autoCropArea: 1 });
             }
         });
+    }
+
+    // 🌟 ฟังก์ชันสลับอัตราส่วนตอนแอดมินเปลี่ยนตัวเลือก dropdown
+    window.updateCropperRatio = function() {
+        if (!cropper) return;
+        let pos = document.getElementById('cms-banner-position').value;
+        let aspect = (16 / 9);
+        if (pos === 'bottom') aspect = (600 / 120);
+        if (pos === 'popup') aspect = (4 / 5);
+        cropper.setAspectRatio(aspect);
     }
 
     function cancelCrop() {
@@ -1214,14 +1231,24 @@
     function saveCroppedImage() {
         if (!cropper) return;
         let pos = document.getElementById('cms-banner-position').value;
-        let canvas = cropper.getCroppedCanvas(pos === 'bottom' ? { width: 600, height: 120 } : { width: 600 });
+        
+        // 🌟 ตั้งค่าความละเอียดภาพตามประเภทโมดูล
+        let cropOptions = { width: 600 };
+        if (pos === 'bottom') cropOptions = { width: 600, height: 120 };
+        if (pos === 'popup') cropOptions = { width: 480, height: 600 }; 
+        
+        let canvas = cropper.getCroppedCanvas(cropOptions);
         let base64 = canvas.toDataURL('image/jpeg', 0.6);
         
         let linkUrl = document.getElementById('cms-banner-link').value.trim();
         let startTime = document.getElementById('cms-banner-start').value;
         let endTime = document.getElementById('cms-banner-end').value;
 
-        let path = pos === 'bottom' ? 'config/bottom_banners' : 'config/banners';
+        // 🌟 แยกถังเก็บข้อมูลออกจากกันชัดเจน
+        let path = 'config/banners';
+        if (pos === 'bottom') path = 'config/bottom_banners';
+        if (pos === 'popup') path = 'config/popup_ad';
+
         db.ref(path).push({ imageUrl: base64, linkUrl: linkUrl, startTime: startTime || null, endTime: endTime || null, timestamp: firebase.database.ServerValue.TIMESTAMP }).then(() => {
             showCustomAlert("สำเร็จ", 'อัปเดตสไลด์ภาพและตั้งเวลาเรียบร้อย!', 'success'); cancelCrop();
         });
@@ -1247,8 +1274,42 @@
         db.ref('config/banners').once('value', snap => { drawItem(snap, 'บน (16:9)', 'config/banners'); db.ref('config/bottom_banners').once('value', snap2 => { drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-slate-500 text-xs py-4">ไม่มีรูปแบนเนอร์ในระบบ</p>'; }); });
     }
 
+    // 🌟 ดักจับข้อมูลแบบเรียลไทม์ทั้ง 3 ถังข้อมูล
     db.ref('config/banners').on('value', () => loadAdminBannersList());
     db.ref('config/bottom_banners').on('value', () => loadAdminBannersList());
+    db.ref('config/popup_ad').on('value', () => loadAdminBannersList());
+
+    function loadAdminBannersList() {
+        let listContainer = document.getElementById('admin-banners-list'); if(!listContainer) return;
+        listContainer.innerHTML = '';
+        
+        const drawItem = (snap, lbl, path) => {
+            if(snap.exists()) {
+                snap.forEach(child => {
+                    let b = child.val();
+                    let timer = (b.startTime || b.endTime) ? `<p class="text-[9px] text-yellow-500">⏱ ${b.startTime ? b.startTime.replace('T',' '):'เริ่ม'} ถึง ${b.endTime ? b.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-green-400">✅ แสดงผล 24 ชม.</p>`;
+                    listContainer.innerHTML += `
+                    <div class="flex gap-3 bg-slate-800/40 p-2 rounded-xl border border-slate-700 items-center shrink-0 animate-fade-in text-left">
+                        <div class="w-20 h-12 bg-black rounded border border-slate-600 overflow-hidden shrink-0"><img src="${b.imageUrl}" class="w-full h-full object-contain"></div>
+                        <div class="flex-1 min-w-0 text-left"><p class="text-xs font-bold text-white truncate">ตำแหน่ง: ${lbl}</p>${timer}</div>
+                        <button onclick="showCustomConfirm('ลบแบนเนอร์?', 'ต้องการลบรูปภาพนี้ออกจากระบบใช่หรือไม่?', () => { db.ref('${path}/${child.key}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-400 bg-red-950/20 w-8 h-8 rounded-lg border border-red-500/20 text-sm flex items-center justify-center shrink-0 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
+                });
+            }
+        };
+        
+        // รัน Loop รวมประวัติสื่อทั้งสามก้อนมาโชว์ในตารางเดียว
+        db.ref('config/banners').once('value', snap => { 
+            drawItem(snap, 'บน (16:9)', 'config/banners'); 
+            db.ref('config/bottom_banners').once('value', snap2 => { 
+                drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); 
+                db.ref('config/popup_ad').once('value', snap3 => {
+                    drawItem(snap3, '💥 โฆษณาคั่นป๊อปอัป (เปิดแอป)', 'config/popup_ad');
+                    if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-slate-500 text-xs py-4">ไม่มีรูปแบนเนอร์ในระบบ</p>';
+                });
+            }); 
+        });
+    }
 
     // ข่าวสารอัปโหลดรูป
     function addNewsContent() {
