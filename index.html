@@ -87,6 +87,10 @@
             <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-ban w-6 text-left"></i> บล็อกเบอร์โทร</div>
             <span id="menu-badge-block" class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden shrink-0">0</span>
         </button>
+      <div class="border-t border-slate-700 my-1"></div>
+        <button onclick="switchTab('chatlogs')" id="tab-chatlogs" class="tab-btn px-4 py-3 bg-slate-800 text-slate-400 hover:text-white font-bold rounded-xl text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-3 w-full justify-start"><i class="fas fa-comments w-6 text-left"></i> บันทึกแชทระบบ</div>
+        </button>
     </nav>
   </header>
 
@@ -315,7 +319,40 @@
               </div>
           </div>
       </section>
+<section id="content-chatlogs" class="tab-content hidden space-y-4">
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
+              <h2 class="text-lg font-bold text-white mb-1"><i class="fas fa-user-secret text-blue-400 mr-1"></i> คลังประวัติแชท (ตรวจสอบย้อนหลัง)</h2>
+              <p class="text-xs text-slate-400 mb-4">ข้อมูลแชททั้งหมดจะถูกเก็บถาวรที่นี่ เพื่อใช้เป็นหลักฐานเวลามีการร้องเรียน</p>
+              
+              <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse min-w-[700px]">
+                      <thead>
+                          <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30">
+                              <th class="py-3 px-3 text-left rounded-tl-lg">รหัสงาน (Job ID)</th>
+                              <th class="py-3 px-2 text-left">ผู้โดยสาร</th>
+                              <th class="py-3 px-2 text-left">คนขับ</th>
+                              <th class="py-3 px-2 text-left">เวลาอัปเดตล่าสุด</th>
+                              <th class="py-3 px-3 text-right rounded-tr-lg">ตรวจสอบ</th>
+                          </tr>
+                      </thead>
+                      <tbody id="chatlogs-table-body" class="text-sm divide-y divide-slate-800">
+                          <tr><td colspan="5" class="py-6 text-center text-slate-500">กำลังดึงข้อมูล...</td></tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
 
+      <div id="modalViewChatLog" class="hidden fixed inset-0 z-[150] bg-black/80 flex items-center justify-center p-4">
+          <div class="bg-slate-900 border border-blue-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col h-[80vh] overflow-hidden animate-fade-in">
+              <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/80">
+                  <h2 class="text-base font-bold text-blue-400"><i class="fas fa-comments mr-1"></i> ประวัติสนทนา</h2>
+                  <button onclick="closeModal('modalViewChatLog')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+              </div>
+              <div id="chatlog-messages-container" class="p-4 overflow-y-auto flex-1 slim-scroll bg-slate-900 space-y-3">
+              </div>
+          </div>
+      </div>
   </main>
 
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
@@ -700,7 +737,7 @@
   <script>
     const windowContext = window;
     // 🌟 ประกาศ tabTitles ไว้ระดับ Global เพื่อป้องกัน Error การเรียกใช้งานไม่เจอ
-    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'drivers': 'ทำเนียบพนักงานคนขับ', 'passengers':'ระบบฐานข้อมูลรายงานลูกค้า', 'promos':'คลังคูปองและสิทธิ์ส่วนลด', 'history': 'แฟ้มงานประวัติคิวระบบทั้งหมด', 'banners': 'จัดการสไลด์แบนเนอร์', 'news': 'บอร์ดประกาศข่าวสารระบบ', 'blacklist': 'แฟ้มเบอร์โทรระงับสัญญาณ' };
+    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'drivers': 'ทำเนียบพนักงานคนขับ', 'passengers':'ระบบฐานข้อมูลรายงานลูกค้า', 'promos':'คลังคูปองและสิทธิ์ส่วนลด', 'history': 'แฟ้มงานประวัติคิวระบบทั้งหมด', 'banners': 'จัดการสไลด์แบนเนอร์', 'news': 'บอร์ดประกาศข่าวสารระบบ', 'blacklist': 'แฟ้มเบอร์โทรระงับสัญญาณ' 'chatlogs': 'บันทึกแชทระบบ (Log)'};
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
 
@@ -1584,6 +1621,106 @@
             showCustomAlert("สำเร็จ", "สำรองเก็บข้อมูลลงคลาวด์แผ่นชีตเรียบร้อยครับ!", "success"); btn.innerHTML = '<i class="fas fa-check"></i> สำรองสำเร็จ';
             setTimeout(() => { btn.innerHTML = orig; btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"; }, 2500);
         });
+    }
+    // ================= ระบบคลังแชทลับ (ADMIN CHAT LOGS) =================
+    let allChatLogsGrouped = {};
+
+    db.ref('admin_chat_logs').on('value', snap => {
+        let logs = snap.val() || {};
+        let grouped = {};
+        
+        // จัดกลุ่มข้อความตาม JobID
+        for(let key in logs) {
+            let msg = logs[key];
+            let jid = msg.jobId;
+            if(!jid) continue;
+
+            if(!grouped[jid]) {
+                grouped[jid] = {
+                    jobId: jid,
+                    passengerName: msg.passengerName || 'ลูกค้า',
+                    driverPin: msg.driverPin || '-',
+                    driverName: msg.driverName || 'ไม่ระบุชื่อ',
+                    messages: [],
+                    lastTime: 0
+                };
+            }
+            grouped[jid].messages.push(msg);
+            if(msg.timestamp > grouped[jid].lastTime) {
+                grouped[jid].lastTime = msg.timestamp;
+            }
+        }
+
+        allChatLogsGrouped = grouped;
+        renderChatLogsTable();
+    });
+
+    function renderChatLogsTable() {
+        let tbody = document.getElementById('chatlogs-table-body');
+        if(!tbody) return;
+
+        let chatArr = Object.values(allChatLogsGrouped);
+        chatArr.sort((a,b) => b.lastTime - a.lastTime); // เรียงล่าสุดขึ้นก่อน
+
+        if(chatArr.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-500">ไม่มีประวัติการสนทนาในระบบ</td></tr>';
+            return;
+        }
+
+        let html = '';
+        chatArr.forEach(chat => {
+            let dateStr = new Date(chat.lastTime).toLocaleString('th-TH');
+            let shortId = chat.jobId.substring(chat.jobId.length - 8).toUpperCase();
+            
+            html += `
+            <tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/50 transition">
+                <td class="py-3 px-3 font-mono text-xs text-blue-400">#${shortId}</td>
+                <td class="py-3 px-2 font-bold text-white">${chat.passengerName}</td>
+                <td class="py-3 px-2 text-xs text-slate-400">PIN: <span class="text-green-400 font-bold">${chat.driverPin}</span><br>${chat.driverName}</td>
+                <td class="py-3 px-2 text-[11px] text-slate-500">${dateStr}</td>
+                <td class="py-3 px-3 text-right">
+                    <button onclick="openChatLogDetail('${chat.jobId}')" class="bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-500/20 hover:bg-blue-600 hover:text-white transition shadow-sm">
+                        <i class="fas fa-eye"></i> ดูแชท
+                    </button>
+                </td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    window.openChatLogDetail = function(jobId) {
+        let chat = allChatLogsGrouped[jobId];
+        if(!chat) return;
+
+        let container = document.getElementById('chatlog-messages-container');
+        container.innerHTML = '';
+        
+        // เรียงข้อความตามเวลา (เก่าไปใหม่)
+        chat.messages.sort((a,b) => a.timestamp - b.timestamp);
+
+        let html = '';
+        chat.messages.forEach(msg => {
+            let isPassenger = (msg.sender === 'passenger');
+            let align = isPassenger ? 'justify-end' : 'justify-start';
+            let bg = isPassenger ? 'bg-[#fae100] text-gray-900' : 'bg-white text-gray-800 border border-gray-200';
+            let senderName = isPassenger ? `<span class="text-[10px] text-yellow-500 font-bold mb-1 mr-1 text-right w-full block">ผู้โดยสาร (${chat.passengerName})</span>` : `<span class="text-[10px] text-green-500 font-bold mb-1 ml-1 text-left w-full block">คนขับ (${chat.driverPin})</span>`;
+            let timeStr = new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+            html += `
+            <div class="flex w-full ${align} mb-2">
+                <div class="flex flex-col max-w-[80%]">
+                    ${senderName}
+                    <div class="${bg} px-4 py-2.5 rounded-2xl text-[13px] font-normal shadow-sm break-words w-full">
+                        ${msg.text}
+                    </div>
+                    <span class="text-[9px] text-slate-500 mt-1 ${isPassenger ? 'text-right mr-1' : 'text-left ml-1'}">${timeStr}</span>
+                </div>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+        openModal('modalViewChatLog');
+        setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
     }
   </script>
 </body>
