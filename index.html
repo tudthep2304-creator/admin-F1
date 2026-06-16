@@ -10,6 +10,18 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = { darkMode: 'class' };
+    
+    // เช็คประวัติการใช้งานก่อนโหลดหน้าจอ ป้องกันจอกระพริบ
+    if (localStorage.getItem('admin_theme') === 'light') {
+        document.documentElement.classList.remove('dark');
+    } else {
+        document.documentElement.classList.add('dark'); // ค่าเริ่มต้นให้เป็นโหมดมืด
+    }
+  </script>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -38,17 +50,18 @@
     .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col pb-20">
+<body class="bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 min-h-screen flex flex-col pb-20 transition-colors duration-300">
 
   <!-- 🌟 Header ด้านบน (มีปุ่มย้อนกลับ) -->
-  <header class="bg-slate-900 border-b border-slate-800 px-4 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40">
+  <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40 transition-colors duration-300">
     <div class="flex items-center gap-2">
         <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9 bg-slate-800 text-slate-300 hover:text-white rounded-xl flex items-center justify-center text-lg border border-slate-700 transition active:scale-95 shrink-0">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <div class="w-9 h-9 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center text-lg border border-green-500/30 shrink-0">
-            <i class="fas fa-cogs"></i>
-        </div>
+        <button onclick="window.toggleAdminTheme()" class="w-9 h-9 bg-gray-100 dark:bg-slate-800 text-slate-500 dark:text-yellow-400 hover:text-blue-500 dark:hover:text-yellow-300 rounded-xl flex items-center justify-center text-lg border border-gray-200 dark:border-slate-700 transition active:scale-95 shrink-0 shadow-sm cursor-pointer">
+            <i class="fas fa-moon block dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+        </button>
         <div class="min-w-0">
             <h1 class="text-lg sm:text-xl font-black text-white tracking-wide flex items-center gap-2 truncate">
                 F1 DRIVER <span class="text-slate-500 font-normal hidden sm:inline">|</span> 
@@ -624,6 +637,26 @@
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
     const db = firebase.database();
+    // ==========================================
+    // 🌟 ระบบสลับโหมด มืด/สว่าง สำหรับแอดมิน
+    // ==========================================
+    window.toggleAdminTheme = function() {
+        const htmlEl = document.documentElement;
+        let isNowDark = htmlEl.classList.contains('dark');
+        
+        if (isNowDark) {
+            htmlEl.classList.remove('dark');
+            localStorage.setItem('admin_theme', 'light');
+        } else {
+            htmlEl.classList.add('dark');
+            localStorage.setItem('admin_theme', 'dark');
+        }
+        
+        // อัปเดตสีแผนที่แบบเรียลไทม์ (ถ้าเปิดแผนที่อยู่)
+        if (typeof adminMap !== 'undefined' && adminMap) {
+            adminMap.setOptions({ styles: !isNowDark ? darkMapStyle : lightMapStyle });
+        }
+    }
 
     // ================= CUSTOM ALERTS =================
     let confirmCallback = null;
@@ -825,18 +858,30 @@
 
     window.initAdminMap = function() {
         if(typeof google === 'undefined' || adminMap) return;
-        let darkStyle = [
-            { elementType: "geometry", stylers: [{ color: "#0f172a" }] },
-            { elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
-            { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
-            { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
-            { featureType: "water", elementType: "geometry", stylers: [{ color: "#020617" }] },
-            { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } 
-        ];
+        // 🌟 แยกสไตล์แผนที่เป็น 2 โหมด
+    let darkMapStyle = [
+        { elementType: "geometry", stylers: [{ color: "#0f172a" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
+        { featureType: "water", elementType: "geometry", stylers: [{ color: "#020617" }] },
+        { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } 
+    ];
+    let lightMapStyle = [
+        { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } // คลีนๆ แบบสว่าง
+    ];
+
+    window.initAdminMap = function() {
+        if(typeof google === 'undefined' || adminMap) return;
+        
+        // เช็คว่าตอนนี้เป็นโหมดไหน
+        let isDark = document.documentElement.classList.contains('dark');
 
         adminMap = new google.maps.Map(document.getElementById('adminLiveMap'), {
             zoom: 13, center: {lat: 19.910479, lng: 99.840576},
-            mapTypeId: 'roadmap', styles: darkStyle, disableDefaultUI: true, gestureHandling: 'greedy'
+            mapTypeId: 'roadmap', 
+            styles: isDark ? darkMapStyle : lightMapStyle, // 🌟 สลับสีแผนที่อัตโนมัติ
+            disableDefaultUI: true, gestureHandling: 'greedy'
         });
         
         google.maps.event.addListenerOnce(adminMap, 'idle', function(){
