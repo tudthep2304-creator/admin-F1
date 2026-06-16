@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>F1 Driver - แผงควบคุมระบบหลังบ้าน</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -14,7 +14,7 @@
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap');
-    body { font-family: 'Kanit', sans-serif; background-color: #0f172a; }
+    body { font-family: 'Kanit', sans-serif; background-color: #0f172a; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .cropper-container { width: 100%; max-height: 400px; }
@@ -30,6 +30,24 @@
 <body class="text-slate-100 min-h-screen flex flex-col">
 
   <header class="bg-slate-900 border-b border-slate-800 px-4 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40">
+    <div class="flex items-center gap-2">
+        <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9 bg-slate-800 text-slate-300 hover:text-white rounded-xl flex items-center justify-center text-lg border border-slate-700 transition active:scale-95 shrink-0">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="w-9 h-9 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center text-lg border border-green-500/30 shrink-0">
+            <i class="fas fa-cogs"></i>
+        </div>
+        <div class="min-w-0">
+            <h1 class="text-lg sm:text-xl font-black text-white tracking-wide flex items-center gap-2 truncate">
+                F1 DRIVER <span class="text-slate-500 font-normal hidden sm:inline">|</span> 
+                <span id="current-page-title" class="text-green-400 text-sm sm:text-base truncate">แดชบอร์ด</span>
+            </h1>
+            <p class="text-[10px] sm:text-xs text-slate-400 font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> แผงควบคุมส่วนกลาง
+            </p>
+        </div>
+    </div>
+  </header>
     <div class="flex items-center gap-2">
         <div class="w-9 h-9 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center text-lg border border-green-500/30">
             <i class="fas fa-cogs"></i>
@@ -289,78 +307,66 @@
       <section id="content-allmenu" class="tab-content hidden pb-20">
           <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-th-list text-blue-400"></i> เลือกเมนูจัดการระบบ</h2>
           
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              <button onclick="switchTab('drivers')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-green-900/30 text-green-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-motorcycle"></i></div>
-                  <span class="text-[13px] font-bold text-center">จัดการคนขับ</span>
+          <div class="grid grid-cols-4 gap-2 sm:gap-4">
+              <button onclick="switchTab('drivers')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-900/30 text-green-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการคนขับ</span>
               </button>
               
-              <button onclick="switchTab('passengers')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-blue-900/30 text-blue-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-user-friends"></i></div>
-                  <span class="text-[13px] font-bold text-center">ข้อมูลลูกค้า</span>
+              <button onclick="switchTab('passengers')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-900/30 text-blue-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-friends"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข้อมูลลูกค้า</span>
               </button>
 
-              <button onclick="switchTab('history')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-purple-900/30 text-purple-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-history"></i></div>
-                  <span class="text-[13px] font-bold text-center">ประวัติงานวิ่ง</span>
+              <button onclick="switchTab('history')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-900/30 text-purple-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-history"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ประวัติงาน</span>
               </button>
 
-              <button onclick="switchTab('vehicles')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-indigo-900/30 text-indigo-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-car"></i></div>
-                  <span class="text-[13px] font-bold text-center">เรท & ประเภทรถ</span>
+              <button onclick="switchTab('vehicles')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-900/30 text-indigo-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">เรท & ประเภท</span>
               </button>
 
-              <button onclick="switchTab('promos')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-yellow-900/30 text-yellow-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-ticket-alt"></i></div>
-                  <span class="text-[13px] font-bold text-center">คูปองส่วนลด</span>
+              <button onclick="switchTab('promos')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-900/30 text-yellow-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ticket-alt"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">คูปองส่วนลด</span>
               </button>
 
-              <button onclick="switchTab('banners')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-orange-900/30 text-orange-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-images"></i></div>
-                  <span class="text-[13px] font-bold text-center">จัดการโฆษณา</span>
+              <button onclick="switchTab('banners')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-900/30 text-orange-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการโฆษณา</span>
               </button>
 
-              <button onclick="switchTab('news')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-pink-900/30 text-pink-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-bullhorn"></i></div>
-                  <span class="text-[13px] font-bold text-center">โพสต์ข่าวสาร</span>
+              <button onclick="switchTab('news')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-pink-900/30 text-pink-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">โพสต์ข่าวสาร</span>
               </button>
 
-              <button onclick="switchTab('chatlogs')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95">
-                  <div class="w-14 h-14 bg-teal-900/30 text-teal-400 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-comments"></i></div>
-                  <span class="text-[13px] font-bold text-center">บันทึกแชท</span>
+              <button onclick="switchTab('chatlogs')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-teal-900/30 text-teal-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">บันทึกแชท</span>
               </button>
 
-              <button onclick="switchTab('blacklist')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95 border-red-500/30">
-                  <div class="w-14 h-14 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-user-slash"></i></div>
-                  <span class="text-[13px] font-bold text-center text-red-400">บล็อกลูกค้า</span>
+              <button onclick="switchTab('blacklist')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-slash"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center text-red-400 leading-tight">บล็อกลูกค้า</span>
               </button>
 
-              <button onclick="switchTab('blockdrivers')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3 transition shadow-md active:scale-95 border-red-500/30">
-                  <div class="w-14 h-14 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-ban"></i></div>
-                  <span class="text-[13px] font-bold text-center text-red-400">บล็อกคนขับ</span>
+              <button onclick="switchTab('blockdrivers')" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-md active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ban"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center text-red-400 leading-tight">บล็อกคนขับ</span>
               </button>
           </div>
       </section>
     <!-- 🌟 หน้าตั้งค่าประเภทรถ (ย้ายมาจาก Modal มาเป็นหน้าเต็ม) -->
-      <section id="content-vehicles" class="tab-content hidden space-y-4 pb-10">
-          <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 shadow-md">
-              <h2 class="text-lg font-bold text-blue-400 border-b border-slate-800 pb-3 mb-4"><i class="fas fa-tags mr-1"></i> กำหนดเรทราคาและประเภทรถ</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div class="bg-slate-800/50 border border-green-500/20 p-4 rounded-xl space-y-3">
-                      <h3 class="font-bold text-green-400 border-b border-slate-700 pb-1.5 flex items-center gap-1.5"><i class="fas fa-car-side"></i> เรทราคารถยนต์</h3>
-                      <div><label class="block text-[10px] text-slate-400 font-bold mb-1">ราคาเริ่มต้นเปิดแอป (Base)</label><input type="number" id="cfg-car-base" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm"></div>
-                      <div><label class="block text-[10px] text-slate-400 font-bold mb-1">ค่าบริการวิ่งตามระยะทางต่อ กม.</label><input type="number" id="cfg-car-km" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm"></div>
-                      <div><label class="block text-[10px] text-slate-400 font-bold mb-1">เรทค่าเสียเวลาไปรับต่อ กม. (Pickup)</label><input type="number" id="cfg-car-pick" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm"></div>
-                  </div>
-                  <div class="bg-slate-800/50 border border-blue-500/20 p-4 rounded-xl space-y-3">
-                      <h3 class="font-bold text-blue-400 border-b border-slate-700 pb-1.5 flex items-center gap-1.5"><i class="fas fa-motorcycle"></i> เรทมอเตอร์ไซค์</h3>
-                      <div><label class="block text-[10px] text-slate-400 font-bold mb-1">ราคาเริ่มต้นเปิดแอป (Base)</label><input type="number" id="cfg-bike-base" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm"></div>
-                      <div><label class="block text-[10px] text-slate-400 font-bold mb-1">ค่าบริการวิ่งตามระยะทางต่อ กม.</label><input type="number" id="cfg-bike-km" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm"></div>
-                      <div><label class="block text-[10px] text-slate-400 font-bold mb-1">เรทค่าเสียเวลาไปรับต่อ กม. (Pickup)</label><input type="number" id="cfg-bike-pick" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg outline-none text-sm"></div>
-                  </div>
-              </div>
-              <button onclick="savePricingConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition">บันทึกอัตราเรทราคาใหม่</button>
+      <section id="content-vehicles" class="tab-content hidden space-y-4 pb-20">
+          <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-md">
+              <h2 class="text-base font-bold text-white"><i class="fas fa-car-side text-indigo-400 mr-2"></i> ประเภทรถทั้งหมด</h2>
+              <button onclick="window.openManageVehicleModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm"><i class="fas fa-plus"></i> เพิ่มรถใหม่</button>
           </div>
+          <div id="vehicle-types-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              </div>
       </section>
 
       <!-- 🌟 หน้าบล็อกคนขับโดยเฉพาะ -->
@@ -421,6 +427,27 @@
           <h3 id="adminAlertTitle" class="text-xl font-black text-white mb-2"></h3>
           <p id="adminAlertMessage" class="text-sm text-slate-400 mb-6 whitespace-pre-line leading-relaxed"></p>
           <button onclick="closeAdminAlert()" id="adminAlertBtn" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition">ตกลง</button>
+      </div>
+  </div>
+  <div id="modalManageVehicle" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-base font-bold text-indigo-400" id="vehicle-modal-title"><i class="fas fa-car"></i> เพิ่มประเภทรถใหม่</h2>
+              <button onclick="closeModal('modalManageVehicle')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-5 space-y-3">
+              <input type="hidden" id="veh-id">
+              <div><label class="block text-xs font-bold text-slate-400 mb-1">รหัสอ้างอิง (ภาษาอังกฤษห้ามเว้นวรรค เช่น car, vip_car)</label><input type="text" id="veh-key" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs"></div>
+              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อประเภทรถ (โชว์ให้ลูกค้าเห็น)</label><input type="text" id="veh-name" placeholder="รถยนต์ 4 ที่นั่ง" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-sm font-bold"></div>
+              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อไอคอน FontAwesome (เช่น fa-car, fa-motorcycle)</label><input type="text" id="veh-icon" value="fa-car-side" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs font-mono"></div>
+              
+              <div class="grid grid-cols-2 gap-3 mt-4 border-t border-slate-800 pt-3">
+                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">เริ่มสตาร์ท (บาท)</label><input type="number" id="veh-base" class="w-full p-2 bg-slate-800 text-green-400 border border-slate-700 rounded-lg outline-none font-bold text-center"></div>
+                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ค่าวิ่ง กม.ละ (บาท)</label><input type="number" id="veh-km" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center"></div>
+                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ค่าไปรับ กม.ละ (บาท)</label><input type="number" id="veh-pick" class="w-full p-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg outline-none text-center"></div>
+                  <div class="flex items-end"><button onclick="window.saveVehicleData()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg shadow transition">บันทึก</button></div>
+              </div>
+          </div>
       </div>
   </div>
 
@@ -957,8 +984,169 @@
         }
     }
 
-    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ' };
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ' };
 
+    // 🌟 1. ระบบ History & Back Button
+    window.adminHistoryStack = ['dashboard'];
+
+    function switchTab(tabId, isBack = false) {
+        document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
+        
+        let targetContent = document.getElementById('content-' + tabId);
+        if(targetContent) {
+            targetContent.classList.remove('hidden');
+            if(tabId === 'map') targetContent.classList.add('flex');
+        }
+
+        // จัดการ History Stack
+        if(!isBack) {
+            if(tabId === 'dashboard' || tabId === 'allmenu' || tabId === 'map') {
+                window.adminHistoryStack = [tabId]; // หน้าหลักไม่ซ้อน
+            } else {
+                if(window.adminHistoryStack[window.adminHistoryStack.length - 1] !== tabId) {
+                    window.adminHistoryStack.push(tabId);
+                }
+            }
+        }
+
+        // เปิด/ปิด ปุ่มย้อนกลับ
+        let backBtn = document.getElementById('admin-back-btn');
+        if(backBtn) {
+            if(window.adminHistoryStack.length > 1) backBtn.classList.remove('hidden');
+            else backBtn.classList.add('hidden');
+        }
+
+        let titleEl = document.getElementById('current-page-title');
+        if(titleEl) titleEl.innerText = tabTitles[tabId] || 'แดชบอร์ด';
+
+        document.querySelectorAll('.nav-bottom-btn').forEach(btn => { btn.classList.remove('text-blue-400'); btn.classList.add('text-slate-500'); });
+        
+        let bottomMap = { 'dashboard': 'nav-dashboard', 'map': 'nav-map' };
+        let activeNavId = bottomMap[tabId] || 'nav-allmenu'; 
+        let activeNav = document.getElementById(activeNavId);
+        if(activeNav) { activeNav.classList.remove('text-slate-500'); activeNav.classList.add('text-blue-400'); }
+
+        if(tabId === 'passengers') renderPassengers();
+        if(tabId === 'promos') renderPromoList();
+        if(tabId === 'history') renderHistoryTab();
+        if(tabId === 'map') { if(adminMap) google.maps.event.trigger(adminMap, 'resize'); }
+    }
+
+    window.goBackAdmin = function() {
+        if(window.adminHistoryStack.length > 1) {
+            window.adminHistoryStack.pop(); 
+            let prevTab = window.adminHistoryStack[window.adminHistoryStack.length - 1];
+            switchTab(prevTab, true);
+        }
+    }
+
+    // 🌟 2. ระบบสไลด์ย้อนกลับ (Swipe to go back)
+    let touchStartX = 0; let touchStartY = 0;
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+    }, {passive: true});
+    
+    document.addEventListener('touchend', e => {
+        // ห้ามทำงานถ้าเลื่อนบนแผนที่ หรือเลื่อนตัวตัดรูป
+        if(e.target.closest('#adminLiveMap') || e.target.closest('.cropper-container') || e.target.closest('.overflow-x-auto')) return;
+        
+        let touchEndX = e.changedTouches[0].clientX; let touchEndY = e.changedTouches[0].clientY;
+        let diffX = touchEndX - touchStartX; let diffY = Math.abs(touchEndY - touchStartY);
+        
+        // ถ้าปัดขวาแรงพอ และไม่ได้เลื่อนขึ้นลงเยอะ
+        if (diffX > 80 && diffX > diffY) {
+            window.goBackAdmin();
+        }
+    }, {passive: true});
+
+    // 🌟 3. ระบบจัดการป้องกันการซูมด้วยนิ้ว (เหมือนฝั่งผู้โดยสาร)
+    document.addEventListener('touchmove', function(event) {
+        if (event.scale !== 1 && event.touches.length > 1) { event.preventDefault(); }
+    }, { passive: false });
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        let now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) { event.preventDefault(); }
+        lastTouchEnd = now;
+    }, { passive: false });
+
+    // 🌟 4. ระบบจัดการประเภทรถแบบไดนามิก
+    db.ref('system_settings/vehicle_types').on('value', snap => {
+        let container = document.getElementById('vehicle-types-container'); if(!container) return;
+        let html = '';
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let id = child.key; let v = child.val();
+                let vData = encodeURIComponent(JSON.stringify({id: id, ...v}));
+                html += `
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-xl text-slate-300 border border-slate-700"><i class="fas ${v.icon || 'fa-car'}"></i></div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm leading-tight">${v.name}</h3>
+                            <p class="text-[10px] text-slate-400 mt-1">เริ่ม: <span class="text-green-400">฿${v.baseFare}</span> | กม.ละ ฿${v.kmRate}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="window.openManageVehicleModal('${vData}')" class="bg-blue-900/30 text-blue-400 px-3 py-1 rounded text-xs hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit"></i></button>
+                        <button onclick="window.deleteVehicleType('${id}', '${v.name}')" class="bg-red-900/30 text-red-500 px-3 py-1 rounded text-xs hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>`;
+            });
+        } else {
+            // สร้างค่าเริ่มต้นถ้าระบบว่างเปล่า
+            let initData = { 
+                car: { name: 'รถยนต์', baseFare: 50, kmRate: 10, pickupRate: 5, icon: 'fa-car-side' },
+                bike: { name: 'มอเตอร์ไซค์', baseFare: 30, kmRate: 8, pickupRate: 5, icon: 'fa-motorcycle' }
+            };
+            db.ref('system_settings/vehicle_types').set(initData);
+        }
+        container.innerHTML = html;
+    });
+
+    window.openManageVehicleModal = function(encodedData = null) {
+        if(encodedData) {
+            let v = JSON.parse(decodeURIComponent(encodedData));
+            document.getElementById('vehicle-modal-title').innerHTML = `<i class="fas fa-edit"></i> แก้ไข: ${v.name}`;
+            document.getElementById('veh-id').value = v.id;
+            document.getElementById('veh-key').value = v.id; document.getElementById('veh-key').disabled = true; document.getElementById('veh-key').classList.add('opacity-50');
+            document.getElementById('veh-name').value = v.name; document.getElementById('veh-icon').value = v.icon || 'fa-car';
+            document.getElementById('veh-base').value = v.baseFare; document.getElementById('veh-km').value = v.kmRate; document.getElementById('veh-pick').value = v.pickupRate || 0;
+        } else {
+            document.getElementById('vehicle-modal-title').innerHTML = `<i class="fas fa-plus"></i> เพิ่มประเภทรถใหม่`;
+            document.getElementById('veh-id').value = '';
+            document.getElementById('veh-key').value = ''; document.getElementById('veh-key').disabled = false; document.getElementById('veh-key').classList.remove('opacity-50');
+            document.getElementById('veh-name').value = ''; document.getElementById('veh-icon').value = 'fa-car-side';
+            document.getElementById('veh-base').value = ''; document.getElementById('veh-km').value = ''; document.getElementById('veh-pick').value = '';
+        }
+        openModal('modalManageVehicle');
+    }
+
+    window.saveVehicleData = function() {
+        let id = document.getElementById('veh-id').value;
+        let key = document.getElementById('veh-key').value.trim().toLowerCase();
+        let name = document.getElementById('veh-name').value.trim();
+        let icon = document.getElementById('veh-icon').value.trim();
+        let base = parseInt(document.getElementById('veh-base').value);
+        let km = parseInt(document.getElementById('veh-km').value);
+        let pick = parseInt(document.getElementById('veh-pick').value) || 0;
+
+        if(!key || !name || isNaN(base) || isNaN(km)) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกรหัสชื่อและราคาให้ครบถ้วน', 'error');
+
+        let targetId = id ? id : key; // ถ้าแก้ไขให้ใช้ ID เดิม ถ้าสร้างใหม่ใช้ Key
+        db.ref('system_settings/vehicle_types/' + targetId).set({ name: name, baseFare: base, kmRate: km, pickupRate: pick, icon: icon }).then(() => {
+            showCustomAlert('สำเร็จ', 'อัปเดตประเภทและราคารถเรียบร้อย!', 'success');
+            closeModal('modalManageVehicle');
+        });
+    }
+
+    window.deleteVehicleType = function(id, name) {
+        showCustomConfirm('ลบประเภทรถ?', `คุณแน่ใจหรือไม่ที่จะลบ "${name}" ออกจากระบบ? (ลูกค้าจะเรียกไม่ได้)`, () => {
+            db.ref('system_settings/vehicle_types/' + id).remove().then(()=>{
+                showCustomAlert('ลบสำเร็จ', `ลบประเภทรถ ${name} ออกแล้ว`, 'success');
+            });
+        }, 'ลบทิ้ง', 'red');
+    }
     function switchTab(tabId) {
         // ซ่อนทุกหน้า
         document.querySelectorAll('.tab-content').forEach(el => {
