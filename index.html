@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>F1 Driver - แผงควบคุมระบบหลังบ้าน</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+  <!-- 🌟 ป้องกันการซูมแบบ 100% -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -14,8 +17,16 @@
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap');
-    /* 🌟 ป้องกันการแตะดับเบิ้ลซูม */
-    body { font-family: 'Kanit', sans-serif; background-color: #0f172a; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+    
+    /* 🌟 ป้องกันการแตะดับเบิ้ลซูม และการถ่างนิ้ว */
+    body { 
+        font-family: 'Kanit', sans-serif; 
+        background-color: #0f172a; 
+        touch-action: pan-y; /* อนุญาตให้เลื่อนขึ้นลง แต่ห้ามถ่างซูม */
+        -webkit-text-size-adjust: 100%; 
+        overflow-x: hidden;
+    }
+    
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .cropper-container { width: 100%; max-height: 400px; }
@@ -26,8 +37,9 @@
     .radio-label input[type="radio"]:checked + div { background-color: #2563eb; border-color: #3b82f6; color: white; }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col">
+<body class="text-slate-100 min-h-screen flex flex-col pb-20">
 
+  <!-- 🌟 Header ด้านบน (มีปุ่มย้อนกลับ) -->
   <header class="bg-slate-900 border-b border-slate-800 px-4 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40">
     <div class="flex items-center gap-2">
         <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9 bg-slate-800 text-slate-300 hover:text-white rounded-xl flex items-center justify-center text-lg border border-slate-700 transition active:scale-95 shrink-0">
@@ -48,8 +60,9 @@
     </div>
   </header>
 
-  <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto pb-24">
+  <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto">
       
+      <!-- ================= 1. หน้าแดชบอร์ด ================= -->
       <section id="content-dashboard" class="tab-content space-y-6">
           <div class="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
@@ -85,6 +98,7 @@
           </div>
       </section>
 
+      <!-- ================= 2. หน้าเมนูระบบ ================= -->
       <section id="content-allmenu" class="tab-content hidden">
           <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-th-list text-blue-400"></i> เลือกเมนูจัดการระบบ</h2>
           
@@ -141,6 +155,21 @@
           </div>
       </section>
 
+      <!-- ================= 3. หน้าแผนที่ ================= -->
+      <section id="content-map" class="tab-content hidden h-[calc(100vh-140px)] flex-col">
+          <div class="flex justify-between items-center mb-3 shrink-0">
+              <h2 class="text-base font-bold text-white"><i class="fas fa-satellite-dish text-green-400 mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
+              <div class="flex gap-2">
+                  <span class="text-[10px] bg-blue-900/30 text-blue-400 px-2 py-1 rounded border border-blue-500/30 shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
+                  <span class="text-[10px] bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/30 shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
+              </div>
+          </div>
+          <div id="adminLiveMap" class="w-full flex-1 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden relative shadow-lg">
+              <div id="map-loader" class="absolute inset-0 flex items-center justify-center text-slate-500 text-sm z-0 pointer-events-none"><i class="fas fa-spinner fa-spin mr-2"></i> กำลังโหลดแผนที่...</div>
+          </div>
+      </section>
+
+      <!-- ================= 4. หน้าจัดการย่อยต่างๆ ================= -->
       <section id="content-drivers" class="tab-content hidden space-y-4">
           <div class="flex justify-end"><button onclick="openModal('modalAddDriver')" class="bg-green-600 hover:bg-green-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-user-plus"></i> ลงทะเบียนคนขับใหม่</button></div>
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
@@ -179,6 +208,29 @@
           </div>
       </section>
 
+      <section id="content-history" class="tab-content hidden space-y-4">
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                  <h2 class="text-lg font-bold text-white"><i class="fas fa-history text-green-400 mr-1"></i> ประวัติงานวิ่งทั้งหมดในสารบบ</h2>
+                  <button onclick="syncToGoogleSheet(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"><i class="fas fa-file-excel"></i> สำรองลง Google Sheet</button>
+              </div>
+              <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse min-w-[700px]">
+                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30"><th class="py-3 px-2 text-left">ข้อมูลผู้โดยสาร</th><th class="py-3 px-2 text-center">ประเภทรถ</th><th class="py-3 px-2 text-left">หมุดตำแหน่งการเดินทาง</th><th class="py-3 px-2 text-left">ระยะรวม</th><th class="py-3 px-2 text-left">สุทธิ</th><th class="py-3 px-2 text-left">พนักงานขับ</th><th class="pb-3 px-2 text-right">สถานะ</th></tr></thead>
+                      <tbody id="history-jobs-list" class="text-sm divide-y divide-slate-800"></tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
+
+      <section id="content-vehicles" class="tab-content hidden space-y-4">
+          <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-md">
+              <h2 class="text-base font-bold text-white"><i class="fas fa-car-side text-indigo-400 mr-2"></i> ประเภทรถทั้งหมด</h2>
+              <button onclick="window.openManageVehicleModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm"><i class="fas fa-plus"></i> เพิ่มรถใหม่</button>
+          </div>
+          <div id="vehicle-types-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </section>
+
       <section id="content-promos" class="tab-content hidden space-y-4">
           <div class="flex justify-end"><button onclick="openModal('modalAddPromo')" class="bg-green-600 hover:bg-green-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-ticket-alt"></i> เพิ่มโปรโมชั่นใหม่</button></div>
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
@@ -210,16 +262,14 @@
           </div>
       </section>
 
-      <section id="content-history" class="tab-content hidden space-y-4">
+      <section id="content-chatlogs" class="tab-content hidden space-y-4">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h2 class="text-lg font-bold text-white"><i class="fas fa-history text-green-400 mr-1"></i> ประวัติงานวิ่งทั้งหมดในสารบบ</h2>
-                  <button onclick="syncToGoogleSheet(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"><i class="fas fa-file-excel"></i> สำรองลง Google Sheet</button>
-              </div>
+              <h2 class="text-lg font-bold text-white mb-1"><i class="fas fa-user-secret text-blue-400 mr-1"></i> คลังประวัติแชท (ตรวจสอบย้อนหลัง)</h2>
+              <p class="text-xs text-slate-400 mb-4">ข้อมูลแชททั้งหมดจะถูกเก็บถาวรที่นี่ เพื่อใช้เป็นหลักฐานเวลามีการร้องเรียน</p>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30"><th class="py-3 px-2 text-left">ข้อมูลผู้โดยสาร</th><th class="py-3 px-2 text-center">ประเภทรถ</th><th class="py-3 px-2 text-left">หมุดตำแหน่งการเดินทาง</th><th class="py-3 px-2 text-left">ระยะรวม</th><th class="py-3 px-2 text-left">สุทธิ</th><th class="py-3 px-2 text-left">พนักงานขับ</th><th class="pb-3 px-2 text-right">สถานะ</th></tr></thead>
-                      <tbody id="history-jobs-list" class="text-sm divide-y divide-slate-800"></tbody>
+                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30"><th class="py-3 px-3 text-left rounded-tl-lg">รหัสงาน (Job ID)</th><th class="py-3 px-2 text-left">ผู้โดยสาร</th><th class="py-3 px-2 text-left">คนขับ</th><th class="py-3 px-2 text-left">เวลาอัปเดตล่าสุด</th><th class="py-3 px-3 text-right rounded-tr-lg">ตรวจสอบ</th></tr></thead>
+                      <tbody id="chatlogs-table-body" class="text-sm divide-y divide-slate-800"><tr><td colspan="5" class="py-6 text-center text-slate-500">กำลังดึงข้อมูล...</td></tr></tbody>
                   </table>
               </div>
           </div>
@@ -227,15 +277,15 @@
 
       <section id="content-blacklist" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> ระงับการใช้งานเบอร์ลูกค้า</h2>
+              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> ระงับสิทธิ์ลูกค้า</h2>
               <div class="space-y-4">
                   <input type="tel" id="block-phone" placeholder="กรอกเบอร์ (10 หลัก)" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-center focus:border-red-500">
-                  <input type="text" id="block-reason" placeholder="สาเหตุการขึ้นบัญชีดำ..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm focus:border-red-500">
-                  <button onclick="addNumberToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">ระงับสัญญาณเบอร์โทรนี้</button>
+                  <input type="text" id="block-reason" placeholder="สาเหตุการระงับ..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm focus:border-red-500">
+                  <button onclick="addNumberToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">ระงับลูกค้า</button>
               </div>
           </div>
           <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อลูกค้าแบล็กลิสต์</h2>
+              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อลูกค้าในบัญชีดำ</h2>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[400px]">
                       <thead><tr class="border-b border-slate-800 text-slate-400 text-xs font-bold bg-slate-800/20"><th class="py-3 px-2 text-left">เบอร์มือถือ</th><th class="py-3 px-2 text-left">เหตุผลการบล็อก</th><th class="py-3 px-2 text-right">จัดการ</th></tr></thead>
@@ -243,15 +293,6 @@
                   </table>
               </div>
           </div>
-      </section>
-
-      <section id="content-vehicles" class="tab-content hidden space-y-4">
-          <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-md">
-              <h2 class="text-base font-bold text-white"><i class="fas fa-car-side text-indigo-400 mr-2"></i> ประเภทรถทั้งหมด</h2>
-              <button onclick="window.openManageVehicleModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm"><i class="fas fa-plus"></i> เพิ่มรถใหม่</button>
-          </div>
-          <div id="vehicle-types-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              </div>
       </section>
 
       <section id="content-blockdrivers" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -274,33 +315,9 @@
           </div>
       </section>
 
-      <section id="content-chatlogs" class="tab-content hidden space-y-4">
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-lg font-bold text-white mb-1"><i class="fas fa-user-secret text-blue-400 mr-1"></i> คลังประวัติแชท (ตรวจสอบย้อนหลัง)</h2>
-              <p class="text-xs text-slate-400 mb-4">ข้อมูลแชททั้งหมดจะถูกเก็บถาวรที่นี่ เพื่อใช้เป็นหลักฐานเวลามีการร้องเรียน</p>
-              <div class="overflow-x-auto">
-                  <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30"><th class="py-3 px-3 text-left rounded-tl-lg">รหัสงาน (Job ID)</th><th class="py-3 px-2 text-left">ผู้โดยสาร</th><th class="py-3 px-2 text-left">คนขับ</th><th class="py-3 px-2 text-left">เวลาอัปเดตล่าสุด</th><th class="py-3 px-3 text-right rounded-tr-lg">ตรวจสอบ</th></tr></thead>
-                      <tbody id="chatlogs-table-body" class="text-sm divide-y divide-slate-800"><tr><td colspan="5" class="py-6 text-center text-slate-500">กำลังดึงข้อมูล...</td></tr></tbody>
-                  </table>
-              </div>
-          </div>
-      </section>
-
-      <section id="content-map" class="tab-content hidden h-[calc(100vh-140px)] flex-col">
-          <div class="flex justify-between items-center mb-3 shrink-0">
-              <h2 class="text-base font-bold text-white"><i class="fas fa-satellite-dish text-green-400 mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
-              <div class="flex gap-2">
-                  <span class="text-[10px] bg-blue-900/30 text-blue-400 px-2 py-1 rounded border border-blue-500/30 shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
-                  <span class="text-[10px] bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/30 shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
-              </div>
-          </div>
-          <div id="adminLiveMap" class="w-full flex-1 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden relative shadow-lg">
-              <div class="absolute inset-0 flex items-center justify-center text-slate-500 text-sm z-0"><i class="fas fa-spinner fa-spin mr-2"></i> กำลังโหลดแผนที่...</div>
-          </div>
-      </section>
   </main>
 
+  <!-- ======================= MODALS ======================= -->
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl transform transition-all animate-fade-in">
           <div id="adminAlertIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"></div>
@@ -440,6 +457,28 @@
       </div>
   </div>
 
+  <div id="modalManageVehicle" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-base font-bold text-indigo-400" id="vehicle-modal-title"><i class="fas fa-car"></i> เพิ่มประเภทรถใหม่</h2>
+              <button onclick="closeModal('modalManageVehicle')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-5 space-y-3">
+              <input type="hidden" id="veh-id">
+              <div><label class="block text-xs font-bold text-slate-400 mb-1">รหัสอ้างอิง (ภาษาอังกฤษห้ามเว้นวรรค เช่น car, vip_car)</label><input type="text" id="veh-key" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs"></div>
+              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อประเภทรถ (โชว์ให้ลูกค้าเห็น)</label><input type="text" id="veh-name" placeholder="รถยนต์ 4 ที่นั่ง" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-sm font-bold"></div>
+              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อไอคอน FontAwesome (เช่น fa-car, fa-motorcycle)</label><input type="text" id="veh-icon" value="fa-car-side" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs font-mono"></div>
+              
+              <div class="grid grid-cols-2 gap-3 mt-4 border-t border-slate-800 pt-3">
+                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">เริ่มสตาร์ท (บาท)</label><input type="number" id="veh-base" class="w-full p-2 bg-slate-800 text-green-400 border border-slate-700 rounded-lg outline-none font-bold text-center"></div>
+                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ค่าวิ่ง กม.ละ (บาท)</label><input type="number" id="veh-km" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center"></div>
+                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ค่าไปรับ กม.ละ (บาท)</label><input type="number" id="veh-pick" class="w-full p-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg outline-none text-center"></div>
+                  <div class="flex items-end"><button onclick="window.saveVehicleData()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg shadow transition">บันทึก</button></div>
+              </div>
+          </div>
+      </div>
+  </div>
+
   <div id="modalPendingJobs" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
@@ -527,28 +566,6 @@
       </div>
   </div>
 
-  <div id="modalManageVehicle" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-base font-bold text-indigo-400" id="vehicle-modal-title"><i class="fas fa-car"></i> เพิ่มประเภทรถใหม่</h2>
-              <button onclick="closeModal('modalManageVehicle')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="p-5 space-y-3">
-              <input type="hidden" id="veh-id">
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">รหัสอ้างอิง (ภาษาอังกฤษห้ามเว้นวรรค เช่น car, vip_car)</label><input type="text" id="veh-key" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs"></div>
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อประเภทรถ (โชว์ให้ลูกค้าเห็น)</label><input type="text" id="veh-name" placeholder="รถยนต์ 4 ที่นั่ง" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-sm font-bold"></div>
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อไอคอน FontAwesome (เช่น fa-car, fa-motorcycle)</label><input type="text" id="veh-icon" value="fa-car-side" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs font-mono"></div>
-              
-              <div class="grid grid-cols-2 gap-3 mt-4 border-t border-slate-800 pt-3">
-                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">เริ่มสตาร์ท (บาท)</label><input type="number" id="veh-base" class="w-full p-2 bg-slate-800 text-green-400 border border-slate-700 rounded-lg outline-none font-bold text-center"></div>
-                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ค่าวิ่ง กม.ละ (บาท)</label><input type="number" id="veh-km" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center"></div>
-                  <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ค่าไปรับ กม.ละ (บาท)</label><input type="number" id="veh-pick" class="w-full p-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-lg outline-none text-center"></div>
-                  <div class="flex items-end"><button onclick="window.saveVehicleData()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg shadow transition">บันทึก</button></div>
-              </div>
-          </div>
-      </div>
-  </div>
-
   <div id="modalViewChatLog" class="hidden fixed inset-0 z-[150] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-slate-900 border border-blue-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col h-[80vh] overflow-hidden animate-fade-in">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/80">
@@ -560,6 +577,7 @@
       </div>
   </div>
 
+  <!-- 🌟 บาร์ด้านล่างสุดของจอ (Bottom Navigation) -->
   <div class="fixed bottom-0 left-0 right-0 h-[68px] bg-slate-900/95 backdrop-blur-md border-t border-slate-800 z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-blue-400 transition active:scale-90">
           <i class="fas fa-home text-xl mb-1"></i><span class="text-[10px] font-bold">หน้าหลัก</span>
@@ -709,6 +727,7 @@
     }, {passive: true});
 
     // 🌟 3. ระบบจัดการป้องกันการซูมด้วยนิ้ว
+    document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
     document.addEventListener('touchmove', function(event) {
         if (event.scale !== 1 && event.touches.length > 1) { event.preventDefault(); }
     }, { passive: false });
@@ -786,6 +805,11 @@
         adminMap = new google.maps.Map(document.getElementById('adminLiveMap'), {
             zoom: 12, center: {lat: 19.910479, lng: 99.840576},
             mapTypeId: 'roadmap', styles: darkStyle, disableDefaultUI: true, gestureHandling: 'greedy'
+        });
+        
+        google.maps.event.addListenerOnce(adminMap, 'idle', function(){
+            let loader = document.getElementById('map-loader');
+            if(loader) loader.style.display = 'none';
         });
 
         db.ref('active_passengers').on('value', snap => {
@@ -1187,13 +1211,6 @@
         }
     });
 
-    function executeAutoDispatchBalancing(jobId, jobData) {
-        if(!windowContext.onlineDrivers || windowContext.onlineDrivers.length === 0) return;
-        let todayStart = new Date().setHours(0,0,0,0); let targets = windowContext.onlineDrivers; if(targets.length === 0) return;
-        let pool = targets.map(d => { let countToday = 0; for(let k in allCompletedJobs) { let c = allCompletedJobs[k]; if(c.driverPin === d.pin && (c.completedAt || 0) >= todayStart) { countToday++; } } return { pin: d.pin, jobsCount: countToday }; });
-        pool.sort((a,b) => a.jobsCount - b.jobsCount); db.ref('bookings/' + jobId).update({ assignedDriver: pool[0].pin });
-    }
-
     db.ref('blacklist').on('value', snap => {
         let list = snap.val(); let count = 0; let mainHtml = ''; let modalHtml = ''; let badge = document.getElementById('menu-badge-block');
         if(list) {
@@ -1207,19 +1224,6 @@
         let tMain = document.getElementById('blacklist-table-body'); if(tMain) tMain.innerHTML = mainHtml || '<tr><td colspan="4" class="py-6 text-center text-slate-500">ทำเนียบบัญชีดำว่างเปล่า</td></tr>';
         let tModal = document.getElementById('modal-blacklist-list'); if(tModal) tModal.innerHTML = modalHtml || '<tr><td colspan="3" class="py-6 text-center text-slate-500">ไม่มีเบอร์ถูกแบน</td></tr>';
     });
-
-    function saveDriverProfile() {
-        let pin = document.getElementById('drv-pin').value.trim(); let name = document.getElementById('drv-name').value.trim(); let brand = document.getElementById('drv-brand').value.trim(); let color = document.getElementById('drv-color').value.trim(); let plate = document.getElementById('drv-plate').value.trim(); let phone = document.getElementById('drv-phone').value.trim();
-        if(pin.length !== 4 || !name || !phone) return showCustomAlert("ข้อมูลไม่ครบ", "กรอก PIN ชื่อ และเบอร์โทรพนักงานขับเป็นหลักสำคัญครับ", "error");
-        db.ref('drivers_profile/' + pin).update({ pin, name, brand, color, plate, phone }).then(() => { showCustomAlert('สำเร็จ', 'บันทึกแฟ้มประวัติคนขับเรียบร้อย!', 'success'); ['drv-pin','drv-name','drv-brand','drv-color','drv-plate','drv-phone'].forEach(id => document.getElementById(id).value = ''); closeModal('modalAddDriver'); });
-    }
-
-    function addNumberToBlacklist() {
-        let phone = document.getElementById('block-phone').value.trim(); let reason = document.getElementById('block-reason').value.trim();
-        if(phone.length < 10) return showCustomAlert('ข้อมูลไม่ครบ', 'กรอกตัวเลขเบอร์โทรสิบหลักให้ครบถ้วนครับ', 'error');
-        db.ref('blacklist/' + phone).set({ phone, reason: reason || 'ไม่ระบุสาเหตุพฤติกรรม', timestamp: new Date().toLocaleString('th-TH') }).then(() => { showCustomAlert('สำเร็จ', 'ระงับสัญญาณถาวรเสร็จสิ้น!', 'success'); document.getElementById('block-phone').value = ''; document.getElementById('block-reason').value = ''; });
-    }
-    function removeFormBlacklist(phone) { showCustomConfirm('ปลดบล็อกเบอร์?', `คุณต้องการปลดบล็อกเบอร์โทร ${phone} ใช่หรือไม่?`, () => { db.ref('blacklist/' + phone).remove(); }); }
 
     // ================= 🌟 4. ระบบจัดการประเภทรถแบบไดนามิก =================
     db.ref('system_settings/vehicle_types').on('value', snap => {
