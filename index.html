@@ -156,15 +156,29 @@
           </div>
       </section>
 
-      <!-- ================= 3. หน้าแผนที่ ================= -->
-      <section id="content-map" class="tab-content hidden h-[calc(100vh-140px)] flex-col">
-          <div class="flex justify-between items-center mb-3 shrink-0">
+      <!-- ================= 3. หน้าแผนที่ (อัปเดตใหม่) ================= -->
+      <section id="content-map" class="tab-content hidden h-[calc(100vh-210px)] flex-col pb-8">
+          <div class="flex justify-between items-center mb-2 shrink-0">
               <h2 class="text-base font-bold text-white"><i class="fas fa-satellite-dish text-green-400 mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
               <div class="flex gap-2">
                   <span class="text-[10px] bg-blue-900/30 text-blue-400 px-2 py-1 rounded border border-blue-500/30 shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
                   <span class="text-[10px] bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/30 shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
               </div>
           </div>
+          
+          <!-- 🌟 แถบตัวกรอง (Filters) -->
+          <div class="flex gap-2 mb-3 shrink-0">
+              <select id="map-filter-user" onchange="window.refreshMapFilters()" class="flex-1 bg-slate-800 text-white text-xs border border-slate-700 rounded-lg px-2 py-2 outline-none font-bold">
+                  <option value="all">👁️ ดูทั้งหมด</option>
+                  <option value="driver">🚗 เฉพาะคนขับ</option>
+                  <option value="passenger">🧍 เฉพาะลูกค้า</option>
+              </select>
+              <select id="map-filter-vehicle" onchange="window.refreshMapFilters()" class="flex-1 bg-slate-800 text-white text-xs border border-slate-700 rounded-lg px-2 py-2 outline-none font-bold">
+                  <option value="all">🏷️ รถทุกประเภท</option>
+                  <!-- รายการรถจะถูกเติมอัตโนมัติด้วย JS -->
+              </select>
+          </div>
+
           <div id="adminLiveMap" class="w-full flex-1 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden relative shadow-lg">
               <div id="map-loader" class="absolute inset-0 flex items-center justify-center text-slate-500 text-sm z-0 pointer-events-none"><i class="fas fa-spinner fa-spin mr-2"></i> กำลังโหลดแผนที่...</div>
           </div>
