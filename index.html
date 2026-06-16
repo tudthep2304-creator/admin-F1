@@ -21,7 +21,6 @@
     /* 🌟 ป้องกันการแตะดับเบิ้ลซูม และการถ่างนิ้ว */
     body { 
         font-family: 'Kanit', sans-serif; 
-        background-color: #0f172a; 
         touch-action: pan-y; /* อนุญาตให้เลื่อนขึ้นลง แต่ห้ามถ่างซูม */
         -webkit-text-size-adjust: 100%; 
         overflow-x: hidden;
@@ -37,33 +36,31 @@
     .radio-label input[type="radio"]:checked + div { background-color: #2563eb; border-color: #3b82f6; color: white; }
     .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
   </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
   <script>
-    // ตั้งค่า Tailwind ให้ใช้ระบบ Class
     tailwind.config = { darkMode: 'class' };
-
-    // เช็คและตั้งค่าโหมดสีก่อนโหลดหน้าจอ
-    if (localStorage.getItem('admin_theme') === 'dark' || (!('admin_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    } else {
+    
+    // เช็คประวัติการใช้งานก่อนโหลดหน้าจอ ป้องกันจอกระพริบ
+    if (localStorage.getItem('admin_theme') === 'light') {
         document.documentElement.classList.remove('dark');
+    } else {
+        document.documentElement.classList.add('dark'); // ค่าเริ่มต้นให้เป็นโหมดมืด
     }
   </script>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col pb-20">
+<body class="bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 min-h-screen flex flex-col pb-20 transition-colors duration-300">
 
   <!-- 🌟 Header ด้านบน (มีปุ่มย้อนกลับ) -->
-  <header class="bg-slate-900 border-b border-slate-800 px-4 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40">
+  <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40 transition-colors duration-300">
     <div class="flex items-center gap-2">
         <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9 bg-slate-800 text-slate-300 hover:text-white rounded-xl flex items-center justify-center text-lg border border-slate-700 transition active:scale-95 shrink-0">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <div class="w-9 h-9 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center text-lg border border-green-500/30 shrink-0">
-            <i class="fas fa-cogs"></i>
-        </div>
-      <button onclick="window.toggleAdminTheme()" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-[#2a2f5c] text-gray-600 dark:text-[#fae100] border border-gray-200 dark:border-[#383d6a] transition-all hover:bg-gray-200 dark:hover:bg-[#383d6a] shadow-sm active:scale-95">
-    <i class="fas fa-moon block dark:hidden text-[16px]"></i>
-    <i class="fas fa-sun hidden dark:block text-[16px]"></i>
-</button>  
+        <button onclick="window.toggleAdminTheme()" class="w-9 h-9 bg-gray-100 dark:bg-slate-800 text-slate-500 dark:text-yellow-400 hover:text-blue-500 dark:hover:text-yellow-300 rounded-xl flex items-center justify-center text-lg border border-gray-200 dark:border-slate-700 transition active:scale-95 shrink-0 shadow-sm cursor-pointer">
+            <i class="fas fa-moon block dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+        </button>
       <div class="min-w-0">
             <h1 class="text-lg sm:text-xl font-black text-white tracking-wide flex items-center gap-2 truncate">
                 F1 DRIVER <span class="text-slate-500 font-normal hidden sm:inline">|</span> 
