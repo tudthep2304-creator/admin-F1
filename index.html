@@ -1052,18 +1052,56 @@
     // ================= ระบบฐานข้อมูลลูกค้า CRM =================
     function renderPassengers() {
         let passMap = {};
+        
+        // 🌟 1. ดึงข้อมูลจากประวัติที่จบงานแล้ว
         Object.values(allCompletedJobs).forEach(job => {
-            let uid = job.phone || job.userId; if(!uid) return;
-            if(!passMap[uid]) passMap[uid] = { phone: job.phone || '-', name: job.name || 'สมาชิกลูกค้า', rides: 0, spend: 0, promos: [], firstRide: job.completedAt || job.timestamp || Date.now() };
-            passMap[uid].rides++; passMap[uid].spend += parseInt(job.price || 0);
+            let uid = job.userId; // 🌟 ใช้ LINE User ID เป็นตัวแบ่งแยกหลัก
+            if(!uid) uid = job.phone; // ถ้าเกิดเป็นข้อมูลเก่ามากที่ไม่มี LINE ID ค่อยสำรองใช้เบอร์แทน
+            if(!uid) return;
+            
+            if(!passMap[uid]) {
+                passMap[uid] = { 
+                    userId: uid,
+                    phone: job.phone || '-', // เบอร์โทร
+                    name: job.name || 'สมาชิกลูกค้า', // ชื่อ
+                    rides: 0, 
+                    spend: 0, 
+                    promos: [], 
+                    firstRide: job.completedAt || job.timestamp || Date.now() 
+                };
+            } else {
+                // 🌟 ถ้าระบบเจอว่าใช้ LINE ID เดิม แต่พิมพ์เบอร์/ชื่อมาใหม่ จะอัปเดตเป็นของล่าสุดเสมอ
+                if(job.phone) passMap[uid].phone = job.phone;
+                if(job.name) passMap[uid].name = job.name;
+            }
+            
+            passMap[uid].rides++; 
+            passMap[uid].spend += parseInt(job.price || 0);
             if(job.promoCode && !passMap[uid].promos.includes(job.promoCode)) passMap[uid].promos.push(job.promoCode);
             if((job.completedAt || job.timestamp || Date.now()) < passMap[uid].firstRide) passMap[uid].firstRide = job.completedAt || job.timestamp;
         });
 
+        // 🌟 2. ดึงข้อมูลจากงานที่กำลังรอคิว (เผื่อเป็นลูกค้าใหม่เพิ่งเรียกครั้งแรก)
         if(allBookings) {
             Object.values(allBookings).forEach(job => {
-                let uid = job.phone || job.userId; if(!uid) return;
-                if(!passMap[uid]) { passMap[uid] = { phone: job.phone || '-', name: job.name || 'สมาชิกลูกค้า', rides: 0, spend: 0, promos: [], firstRide: job.timestamp || Date.now() }; }
+                let uid = job.userId; 
+                if(!uid) uid = job.phone;
+                if(!uid) return;
+                
+                if(!passMap[uid]) { 
+                    passMap[uid] = { 
+                        userId: uid,
+                        phone: job.phone || '-', 
+                        name: job.name || 'สมาชิกลูกค้า', 
+                        rides: 0, 
+                        spend: 0, 
+                        promos: [], 
+                        firstRide: job.timestamp || Date.now() 
+                    }; 
+                } else {
+                    if(job.phone) passMap[uid].phone = job.phone;
+                    if(job.name) passMap[uid].name = job.name;
+                }
             });
         }
 
@@ -1071,6 +1109,8 @@
         let filterEl = document.getElementById('filter-passenger'); let filter = filterEl ? filterEl.value : 'all';
         if(filter === 'new') passArray = passArray.filter(p => p.rides <= 1);
         if(filter === 'regular') passArray = passArray.filter(p => p.rides > 1);
+        
+        // เรียงลำดับตามคนที่จ่ายเงินให้เราเยอะสุดขึ้นก่อน (VIP)
         passArray.sort((a,b) => b.spend - a.spend);
 
         let html = '';
