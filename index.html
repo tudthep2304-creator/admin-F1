@@ -60,7 +60,11 @@
         <div class="w-9 h-9 bg-green-500/10 text-green-400 rounded-xl flex items-center justify-center text-lg border border-green-500/30 shrink-0">
             <i class="fas fa-cogs"></i>
         </div>
-        <div class="min-w-0">
+      <button onclick="window.toggleAdminTheme()" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-[#2a2f5c] text-gray-600 dark:text-[#fae100] border border-gray-200 dark:border-[#383d6a] transition-all hover:bg-gray-200 dark:hover:bg-[#383d6a] shadow-sm active:scale-95">
+    <i class="fas fa-moon block dark:hidden text-[16px]"></i>
+    <i class="fas fa-sun hidden dark:block text-[16px]"></i>
+</button>  
+      <div class="min-w-0">
             <h1 class="text-lg sm:text-xl font-black text-white tracking-wide flex items-center gap-2 truncate">
                 F1 DRIVER <span class="text-slate-500 font-normal hidden sm:inline">|</span> 
                 <span id="current-page-title" class="text-green-400 text-sm sm:text-base truncate">แดชบอร์ด</span>
