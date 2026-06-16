@@ -201,13 +201,38 @@
 
       <!-- ================= 4. หน้าจัดการย่อยต่างๆ ================= -->
       <section id="content-drivers" class="tab-content hidden space-y-4">
-          <div class="flex justify-end"><button onclick="openModal('modalAddDriver')" class="bg-green-600 hover:bg-green-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-user-plus"></i> ลงทะเบียนคนขับใหม่</button></div>
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-address-book text-green-400 mr-1"></i> ทำเนียบคนขับทั้งหมดในระบบ</h2>
-              <div class="overflow-x-auto">
-                  <table class="w-full text-left border-collapse min-w-[600px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/20"><th class="py-3 px-2 text-left">PIN</th><th class="py-3 px-2 text-left">ชื่อพนักงาน</th><th class="py-3 px-2 text-left">ข้อมูลตัวรถ</th><th class="py-3 px-2 text-left">เบอร์โทร</th><th class="py-3 px-2 text-right">จัดการ</th></tr></thead>
-                      <tbody id="all-drivers-table" class="text-sm divide-y divide-slate-800"></tbody>
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <button onclick="openModal('modalAddDriver')" class="bg-green-600 hover:bg-green-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center shrink-0">
+                  <i class="fas fa-user-plus"></i> ลงทะเบียนคนขับใหม่
+              </button>
+          </div>
+          
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm dark:shadow-md transition-colors duration-300">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-gray-200 dark:border-slate-800 pb-4">
+                  <div>
+                      <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-address-book text-green-500 dark:text-green-400"></i> ทำเนียบคนขับ</h2>
+                      <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">จำนวนคนขับในระบบ: <span id="stat-total-drivers" class="font-bold text-blue-600 dark:text-blue-400 text-sm">0</span> คน</p>
+                  </div>
+                  
+                  <div class="relative w-full sm:w-64 shrink-0">
+                      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <i class="fas fa-search text-gray-400 dark:text-slate-500"></i>
+                      </div>
+                      <input type="text" id="search-driver-input" onkeyup="window.filterDrivers()" placeholder="ค้นหาชื่อ หรือ เบอร์โทร..." class="w-full bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white text-xs font-bold border border-gray-300 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 outline-none focus:border-blue-500 transition-colors shadow-sm">
+                  </div>
+              </div>
+
+              <div class="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
+                  <table class="w-full text-left border-collapse">
+                      <thead>
+                          <tr class="bg-gray-100 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold border-b border-gray-200 dark:border-slate-700">
+                              <th class="py-3 px-3">PIN</th>
+                              <th class="py-3 px-3">ชื่อพนักงาน</th>
+                              <th class="py-3 px-3 text-right">เบอร์โทร</th>
+                          </tr>
+                      </thead>
+                      <tbody id="all-drivers-table" class="text-sm divide-y divide-gray-200 dark:divide-slate-800 bg-white dark:bg-slate-900 transition-colors">
+                          </tbody>
                   </table>
               </div>
           </div>
@@ -550,24 +575,83 @@
       </div>
   </div>
 
-  <div id="modalDriverDetails" class="hidden fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-start bg-slate-800/50 rounded-t-2xl relative overflow-hidden">
-              <div class="absolute right-0 top-0 opacity-10 text-6xl p-2"><i class="fas fa-id-badge"></i></div>
-              <div class="relative z-10 w-full pr-8 text-left">
-                  <div class="flex justify-between items-start">
-                      <div><h2 class="text-xl font-black text-white" id="det-name">ชื่อคนขับ</h2><p class="text-xs font-bold text-green-400 mt-1" id="det-pin">รหัส: 0000</p></div>
-                      <div class="text-right"><div class="bg-yellow-900/40 border border-yellow-500/30 px-2 py-1 rounded-lg text-yellow-400 font-bold flex items-center gap-1.5 cursor-pointer hover:bg-yellow-900/60 transition" onclick="editDriverRating()" title="กดเพื่อแก้ไขคะแนนดาว"><i class="fas fa-star"></i> <span id="det-rating">0.0</span></div><p class="text-[9px] text-slate-500 mt-1" id="det-rating-count">(0 รีวิว)</p></div>
+  <div id="modalDriverDetails" class="hidden fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4 sm:p-6 transition-opacity">
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col h-[90vh] sm:h-[80vh] overflow-hidden">
+          
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 shrink-0">
+              <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-2xl shadow-inner border border-blue-200 dark:border-blue-500/30"><i class="fas fa-id-card"></i></div>
+                  <div>
+                      <h2 class="text-lg font-black text-gray-800 dark:text-white leading-tight flex items-center gap-2" id="det-name">ชื่อคนขับ</h2>
+                      <p class="text-xs font-bold text-green-600 dark:text-green-400 mt-0.5">PIN: <span id="det-pin">0000</span></p>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-2" id="det-phone">เบอร์: -</p>
-                  <p class="text-[11px] text-slate-400" id="det-car">รถ: -</p>
               </div>
-              <button onclick="closeModal('modalDriverDetails')" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fas fa-times"></i></button>
+              <button onclick="closeModal('modalDriverDetails')" class="text-gray-400 hover:text-gray-800 dark:text-slate-400 dark:hover:text-white bg-gray-200 dark:bg-slate-800 rounded-full w-9 h-9 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
           </div>
-          <div class="p-5 space-y-4">
-              <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700"><p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานของวันนี้</p><div class="flex justify-between items-end"><h3 class="text-2xl font-black text-green-400" id="det-today-earn">฿0</h3><p class="text-sm font-bold text-slate-300" id="det-today-jobs">0 งานวิ่ง</p></div></div>
-              <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700"><p class="text-xs font-bold text-slate-400 uppercase mb-1">ผลงานสัปดาห์นี้</p><div class="flex justify-between items-end"><h3 class="text-xl font-black text-blue-400" id="det-week-earn">฿0</h3><p class="text-sm font-bold text-slate-300" id="det-week-jobs">0 งานวิ่ง</p></div></div>
-              <div class="flex justify-between items-center border-t border-slate-800 pt-3"><p class="text-xs font-bold text-slate-500">รวมรายรับสะสมทั้งหมดในประวัติ:</p><p class="text-base font-black text-white" id="det-total-earn">฿0</p></div>
+          
+          <div class="flex-1 overflow-y-auto p-4 sm:p-5 slim-scroll space-y-5 bg-white dark:bg-slate-900">
+              
+              <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase mb-3 flex items-center gap-2"><i class="fas fa-power-off text-blue-500"></i> ควบคุมสถานะการทำงาน</h3>
+                  <div class="flex items-center justify-between">
+                      <div>
+                          <p class="text-[10px] text-gray-500 dark:text-slate-500 mb-0.5">สถานะปัจจุบันบนแผนที่</p>
+                          <span id="det-status-badge" class="px-2 py-1 rounded bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-slate-300 text-xs font-bold">ออฟไลน์</span>
+                      </div>
+                      <button id="btn-force-status" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-lg shadow-sm transition flex items-center gap-1.5">
+                          <i class="fas fa-exchange-alt"></i> บังคับสลับสถานะ
+                      </button>
+                  </div>
+              </div>
+
+              <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div class="flex justify-between items-center mb-3">
+                      <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase flex items-center gap-2"><i class="fas fa-car text-indigo-500"></i> ข้อมูล & ยานพาหนะ</h3>
+                      <div class="bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-500/30 px-2 py-1 rounded-lg text-yellow-600 dark:text-yellow-400 font-bold flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition text-[10px]" onclick="editDriverRating()"><i class="fas fa-star"></i> <span id="det-rating">5.0</span> <span id="det-rating-count" class="font-normal">(0)</span></div>
+                  </div>
+                  <div class="space-y-3">
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">เบอร์ติดต่อ</label><input type="text" id="det-phone" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-xs font-bold"></div>
+                      
+                      <div class="border-t border-gray-200 dark:border-slate-700 pt-3">
+                          <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">เลือกประเภทรถที่ใช้งาน <span class="text-[9px] font-normal text-indigo-400">(เชื่อมกับตั้งค่ารถ)</span></label>
+                          <select id="det-vehicle-type" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-xs font-bold focus:border-indigo-500">
+                              </select>
+                      </div>
+                      <div class="grid grid-cols-2 gap-2">
+                          <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">ยี่ห้อ/รุ่นรถ</label><input type="text" id="det-car-brand" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none"></div>
+                          <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">ป้ายทะเบียน</label><input type="text" id="det-car-plate" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs font-bold outline-none"></div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                  <div class="bg-green-50 dark:bg-green-900/10 p-3 rounded-xl border border-green-200 dark:border-green-500/20 text-center">
+                      <p class="text-[10px] font-bold text-green-600 dark:text-green-500 uppercase mb-1">รายรับวันนี้</p>
+                      <h3 class="text-xl font-black text-green-600 dark:text-green-400" id="det-today-earn">฿0</h3>
+                      <p class="text-[10px] font-bold text-gray-500 dark:text-slate-500" id="det-today-jobs">0 งาน</p>
+                  </div>
+                  <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-500/20 text-center">
+                      <p class="text-[10px] font-bold text-blue-600 dark:text-blue-500 uppercase mb-1">รายรับสะสมทั้งหมด</p>
+                      <h3 class="text-xl font-black text-blue-600 dark:text-blue-400" id="det-total-earn">฿0</h3>
+                      <p class="text-[10px] font-bold text-gray-500 dark:text-slate-500" id="det-total-jobs">0 งาน</p>
+                  </div>
+              </div>
+
+              <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase mb-2 flex items-center gap-2"><i class="fas fa-history text-purple-500"></i> บันทึกประวัติสถานะ (Logs)</h3>
+                  <div class="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 max-h-32 overflow-y-auto slim-scroll">
+                      <table class="w-full text-left text-[10px]">
+                          <tbody id="det-logs-table" class="divide-y divide-gray-200 dark:divide-slate-700">
+                              <tr><td class="py-4 text-center text-gray-400 dark:text-slate-500">รออัปเดตระบบจัดเก็บ Log พิกัด...</td></tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="p-4 border-t border-gray-200 dark:border-slate-800 flex gap-2 sm:gap-3 bg-gray-50 dark:bg-slate-800/50 shrink-0">
+              <button onclick="deleteDriverFromModal()" class="flex-[1] py-2.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold rounded-xl border border-red-200 dark:border-red-500/30 hover:bg-red-200 dark:hover:bg-red-600 hover:text-white transition text-xs">ลบคนขับ</button>
+              <button onclick="saveDriverUpdates()" class="flex-[2] py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-md transition text-xs flex justify-center items-center gap-1.5"><i class="fas fa-save"></i> อัปเดตข้อมูล</button>
           </div>
       </div>
   </div>
@@ -981,30 +1065,42 @@
 
     function removeAdminMarker(id) { if(liveMarkers[id]) { liveMarkers[id].marker.setMap(null); delete liveMarkers[id]; } }
 
-// ================= ระบบจัดการคนขับ (ทำเนียบคนขับ) =================
+// ================= ระบบจัดการคนขับ (ทำเนียบคนขับโฉมใหม่) =================
+    // 🌟 ระบบค้นหา
+    window.filterDrivers = function() {
+        let keyword = document.getElementById('search-driver-input').value.toLowerCase();
+        let rows = document.querySelectorAll('.driver-row-item');
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(keyword) ? '' : 'none';
+        });
+    };
+
     db.ref('drivers_profile').on('value', snap => {
         let table = document.getElementById('all-drivers-table'); 
         let html = ''; 
-        allProfiles = snap.val() || {}; // 🌟 โหลดข้อมูลโปรไฟล์เข้าระบบตรงนี้!
+        let count = 0;
+        allProfiles = snap.val() || {}; 
         
         if(snap.exists() && table) {
             snap.forEach(child => { 
+                count++;
                 let d = child.val();
-                html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/30 transition text-left">
-                    <td class="py-3 px-2 font-bold text-green-400 text-left">${d.pin}</td>
-                    <td class="py-3 px-2 font-bold text-white cursor-pointer hover:text-blue-400 transition text-left" onclick="showDriverDetails('${d.pin}')"><u>${d.name}</u></td>
-                    <td class="py-3 px-2 text-xs text-slate-400 text-left">${d.brand||'-'} ${d.color||''}<br><b class="text-white">${d.plate||''}</b></td>
-                    <td class="py-3 px-2 text-sm text-left">${d.phone}</td>
-                    <td class="py-3 px-2 text-right">
-                        <button onclick="editDriver('${d.pin}')" class="bg-blue-900/30 text-blue-400 w-8 h-8 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition mr-1"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteDriver('${d.pin}')" class="bg-red-900/30 text-red-400 w-8 h-8 rounded-lg text-xs hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
-                    </td>
+                // 🌟 โชว์เฉพาะรหัส ชื่อ และเบอร์ ตามที่คุณต้องการ
+                html += `
+                <tr class="driver-row-item cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors" onclick="showDriverDetails('${d.pin}')">
+                    <td class="py-3.5 px-3 font-black text-green-600 dark:text-green-400 w-20">${d.pin}</td>
+                    <td class="py-3.5 px-3 font-bold text-gray-800 dark:text-white">${d.name}</td>
+                    <td class="py-3.5 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono">${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-gray-400 ml-1"></i></td>
                 </tr>`;
             });
             table.innerHTML = html;
         } else if(table) {
-            table.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-500">ยังไม่มีการเพิ่มรายชื่อคนขับ</td></tr>';
+            table.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-gray-500">ยังไม่มีการเพิ่มรายชื่อคนขับ</td></tr>';
         }
+        
+        let statTotal = document.getElementById('stat-total-drivers');
+        if(statTotal) statTotal.innerText = count;
     });
 
     window.showDriverDetails = function(pin) {
@@ -1012,23 +1108,44 @@
         if(!d) return; 
         window.currentDriverFocus = pin;
 
-        let dName = document.getElementById('det-name'); if(dName) dName.innerText = d.name;
-        let dPin = document.getElementById('det-pin'); if(dPin) dPin.innerText = "รหัสคนขับ: " + d.pin;
-        let dPhone = document.getElementById('det-phone'); if(dPhone) dPhone.innerText = "เบอร์โทร: " + d.phone;
-        let dCar = document.getElementById('det-car'); if(dCar) dCar.innerText = "รถ: " + (d.brand||'-') + " " + (d.color||'') + " (" + (d.plate||'-') + ")";
+        // ใส่ข้อมูลลงในกล่อง
+        document.getElementById('det-name').innerText = d.name;
+        document.getElementById('det-pin').innerText = d.pin;
+        document.getElementById('det-phone').value = d.phone || '';
+        document.getElementById('det-car-brand').value = d.brand || '';
+        document.getElementById('det-car-plate').value = d.plate || '';
+        
+        // ดึงประเภทรถใส่ Dropdown
+        let vehSelect = document.getElementById('det-vehicle-type');
+        if (vehSelect) {
+            let optHtml = '';
+            if (windowContext.vehicleTypesFromDB) {
+                windowContext.vehicleTypesFromDB.forEach(v => {
+                    let sel = (d.serviceType === v.id) ? 'selected' : '';
+                    optHtml += `<option value="${v.id}" ${sel}>${v.name}</option>`;
+                });
+            } else {
+                optHtml = `<option value="car">รถยนต์</option><option value="bike">มอเตอร์ไซค์</option>`;
+            }
+            vehSelect.innerHTML = optHtml;
+            // ถ้าคนขับมีเซ็ตไว้แล้วให้เลือกอันนั้น ถ้าไม่มีให้ดึงตัวแรกมา
+            if(d.serviceType) vehSelect.value = d.serviceType;
+        }
 
+        // โชว์คะแนน
         let rEl = document.getElementById('det-rating'); let cEl = document.getElementById('det-rating-count');
         if (d.ratings) {
             let total = 0; let count = 0; 
             Object.values(d.ratings).forEach(r => { total += parseInt(r.score); count++; });
             let avg = (total / count).toFixed(1); 
-            if(rEl) rEl.innerText = avg; if(cEl) cEl.innerText = `(${count} รีวิว)`;
+            if(rEl) rEl.innerText = avg; if(cEl) cEl.innerText = `(${count})`;
         } else { 
-            if(rEl) rEl.innerText = "0.0"; if(cEl) cEl.innerText = "(ยังไม่มีรีวิว)"; 
+            if(rEl) rEl.innerText = "5.0"; if(cEl) cEl.innerText = "(0)"; 
         }
 
-        let todayEarn = 0, todayJobs = 0; let weekEarn = 0, weekJobs = 0; let totalEarn = 0, totalJobs = 0;
-        let now = new Date(); let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(); let startOfWeek = startOfDay - (now.getDay() * 86400000); 
+        // คำนวณรายได้
+        let todayEarn = 0, todayJobs = 0, totalEarn = 0, totalJobs = 0;
+        let now = new Date(); let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
         if(allCompletedJobs) {
             for(let k in allCompletedJobs) {
@@ -1037,16 +1154,46 @@
                     let price = parseInt(j.price) || 0; let time = j.completedAt || j.timestamp || 0;
                     totalEarn += price; totalJobs++;
                     if(time >= startOfDay) { todayEarn += price; todayJobs++; }
-                    if(time >= startOfWeek) { weekEarn += price; weekJobs++; }
                 }
             }
         }
-        let tEarn = document.getElementById('det-today-earn'); if(tEarn) tEarn.innerText = "฿" + todayEarn.toLocaleString();
-        let tJob = document.getElementById('det-today-jobs'); if(tJob) tJob.innerText = todayJobs + " งานวิ่ง";
-        let wEarn = document.getElementById('det-week-earn'); if(wEarn) wEarn.innerText = "฿" + weekEarn.toLocaleString();
-        let wJob = document.getElementById('det-week-jobs'); if(wJob) wJob.innerText = weekJobs + " งานวิ่ง";
-        let toEarn = document.getElementById('det-total-earn'); if(toEarn) toEarn.innerText = "฿" + totalEarn.toLocaleString();
+        document.getElementById('det-today-earn').innerText = "฿" + todayEarn.toLocaleString();
+        document.getElementById('det-today-jobs').innerText = todayJobs + " งาน";
+        document.getElementById('det-total-earn').innerText = "฿" + totalEarn.toLocaleString();
+        document.getElementById('det-total-jobs').innerText = totalJobs + " งาน";
+
         openModal('modalDriverDetails');
+    }
+
+    // 🌟 ระบบเซฟข้อมูลอัปเดตจากหน้าโปรไฟล์คนขับ
+    window.saveDriverUpdates = function() {
+        if(!window.currentDriverFocus) return;
+        let pin = window.currentDriverFocus;
+        let phone = document.getElementById('det-phone').value.trim();
+        let brand = document.getElementById('det-car-brand').value.trim();
+        let plate = document.getElementById('det-car-plate').value.trim();
+        let vType = document.getElementById('det-vehicle-type').value;
+
+        db.ref('drivers_profile/' + pin).update({
+            phone: phone,
+            brand: brand,
+            plate: plate,
+            serviceType: vType
+        }).then(() => {
+            showCustomAlert('อัปเดตสำเร็จ', 'บันทึกข้อมูลรถและเบอร์ติดต่อเรียบร้อย', 'success');
+            closeModal('modalDriverDetails');
+        });
+    }
+
+    window.deleteDriverFromModal = function() {
+        if(!window.currentDriverFocus) return;
+        let pin = window.currentDriverFocus;
+        showCustomConfirm('ถอดพนักงาน?', `ต้องการลบประวัติคนขับรหัส ${pin} ถาวรใช่หรือไม่?`, () => { 
+            db.ref('drivers_profile/'+pin).remove(); 
+            db.ref('driver_sessions/'+pin).remove(); 
+            closeModal('modalDriverDetails');
+            showCustomAlert('สำเร็จ', 'ลบคนขับออกจากระบบเรียบร้อย', 'success');
+        }, 'ลบทิ้ง', 'red'); 
     }
 
     window.editDriverRating = function() {
@@ -1072,26 +1219,6 @@
                 showCustomAlert('ข้อผิดพลาด', 'โปรดระบุตัวเลข 1-5 หรือพิมพ์ clear เท่านั้น', 'error'); 
             } 
         }
-    }
-
-    window.editDriver = function(pin) {
-        let d = allProfiles[pin];
-        if(d) {
-            openModal('modalAddDriver');
-            let pInp = document.getElementById('drv-pin'); if(pInp) pInp.value = d.pin; 
-            let nInp = document.getElementById('drv-name'); if(nInp) nInp.value = d.name;
-            let bInp = document.getElementById('drv-brand'); if(bInp) bInp.value = d.brand||''; 
-            let cInp = document.getElementById('drv-color'); if(cInp) cInp.value = d.color||'';
-            let plInp = document.getElementById('drv-plate'); if(plInp) plInp.value = d.plate||''; 
-            let phInp = document.getElementById('drv-phone'); if(phInp) phInp.value = d.phone;
-        }
-    }
-    
-    window.deleteDriver = function(pin) { 
-        showCustomConfirm('ถอดพนักงาน?', 'ต้องการลบประวัติพนักงานรหัสนี้ถาวรใช่หรือไม่?', () => { 
-            db.ref('drivers_profile/'+pin).remove(); 
-            db.ref('driver_sessions/'+pin).remove(); 
-        }, 'ลบทิ้ง', 'red'); 
     }
     
     // ================= ระบบฐานข้อมูลลูกค้า CRM =================
