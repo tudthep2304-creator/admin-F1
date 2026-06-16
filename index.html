@@ -743,14 +743,20 @@
     }, {passive: true});
 
     // 🌟 3. ระบบจัดการป้องกันการซูมด้วยนิ้ว
+   // 🌟 3. ระบบจัดการป้องกันการซูมด้วยนิ้ว (รองรับทุก Browser)
     document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
-    document.addEventListener('touchmove', function(event) {
-        if (event.scale !== 1 && event.touches.length > 1) { event.preventDefault(); }
+    document.addEventListener('touchmove', function(e) {
+        if (e.scale !== 1 && e.touches.length > 1) { e.preventDefault(); }
     }, { passive: false });
+    
+    // ป้องกันการแตะจอ 2 ครั้งติดกัน (Double Tap Zoom)
     let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(event) {
+    document.addEventListener('touchend', function(e) {
         let now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 300) { event.preventDefault(); }
+        // ยกเว้นถ้าลูกค้ากดปุ่ม หรือพิมพ์ข้อความอยู่ ให้แตะซ้ำได้
+        if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'TEXTAREA') {
+            if (now - lastTouchEnd <= 300) { e.preventDefault(); }
+        }
         lastTouchEnd = now;
     }, { passive: false });
 
@@ -1246,14 +1252,14 @@
         let container = document.getElementById('vehicle-types-container');
         let filterSelect = document.getElementById('map-filter-vehicle');
         let html = '';
-        let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; // ตัวกรองแผนที่
+        let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; // ตัวกรองแผนที่ตั้งต้น
 
         if(snap.exists()) {
             snap.forEach(child => {
                 let id = child.key; let v = child.val();
                 let vData = encodeURIComponent(JSON.stringify({id: id, ...v}));
                 
-                // สร้างรายการในหน้าจัดการรถ
+                // สร้างการ์ดแสดงรายชื่อรถในหน้าตั้งค่า
                 html += `
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -1269,15 +1275,17 @@
                     </div>
                 </div>`;
 
-                // 🌟 เติมตัวเลือกรถลงใน Dropdown ของแผนที่
+                // 🌟 เติมตัวเลือกรถลงใน Dropdown ของหน้าเรดาร์แผนที่
                 filterHtml += `<option value="${id}">${v.name}</option>`;
             });
         } else {
+            // สร้างค่าตั้งต้นถ้าระบบว่างเปล่า
             let initData = { car: { name: 'รถยนต์', baseFare: 50, kmRate: 10, pickupRate: 5, icon: 'fa-car-side' }, bike: { name: 'มอเตอร์ไซค์', baseFare: 30, kmRate: 8, pickupRate: 5, icon: 'fa-motorcycle' } };
             db.ref('system_settings/vehicle_types').set(initData);
         }
+        
         if(container) container.innerHTML = html;
-        if(filterSelect) filterSelect.innerHTML = filterHtml;
+        if(filterSelect) filterSelect.innerHTML = filterHtml; // อัปเดต Dropdown ให้แผนที่
     });
 
     window.openManageVehicleModal = function(encodedData = null) {
