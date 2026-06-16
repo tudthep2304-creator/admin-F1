@@ -1476,27 +1476,58 @@
     }
 
     db.ref('bookings').on('value', snap => {
-        let countPending = 0; let modalPendingHtml = ''; let badgeMenu = document.getElementById('menu-badge-pending'); let headerAlert = document.getElementById('header-alert-badge');
+        let countPending = 0; let modalPendingHtml = ''; 
+        let badgeMenu = document.getElementById('menu-badge-pending'); 
+        let headerAlert = document.getElementById('header-alert-badge');
+        
         if(snap.exists()) {
             let allBookings = snap.val();
             for (let key in allBookings) {
-                let j = allBookings[key]; if (j.status !== "รอผู้ขับขี่ตอบรับ") continue; 
-                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-green-400 text-base" title="รถยนต์"></i>';
-                let statusColor = "text-yellow-500 bg-yellow-500/10 border-yellow-500/20"; let priceDisplay = `฿${j.price}`;
-                if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-green-400 bg-green-900/30 px-1 rounded border border-green-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
+                let j = allBookings[key]; 
+                if (j.status !== "รอผู้ขับขี่ตอบรับ") continue; 
+                
+                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-500 dark:text-blue-400 text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-green-500 dark:text-green-400 text-base" title="รถยนต์"></i>';
+                let statusColor = "text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-500/10 border-yellow-200 dark:border-yellow-500/20"; 
+                let priceDisplay = `฿${j.price}`;
+                
+                if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-1 rounded border border-green-200 dark:border-green-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
                 countPending++;
-                let dispatchControl = dispatchMode === 'auto' ? `<span class="text-[10px] font-bold text-blue-400 bg-blue-900/20 border border-blue-500/30 px-2 py-1 rounded-lg"><i class="fas fa-robot"></i> จัดการออโต้คิว</span>` : `<button onclick="openAssignModal('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition">เลือกคนขับ</button>`;
-                if(j.assignedDriver && dispatchMode === 'manual') { dispatchControl = `<div class="text-[10px] text-slate-400">ยิงงานให้ PIN <b class="text-yellow-400 text-xs ml-1">#${j.assignedDriver}</b><br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-red-400 underline mt-1 hover:text-red-300">ดึงงานกลับมาจ่ายใหม่</button></div>`; }
-                let callCusBtn = j.phone ? `<a href="tel:${j.phone}" class="ml-2 text-green-400 bg-green-900/30 p-1.5 rounded-lg hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
+                
+                let dispatchControl = dispatchMode === 'auto' ? `<span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-500/30 px-2 py-1 rounded-lg"><i class="fas fa-robot"></i> จัดการออโต้คิว</span>` : `<button onclick="openAssignModal('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition">เลือกคนขับ</button>`;
+                
+                if(j.assignedDriver && dispatchMode === 'manual') { dispatchControl = `<div class="text-[10px] text-gray-500 dark:text-slate-400">ยิงงานให้ PIN <b class="text-yellow-600 dark:text-yellow-400 text-xs ml-1">#${j.assignedDriver}</b><br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-red-500 dark:text-red-400 underline mt-1 hover:text-red-600 dark:hover:text-red-300">ดึงงานกลับมาจ่ายใหม่</button></div>`; }
+                
+                let callCusBtn = j.phone ? `<a href="tel:${j.phone}" class="ml-2 text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 p-1.5 rounded-lg hover:text-green-700 dark:hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
 
-                modalPendingHtml += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/40 transition"><td class="py-3 px-2 font-bold text-white text-left flex flex-col items-start gap-1"><div class="flex items-center">${srvIcon} <span class="ml-2">${j.name || 'ลูกค้า'}</span> ${callCusBtn}</div><span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded border inline-block mt-0.5">${j.status}</span></td><td class="py-3 px-2 text-[11px] text-slate-400 max-w-[200px] truncate leading-relaxed text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td><td class="py-3 px-2 font-black text-green-400 text-sm text-left"> ${priceDisplay}</td><td class="py-3 px-2 text-right">${dispatchControl}</td></tr>`;
-                if(dispatchMode === 'auto' && j.status === "รอผู้ขับขี่ตอบรับ" && !j.assignedDriver) { executeAutoDispatchBalancing(key, j); }
+                modalPendingHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition"><td class="py-3 px-2 font-bold text-gray-800 dark:text-white text-left flex flex-col items-start gap-1"><div class="flex items-center">${srvIcon} <span class="ml-2">${j.name || 'ลูกค้า'}</span> ${callCusBtn}</div><span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded border inline-block mt-0.5">${j.status}</span></td><td class="py-3 px-2 text-[11px] text-gray-500 dark:text-slate-400 max-w-[200px] truncate leading-relaxed text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td><td class="py-3 px-2 font-black text-green-500 dark:text-green-400 text-sm text-left"> ${priceDisplay}</td><td class="py-3 px-2 text-right">${dispatchControl}</td></tr>`;
+                
+                if(dispatchMode === 'auto' && j.status === "รอผู้ขับขี่ตอบรับ" && !j.assignedDriver) { 
+                    if(typeof executeAutoDispatchBalancing === 'function') executeAutoDispatchBalancing(key, j); 
+                }
             }
         }
-        let pCountEl = document.getElementById('stat-pending-count'); if(pCountEl) pCountEl.innerText = countPending + " งาน";
+        
+        // 🌟 1. อัปเดตตัวเลขหน้าแดชบอร์ดหลัก
+        let pCountEl = document.getElementById('stat-pending-count'); 
+        if(pCountEl) pCountEl.innerText = countPending + " งาน";
+        
+        // 🌟 2. อัปเดตตารางข้างใน Modal เสมอ (แยกเป็นอิสระแล้ว โค้ดจะไม่พัง)
+        let mpList = document.getElementById('modal-pending-list'); 
+        if(mpList) {
+            if(countPending > 0) {
+                mpList.innerHTML = modalPendingHtml;
+            } else {
+                mpList.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-gray-500 dark:text-slate-500">ไม่มีงานเรียกรถค้างคิวในขณะนี้</td></tr>';
+            }
+        }
+
+        // 🌟 3. อัปเดตตัวแจ้งเตือนจุดสีแดง (ถ้ามีสร้างไว้ในอนาคต)
         if(badgeMenu && headerAlert) {
-            if(countPending > 0) { badgeMenu.innerText = countPending + " งานรอ"; badgeMenu.classList.remove('hidden'); headerAlert.classList.remove('hidden'); let mpList = document.getElementById('modal-pending-list'); if(mpList) mpList.innerHTML = modalPendingHtml; } 
-            else { badgeMenu.classList.add('hidden'); headerAlert.classList.add('hidden'); let mpList = document.getElementById('modal-pending-list'); if(mpList) mpList.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-slate-500">ไม่มีงานเรียกรถค้างคิวในขณะนี้</td></tr>'; }
+            if(countPending > 0) { 
+                badgeMenu.innerText = countPending + " งานรอ"; badgeMenu.classList.remove('hidden'); headerAlert.classList.remove('hidden'); 
+            } else { 
+                badgeMenu.classList.add('hidden'); headerAlert.classList.add('hidden'); 
+            }
         }
     });
 
