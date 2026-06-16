@@ -607,26 +607,14 @@
       </div>
   </div>
 
-  <!-- 🌟 บาร์ด้านล่างสุดของจอ (Bottom Navigation) แบบหลังเต่า (Floating Center) -->
-  <div class="fixed bottom-0 left-0 right-0 h-[68px] bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_20px_rgba(0,0,0,0.4)] transition-colors duration-300">
-      
-      <!-- ปุ่มซ้าย: หน้าหลัก -->
+  <!-- 🌟 บาร์ด้านล่างสุดของจอ (Bottom Navigation) -->
+  <div class="fixed bottom-0 left-0 right-0 h-[68px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-800 z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_20px_rgba(0,0,0,0.3)] transition-colors duration-300">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-blue-600 dark:text-blue-400 transition active:scale-90">
           <i class="fas fa-home text-xl mb-1"></i><span class="text-[10px] font-bold">หน้าหลัก</span>
       </button>
-
-      <!-- 🌟 ปุ่มตรงกลางที่ลอยขึ้นมาและใหญ่ขึ้น (ทรงหลังเต่า) -->
-      <div class="relative w-full h-full flex justify-center">
-          <button onclick="switchTab('allmenu')" id="nav-allmenu" class="nav-bottom-btn flex flex-col items-center justify-end w-full h-full pb-1.5 transition group cursor-pointer text-gray-400 dark:text-slate-500">
-              <!-- วงกลมที่ลอยขึ้นมาและมีขอบหนา 6px เพื่อเจาะช่องเว้าให้กลืนกับพื้นหลังจอ -->
-              <div class="absolute -top-6 w-[70px] h-[70px] bg-gradient-to-tr from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-400 text-white rounded-full flex items-center justify-center shadow-[0_8px_15px_rgba(37,99,235,0.4)] border-[6px] border-slate-50 dark:border-[#0f172a] transform transition-transform group-hover:-translate-y-1 group-active:scale-95 z-10 duration-300">
-                  <i class="fas fa-th-large text-[24px]"></i>
-              </div>
-              <span class="text-[10px] font-bold mt-auto relative z-20 transition-colors duration-300">เมนูระบบ</span>
-          </button>
-      </div>
-
-      <!-- ปุ่มขวา: แผนที่รถ -->
+      <button onclick="switchTab('allmenu')" id="nav-allmenu" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition active:scale-90">
+          <i class="fas fa-th-large text-xl mb-1"></i><span class="text-[10px] font-bold">เมนูระบบ</span>
+      </button>
       <button onclick="switchTab('map')" id="nav-map" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition active:scale-90 relative">
           <i class="fas fa-map-marked-alt text-xl mb-1"></i><span class="text-[10px] font-bold">แผนที่รถ</span>
       </button>
@@ -1628,6 +1616,31 @@
         container.innerHTML = html; openModal('modalViewChatLog'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
     }
   </script>
+  <!-- 🌟 บาร์ด้านล่างสุดของจอ (Bottom Navigation) แบบหลังเต่า (Floating Center) -->
+  <div class="fixed bottom-0 left-0 right-0 h-[68px] bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_20px_rgba(0,0,0,0.4)] transition-colors duration-300">
+      
+      <!-- ปุ่มซ้าย: หน้าหลัก -->
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-blue-600 dark:text-blue-400 transition active:scale-90">
+          <i class="fas fa-home text-xl mb-1"></i><span class="text-[10px] font-bold">หน้าหลัก</span>
+      </button>
+
+      <!-- 🌟 ปุ่มตรงกลางที่ลอยขึ้นมาและใหญ่ขึ้น (ทรงหลังเต่า) -->
+      <div class="relative w-full h-full flex justify-center">
+          <button onclick="switchTab('allmenu')" id="nav-allmenu" class="nav-bottom-btn flex flex-col items-center justify-end w-full h-full pb-1.5 transition group cursor-pointer text-gray-400 dark:text-slate-500">
+              <!-- วงกลมที่ลอยขึ้นมาและมีขอบหนา 6px เพื่อเจาะช่องเว้าให้กลืนกับพื้นหลังจอ -->
+              <div class="absolute -top-6 w-[70px] h-[70px] bg-gradient-to-tr from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-400 text-white rounded-full flex items-center justify-center shadow-[0_8px_15px_rgba(37,99,235,0.4)] border-[6px] border-slate-50 dark:border-[#0f172a] transform transition-transform group-hover:-translate-y-1 group-active:scale-95 z-10 duration-300">
+                  <i class="fas fa-th-large text-[24px]"></i>
+              </div>
+              <span class="text-[10px] font-bold mt-auto relative z-20 transition-colors duration-300">เมนูระบบ</span>
+          </button>
+      </div>
+
+      <!-- ปุ่มขวา: แผนที่รถ -->
+      <button onclick="switchTab('map')" id="nav-map" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition active:scale-90 relative">
+          <i class="fas fa-map-marked-alt text-xl mb-1"></i><span class="text-[10px] font-bold">แผนที่รถ</span>
+      </button>
+  </div>
+
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsZ_tbFhH6fUXRz3I6C-tMshNwwrSevd4&libraries=places,geometry&callback=initAdminMap" async defer></script>
 </body>
 </html>
