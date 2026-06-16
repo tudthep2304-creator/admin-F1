@@ -806,6 +806,21 @@
 
     // ================= ระบบเรดาร์แผนที่แอดมิน (Live Map) =================
     let adminMap = null; let liveMarkers = {};
+    window.mapFilterUser = 'all'; window.mapFilterVehicle = 'all';
+
+    // 🌟 ระบบคุมตัวกรอง
+    window.refreshMapFilters = function() {
+        window.mapFilterUser = document.getElementById('map-filter-user').value;
+        window.mapFilterVehicle = document.getElementById('map-filter-vehicle').value;
+        
+        for(let id in liveMarkers) {
+            let mData = liveMarkers[id];
+            let show = true;
+            if(window.mapFilterUser !== 'all' && mData.type !== window.mapFilterUser) show = false;
+            if(mData.type === 'driver' && window.mapFilterVehicle !== 'all' && mData.vehicleType !== window.mapFilterVehicle) show = false;
+            mData.marker.setMap(show ? adminMap : null);
+        }
+    }
 
     window.initAdminMap = function() {
         if(typeof google === 'undefined' || adminMap) return;
@@ -814,11 +829,12 @@
             { elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
             { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
             { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
-            { featureType: "water", elementType: "geometry", stylers: [{ color: "#020617" }] }
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#020617" }] },
+            { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } // ซ่อนไอคอนร้านค้าให้ดูสะอาดขึ้น
         ];
 
         adminMap = new google.maps.Map(document.getElementById('adminLiveMap'), {
-            zoom: 12, center: {lat: 19.910479, lng: 99.840576},
+            zoom: 13, center: {lat: 19.910479, lng: 99.840576},
             mapTypeId: 'roadmap', styles: darkStyle, disableDefaultUI: true, gestureHandling: 'greedy'
         });
         
@@ -827,39 +843,73 @@
             if(loader) loader.style.display = 'none';
         });
 
+        // ลูกค้า
         db.ref('active_passengers').on('value', snap => {
             let passCount = 0; let now = Date.now();
             if(snap.exists()) {
                 snap.forEach(child => {
                     let p = child.val();
-                    if(now - p.timestamp < 300000) { passCount++; updateAdminMarker(child.key, p.lat, p.lng, p.name, 'passenger'); } 
+                    if(now - p.timestamp < 300000) { passCount++; updateAdminMarker(child.key, p.lat, p.lng, p.name, 'passenger', 'none'); } 
                     else { removeAdminMarker(child.key); }
                 });
             }
             document.getElementById('map-pass-count').innerText = passCount;
         });
 
+        // คนขับ
         setInterval(() => {
             let drvCount = 0;
             if(windowContext.onlineDrivers) {
                 windowContext.onlineDrivers.forEach(d => {
                     drvCount++;
                     let name = allProfiles[d.pin] ? allProfiles[d.pin].name : `PIN: ${d.pin}`;
-                    updateAdminMarker('drv_'+d.pin, d.lat, d.lng, name, 'driver');
+                    let vType = d.serviceType || 'car'; // ดึงประเภทรถของคนขับ
+                    updateAdminMarker('drv_'+d.pin, d.lat, d.lng, name, 'driver', vType);
                 });
             }
             document.getElementById('map-drv-count').innerText = drvCount;
         }, 3000);
     }
 
-    function updateAdminMarker(id, lat, lng, title, type) {
+    function updateAdminMarker(id, lat, lng, title, type, vehicleType) {
         if(!adminMap) return;
+        
+        let show = true;
+        if(window.mapFilterUser !== 'all' && type !== window.mapFilterUser) show = false;
+        if(type === 'driver' && window.mapFilterVehicle !== 'all' && vehicleType !== window.mapFilterVehicle) show = false;
+
         let iconUrl = type === 'driver' ? "https://img.icons8.com/color/48/car-top-view.png" : "https://img.icons8.com/color/48/marker--v1.png";
+        let labelColor = type === 'driver' ? '#4ade80' : '#60a5fa'; // เขียว=คนขับ, ฟ้า=ลูกค้า
+
         if(!liveMarkers[id]) {
-            liveMarkers[id] = new google.maps.Marker({ position: {lat, lng}, map: adminMap, title: title, icon: { url: iconUrl, scaledSize: new google.maps.Size(35, 35) } });
-        } else { liveMarkers[id].setPosition({lat, lng}); }
+            let m = new google.maps.Marker({ 
+                position: {lat, lng}, 
+                map: show ? adminMap : null, 
+                title: title, 
+                icon: { url: iconUrl, scaledSize: new google.maps.Size(35, 35), labelOrigin: new google.maps.Point(17, 45) },
+                label: { text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' }
+            });
+            
+            // 🌟 เพิ่มให้กดที่หมุดได้
+            m.addListener('click', () => {
+                if(type === 'driver') {
+                    let pin = id.replace('drv_', '');
+                    showDriverDetails(pin); // เปิด Modal คนขับ
+                } else {
+                    // เปิด Alert ข้อมูลลูกค้า
+                    showCustomAlert("ข้อมูลผู้โดยสาร (ออนไลน์)", `ชื่อบัญชี: ${title}\nละติจูด: ${lat.toFixed(5)}\nลองจิจูด: ${lng.toFixed(5)}\nกำลังเปิดแอปพลิเคชันอยู่ขณะนี้`, "info");
+                }
+            });
+
+            liveMarkers[id] = { marker: m, type: type, vehicleType: vehicleType };
+        } else { 
+            liveMarkers[id].marker.setPosition({lat, lng}); 
+            liveMarkers[id].marker.setMap(show ? adminMap : null);
+            liveMarkers[id].marker.setLabel({ text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' });
+        }
     }
-    function removeAdminMarker(id) { if(liveMarkers[id]) { liveMarkers[id].setMap(null); delete liveMarkers[id]; } }
+
+    function removeAdminMarker(id) { if(liveMarkers[id]) { liveMarkers[id].marker.setMap(null); delete liveMarkers[id]; } }
 
     // ================= ระบบฐานข้อมูลลูกค้า CRM =================
     function renderPassengers() {
@@ -1242,12 +1292,17 @@
 
     // ================= 🌟 4. ระบบจัดการประเภทรถแบบไดนามิก =================
     db.ref('system_settings/vehicle_types').on('value', snap => {
-        let container = document.getElementById('vehicle-types-container'); if(!container) return;
+        let container = document.getElementById('vehicle-types-container');
+        let filterSelect = document.getElementById('map-filter-vehicle');
         let html = '';
+        let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; // ตัวกรองแผนที่
+
         if(snap.exists()) {
             snap.forEach(child => {
                 let id = child.key; let v = child.val();
                 let vData = encodeURIComponent(JSON.stringify({id: id, ...v}));
+                
+                // สร้างรายการในหน้าจัดการรถ
                 html += `
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -1262,12 +1317,16 @@
                         <button onclick="window.deleteVehicleType('${id}', '${v.name}')" class="bg-red-900/30 text-red-500 px-3 py-1 rounded text-xs hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>`;
+
+                // 🌟 เติมตัวเลือกรถลงใน Dropdown ของแผนที่
+                filterHtml += `<option value="${id}">${v.name}</option>`;
             });
         } else {
             let initData = { car: { name: 'รถยนต์', baseFare: 50, kmRate: 10, pickupRate: 5, icon: 'fa-car-side' }, bike: { name: 'มอเตอร์ไซค์', baseFare: 30, kmRate: 8, pickupRate: 5, icon: 'fa-motorcycle' } };
             db.ref('system_settings/vehicle_types').set(initData);
         }
-        container.innerHTML = html;
+        if(container) container.innerHTML = html;
+        if(filterSelect) filterSelect.innerHTML = filterHtml;
     });
 
     window.openManageVehicleModal = function(encodedData = null) {
@@ -1299,7 +1358,6 @@
     window.deleteVehicleType = function(id, name) {
         showCustomConfirm('ลบประเภทรถ?', `คุณแน่ใจหรือไม่ที่จะลบ "${name}" ออกจากระบบ? (ลูกค้าจะเรียกไม่ได้)`, () => { db.ref('system_settings/vehicle_types/' + id).remove().then(()=>{ showCustomAlert('ลบสำเร็จ', `ลบประเภทรถ ${name} ออกแล้ว`, 'success'); }); }, 'ลบทิ้ง', 'red');
     }
-
     // ================= ระบบคลังแชทลับ (ADMIN CHAT LOGS) =================
     let allChatLogsGrouped = {};
     db.ref('admin_chat_logs').on('value', snap => {
