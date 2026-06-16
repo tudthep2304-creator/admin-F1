@@ -114,6 +114,11 @@
                   </div>
               </div>
           </div>
+        <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm dark:shadow-md transition-colors duration-300">
+              <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-indigo-500 dark:text-indigo-400"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
+              <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  </div>
+          </div>
       </section>
 
       <!-- ================= 2. หน้าเมนูระบบ ================= -->
@@ -1105,7 +1110,6 @@
                 <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 w-7 h-7 rounded-lg flex items-center justify-center transition shadow-sm border border-red-100 dark:border-red-500/20"><i class="fas fa-trash-alt text-[11px]"></i></button>
                 
                 <div class="flex justify-between items-center mb-3 pr-10">
-                    <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="v-online-${vId}" onchange="toggleVehicleOnline('${vId}', this.checked)" class="sr-only peer" ${v.isOnline ? 'checked' : ''}>
                         <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
                         <span class="ml-2 text-xs font-bold ${v.isOnline ? 'text-green-600 dark:text-green-500' : 'text-gray-500 dark:text-slate-400'}">${v.isOnline ? 'ออนไลน์' : 'ออฟไลน์'}</span>
@@ -1662,22 +1666,21 @@
     });
 
     // ================= 🌟 4. ระบบจัดการประเภทรถแบบไดนามิก =================
-    window.systemVehicleTypes = []; // 🌟 ตัวแปรกลางสำหรับเก็บรายชื่อรถไว้ใช้ข้ามฟังก์ชัน
+    window.systemVehicleTypes = []; 
 
     db.ref('system_settings/vehicle_types').on('value', snap => {
         let container = document.getElementById('vehicle-types-container');
         let filterSelect = document.getElementById('map-filter-vehicle');
-        let html = '';
-        let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; 
-        window.systemVehicleTypes = []; // เคลียร์ของเก่าก่อน
+        let html = ''; let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; 
+        window.systemVehicleTypes = []; 
 
         if(snap.exists()) {
             snap.forEach(child => {
                 let id = child.key; let v = child.val();
                 let vData = encodeURIComponent(JSON.stringify({id: id, ...v}));
                 
-                // 🌟 เก็บข้อมูลลงตัวแปรกลาง เพื่อให้หน้าโปรไฟล์คนขับดึงไปใช้ได้
-                window.systemVehicleTypes.push({ id: id, name: v.name });
+                // 🌟 เก็บข้อมูล forceOnline เข้าไปในตัวแปรกลางด้วย
+                window.systemVehicleTypes.push({ id: id, name: v.name, icon: v.icon, forceOnline: v.forceOnline || false });
 
                 html += `
                 <div class="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
@@ -1690,23 +1693,59 @@
                     </div>
                     <div class="flex flex-col gap-2">
                         <button onclick="window.openManageVehicleModal('${vData}')" class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded text-xs hover:bg-blue-200 dark:hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit"></i></button>
-                        <button onclick="window.deleteVehicleType('${id}', '${v.name}')" class="bg-red-100 dark:bg-red-900/30 text-red-500 px-3 py-1 rounded text-xs hover:bg-red-200 dark:hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>`;
                 filterHtml += `<option value="${id}">${v.name}</option>`;
             });
-        } else {
-            let initData = { car: { name: 'รถยนต์', baseFare: 50, kmRate: 10, pickupRate: 5, icon: 'fa-car-side' }, bike: { name: 'มอเตอร์ไซค์', baseFare: 30, kmRate: 8, pickupRate: 5, icon: 'fa-motorcycle' } };
-            db.ref('system_settings/vehicle_types').set(initData);
         }
         if(container) container.innerHTML = html;
         if(filterSelect) filterSelect.innerHTML = filterHtml;
         
-        // ถ้าระหว่างที่ตั้งค่ารถเปิดหน้าโปรไฟล์คนขับอยู่ ให้รีเฟรช Dropdown ด้วย
-        if(document.getElementById('pageDriverDetails') && !document.getElementById('pageDriverDetails').classList.contains('translate-x-full')) {
-            if(typeof renderDriverVehicles === 'function') renderDriverVehicles();
-        }
+        if(typeof renderDriverVehicles === 'function') renderDriverVehicles();
+        if(typeof renderDashboardVehicleToggles === 'function') renderDashboardVehicleToggles(); // 🌟 อัปเดตสวิตช์แดชบอร์ด
     });
+
+    // 🌟 ฟังก์ชันวาดสวิตช์เปิด-ปิด และนับจำนวนรถบนหน้าแดชบอร์ด
+    window.renderDashboardVehicleToggles = function() {
+        let container = document.getElementById('dashboard-vehicle-toggles');
+        if(!container) return;
+        
+        let html = '';
+        (window.systemVehicleTypes || []).forEach(v => {
+            let total = 0; let online = 0;
+            
+            // 🌟 1. นับจำนวนรถทั้งหมด + รถที่ออนไลน์อยู่จริง
+            for (let pin in allProfiles) {
+                let p = allProfiles[pin];
+                if (p.vehicles && Object.values(p.vehicles).some(veh => veh.serviceType === v.id)) {
+                    total++;
+                    // ถ้าคนขับคนนี้มีรายชื่อใน onlineDrivers ถือว่ารถคันนี้ออนไลน์จริง
+                    if ((windowContext.onlineDrivers || []).some(od => od.pin === pin)) online++;
+                }
+            }
+            
+            let isForced = v.forceOnline || false;
+            let badgeColor = online > 0 ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-slate-500';
+            
+            html += `
+            <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-600 shadow-sm"><i class="fas ${v.icon || 'fa-car'}"></i></div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-800 dark:text-white">${v.name}</p>
+                        <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">ออนไลน์จริง <span class="font-bold ${badgeColor}">${online}</span> / ${total} คัน</p>
+                    </div>
+                </div>
+                    <input type="checkbox" onchange="db.ref('system_settings/vehicle_types/${v.id}').update({forceOnline: this.checked})" class="sr-only peer" ${isForced ? 'checked' : ''}>
+                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                </label>
+            </div>`;
+        });
+        container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-2">กำลังโหลดข้อมูลรถ...</p>';
+    }
+
+    // 🌟 สั่งให้หน้าแดชบอร์ดนับจำนวนใหม่ทุกครั้งที่มีคนขับออนไลน์/ออฟไลน์
+    db.ref('active_drivers').on('value', () => { setTimeout(() => { if(typeof renderDashboardVehicleToggles === 'function') renderDashboardVehicleToggles(); }, 500); });
 
     window.openManageVehicleModal = function(encodedData = null) {
         if(encodedData) {
