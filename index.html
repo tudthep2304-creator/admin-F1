@@ -1320,5 +1320,21 @@
         container.innerHTML = html; openModal('modalViewChatLog'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
     }
   </script>
+  <div class="fixed bottom-0 left-0 right-0 h-[68px] bg-slate-900/95 backdrop-blur-md border-t border-slate-800 z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-blue-400 transition active:scale-90">
+          <i class="fas fa-home text-xl mb-1"></i>
+          <span class="text-[10px] font-bold">หน้าหลัก</span>
+      </button>
+      <button onclick="switchTab('allmenu')" id="nav-allmenu" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-slate-500 hover:text-slate-300 transition active:scale-90">
+          <i class="fas fa-th-large text-xl mb-1"></i>
+          <span class="text-[10px] font-bold">เมนูระบบ</span>
+      </button>
+      <button onclick="switchTab('map')" id="nav-map" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-slate-500 hover:text-slate-300 transition active:scale-90 relative">
+          <i class="fas fa-map-marked-alt text-xl mb-1"></i>
+          <span class="text-[10px] font-bold">แผนที่รถ</span>
+      </button>
+  </div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsZ_tbFhH6fUXRz3I6C-tMshNwwrSevd4&libraries=places,geometry&callback=initAdminMap" async defer></script>
 </body>
 </html>
