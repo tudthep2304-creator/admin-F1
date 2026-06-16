@@ -1706,6 +1706,14 @@
     });
 
     // 🌟 ฟังก์ชันวาดสวิตช์เปิด-ปิด และนับจำนวนรถบนหน้าแดชบอร์ด
+    // 🌟 ฟังก์ชันแยกสำหรับกดสวิตช์ (แก้ปัญหากดไม่ได้)
+    window.toggleForceOnline = function(vehicleId, isChecked) {
+        db.ref('system_settings/vehicle_types/' + vehicleId).update({
+            forceOnline: isChecked
+        });
+    };
+
+    // 🌟 ฟังก์ชันวาดสวิตช์เปิด-ปิด และนับจำนวนรถบนหน้าแดชบอร์ด
     window.renderDashboardVehicleToggles = function() {
         let container = document.getElementById('dashboard-vehicle-toggles');
         if(!container) return;
@@ -1714,17 +1722,15 @@
         (window.systemVehicleTypes || []).forEach(v => {
             let total = 0; let online = 0;
             
-            // 🌟 1. นับจำนวนรถทั้งหมด + รถที่ออนไลน์อยู่จริง
             for (let pin in allProfiles) {
                 let p = allProfiles[pin];
                 if (p.vehicles && Object.values(p.vehicles).some(veh => veh.serviceType === v.id)) {
                     total++;
-                    // ถ้าคนขับคนนี้มีรายชื่อใน onlineDrivers ถือว่ารถคันนี้ออนไลน์จริง
                     if ((windowContext.onlineDrivers || []).some(od => od.pin === pin)) online++;
                 }
             }
             
-            let isForced = v.forceOnline || false;
+            let isForced = v.forceOnline === true;
             let badgeColor = online > 0 ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-slate-500';
             
             html += `
@@ -1736,7 +1742,8 @@
                         <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">ออนไลน์จริง <span class="font-bold ${badgeColor}">${online}</span> / ${total} คัน</p>
                     </div>
                 </div>
-                    <input type="checkbox" onchange="db.ref('system_settings/vehicle_types/${v.id}').update({forceOnline: this.checked})" class="sr-only peer" ${isForced ? 'checked' : ''}>
+                <label class="relative inline-flex items-center cursor-pointer z-10">
+                    <input type="checkbox" onchange="window.toggleForceOnline('${v.id}', this.checked)" class="sr-only peer" ${isForced ? 'checked' : ''}>
                     <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                 </label>
             </div>`;
