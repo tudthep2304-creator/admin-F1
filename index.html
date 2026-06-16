@@ -530,16 +530,20 @@
                               <input type="datetime-local" id="cms-banner-end" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-[10px] outline-none">
                           </div>
                       </div>
-                    <div id="popup-only-settings" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-800 p-3 rounded-xl border border-slate-700 mt-2">
+                    <div id="popup-only-settings" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-800 p-3 rounded-xl border border-slate-700 mt-2">
                       <div>
-                          <label class="block text-[10px] font-bold text-slate-400 mb-1">เวลาแสดงผลนับถอยหลัง (วินาที)</label>
-                          <input type="number" id="cms-banner-duration" placeholder="เช่น 5 (เว้นว่าง = ลูกค้าต้องกดปิดเอง)" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500 font-bold text-center">
+                          <label class="block text-[10px] font-bold text-slate-400 mb-1">เวลานับถอยหลัง (วิ)</label>
+                          <input type="number" id="cms-banner-duration" placeholder="ว่าง=กดปิดเอง" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500 font-bold text-center">
                       </div>
                       <div>
-                          <label class="block text-[10px] font-bold text-slate-400 mb-1">หน้าจอที่ต้องการให้แสดงโฆษณา</label>
-                          <div class="flex flex-col gap-1.5 mt-1 text-[11px] text-slate-300">
-                              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="home" class="cms-banner-pages accent-blue-500" checked> หน้าแรก (เลือกประเภทรถ)</label>
-                              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="tracking" class="cms-banner-pages accent-blue-500"> หน้าติดตามงาน (Tracking)</label>
+                          <label class="block text-[10px] font-bold text-slate-400 mb-1">ซ่อนกี่วัน (ถ้าลูกค้าติ๊ก)</label>
+                          <input type="number" id="cms-banner-snooze" placeholder="เช่น 14" value="14" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500 font-bold text-center">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-slate-400 mb-1">หน้าจอที่แสดง</label>
+                          <div class="flex flex-col gap-1 text-[10px] text-slate-300">
+                              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="home" class="cms-banner-pages accent-blue-500" checked> หน้าแรก</label>
+                              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="tracking" class="cms-banner-pages accent-blue-500"> หน้าติดตาม</label>
                           </div>
                       </div>
                   </div>
@@ -1264,7 +1268,11 @@
         if (pos === 'bottom') path = 'config/bottom_banners';
         if (pos === 'popup') path = 'config/popup_ad';
 
+        // 🌟 ดึงข้อมูลฟิลด์พิเศษสำหรับโฆษณาคั่น
         let duration = document.getElementById('cms-banner-duration') ? parseInt(document.getElementById('cms-banner-duration').value) : null;
+        let snoozeDays = document.getElementById('cms-banner-snooze') ? parseInt(document.getElementById('cms-banner-snooze').value) : 14;
+        if(isNaN(snoozeDays)) snoozeDays = 14; // กันแอดมินลืมกรอก
+
         let targetPages = [];
         document.querySelectorAll('.cms-banner-pages:checked').forEach(cb => targetPages.push(cb.value));
 
@@ -1275,12 +1283,14 @@
 
         if (pos === 'popup') {
             dataToSave.duration = duration || 0;
+            dataToSave.snoozeDays = snoozeDays; // 🌟 ส่งข้อมูลวันขึ้นฐานข้อมูล
             dataToSave.targetPages = targetPages.length > 0 ? targetPages : ['home'];
         }
 
         db.ref(path).push(dataToSave).then(() => {
             showCustomAlert("สำเร็จ", 'อัปเดตสไลด์ภาพและตั้งเงื่อนไขโฆษณาเรียบร้อย!', 'success'); 
             if(document.getElementById('cms-banner-duration')) document.getElementById('cms-banner-duration').value = '';
+            if(document.getElementById('cms-banner-snooze')) document.getElementById('cms-banner-snooze').value = '14';
             cancelCrop();
         });
     }
@@ -1309,8 +1319,9 @@
                         if (path === 'config/popup_ad') {
                             let pagesMap = { 'home': 'หน้าแรก', 'tracking': 'หน้าติดตามงาน' };
                             let displayPages = b.targetPages ? b.targetPages.map(p => pagesMap[p] || p).join(', ') : 'หน้าแรก';
-                            let displayDur = b.duration ? `${b.duration} วินาทีออโต้` : 'ให้กดปิดเอง';
-                            extraRules = `<p class="text-[9px] text-blue-400 font-bold mt-0.5">📌 โชว์ที่: ${displayPages} (${displayDur})</p>`;
+                            let displayDur = b.duration ? `${b.duration} วิ` : 'รอปิดเอง';
+                            let displaySnooze = b.snoozeDays !== undefined ? b.snoozeDays : 14;
+                            extraRules = `<p class="text-[9px] text-blue-400 font-bold mt-0.5">📌 โชว์ที่: ${displayPages} (${displayDur}) | ซ่อน: ${displaySnooze} วัน</p>`;
                         }
 
                         listContainer.innerHTML += `
