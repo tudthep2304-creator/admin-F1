@@ -636,7 +636,26 @@
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
     const db = firebase.database();
-
+// ==========================================
+    // 🌟 ระบบสลับโหมด มืด/สว่าง สำหรับแอดมิน
+    // ==========================================
+    window.toggleAdminTheme = function() {
+        const htmlEl = document.documentElement;
+        let isNowDark = htmlEl.classList.contains('dark');
+        
+        if (isNowDark) {
+            htmlEl.classList.remove('dark');
+            localStorage.setItem('admin_theme', 'light');
+        } else {
+            htmlEl.classList.add('dark');
+            localStorage.setItem('admin_theme', 'dark');
+        }
+        
+        // อัปเดตสีแผนที่แบบเรียลไทม์ (ถ้าเปิดแผนที่อยู่)
+        if (typeof adminMap !== 'undefined' && adminMap) {
+            adminMap.setOptions({ styles: !isNowDark ? darkMapStyle : lightMapStyle });
+        }
+    }
     // ================= CUSTOM ALERTS =================
     let confirmCallback = null;
     function showCustomAlert(title, message, type='info', callback=null) {
