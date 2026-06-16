@@ -35,6 +35,8 @@
     .slim-scroll::-webkit-scrollbar { width: 4px; }
     .slim-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
     .radio-label input[type="radio"]:checked + div { background-color: #2563eb; border-color: #3b82f6; color: white; }
+    /* 🌟 แต่งป้ายชื่อบนแผนที่ให้มีขอบดำและอ่านง่ายขึ้น */
+    .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
   </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col pb-20">
@@ -155,15 +157,29 @@
           </div>
       </section>
 
-      <!-- ================= 3. หน้าแผนที่ ================= -->
-      <section id="content-map" class="tab-content hidden h-[calc(100vh-140px)] flex-col">
-          <div class="flex justify-between items-center mb-3 shrink-0">
+      <!-- ================= 3. หน้าแผนที่ (อัปเดตใหม่) ================= -->
+      <section id="content-map" class="tab-content hidden h-[calc(100vh-210px)] flex-col pb-8">
+          <div class="flex justify-between items-center mb-2 shrink-0">
               <h2 class="text-base font-bold text-white"><i class="fas fa-satellite-dish text-green-400 mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
               <div class="flex gap-2">
                   <span class="text-[10px] bg-blue-900/30 text-blue-400 px-2 py-1 rounded border border-blue-500/30 shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
                   <span class="text-[10px] bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/30 shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
               </div>
           </div>
+          
+          <!-- 🌟 แถบตัวกรอง (Filters) -->
+          <div class="flex gap-2 mb-3 shrink-0">
+              <select id="map-filter-user" onchange="window.refreshMapFilters()" class="flex-1 bg-slate-800 text-white text-xs border border-slate-700 rounded-lg px-2 py-2 outline-none font-bold">
+                  <option value="all">👁️ ดูทั้งหมด</option>
+                  <option value="driver">🚗 เฉพาะคนขับ</option>
+                  <option value="passenger">🧍 เฉพาะลูกค้า</option>
+              </select>
+              <select id="map-filter-vehicle" onchange="window.refreshMapFilters()" class="flex-1 bg-slate-800 text-white text-xs border border-slate-700 rounded-lg px-2 py-2 outline-none font-bold">
+                  <option value="all">🏷️ รถทุกประเภท</option>
+                  <!-- รายการรถจะถูกเติมอัตโนมัติด้วย JS -->
+              </select>
+          </div>
+
           <div id="adminLiveMap" class="w-full flex-1 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden relative shadow-lg">
               <div id="map-loader" class="absolute inset-0 flex items-center justify-center text-slate-500 text-sm z-0 pointer-events-none"><i class="fas fa-spinner fa-spin mr-2"></i> กำลังโหลดแผนที่...</div>
           </div>
@@ -1227,12 +1243,17 @@
 
     // ================= 🌟 4. ระบบจัดการประเภทรถแบบไดนามิก =================
     db.ref('system_settings/vehicle_types').on('value', snap => {
-        let container = document.getElementById('vehicle-types-container'); if(!container) return;
+        let container = document.getElementById('vehicle-types-container');
+        let filterSelect = document.getElementById('map-filter-vehicle');
         let html = '';
+        let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; // ตัวกรองแผนที่
+
         if(snap.exists()) {
             snap.forEach(child => {
                 let id = child.key; let v = child.val();
                 let vData = encodeURIComponent(JSON.stringify({id: id, ...v}));
+                
+                // สร้างรายการในหน้าจัดการรถ
                 html += `
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -1247,12 +1268,16 @@
                         <button onclick="window.deleteVehicleType('${id}', '${v.name}')" class="bg-red-900/30 text-red-500 px-3 py-1 rounded text-xs hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>`;
+
+                // 🌟 เติมตัวเลือกรถลงใน Dropdown ของแผนที่
+                filterHtml += `<option value="${id}">${v.name}</option>`;
             });
         } else {
             let initData = { car: { name: 'รถยนต์', baseFare: 50, kmRate: 10, pickupRate: 5, icon: 'fa-car-side' }, bike: { name: 'มอเตอร์ไซค์', baseFare: 30, kmRate: 8, pickupRate: 5, icon: 'fa-motorcycle' } };
             db.ref('system_settings/vehicle_types').set(initData);
         }
-        container.innerHTML = html;
+        if(container) container.innerHTML = html;
+        if(filterSelect) filterSelect.innerHTML = filterHtml;
     });
 
     window.openManageVehicleModal = function(encodedData = null) {
@@ -1284,6 +1309,113 @@
     window.deleteVehicleType = function(id, name) {
         showCustomConfirm('ลบประเภทรถ?', `คุณแน่ใจหรือไม่ที่จะลบ "${name}" ออกจากระบบ? (ลูกค้าจะเรียกไม่ได้)`, () => { db.ref('system_settings/vehicle_types/' + id).remove().then(()=>{ showCustomAlert('ลบสำเร็จ', `ลบประเภทรถ ${name} ออกแล้ว`, 'success'); }); }, 'ลบทิ้ง', 'red');
     }
+
+    // ================= ระบบเรดาร์แผนที่แอดมิน (Live Map) =================
+    let adminMap = null; let liveMarkers = {};
+    window.mapFilterUser = 'all'; window.mapFilterVehicle = 'all';
+
+    // 🌟 ระบบคุมตัวกรอง
+    window.refreshMapFilters = function() {
+        window.mapFilterUser = document.getElementById('map-filter-user').value;
+        window.mapFilterVehicle = document.getElementById('map-filter-vehicle').value;
+        
+        for(let id in liveMarkers) {
+            let mData = liveMarkers[id];
+            let show = true;
+            if(window.mapFilterUser !== 'all' && mData.type !== window.mapFilterUser) show = false;
+            if(mData.type === 'driver' && window.mapFilterVehicle !== 'all' && mData.vehicleType !== window.mapFilterVehicle) show = false;
+            mData.marker.setMap(show ? adminMap : null);
+        }
+    }
+
+    window.initAdminMap = function() {
+        if(typeof google === 'undefined' || adminMap) return;
+        let darkStyle = [
+            { elementType: "geometry", stylers: [{ color: "#0f172a" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
+            { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#020617" }] },
+            { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } // ซ่อนไอคอนร้านค้าให้ดูสะอาดขึ้น
+        ];
+
+        adminMap = new google.maps.Map(document.getElementById('adminLiveMap'), {
+            zoom: 13, center: {lat: 19.910479, lng: 99.840576},
+            mapTypeId: 'roadmap', styles: darkStyle, disableDefaultUI: true, gestureHandling: 'greedy'
+        });
+        
+        google.maps.event.addListenerOnce(adminMap, 'idle', function(){
+            let loader = document.getElementById('map-loader');
+            if(loader) loader.style.display = 'none';
+        });
+
+        // ลูกค้า
+        db.ref('active_passengers').on('value', snap => {
+            let passCount = 0; let now = Date.now();
+            if(snap.exists()) {
+                snap.forEach(child => {
+                    let p = child.val();
+                    if(now - p.timestamp < 300000) { passCount++; updateAdminMarker(child.key, p.lat, p.lng, p.name, 'passenger', 'none'); } 
+                    else { removeAdminMarker(child.key); }
+                });
+            }
+            document.getElementById('map-pass-count').innerText = passCount;
+        });
+
+        // คนขับ
+        setInterval(() => {
+            let drvCount = 0;
+            if(windowContext.onlineDrivers) {
+                windowContext.onlineDrivers.forEach(d => {
+                    drvCount++;
+                    let name = allProfiles[d.pin] ? allProfiles[d.pin].name : `PIN: ${d.pin}`;
+                    let vType = d.serviceType || 'car'; // ดึงประเภทรถของคนขับ
+                    updateAdminMarker('drv_'+d.pin, d.lat, d.lng, name, 'driver', vType);
+                });
+            }
+            document.getElementById('map-drv-count').innerText = drvCount;
+        }, 3000);
+    }
+
+    function updateAdminMarker(id, lat, lng, title, type, vehicleType) {
+        if(!adminMap) return;
+        
+        let show = true;
+        if(window.mapFilterUser !== 'all' && type !== window.mapFilterUser) show = false;
+        if(type === 'driver' && window.mapFilterVehicle !== 'all' && vehicleType !== window.mapFilterVehicle) show = false;
+
+        let iconUrl = type === 'driver' ? "https://img.icons8.com/color/48/car-top-view.png" : "https://img.icons8.com/color/48/marker--v1.png";
+        let labelColor = type === 'driver' ? '#4ade80' : '#60a5fa'; // เขียว=คนขับ, ฟ้า=ลูกค้า
+
+        if(!liveMarkers[id]) {
+            let m = new google.maps.Marker({ 
+                position: {lat, lng}, 
+                map: show ? adminMap : null, 
+                title: title, 
+                icon: { url: iconUrl, scaledSize: new google.maps.Size(35, 35), labelOrigin: new google.maps.Point(17, 45) },
+                label: { text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' }
+            });
+            
+            // 🌟 เพิ่มให้กดที่หมุดได้
+            m.addListener('click', () => {
+                if(type === 'driver') {
+                    let pin = id.replace('drv_', '');
+                    showDriverDetails(pin); // เปิด Modal คนขับ
+                } else {
+                    // เปิด Alert ข้อมูลลูกค้า
+                    showCustomAlert("ข้อมูลผู้โดยสาร (ออนไลน์)", `ชื่อบัญชี: ${title}\nละติจูด: ${lat.toFixed(5)}\nลองจิจูด: ${lng.toFixed(5)}\nกำลังเปิดแอปพลิเคชันอยู่ขณะนี้`, "info");
+                }
+            });
+
+            liveMarkers[id] = { marker: m, type: type, vehicleType: vehicleType };
+        } else { 
+            liveMarkers[id].marker.setPosition({lat, lng}); 
+            liveMarkers[id].marker.setMap(show ? adminMap : null);
+            liveMarkers[id].marker.setLabel({ text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' });
+        }
+    }
+
+    function removeAdminMarker(id) { if(liveMarkers[id]) { liveMarkers[id].marker.setMap(null); delete liveMarkers[id]; } }
 
     // ================= ระบบคลังแชทลับ (ADMIN CHAT LOGS) =================
     let allChatLogsGrouped = {};
