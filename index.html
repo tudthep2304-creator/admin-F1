@@ -911,6 +911,119 @@
 
     function removeAdminMarker(id) { if(liveMarkers[id]) { liveMarkers[id].marker.setMap(null); delete liveMarkers[id]; } }
 
+// ================= ระบบจัดการคนขับ (ทำเนียบคนขับ) =================
+    db.ref('drivers_profile').on('value', snap => {
+        let table = document.getElementById('all-drivers-table'); 
+        let html = ''; 
+        allProfiles = snap.val() || {}; // 🌟 โหลดข้อมูลโปรไฟล์เข้าระบบตรงนี้!
+        
+        if(snap.exists() && table) {
+            snap.forEach(child => { 
+                let d = child.val();
+                html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/30 transition text-left">
+                    <td class="py-3 px-2 font-bold text-green-400 text-left">${d.pin}</td>
+                    <td class="py-3 px-2 font-bold text-white cursor-pointer hover:text-blue-400 transition text-left" onclick="showDriverDetails('${d.pin}')"><u>${d.name}</u></td>
+                    <td class="py-3 px-2 text-xs text-slate-400 text-left">${d.brand||'-'} ${d.color||''}<br><b class="text-white">${d.plate||''}</b></td>
+                    <td class="py-3 px-2 text-sm text-left">${d.phone}</td>
+                    <td class="py-3 px-2 text-right">
+                        <button onclick="editDriver('${d.pin}')" class="bg-blue-900/30 text-blue-400 w-8 h-8 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition mr-1"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteDriver('${d.pin}')" class="bg-red-900/30 text-red-400 w-8 h-8 rounded-lg text-xs hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>`;
+            });
+            table.innerHTML = html;
+        } else if(table) {
+            table.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-500">ยังไม่มีการเพิ่มรายชื่อคนขับ</td></tr>';
+        }
+    });
+
+    window.showDriverDetails = function(pin) {
+        let d = allProfiles[pin]; 
+        if(!d) return; 
+        window.currentDriverFocus = pin;
+
+        let dName = document.getElementById('det-name'); if(dName) dName.innerText = d.name;
+        let dPin = document.getElementById('det-pin'); if(dPin) dPin.innerText = "รหัสคนขับ: " + d.pin;
+        let dPhone = document.getElementById('det-phone'); if(dPhone) dPhone.innerText = "เบอร์โทร: " + d.phone;
+        let dCar = document.getElementById('det-car'); if(dCar) dCar.innerText = "รถ: " + (d.brand||'-') + " " + (d.color||'') + " (" + (d.plate||'-') + ")";
+
+        let rEl = document.getElementById('det-rating'); let cEl = document.getElementById('det-rating-count');
+        if (d.ratings) {
+            let total = 0; let count = 0; 
+            Object.values(d.ratings).forEach(r => { total += parseInt(r.score); count++; });
+            let avg = (total / count).toFixed(1); 
+            if(rEl) rEl.innerText = avg; if(cEl) cEl.innerText = `(${count} รีวิว)`;
+        } else { 
+            if(rEl) rEl.innerText = "0.0"; if(cEl) cEl.innerText = "(ยังไม่มีรีวิว)"; 
+        }
+
+        let todayEarn = 0, todayJobs = 0; let weekEarn = 0, weekJobs = 0; let totalEarn = 0, totalJobs = 0;
+        let now = new Date(); let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(); let startOfWeek = startOfDay - (now.getDay() * 86400000); 
+
+        if(allCompletedJobs) {
+            for(let k in allCompletedJobs) {
+                let j = allCompletedJobs[k];
+                if(j.driverPin === pin && (j.status.includes("ถึงที่หมาย") || j.status.includes("เสร็จสิ้น"))) {
+                    let price = parseInt(j.price) || 0; let time = j.completedAt || j.timestamp || 0;
+                    totalEarn += price; totalJobs++;
+                    if(time >= startOfDay) { todayEarn += price; todayJobs++; }
+                    if(time >= startOfWeek) { weekEarn += price; weekJobs++; }
+                }
+            }
+        }
+        let tEarn = document.getElementById('det-today-earn'); if(tEarn) tEarn.innerText = "฿" + todayEarn.toLocaleString();
+        let tJob = document.getElementById('det-today-jobs'); if(tJob) tJob.innerText = todayJobs + " งานวิ่ง";
+        let wEarn = document.getElementById('det-week-earn'); if(wEarn) wEarn.innerText = "฿" + weekEarn.toLocaleString();
+        let wJob = document.getElementById('det-week-jobs'); if(wJob) wJob.innerText = weekJobs + " งานวิ่ง";
+        let toEarn = document.getElementById('det-total-earn'); if(toEarn) toEarn.innerText = "฿" + totalEarn.toLocaleString();
+        openModal('modalDriverDetails');
+    }
+
+    window.editDriverRating = function() {
+        if(!window.currentDriverFocus) return; 
+        let pin = window.currentDriverFocus;
+        let action = prompt("พิมพ์คะแนน 1-5 เพื่อสร้างรีวิวจำลอง หรือพิมพ์ 'clear' เพื่อล้างคะแนนทั้งหมดของคนขับรายนี้");
+        
+        if (action === 'clear') { 
+            showCustomConfirm('เคลียร์คะแนน?', 'ยืนยันลบประวัติคะแนนรีวิวทั้งหมดทิ้งถาวร?', () => { 
+                db.ref('drivers_profile/' + pin + '/ratings').remove().then(()=>{ 
+                    showCustomAlert('สำเร็จ', 'เคลียร์คะแนนสำเร็จ', 'success'); showDriverDetails(pin); 
+                }); 
+            }, 'ลบทิ้ง', 'red'); 
+        } else { 
+            let score = parseInt(action); 
+            if(score >= 1 && score <= 5) { 
+                db.ref('drivers_profile/' + pin + '/ratings').push({ 
+                    passengerName: "Admin System", score: score, timestamp: firebase.database.ServerValue.TIMESTAMP 
+                }).then(()=>{ 
+                    showCustomAlert('สำเร็จ', 'เพิ่มคะแนนดาวเข้าระบบสำเร็จ', 'success'); showDriverDetails(pin); 
+                }); 
+            } else if (action !== null) { 
+                showCustomAlert('ข้อผิดพลาด', 'โปรดระบุตัวเลข 1-5 หรือพิมพ์ clear เท่านั้น', 'error'); 
+            } 
+        }
+    }
+
+    window.editDriver = function(pin) {
+        let d = allProfiles[pin];
+        if(d) {
+            openModal('modalAddDriver');
+            let pInp = document.getElementById('drv-pin'); if(pInp) pInp.value = d.pin; 
+            let nInp = document.getElementById('drv-name'); if(nInp) nInp.value = d.name;
+            let bInp = document.getElementById('drv-brand'); if(bInp) bInp.value = d.brand||''; 
+            let cInp = document.getElementById('drv-color'); if(cInp) cInp.value = d.color||'';
+            let plInp = document.getElementById('drv-plate'); if(plInp) plInp.value = d.plate||''; 
+            let phInp = document.getElementById('drv-phone'); if(phInp) phInp.value = d.phone;
+        }
+    }
+    
+    window.deleteDriver = function(pin) { 
+        showCustomConfirm('ถอดพนักงาน?', 'ต้องการลบประวัติพนักงานรหัสนี้ถาวรใช่หรือไม่?', () => { 
+            db.ref('drivers_profile/'+pin).remove(); 
+            db.ref('driver_sessions/'+pin).remove(); 
+        }, 'ลบทิ้ง', 'red'); 
+    }
+    
     // ================= ระบบฐานข้อมูลลูกค้า CRM =================
     function renderPassengers() {
         let passMap = {};
