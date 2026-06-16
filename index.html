@@ -830,7 +830,7 @@
             { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
             { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
             { featureType: "water", elementType: "geometry", stylers: [{ color: "#020617" }] },
-            { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } // ซ่อนไอคอนร้านค้าให้ดูสะอาดขึ้น
+            { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } 
         ];
 
         adminMap = new google.maps.Map(document.getElementById('adminLiveMap'), {
@@ -843,61 +843,79 @@
             if(loader) loader.style.display = 'none';
         });
 
-        // ลูกค้า
+        // 🌟 1. ดึงข้อมูลลูกค้า (ส่ง pictureUrl ไปให้หมุดด้วย)
         db.ref('active_passengers').on('value', snap => {
             let passCount = 0; let now = Date.now();
             if(snap.exists()) {
                 snap.forEach(child => {
                     let p = child.val();
-                    if(now - p.timestamp < 300000) { passCount++; updateAdminMarker(child.key, p.lat, p.lng, p.name, 'passenger', 'none'); } 
+                    if(now - p.timestamp < 300000) { 
+                        passCount++; 
+                        // ส่ง p.pictureUrl พ่วงเข้าไปเป็น Parameter ตัวสุดท้าย
+                        updateAdminMarker(child.key, p.lat, p.lng, p.name, 'passenger', 'none', p.pictureUrl); 
+                    } 
                     else { removeAdminMarker(child.key); }
                 });
             }
             document.getElementById('map-pass-count').innerText = passCount;
         });
 
-        // คนขับ
+        // 🌟 2. ดึงข้อมูลคนขับ (ใส่ null ตรงช่องรูปโปรไฟล์ เพราะเราจะใช้ไอคอนรูปรถแทน)
         setInterval(() => {
             let drvCount = 0;
             if(windowContext.onlineDrivers) {
                 windowContext.onlineDrivers.forEach(d => {
                     drvCount++;
                     let name = allProfiles[d.pin] ? allProfiles[d.pin].name : `PIN: ${d.pin}`;
-                    let vType = d.serviceType || 'car'; // ดึงประเภทรถของคนขับ
-                    updateAdminMarker('drv_'+d.pin, d.lat, d.lng, name, 'driver', vType);
+                    let vType = d.serviceType || 'car'; 
+                    updateAdminMarker('drv_'+d.pin, d.lat, d.lng, name, 'driver', vType, null);
                 });
             }
             document.getElementById('map-drv-count').innerText = drvCount;
         }, 3000);
     }
 
-    function updateAdminMarker(id, lat, lng, title, type, vehicleType) {
+    // 🌟 3. ฟังก์ชันอัปเดตหมุด (รองรับการใส่รูปโปรไฟล์ LINE)
+    function updateAdminMarker(id, lat, lng, title, type, vehicleType, profilePic) {
         if(!adminMap) return;
         
         let show = true;
         if(window.mapFilterUser !== 'all' && type !== window.mapFilterUser) show = false;
         if(type === 'driver' && window.mapFilterVehicle !== 'all' && vehicleType !== window.mapFilterVehicle) show = false;
 
-        let iconUrl = type === 'driver' ? "https://img.icons8.com/color/48/car-top-view.png" : "https://img.icons8.com/color/48/marker--v1.png";
-        let labelColor = type === 'driver' ? '#4ade80' : '#60a5fa'; // เขียว=คนขับ, ฟ้า=ลูกค้า
+        // กำหนดรูปไอคอน และขนาด
+        let iconUrl = "https://img.icons8.com/color/48/marker--v1.png"; // ไอคอนลูกค้า (กรณีไม่มีรูปไลน์)
+        let sizeX = 35, sizeY = 35; // ขนาดไอคอนปกติ
+
+        if (type === 'driver') {
+            iconUrl = "https://img.icons8.com/color/48/car-top-view.png"; // รูปรถ
+        } else if (type === 'passenger' && profilePic) {
+            // 🌟 ถ้าเป็นลูกค้า และมีรูป LINE ส่งมา ให้เอารูป LINE มาแสดงเลย!
+            iconUrl = profilePic;
+            sizeX = 32; sizeY = 32; // ปรับขนาดรูปโปรไฟล์ให้เล็กลงนิดนึงจะได้ไม่บังแผนที่
+        }
+
+        let labelColor = type === 'driver' ? '#4ade80' : '#60a5fa';
 
         if(!liveMarkers[id]) {
             let m = new google.maps.Marker({ 
                 position: {lat, lng}, 
                 map: show ? adminMap : null, 
                 title: title, 
-                icon: { url: iconUrl, scaledSize: new google.maps.Size(35, 35), labelOrigin: new google.maps.Point(17, 45) },
+                icon: { 
+                    url: iconUrl, 
+                    scaledSize: new google.maps.Size(sizeX, sizeY), 
+                    labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10) // ดันข้อความให้อยู่ใต้รูปภาพ
+                },
                 label: { text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' }
             });
             
-            // 🌟 เพิ่มให้กดที่หมุดได้
             m.addListener('click', () => {
                 if(type === 'driver') {
                     let pin = id.replace('drv_', '');
-                    showDriverDetails(pin); // เปิด Modal คนขับ
+                    showDriverDetails(pin);
                 } else {
-                    // เปิด Alert ข้อมูลลูกค้า
-                    showCustomAlert("ข้อมูลผู้โดยสาร (ออนไลน์)", `ชื่อบัญชี: ${title}\nละติจูด: ${lat.toFixed(5)}\nลองจิจูด: ${lng.toFixed(5)}\nกำลังเปิดแอปพลิเคชันอยู่ขณะนี้`, "info");
+                    showCustomAlert("ข้อมูลผู้โดยสาร (ออนไลน์)", `ชื่อบัญชี: ${title}\nกำลังเปิดแอปพลิเคชันอยู่ขณะนี้`, "info");
                 }
             });
 
@@ -906,6 +924,13 @@
             liveMarkers[id].marker.setPosition({lat, lng}); 
             liveMarkers[id].marker.setMap(show ? adminMap : null);
             liveMarkers[id].marker.setLabel({ text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' });
+            
+            // 🌟 อัปเดตไอคอนเผื่อรูปลูกค้าเพิ่งโหลดเสร็จ
+            liveMarkers[id].marker.setIcon({
+                url: iconUrl, 
+                scaledSize: new google.maps.Size(sizeX, sizeY), 
+                labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10)
+            });
         }
     }
 
