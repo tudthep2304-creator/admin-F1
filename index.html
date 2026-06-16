@@ -534,7 +534,24 @@
                   <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ค่าวิ่ง กม.ละ (บาท)</label><input type="number" id="veh-km" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center"></div>
                   <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ค่าไปรับ กม.ละ (บาท)</label><input type="number" id="veh-pick" class="w-full p-2 bg-white dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-indigo-500"></div>
                   <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ระยะจำลองมารับ (กม.)</label><input type="number" id="veh-mock-dist" step="0.1" placeholder="เช่น 2.5" class="w-full p-2 bg-white dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-indigo-500"></div>
-                  <div class="col-span-2 mt-2"><button onclick="window.saveVehicleData()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition text-sm">บันทึกตั้งค่าระบบ</button></div>
+                <div class="col-span-2 border-t border-gray-200 dark:border-slate-700 pt-3 mt-1">
+                      <h4 class="text-[11px] font-bold text-gray-800 dark:text-white mb-2"><i class="fas fa-calculator text-blue-500"></i> อัลกอริทึมคุมราคาขั้นสูงสุด</h4>
+                      <div class="grid grid-cols-2 gap-3">
+                          <div>
+                              <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">รูปแบบการคุมราคา</label>
+                              <select id="veh-algo-type" class="w-full p-2 bg-white dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] font-bold focus:border-indigo-500">
+                                  <option value="radius_cap">แบบที่ 1: จำกัดรัศมีไปรับ (กม.)</option>
+                                  <option value="percentage_cap">แบบที่ 2: จำกัดเพดานราคา (%)</option>
+                                  <option value="direct">แบบที่ 3: ปล่อยตามจริง (ไม่กรอง)</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1" id="veh-algo-label">ค่าจำกัด (กม.)</label>
+                              <input type="number" id="veh-algo-param" step="1" placeholder="เช่น 12" class="w-full p-2 bg-white dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-indigo-500">
+                          </div>
+                      </div>
+                  </div>  
+                <div class="col-span-2 mt-2"><button onclick="window.saveVehicleData()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition text-sm">บันทึกตั้งค่าระบบ</button></div>
               </div>
           </div>
       </div>
@@ -1763,16 +1780,28 @@
             document.getElementById('veh-name').value = v.name; document.getElementById('veh-icon').value = v.icon || 'fa-car';
             document.getElementById('veh-base').value = v.baseFare; document.getElementById('veh-km').value = v.kmRate; 
             document.getElementById('veh-pick').value = v.pickupRate || 0;
-            document.getElementById('veh-mock-dist').value = v.mockDistance || 2; // 🌟 ดึงระยะจำลองเดิมมาแสดง (ถ้าไม่มีใช้ 2)
+            document.getElementById('veh-mock-dist').value = v.mockDistance || 2;
+            document.getElementById('veh-algo-type').value = v.algoType || 'radius_cap';
+            document.getElementById('veh-algo-param').value = v.algoParam || 12;
         } else {
             document.getElementById('vehicle-modal-title').innerHTML = `<i class="fas fa-plus"></i> เพิ่มประเภทรถใหม่`;
             document.getElementById('veh-id').value = '';
             document.getElementById('veh-key').value = ''; document.getElementById('veh-key').disabled = false; document.getElementById('veh-key').classList.remove('opacity-50');
             document.getElementById('veh-name').value = ''; document.getElementById('veh-icon').value = 'fa-car-side';
             document.getElementById('veh-base').value = ''; document.getElementById('veh-km').value = ''; 
-            document.getElementById('veh-pick').value = '';
-            document.getElementById('veh-mock-dist').value = '2'; // ค่าเริ่มต้นหน้าใหม่คือ 2 กม.
+            document.getElementById('veh-pick').value = ''; document.getElementById('veh-mock-dist').value = '2';
+            document.getElementById('veh-algo-type').value = 'radius_cap'; document.getElementById('veh-algo-param').value = '12';
         }
+        
+        // แอบใส่ Event เล็กๆ เพื่อเปลี่ยน Label ให้แอดมินเข้าใจง่ายขึ้น
+        document.getElementById('veh-algo-type').onchange = function() {
+            let lbl = document.getElementById('veh-algo-label');
+            if(this.value === 'radius_cap') lbl.innerText = 'รัศมีไม่เกิน (กม.)';
+            else if(this.value === 'percentage_cap') lbl.innerText = 'แพงสุดไม่เกิน (%)';
+            else lbl.innerText = 'ไม่ต้องระบุ';
+        };
+        document.getElementById('veh-algo-type').dispatchEvent(new Event('change'));
+
         openModal('modalManageVehicle');
     }
 
@@ -1780,13 +1809,19 @@
         let id = document.getElementById('veh-id').value; let key = document.getElementById('veh-key').value.trim().toLowerCase(); let name = document.getElementById('veh-name').value.trim();
         let icon = document.getElementById('veh-icon').value.trim(); let base = parseInt(document.getElementById('veh-base').value); let km = parseInt(document.getElementById('veh-km').value); 
         let pick = parseInt(document.getElementById('veh-pick').value) || 0;
-        let mockDist = parseFloat(document.getElementById('veh-mock-dist').value) || 2; // 🌟 รับค่าระยะทางจำลองจากช่องกรอก
+        let mockDist = parseFloat(document.getElementById('veh-mock-dist').value) || 2; 
         
+        // 🌟 รับค่าอัลกอริทึม
+        let aType = document.getElementById('veh-algo-type').value;
+        let aParam = parseFloat(document.getElementById('veh-algo-param').value) || 0;
+
         if(!key || !name || isNaN(base) || isNaN(km)) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกรหัสชื่อและราคาให้ครบถ้วน', 'error');
         let targetId = id ? id : key; 
         
-        // 🌟 เซฟตัวแปร mockDistance พ่วงลงไปในโฟลเดอร์รถคันนั้นด้วย
-        db.ref('system_settings/vehicle_types/' + targetId).set({ name: name, baseFare: base, kmRate: km, pickupRate: pick, mockDistance: mockDist, icon: icon }).then(() => { showCustomAlert('สำเร็จ', 'อัปเดตประเภทและราคารถเรียบร้อย!', 'success'); closeModal('modalManageVehicle'); });
+        db.ref('system_settings/vehicle_types/' + targetId).set({ 
+            name: name, baseFare: base, kmRate: km, pickupRate: pick, mockDistance: mockDist, icon: icon,
+            algoType: aType, algoParam: aParam
+        }).then(() => { showCustomAlert('สำเร็จ', 'อัปเดตประเภท ราคารถ และอัลกอริทึมเรียบร้อย!', 'success'); closeModal('modalManageVehicle'); });
     }
 
     window.deleteVehicleType = function(id, name) {
