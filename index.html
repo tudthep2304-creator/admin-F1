@@ -1741,7 +1741,7 @@
         });
     };
 
-    // 🌟 ฟังก์ชันวาดสวิตช์เปิด-ปิด และนับจำนวนรถบนหน้าแดชบอร์ด
+    // 🌟 ฟังก์ชันวาดสวิตช์เปิด-ปิด และนับจำนวนรถบนหน้าแดชบอร์ด (รองรับข้อมูลทั้งเก่าและใหม่)
     window.renderDashboardVehicleToggles = function() {
         let container = document.getElementById('dashboard-vehicle-toggles');
         if(!container) return;
@@ -1752,9 +1752,23 @@
             
             for (let pin in allProfiles) {
                 let p = allProfiles[pin];
+                let hasThisVehicle = false;
+                
+                // 🌟 เช็ค 1: ถ้าคนขับมีรถแบบใหม่ (ตะกร้า vehicles หลายคัน)
                 if (p.vehicles && Object.values(p.vehicles).some(veh => veh.serviceType === v.id)) {
+                    hasThisVehicle = true;
+                } 
+                // 🌟 เช็ค 2: ถ้าคนขับเป็นข้อมูลระบบเก่า (มีรถคันเดียวฝังในโปรไฟล์หลัก)
+                else if (!p.vehicles && (p.serviceType || 'car') === v.id) {
+                    hasThisVehicle = true;
+                }
+
+                // ถ้าระบบพบว่าคนขับมีรถประเภทนี้ ให้นับยอด
+                if (hasThisVehicle) {
                     total++;
-                    if ((windowContext.onlineDrivers || []).some(od => od.pin === pin)) online++;
+                    // เช็คว่าคนขับคนนี้อยู่ในรายชื่อคนขับที่เปิดแอปออนไลน์อยู่หรือไม่
+                    let isOnline = (windowContext.onlineDrivers || []).some(od => String(od.pin) === String(pin) || String(od.driverPin) === String(pin));
+                    if (isOnline) online++;
                 }
             }
             
