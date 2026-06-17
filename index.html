@@ -558,6 +558,50 @@
               </div>
           </div>
       </section>
+    <section id="content-wallet" class="tab-content hidden space-y-4">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
+                  <h2 class="text-lg font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-wallet mr-1.5"></i> ศูนย์จัดการระบบการเงิน เครดิต และระดับชั้น</h2>
+                  <div class="flex gap-2 w-full sm:w-auto">
+                      <button onclick="openTierAirdropModal()" class="flex-1 sm:flex-none bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-gift"></i> แจกโบนัสกลุ่ม</button>
+                      <button onclick="openCommissionSettings()" class="flex-1 sm:flex-none bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-blue-200 dark:border-blue-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-cog"></i> ตั้งค่าหักเงิน</button>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                  <div class="bg-green-50 dark:bg-green-900/10 p-4 rounded-xl border border-green-200 dark:border-green-900/30 text-center shadow-sm">
+                      <p class="text-[10px] font-bold text-green-600 dark:text-green-500 uppercase mb-1">ยอดเงินสดในระบบ (ถอนได้)</p>
+                      <h3 class="text-2xl font-black text-green-600 dark:text-green-400" id="wallet-stat-cash">฿0</h3>
+                  </div>
+                  <div class="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 text-center shadow-sm">
+                      <p class="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase mb-1">ยอดโบนัสในระบบ (ถอนไม่ได้)</p>
+                      <h3 class="text-2xl font-black text-yellow-600 dark:text-yellow-400" id="wallet-stat-bonus">฿0</h3>
+                  </div>
+                  <div class="col-span-2 bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700 flex flex-col justify-center shadow-sm">
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5">ค้นหาคนขับเพื่อจัดการบัญชี</label>
+                      <div class="relative">
+                          <input type="text" id="wallet-search-input" onkeyup="renderWalletTab()" placeholder="ค้นหาด้วย ชื่อ, รหัส หรือเบอร์โทร..." class="w-full p-2.5 pl-9 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-sm focus:border-emerald-500 shadow-inner">
+                          <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
+                  <table class="w-full text-left border-collapse min-w-[800px]">
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold bg-gray-100 dark:bg-slate-800/50">
+                          <th class="py-3 px-3 w-24">ไอดีคนขับ</th>
+                          <th class="py-3 px-3">พนักงาน</th>
+                          <th class="py-3 px-2 text-center">ระดับ (Tier)</th>
+                          <th class="py-3 px-2 text-center">เรตติ้งดาว</th>
+                          <th class="py-3 px-2 text-right">เงินสด (Cash)</th>
+                          <th class="py-3 px-2 text-right">โบนัส (Bonus)</th>
+                          <th class="py-3 px-3 text-center">จัดการระบบ</th>
+                      </tr></thead>
+                      <tbody id="wallet-drivers-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50"></tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
     
   </main>
 
@@ -2490,29 +2534,39 @@
         }, 200); // รอให้ transition ทำงานเสร็จก่อนเคลียร์ src
     }
     // ==========================================
-    // 🌟 ระบบจัดการกระเป๋าเงินและเครดิต (Wallet Dashboard)
+    // 🌟 ระบบศูนย์จัดการกระเป๋าเงิน สิทธิ์ และระดับชั้น (Wallet & Tier Dashboard)
     // ==========================================
     window.renderWalletTab = function() {
         let keyword = (document.getElementById('wallet-search-input')?.value || '').toLowerCase();
         let lst = document.getElementById('wallet-drivers-list');
         let html = '';
-        
-        let totalCash = 0;
-        let totalBonus = 0;
+        let totalCash = 0; let totalBonus = 0;
 
-        // วนลูปรายชื่อคนขับทั้งหมด (allProfiles ถูกดึงมาจาก Firebase อยู่แล้ว)
         for (let drvId in allProfiles) {
             let d = allProfiles[drvId];
-            
-            // กรองคำค้นหา
             let searchString = `${drvId} ${d.name || ''} ${d.phone || ''}`.toLowerCase();
             if (keyword && !searchString.includes(keyword)) continue;
 
             let cashVal = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
             let bonusVal = parseFloat(d.creditBonus || 0);
+            let currentTier = d.tier || 'Standard';
 
-            totalCash += cashVal;
-            totalBonus += bonusVal;
+            totalCash += cashVal; totalBonus += bonusVal;
+
+            // สัญลักษณ์ป้ายแสดงสถานะ Tier บนกระดานการเงิน
+            let tierBadgeHtml = '';
+            if(currentTier === 'Silver') tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40">Silver</span>`;
+            else if(currentTier === 'Gold') tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200">Gold</span>`;
+            else if(currentTier === 'Platinum') tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-[#1da1f2] border border-blue-200">Platinum</span>`;
+            else if(currentTier === 'F1 Legend') tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-purple-500 to-indigo-500 text-white border border-purple-400">LEGEND</span>`;
+            else if(currentTier === 'owner super legend') tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-black text-yellow-300 border border-yellow-400 shadow-sm">OWNER</span>`;
+            else tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200">Standard</span>`;
+
+            // ดึงคะแนนดาวควบคุมขึ้นมาแสดงผลในหน้าบัญชีการเงิน
+            let displayRating = "5.0";
+            if (d.tier === 'owner super legend') displayRating = "100.0";
+            else if (d.tier === 'F1 Legend') displayRating = "10.0";
+            else if (d.rating) displayRating = parseFloat(d.rating).toFixed(1);
 
             let profilePicHtml = d.profilePic 
                 ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover border border-gray-200 shrink-0">` 
@@ -2530,119 +2584,123 @@
                         </div>
                     </div>
                 </td>
-                <td class="py-3 px-3 text-right font-bold text-green-600 dark:text-green-400 text-[13px]">฿${cashVal.toFixed(2)}</td>
-                <td class="py-3 px-3 text-right font-bold text-yellow-600 dark:text-yellow-500 text-[13px]">฿${bonusVal.toFixed(2)}</td>
+                <td class="py-3 px-2 text-center align-middle">${tierBadgeHtml}</td>
+                <td class="py-3 px-2 text-center font-bold text-yellow-500 text-xs align-middle"><i class="fas fa-star text-[10px] mr-0.5"></i> ${displayRating}</td>
+                <td class="py-3 px-2 text-right font-bold text-green-600 dark:text-green-400 text-[13px]">฿${cashVal.toFixed(2)}</td>
+                <td class="py-3 px-2 text-right font-bold text-yellow-600 dark:text-yellow-500 text-[13px]">฿${bonusVal.toFixed(2)}</td>
                 <td class="py-3 px-3 text-center">
-                    <button onclick="openAdjustCreditModal('${drvId}')" class="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-white hover:bg-emerald-100 dark:hover:bg-emerald-900/40 hover:text-emerald-600 dark:hover:text-emerald-400 px-3 py-1.5 rounded-lg text-[11px] font-bold transition shadow-sm border border-gray-200 dark:border-slate-700"><i class="fas fa-edit mr-1"></i> จัดการ</button>
+                    <div class="flex items-center justify-center gap-1">
+                        <button onclick="openAdjustCreditModal('${drvId}')" class="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-white hover:bg-emerald-500 hover:text-white px-2 py-1.5 rounded-lg text-[10px] font-bold transition border border-gray-200 dark:border-slate-700 flex items-center gap-0.5"><i class="fas fa-money-bill-alt"></i> เงิน</button>
+                        <button onclick="openAdjustTierRatingModal('${drvId}')" class="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-white hover:bg-blue-500 hover:text-white px-2 py-1.5 rounded-lg text-[10px] font-bold transition border border-gray-200 dark:border-slate-700 flex items-center gap-0.5"><i class="fas fa-user-shield"></i> สิทธิ์</button>
+                    </div>
                 </td>
             </tr>`;
         }
 
-        if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูลคนขับที่ค้นหา</td></tr>';
+        if(lst) lst.innerHTML = html || '<tr><td colspan="7" class="py-8 text-center text-gray-400">ไม่พบข้อมูลคนขับที่ค้นหา</td></tr>';
         
         let elCash = document.getElementById('wallet-stat-cash'); if(elCash) elCash.innerText = '฿' + totalCash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
         let elBonus = document.getElementById('wallet-stat-bonus'); if(elBonus) elBonus.innerText = '฿' + totalBonus.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     }
 
-    // 🌟 ระบบ Popup ทำรายการปรับปรุงยอด
+    // 🌟 ระบบสคริปต์ปรับปรุงยอดเงิน (เงินสด/โบนัส)
     let currentWalletDriverId = null;
-
     window.openAdjustCreditModal = function(drvId) {
         currentWalletDriverId = drvId;
-        let d = allProfiles[drvId];
-        if(!d) return;
-
+        let d = allProfiles[drvId]; if(!d) return;
         document.getElementById('adj-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
         document.getElementById('adj-drv-id').innerText = drvId;
-        document.getElementById('adj-amount').value = '';
-        document.getElementById('adj-note').value = '';
-        document.getElementById('adj-wallet-type').value = 'cash';
-        document.getElementById('adj-action-type').value = 'add';
-        toggleAdjustColors();
-
-        document.getElementById('modalAdjustCredit').classList.remove('hidden');
+        document.getElementById('adj-amount').value = ''; document.getElementById('adj-note').value = '';
+        document.getElementById('adj-wallet-type').value = 'cash'; document.getElementById('adj-action-type').value = 'add';
+        toggleAdjustColors(); openModal('modalAdjustCredit');
     }
-
-    window.closeAdjustCreditModal = function() {
-        document.getElementById('modalAdjustCredit').classList.add('hidden');
-        currentWalletDriverId = null;
-    }
-
+    window.closeAdjustCreditModal = function() { closeModal('modalAdjustCredit'); currentWalletDriverId = null; }
     window.toggleAdjustColors = function() {
-        let action = document.getElementById('adj-action-type').value;
-        let el = document.getElementById('adj-action-type');
-        if(action === 'add') {
-            el.className = "w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold focus:border-emerald-500";
-        } else {
-            el.className = "w-full p-2.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-xl outline-none text-sm font-bold focus:border-red-500";
-        }
+        let action = document.getElementById('adj-action-type').value; let el = document.getElementById('adj-action-type');
+        if(action === 'add') el.className = "w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold focus:border-emerald-500";
+        else el.className = "w-full p-2.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-xl outline-none text-sm font-bold focus:border-red-500";
     }
-
     window.submitCreditAdjustment = function() {
         if(!currentWalletDriverId) return;
-        
-        let walletType = document.getElementById('adj-wallet-type').value; // 'cash' หรือ 'bonus'
-        let actionType = document.getElementById('adj-action-type').value; // 'add' หรือ 'deduct'
+        let walletType = document.getElementById('adj-wallet-type').value; 
+        let actionType = document.getElementById('adj-action-type').value; 
         let amount = parseFloat(document.getElementById('adj-amount').value);
         let note = document.getElementById('adj-note').value.trim();
-
         if (isNaN(amount) || amount <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนเงินให้ถูกต้องครับ', 'error');
-        if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุหมายเหตุการทำรายการด้วยครับ (เพื่อการตรวจสอบย้อนหลัง)', 'error');
+        if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุหมายเหตุการทำรายการด้วยครับ', 'error');
 
-        // อ่านยอดเดิม
         let d = allProfiles[currentWalletDriverId];
         let currentCash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
         let currentBonus = parseFloat(d.creditBonus || 0);
+        let newCash = currentCash; let newBonus = currentBonus;
 
-        let newCash = currentCash;
-        let newBonus = currentBonus;
+        if (walletType === 'cash') { if (actionType === 'add') newCash += amount; else newCash -= amount; } 
+        else { if (actionType === 'add') newBonus += amount; else newBonus -= amount; }
 
-        // คำนวณยอดใหม่
-        if (walletType === 'cash') {
-            if (actionType === 'add') newCash += amount;
-            else newCash -= amount;
-        } else {
-            if (actionType === 'add') newBonus += amount;
-            else newBonus -= amount;
-        }
+        if (newCash < 0 || newBonus < 0) { if(!confirm(`กระเป๋าเงินจะติดลบ ยืนยันดำเนินการต่อหรือไม่?`)) return; }
 
-        // แจ้งเตือนถ้าเงินติดลบ (แต่แอดมินบังคับทำรายการติดลบได้)
-        if (newCash < 0 || newBonus < 0) {
-            let confirmMsg = `การทำรายการนี้จะทำให้กระเป๋าเงิน ${walletType === 'cash' ? 'เงินสด' : 'โบนัส'} ของพนักงานติดลบ คุณยืนยันที่จะดำเนินการต่อหรือไม่?`;
-            if(!confirm(confirmMsg)) return;
-        }
-
-        // เซฟลง Database
-        let updateRef = db.ref('drivers_profile/' + currentWalletDriverId);
-        updateRef.update({
-            creditCash: newCash,
-            creditBonus: newBonus,
-            credit: newCash // อัปเดตกลับไปที่ฟิลด์เดิมด้วย เผื่อมีบางโค้ดยังเรียกใช้ credit ตัวเก่า
-        }).then(() => {
-            // 🌟 สร้าง Log ประวัติการทำรายการ (Transaction History) ที่ลบไม่ได้
-            db.ref('wallet_transactions/' + currentWalletDriverId).push({
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                walletType: walletType, // cash, bonus
-                actionType: actionType, // add, deduct
-                amount: amount,
-                note: note,
-                balanceAfter: walletType === 'cash' ? newCash : newBonus,
-                adminName: "แอดมินศูนย์" // อนาคตถ้ามีระบบ Login แอดมินค่อยดึงชื่อมาใส่
-            });
-
-            showCustomAlert('ทำรายการสำเร็จ', `ปรับปรุงยอดเงิน ${walletType === 'cash'?'เงินสด':'โบนัส'} เรียบร้อยแล้ว`, 'success');
-            closeAdjustCreditModal();
-            renderWalletTab(); // รีเฟรชตาราง
+        db.ref('drivers_profile/' + currentWalletDriverId).update({ creditCash: newCash, creditBonus: newBonus, credit: newCash }).then(() => {
+            db.ref('wallet_transactions/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, walletType, actionType, amount, note, balanceAfter: walletType === 'cash' ? newCash : newBonus, adminName: "แอดมินศูนย์" });
+            showCustomAlert('ทำรายการสำเร็จ', `ปรับปรุงยอดเงินเรียบร้อยแล้ว`, 'success'); closeAdjustCreditModal(); renderWalletTab(); 
         });
     }
 
-    // ฟังก์ชันเปล่าๆ เผื่อไว้กดปุ่มที่เราทำหลอกไว้ด้านบน
-    window.openTierAirdropModal = function() {
-        showCustomAlert('เร็วๆ นี้', 'ระบบแจกโบนัสแบบกลุ่ม (Airdrop) กำลังอยู่ระหว่างการพัฒนาในสเต็ปต่อไปครับ!', 'info');
+    // 🌟 ระบบสคริปต์ควบคุมสิทธิ์ความปลอดภัย (ปรับ Tier และ ดาวสูงสุด)
+    window.openAdjustTierRatingModal = function(drvId) {
+        currentWalletDriverId = drvId;
+        let d = allProfiles[drvId]; if(!d) return;
+        document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
+        document.getElementById('trm-drv-id').innerText = drvId;
+        document.getElementById('trm-tier-select').value = d.tier || 'Standard';
+        document.getElementById('trm-note').value = '';
+        
+        let currentRating = d.rating !== undefined ? d.rating : "5.0";
+        if(d.tier === 'owner super legend') currentRating = "100";
+        else if(d.tier === 'F1 Legend') currentRating = "10";
+        document.getElementById('trm-rating-input').value = currentRating;
+
+        openModal('modalAdjustTierRating');
     }
-    window.openCommissionSettings = function() {
-        showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังอยู่ระหว่างการพัฒนาในสเต็ปต่อไปครับ!', 'info');
+    window.closeTierRatingModal = function() { closeModal('modalAdjustTierRating'); currentWalletDriverId = null; }
+    
+    window.autoFillOverrideStars = function() {
+        let tier = document.getElementById('trm-tier-select').value;
+        let ratingInput = document.getElementById('trm-rating-input');
+        if(tier === 'owner super legend') ratingInput.value = "100";
+        else if(tier === 'F1 Legend') ratingInput.value = "10";
+        else ratingInput.value = "5.0";
     }
+
+    window.submitTierRatingAdjustment = function() {
+        if(!currentWalletDriverId) return;
+        let newTier = document.getElementById('trm-tier-select').value;
+        let newRating = parseFloat(document.getElementById('trm-rating-input').value) || 5.0;
+        let note = document.getElementById('trm-note').value.trim();
+
+        if(!note) return showCustomAlert('ระบุหมายเหตุ', 'กรุณากรอกเหตุผลเพื่อบันทึกประวัติการปรับสิทธิ์ความปลอดภัยในระบบ', 'error');
+
+        db.ref('drivers_profile/' + currentWalletDriverId).update({
+            tier: newTier,
+            rating: newRating.toFixed(1)
+        }).then(() => {
+            // บันทึกลงตาราง Log ความปลอดภัย แอดมินตรวจสอบย้อนหลังได้ ไม่มีสิทธิ์รื้อทิ้ง
+            db.ref('security_tier_logs/' + currentWalletDriverId).push({
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                oldTier: allProfiles[currentWalletDriverId].tier || 'Standard',
+                newTier: newTier,
+                assignedRating: newRating.toFixed(1),
+                reason: note,
+                adminName: "ผู้บริหารระบบกลาง"
+            });
+
+            showCustomAlert('อัปเดตสิทธิ์สำเร็จ', 'ระบบปรับเปลี่ยนระดับ Tier และล็อคคะแนนดาวพนักงานเรียบร้อยแล้ว', 'success');
+            closeTierRatingModal();
+            renderWalletTab();
+        });
+    }
+
+    window.openTierAirdropModal = function() { showCustomAlert('เร็วๆ นี้', 'ระบบแจกโบนัสแบบกลุ่ม (Airdrop) กำลังอยู่ระหว่างการพัฒนาครับ!', 'info'); }
+    window.openCommissionSettings = function() { showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังอยู่ระหว่างการพัฒนาครับ!', 'info'); }
   </script>
 
   <!-- 🌟 หน้าต่างแก้ไขโปรไฟล์คนขับ (เปลี่ยนเป็น Modal ธรรมดา) -->
@@ -2714,14 +2772,13 @@
                   </div>                 
                   <div>
                       <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ระดับชั้นของคนขับ (Driver Tier)</label>
-                      <select id="det-tier" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500">
-                          <option value="Standard">🥉 Standard (ระดับทั่วไป)</option>
-                          <option value="Silver">🥈 Silver (ระดับเงิน)</option>
-                          <option value="Gold">🥇 Gold (ระดับทอง)</option>
-                          <option value="Platinum">💎 Platinum (ระดับแพลทินัม)</option>
-                          <option value="F1 Legend">👑 F1 Legend (ระดับตำนาน *10 ดาว)</option>
-                          <option value="owner super legend">🚀 Owner Super Legend (ระดับเจ้าของ *100 ดาว)</option>
-                      </select>
+                      <div>
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">ระดับชั้นของคนขับ (Driver Tier)</label>
+                      <div class="relative">
+                          <input type="text" id="det-tier-display" readonly title="ปรับระดับและคะแนนดาวได้ที่เมนูกระเป๋าเงินเท่านั้น" class="w-full p-2.5 bg-gray-200 dark:bg-slate-800/80 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold cursor-not-allowed pr-8">
+                          <i class="fas fa-lock absolute right-3 top-3.5 text-gray-400 text-xs"></i>
+                      </div>
+                  </div>
                   </div>
               </div>
 
@@ -2867,6 +2924,52 @@
                   <input type="text" id="adj-note" placeholder="เช่น ลูกค้าโอนเงินเข้าบริษัท, หักค่าปรับ..." class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-xs focus:border-emerald-500">
               </div>
               <button onclick="submitCreditAdjustment()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> ยืนยันทำรายการ</button>
+          </div>
+      </div>
+  </div>
+  <div id="modalAdjustTierRating" class="hidden fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+              <h2 class="text-base font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-user-shield mr-1"></i> ปรับระดับพนักงาน & ดาวควบคุม</h2>
+              <button onclick="closeTierRatingModal()" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-slate-700 text-blue-500 flex items-center justify-center text-lg shrink-0"><i class="fas fa-id-card"></i></div>
+                  <div class="min-w-0">
+                      <p id="trm-drv-name" class="font-bold text-sm text-gray-800 dark:text-white truncate">ชื่อคนขับ</p>
+                      <p id="trm-drv-id" class="text-[10px] text-gray-500 dark:text-slate-400">DRV-000000</p>
+                  </div>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ปรับเปลี่ยนระดับชั้น (Driver Tier)</label>
+                  <select id="trm-tier-select" onchange="autoFillOverrideStars()" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold focus:border-blue-500">
+                      <option value="Standard">🥉 Standard (ระดับทั่วไป)</option>
+                      <option value="Silver">🥈 Silver (ระดับเงิน)</option>
+                      <option value="Gold">🥇 Gold (ระดับทอง)</option>
+                      <option value="Platinum">💎 Platinum (ระดับแพลทินัม)</option>
+                      <option value="F1 Legend">👑 F1 Legend (ระดับตำนาน *10 ดาว)</option>
+                      <option value="owner super legend">🚀 Owner Super Legend (ระดับเจ้าของ *100 ดาว)</option>
+                  </select>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">คะแนนดาวประทับตราประจำตำแหน่ง</label>
+                  <div class="relative">
+                      <input type="number" id="trm-rating-input" step="0.1" min="1" max="100" placeholder="5.0" class="w-full p-2.5 bg-white dark:bg-slate-900 text-yellow-600 dark:text-yellow-500 border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-black focus:border-blue-500">
+                      <span class="absolute right-3 top-2.5 text-xs font-bold text-gray-400">★ ดวง</span>
+                  </div>
+                  <p class="text-[9px] text-gray-400 mt-1 leading-normal">*สำหรับระดับทั่วไปจะอิงตามรีวิวจริงจากลูกค้า แต่หากปรับแต่งตรงนี้ระบบจะล็อกค่าดาวคงที่ทันที ลูกค้าหมดสิทธิ์โหวตลดดาว</p>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">หมายเหตุเหตุผลการเลื่อนขั้น/ลดขั้น</label>
+                  <input type="text" id="trm-note" placeholder="เช่น ทำยอดรอบทะลุเป้าประจำเดือน, แต่งตั้งสิทธิ์เจ้าของ..." class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-xs focus:border-blue-500">
+              </div>
+              
+              <button onclick="submitTierRatingAdjustment()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-shield-alt"></i> อนุมัติการปรับเปลี่ยนสิทธิ์</button>
           </div>
       </div>
   </div>
