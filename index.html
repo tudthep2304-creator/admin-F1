@@ -1386,7 +1386,7 @@
         openModal('modalAddDriver');
     }
 
-    // 🌟 บันทึกข้อมูลพนักงานใหม่ (พร้อมระบบตรวจข้อมูลซ้ำ 2 ใน 3)
+    // 🌟 1. ฟังก์ชันบันทึกข้อมูลพนักงานใหม่ (สมบูรณ์แบบ)
     window.saveNewDriver = function() {
         let drvId = document.getElementById('add-drv-id').value;
         let pin = document.getElementById('add-drv-pin').value.trim();
@@ -1398,15 +1398,12 @@
         let vBrand = document.getElementById('add-drv-vbrand').value.trim();
         let vColor = document.getElementById('add-drv-vcolor').value.trim();
         let vPlate = document.getElementById('add-drv-vplate').value.trim();
-        let vProvince = document.getElementById('add-drv-vprovince').value.trim();
+        let vProvince = document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '';
 
         if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'กรุณาตั้งรหัสผ่าน (PIN) 4 หลักสำหรับการเข้าแอปฯ ครั้งแรก', 'error');
         if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานและเบอร์โทรศัพท์ให้ครบถ้วนก่อนครับ', 'error');
 
-        // ==========================================
         // 🔒 ระบบตรวจสอบลงทะเบียนซ้ำ (Duplicate Check)
-        // กฎ: ห้ามเบอร์โทรซ้ำเด็ดขาด หรือ ถ้าชื่อ+นามสกุลเหมือนกันเป๊ะถือว่าซ้ำ (2 ใน 3)
-        // ==========================================
         let isDuplicate = false;
         let dupReason = "";
         
@@ -1417,13 +1414,11 @@
             let existingFname = existingNameParts[0] || '';
             let existingLname = existingNameParts.slice(1).join(' ') || '';
 
-            // 1. เช็คเบอร์โทร (ถ้าเหมือนกัน 100% คือซ้ำทันที)
             if (phone && existingPhone === phone) {
                 isDuplicate = true;
                 dupReason = `เบอร์โทรศัพท์ ${phone} มีอยู่ในระบบแล้ว (รหัส: ${key})`;
                 break;
             }
-            // 2. เช็คชื่อ + นามสกุล (ถ้าเหมือนกันทั้งชื่อและนามสกุล คือซ้ำ)
             if (fname && lname && existingFname === fname && existingLname === lname) {
                 isDuplicate = true;
                 dupReason = `ชื่อ "${fname} ${lname}" มีพนักงานลงทะเบียนอยู่แล้วในระบบ (รหัส: ${key})`;
@@ -1431,9 +1426,7 @@
             }
         }
 
-        if (isDuplicate) {
-            return showCustomAlert('ตรวจพบข้อมูลซ้ำ', dupReason, 'error');
-        }
+        if (isDuplicate) return showCustomAlert('ตรวจพบข้อมูลซ้ำ', dupReason, 'error');
 
         let fullName = fname + (lname ? ' ' + lname : '');
         let vId = 'veh_' + Date.now();
@@ -1444,30 +1437,29 @@
             brand: vBrand, 
             color: vColor, 
             plate: vPlate, 
-            province: vProvince, // 🌟 เพิ่มข้อมูลจังหวัด 
+            province: vProvince,
             isOnline: false 
         };
 
+        // 🌟 ดึงข้อมูลรูปภาพ Base64
         let picUpload = document.getElementById('add-drv-pic-upload');
-        let profilePic = picUpload.getAttribute('data-base64') || null;
+        let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
 
         let driverData = {
             driverId: drvId,  
             pin: pin,         
             name: fullName,
             phone: phone,
-            profilePic: profilePic, // 🌟 เพิ่มบรรทัดนี้
+            profilePic: profilePic, // บันทึกรูปลงฐานข้อมูล
             vehicles: initialVehicles,
             registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
 
-        // เซฟลง Database โดยใช้ Key เป็น "DRV-XXXXXX"
         db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
             showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มพนักงานรหัส ${drvId} เรียบร้อยแล้ว!\n(ให้คนขับใช้ PIN: ${pin} ในการเปิดแอปฯ)`, 'success');
             closeModal('modalAddDriver');
         });
     }
-
     // 🌟 เปิดโปรไฟล์คนขับ (แก้ให้แสดง DRV ID แทน)
     window.currentDriverVehicles = {}; 
 
@@ -1594,10 +1586,10 @@
         window.currentDriverVehicles[vId].plate = document.getElementById('v-plate-' + vId).value.trim();
         window.currentDriverVehicles[vId].province = document.getElementById('v-province-' + vId).value.trim();
     }
-    // 🌟 ฟังก์ชันบันทึกการแก้ไขโปรไฟล์
+    // 🌟 2. ฟังก์ชันอัปเดตข้อมูลพนักงาน (สมบูรณ์แบบ)
     window.saveDriverUpdates = function() {
-        let driverId = window.currentDriverFocus; // โฟกัสเป็น DRV-XXXXXX
-        let newPin = document.getElementById('det-pin-input').value.trim(); // รหัสผ่านใหม่
+        let driverId = window.currentDriverFocus; // DRV-XXXXXX
+        let newPin = document.getElementById('det-pin-input').value.trim(); 
         let phone = document.getElementById('det-phone').value.trim();
         let fname = document.getElementById('det-firstname').value.trim();
         let lname = document.getElementById('det-lastname').value.trim();
@@ -1607,18 +1599,18 @@
 
         for (let vId in window.currentDriverVehicles) { window.updateTempVehicle(vId); }
 
-        db.ref('drivers_profile/' + driverId).update({
-            let picUpload = document.getElementById('edit-drv-pic-upload');
-        let newPic = picUpload.getAttribute('data-base64'); // ดึงรูปใหม่ถ้ามีการอัปโหลด
-        
+        // 🌟 ดึงข้อมูลรูปภาพ Base64 ใหม่ (ถ้าแอดมินอัปโหลด)
+        let picUpload = document.getElementById('edit-drv-pic-upload');
+        let newPic = picUpload ? picUpload.getAttribute('data-base64') : null;
+
         let updateData = {
             pin: newPin,
             name: fullName,
             phone: phone,
             vehicles: window.currentDriverVehicles
         };
-        // ถ้าแอดมินเปลี่ยนรูปใหม่ ให้ยัดใส่ข้อมูลที่จะอัปเดตด้วย
-        if(newPic) updateData.profilePic = newPic;
+        
+        if(newPic) updateData.profilePic = newPic; // อัปเดตรูปถ้ามีการเปลี่ยน
 
         db.ref('drivers_profile/' + driverId).update(updateData).then(() => {
             showCustomAlert('สำเร็จ', 'บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว', 'success');
