@@ -1270,57 +1270,6 @@
     // ==========================================
     // 🌟 ระบบโปรไฟล์คนขับแบบ Popup (แก้ไขข้อมูล & รถ & Logs)
     // ==========================================
-    window.showDriverDetails = function(pin) {
-        let d = allProfiles[pin]; 
-        if(!d) return; 
-        window.currentDriverFocus = pin;
-
-        // แยกชื่อกับนามสกุลออกจากกัน
-        let nameParts = (d.name || '').split(' ');
-        let fname = nameParts[0] || '';
-        let lname = nameParts.slice(1).join(' ') || '';
-
-        document.getElementById('det-pin-input').value = d.pin;
-        document.getElementById('det-firstname').value = fname;
-        document.getElementById('det-lastname').value = lname;
-        document.getElementById('det-phone').value = d.phone || '';
-
-        // ดึงรถ
-        let vehicles = {};
-        if (d.vehicles) {
-            vehicles = JSON.parse(JSON.stringify(d.vehicles)); 
-        } else if (d.plate) {
-            let vId = 'veh_' + Date.now();
-            vehicles[vId] = { id: vId, serviceType: d.serviceType || 'car', brand: d.brand || '', color: d.color || '', plate: d.plate || '', isOnline: false };
-        }
-        window.currentDriverVehicles = vehicles;
-        renderDriverVehicles();
-
-        // คะแนน
-        let rEl = document.getElementById('det-rating'); let cEl = document.getElementById('det-rating-count');
-        if (d.ratings) {
-            let total = 0; let count = 0; Object.values(d.ratings).forEach(r => { total += parseInt(r.score); count++; });
-            let avg = (total / count).toFixed(1); if(rEl) rEl.innerText = avg; if(cEl) cEl.innerText = `(${count})`;
-        } else { if(rEl) rEl.innerText = "5.0"; if(cEl) cEl.innerText = "(0)"; }
-
-        // รายได้
-        let todayEarn = 0, totalEarn = 0;
-        let now = new Date(); let startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-        if(allCompletedJobs) {
-            for(let k in allCompletedJobs) {
-                let j = allCompletedJobs[k];
-                if(j.driverPin === pin && (j.status.includes("ถึงที่หมาย") || j.status.includes("เสร็จสิ้น"))) {
-                    let price = parseInt(j.price) || 0; let time = j.completedAt || j.timestamp || 0;
-                    totalEarn += price; if(time >= startOfDay) todayEarn += price;
-                }
-            }
-        }
-        document.getElementById('det-today-earn').innerText = "฿" + todayEarn.toLocaleString();
-        document.getElementById('det-total-earn').innerText = "฿" + totalEarn.toLocaleString();
-
-        openModal('pageDriverDetails'); // ใช้คำสั่งเปิดหน้าต่างปกติ
-    }
-
     window.closeDriverProfilePage = function() {
         closeModal('pageDriverDetails');
     }
