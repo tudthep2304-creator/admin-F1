@@ -8,6 +8,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+      tailwind.config = {
+        darkMode: 'class', // รองรับการสลับโหมดมืด/สว่าง
+        theme: {
+          extend: {
+            colors: {
+              // เปลี่ยนสีหลักในระบบ (ที่เคยเรียกใช้ blue, indigo, green) ให้เป็นสีธีมของคุณ #1da1f2
+              blue: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
+              indigo: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da', 900: '#0e5078' },
+              green: { 400: '#1da1f2', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
+              
+              // ปรับชุดสีเทา/สเลท ให้ตรงกับโทนพื้นหลัง Dark/Light ที่คุณต้องการ
+              slate: { 
+                300: '#B0B0B0', // สีตัวหนังสือรอง Dark mode
+                400: '#888888', // สีไอคอน/ขอบ Dark mode
+                700: '#333333', // สีขอบกล่อง Dark mode
+                800: '#1E1E1E', // สีกล่อง (Card) Dark mode
+                900: '#121212'  // สีพื้นหลังสุด Dark mode
+              },
+              gray: { 
+                50: '#F5F5F5',  // สีกล่อง (Card) Light mode
+                200: '#CCCCCC', // สีขอบกล่อง Light mode
+                500: '#666666', // สีตัวหนังสือรอง Light mode
+                800: '#121212', // สีตัวหนังสือหลัก Light mode
+                900: '#121212'  // สีพื้นหลัง/ตัวอักษรเข้ม
+              }
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      body { background-color: #E0E0E0; color: #121212; transition: background-color 0.3s ease; }
+      body.dark, html.dark body { background-color: #121212; color: #E0E0E0; }
+      .bg-white { background-color: #F5F5F5; } /* หรี่สีขาวกล่องไม่ให้แสบตา */
+    </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
@@ -37,6 +74,43 @@
     .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+      tailwind.config = {
+        darkMode: 'class', // รองรับการสลับโหมดมืด/สว่าง
+        theme: {
+          extend: {
+            colors: {
+              // เปลี่ยนสีหลักในระบบ (ที่เคยเรียกใช้ blue, indigo, green) ให้เป็นสีธีมของคุณ #1da1f2
+              blue: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
+              indigo: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da', 900: '#0e5078' },
+              green: { 400: '#1da1f2', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
+              
+              // ปรับชุดสีเทา/สเลท ให้ตรงกับโทนพื้นหลัง Dark/Light ที่คุณต้องการ
+              slate: { 
+                300: '#B0B0B0', // สีตัวหนังสือรอง Dark mode
+                400: '#888888', // สีไอคอน/ขอบ Dark mode
+                700: '#333333', // สีขอบกล่อง Dark mode
+                800: '#1E1E1E', // สีกล่อง (Card) Dark mode
+                900: '#121212'  // สีพื้นหลังสุด Dark mode
+              },
+              gray: { 
+                50: '#F5F5F5',  // สีกล่อง (Card) Light mode
+                200: '#CCCCCC', // สีขอบกล่อง Light mode
+                500: '#666666', // สีตัวหนังสือรอง Light mode
+                800: '#121212', // สีตัวหนังสือหลัก Light mode
+                900: '#121212'  // สีพื้นหลัง/ตัวอักษรเข้ม
+              }
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      body { background-color: #E0E0E0; color: #121212; transition: background-color 0.3s ease; }
+      body.dark, html.dark body { background-color: #121212; color: #E0E0E0; }
+      .bg-white { background-color: #F5F5F5; } /* หรี่สีขาวกล่องไม่ให้แสบตา */
+    </style>
   
   <script>
     tailwind.config = { darkMode: 'class' };
@@ -48,93 +122,6 @@
         document.documentElement.classList.add('dark'); // ค่าเริ่มต้นให้เป็นโหมดมืด
     }
   </script>
-  <style>
-      /* =========================================
-         🌟 1. ตั้งค่าสีพื้นหลังและตัวหนังสือหลัก (Base Colors)
-         ========================================= */
-      /* โหมดสว่าง (Light Mode) */
-      body {
-        background-color: #E0E0E0 !important;
-        color: #121212 !important;
-      }
-
-      /* โหมดมืด (Dark Mode) */
-      html.dark body, body.dark, .dark {
-        background-color: #121212 !important;
-        color: #E0E0E0 !important;
-      }
-
-      /* =========================================
-         🌟 2. ปรับสีกล่องเนื้อหา (Cards & Modals) ให้มีมิติ
-         ========================================= */
-      /* กล่องในโหมดสว่าง (สว่างกว่าพื้นหลัง #E0E0E0 นิดนึง) */
-      .bg-white, .bg-gray-50 {
-        background-color: #F5F5F5 !important;
-        border-color: #CCCCCC !important;
-        color: #121212 !important;
-      }
-      
-      /* กล่องในโหมดมืด (สว่างกว่าพื้นหลัง #121212 นิดนึง) */
-      .dark .bg-white, .dark .dark\:bg-slate-900, .dark .dark\:bg-slate-800, .dark .dark\:bg-slate-800\/50 {
-        background-color: #1E1E1E !important; 
-        border-color: #333333 !important;
-        color: #E0E0E0 !important;
-      }
-
-      /* ปรับสีข้อความรอง (Subtext) ให้กลืนกับธีมใหม่ */
-      .text-gray-500, .dark\:text-slate-400, .dark\:text-slate-500 {
-        color: #888888 !important;
-      }
-      h1, h2, h3, h4, p, span, td, th {
-        color: inherit; /* บังคับให้ใช้สีตามที่ตั้งไว้ด้านบน */
-      }
-
-      /* =========================================
-         🌟 3. สีตีมหลัก (Primary Theme: #1da1f2)
-         ========================================= */
-      /* เปลี่ยนปุ่มและไอคอนที่เคยเป็นสีฟ้า/น้ำเงิน/เขียว ให้เป็นสีธีมหลัก */
-      .bg-blue-600, .bg-indigo-600, .bg-green-600 {
-        background-color: #1da1f2 !important;
-        color: #ffffff !important;
-        border: none !important;
-      }
-      /* สีปุ่มตอนเอาเมาส์ชี้ (Hover) ให้เข้มขึ้นนิดนึง */
-      .hover\:bg-blue-700:hover, .hover\:bg-indigo-700:hover, .hover\:bg-green-700:hover {
-        background-color: #1a91da !important;
-      }
-      
-      /* สีตัวอักษรและไอคอนที่เป็นสีเด่น */
-      .text-blue-600, .text-indigo-600, .text-blue-500, .text-indigo-500,
-      .dark\:text-blue-400, .dark\:text-indigo-400, .dark\:text-blue-500 {
-        color: #1da1f2 !important;
-      }
-
-      /* สวิตช์ปุ่มเปิด-ปิด (Toggle) บังคับให้เป็นสีธีมหลักตอนกดเปิด */
-      .peer:checked ~ div {
-        background-color: #1da1f2 !important;
-        border-color: #1da1f2 !important;
-      }
-
-      /* =========================================
-         🌟 4. ปรับช่องกรอกข้อมูล (Inputs & Selects)
-         ========================================= */
-      input, select {
-        background-color: #FFFFFF !important;
-        color: #121212 !important;
-        border-color: #CCCCCC !important;
-      }
-      .dark input, .dark select {
-        background-color: #2A2A2A !important;
-        color: #E0E0E0 !important;
-        border-color: #444444 !important;
-      }
-      /* ขอบเปลี่ยนเป็นสีธีมหลักตอนกดพิมพ์ */
-      input:focus, select:focus {
-        border-color: #1da1f2 !important;
-        box-shadow: 0 0 0 1px #1da1f2 !important;
-        outline: none !important;
-      }
-    </style>
 </head>
 <body class="bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 h-[100dvh] w-full m-0 flex flex-col overflow-hidden transition-colors duration-300">
 
