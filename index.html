@@ -277,8 +277,8 @@
                   </div>
               </div>
 
-              <div class="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
-                  <table class="w-full text-left border-collapse">
+              <div class="w-full overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
+                  <table class="w-full text-left border-collapse min-w-[600px] sm:min-w-full">
                       <thead>
                           <tr class="bg-gray-100 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold border-b border-gray-200 dark:border-slate-700">
                               <th class="py-3 px-3 w-28">ไอดีคนขับ</th>
@@ -1414,14 +1414,19 @@
                 else tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200">Standard</span>`;
                 
                 // 🌟 ไอคอนเพศ และ แสดงกระเป๋า 2 ใบ (Cash & Bonus)
+                // 🌟 ไอคอนเพศ และ แสดงกระเป๋า 2 ใบ (Cash & Bonus)
                 let genderIcon = d.gender === 'female' ? `<i class="fas fa-venus text-pink-500 mx-1" title="หญิง"></i>` : `<i class="fas fa-mars text-blue-500 mx-1" title="ชาย"></i>`;
-                let cashVal = parseFloat(d.creditCash || d.credit || 0).toFixed(0); // เผื่อข้อมูลเก่าที่เคยเป็นช่อง credit เฉยๆ
+                let cashVal = parseFloat(d.creditCash || d.credit || 0).toFixed(0); 
                 let bonusVal = parseFloat(d.creditBonus || 0).toFixed(0);
                 
+                // เพิ่ม whitespace-nowrap ห้ามข้อความในป้ายโดนบีบตกบรรทัด
                 let creditDisplay = `
-                    <span class="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50 px-1 py-[1px] rounded text-[9px] font-bold ml-1 flex items-center gap-1" title="เงินสด (ถอนได้)"><i class="fas fa-money-bill-wave"></i> ${cashVal}</span>
-                    <span class="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800/50 px-1 py-[1px] rounded text-[9px] font-bold ml-1 flex items-center gap-1" title="โบนัส (ถอนไม่ได้)"><i class="fas fa-star"></i> ${bonusVal}</span>
+                    <span class="whitespace-nowrap bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1" title="เงินสด (ถอนได้)"><i class="fas fa-money-bill-wave"></i> ${cashVal}</span>
+                    <span class="whitespace-nowrap bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1" title="โบนัส (ถอนไม่ได้)"><i class="fas fa-star"></i> ${bonusVal}</span>
                 `;
+
+                // จัดการป้าย Tier ไม่ให้โดนบีบ (เพิ่ม whitespace-nowrap)
+                let finalTierBadge = tierBadgeHtml.replace('class="', 'class="whitespace-nowrap ');
 
                 let profilePicHtml = d.profilePic 
                     ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-slate-600 shrink-0 shadow-sm">` 
@@ -1430,18 +1435,19 @@
                 html += `
                 <tr class="driver-row-item cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors" onclick="showDriverDetails('${displayId}')">
                     <td class="py-3 px-3 font-black text-[#1da1f2] w-28 align-middle">
-                        <span class="bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 px-2 py-1 rounded-lg text-xs tracking-wider">${displayId}</span>
+                        <span class="bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 px-2 py-1 rounded-lg text-xs tracking-wider whitespace-nowrap">${displayId}</span>
                     </td>
                     <td class="py-3 px-3 align-middle">
                         <div class="flex items-center gap-3">
                             ${profilePicHtml}
                             <div class="flex flex-col min-w-0">
                                 <span class="font-bold text-gray-800 dark:text-white text-sm truncate max-w-[150px] sm:max-w-[250px]">${d.name} ${genderIcon}</span>
-                                <div class="mt-1 flex items-center gap-0">${tierBadgeHtml} ${creditDisplay}</div>
+                                <!-- เปลี่ยนเป็น flex-wrap ให้ป้ายตกบรรทัดได้ถ้าที่แคบ -->
+                                <div class="mt-1 flex flex-wrap items-center gap-1.5">${finalTierBadge} ${creditDisplay}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="py-3 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono align-middle">
+                    <td class="py-3 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono align-middle whitespace-nowrap">
                         ${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-gray-400 ml-1"></i>
                     </td>
                 </tr>`;
