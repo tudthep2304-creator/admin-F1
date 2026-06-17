@@ -8,43 +8,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-      tailwind.config = {
-        darkMode: 'class', // รองรับการสลับโหมดมืด/สว่าง
-        theme: {
-          extend: {
-            colors: {
-              // เปลี่ยนสีหลักในระบบ (ที่เคยเรียกใช้ blue, indigo, green) ให้เป็นสีธีมของคุณ #1da1f2
-              blue: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
-              indigo: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da', 900: '#0e5078' },
-              green: { 400: '#1da1f2', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
-              
-              // ปรับชุดสีเทา/สเลท ให้ตรงกับโทนพื้นหลัง Dark/Light ที่คุณต้องการ
-              slate: { 
-                300: '#B0B0B0', // สีตัวหนังสือรอง Dark mode
-                400: '#888888', // สีไอคอน/ขอบ Dark mode
-                700: '#333333', // สีขอบกล่อง Dark mode
-                800: '#1E1E1E', // สีกล่อง (Card) Dark mode
-                900: '#121212'  // สีพื้นหลังสุด Dark mode
-              },
-              gray: { 
-                50: '#F5F5F5',  // สีกล่อง (Card) Light mode
-                200: '#CCCCCC', // สีขอบกล่อง Light mode
-                500: '#666666', // สีตัวหนังสือรอง Light mode
-                800: '#121212', // สีตัวหนังสือหลัก Light mode
-                900: '#121212'  // สีพื้นหลัง/ตัวอักษรเข้ม
-              }
-            }
-          }
-        }
-      }
-    </script>
-
-    <style>
-      body { background-color: #E0E0E0; color: #121212; transition: background-color 0.3s ease; }
-      body.dark, html.dark body { background-color: #121212; color: #E0E0E0; }
-      .bg-white { background-color: #F5F5F5; } /* หรี่สีขาวกล่องไม่ให้แสบตา */
-    </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
@@ -74,43 +37,6 @@
     .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-      tailwind.config = {
-        darkMode: 'class', // รองรับการสลับโหมดมืด/สว่าง
-        theme: {
-          extend: {
-            colors: {
-              // เปลี่ยนสีหลักในระบบ (ที่เคยเรียกใช้ blue, indigo, green) ให้เป็นสีธีมของคุณ #1da1f2
-              blue: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
-              indigo: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da', 900: '#0e5078' },
-              green: { 400: '#1da1f2', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
-              
-              // ปรับชุดสีเทา/สเลท ให้ตรงกับโทนพื้นหลัง Dark/Light ที่คุณต้องการ
-              slate: { 
-                300: '#B0B0B0', // สีตัวหนังสือรอง Dark mode
-                400: '#888888', // สีไอคอน/ขอบ Dark mode
-                700: '#333333', // สีขอบกล่อง Dark mode
-                800: '#1E1E1E', // สีกล่อง (Card) Dark mode
-                900: '#121212'  // สีพื้นหลังสุด Dark mode
-              },
-              gray: { 
-                50: '#F5F5F5',  // สีกล่อง (Card) Light mode
-                200: '#CCCCCC', // สีขอบกล่อง Light mode
-                500: '#666666', // สีตัวหนังสือรอง Light mode
-                800: '#121212', // สีตัวหนังสือหลัก Light mode
-                900: '#121212'  // สีพื้นหลัง/ตัวอักษรเข้ม
-              }
-            }
-          }
-        }
-      }
-    </script>
-
-    <style>
-      body { background-color: #E0E0E0; color: #121212; transition: background-color 0.3s ease; }
-      body.dark, html.dark body { background-color: #121212; color: #E0E0E0; }
-      .bg-white { background-color: #F5F5F5; } /* หรี่สีขาวกล่องไม่ให้แสบตา */
-    </style>
   
   <script>
     tailwind.config = { darkMode: 'class' };
