@@ -76,37 +76,6 @@
     .peer:checked ~ div {
         background-color: #1da1f2 !important;
     }
-    /* =========================================
-         🌟 บังคับฟอนต์ 11px และตัวบาง (Weight 300) ทั้งหน้า 
-         ========================================= */
-      body * {
-        font-size: 11px !important;
-        font-weight: 300 !important;
-      }
-      
-      /* คืนค่าขนาดและความหนาให้ไอคอน FontAwesome ไม่งั้นจะเล็กจนกด/มองลำบากครับ */
-      i.fas, i.far, i.fab {
-        font-size: 16px !important;
-        font-weight: 900 !important; 
-      }
-
-      /* =========================================
-         🌟 บังคับสีตัวอักษร 
-         โหมดสว่าง: #111111 (สีดำเข้ม)
-         โหมดมืด: #E0E0E0 (สีเทาสว่าง)
-         ========================================= */
-      body, body *:not(i) {
-        color: #111111 !important; 
-      }
-      
-      html.dark body, html.dark body *:not(i) {
-        color: #E0E0E0 !important;
-      }
-
-      /* 🌟 ข้อยกเว้นฉุกเฉิน: ป้องกันตัวหนังสือสีดำไปกลืนกับปุ่มสีทึบจนอ่านไม่ออก 🌟 */
-      button, button *, .text-white, .bg-blue-600 *, .bg-red-600 *, .bg-green-600 * {
-        color: #ffffff !important;
-      }
   </style>
   
   <script>
@@ -307,9 +276,9 @@
                   <table class="w-full text-left border-collapse">
                       <thead>
                           <tr class="bg-gray-100 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold border-b border-gray-200 dark:border-slate-700">
-                              <th class="py-3 px-3">PIN</th>
-                              <th class="py-3 px-3">ชื่อพนักงาน</th>
-                              <th class="py-3 px-3 text-right">เบอร์โทร</th>
+                              <th class="py-3 px-3 w-28">ไอดีคนขับ</th>
+                              <th class="py-3 px-3">ข้อมูลพนักงาน</th>
+                              <th class="py-3 px-3 text-right">เบอร์ติดต่อ</th>
                           </tr>
                       </thead>
                       <tbody id="all-drivers-table" class="text-sm divide-y divide-gray-200 dark:divide-slate-800 bg-white dark:bg-slate-900 transition-colors">
@@ -1356,7 +1325,7 @@
         });
     };
 
-    // 🌟 ดึงข้อมูลและวาดตาราง (ใช้ Key เป็น DRV-XXXXXX แทน PIN)
+    // 🌟 ดึงข้อมูลและวาดตาราง (เพิ่มการแสดงผลรูปภาพโปรไฟล์ และ ชื่อ-นามสกุล)
     db.ref('drivers_profile').on('value', snap => {
         let table = document.getElementById('all-drivers-table'); 
         let html = ''; 
@@ -1369,11 +1338,25 @@
                 let d = child.val();
                 let displayId = child.key; // นี่คือ DRV-123456
                 
+                // 🌟 เช็คว่ามีรูปโปรไฟล์ไหม ถ้ามีให้แสดงรูป ถ้าไม่มีให้แสดงไอคอนรูปคนสีเทา
+                let profilePicHtml = d.profilePic 
+                    ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-slate-600 shrink-0 shadow-sm">` 
+                    : `<div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-slate-500 shrink-0 shadow-sm"><i class="fas fa-user text-xs"></i></div>`;
+                
                 html += `
-                <tr class="driver-row-item cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800/60 transition-colors" onclick="showDriverDetails('${displayId}')">
-                    <td class="py-3.5 px-3 font-black text-[#1da1f2] w-28"><span class="bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 px-2 py-1 rounded-lg text-xs tracking-wider">${displayId}</span></td>
-                    <td class="py-3.5 px-3 font-bold text-gray-800 dark:text-white">${d.name}</td>
-                    <td class="py-3.5 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono">${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-gray-400 ml-1"></i></td>
+                <tr class="driver-row-item cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors" onclick="showDriverDetails('${displayId}')">
+                    <td class="py-3 px-3 font-black text-[#1da1f2] w-28 align-middle">
+                        <span class="bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 px-2 py-1 rounded-lg text-xs tracking-wider">${displayId}</span>
+                    </td>
+                    <td class="py-3 px-3 align-middle">
+                        <div class="flex items-center gap-3">
+                            ${profilePicHtml}
+                            <span class="font-bold text-gray-800 dark:text-white text-sm truncate max-w-[150px] sm:max-w-[250px]">${d.name}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono align-middle">
+                        ${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-gray-400 ml-1"></i>
+                    </td>
                 </tr>`;
             });
             table.innerHTML = html;
