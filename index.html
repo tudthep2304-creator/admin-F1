@@ -544,6 +544,19 @@
               <button onclick="closeModal('modalAddDriver')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5 space-y-4 overflow-y-auto slim-scroll">
+            
+            <div class="flex flex-col items-center justify-center mb-2">
+                  <div class="relative w-24 h-24 rounded-full bg-gray-100 dark:bg-slate-800 border-2 border-dashed border-gray-300 dark:border-slate-600 flex items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-700 transition overflow-hidden group shadow-sm" onclick="document.getElementById('add-drv-pic-upload').click()">
+                      <img id="add-drv-pic-preview" class="w-full h-full object-cover hidden">
+                      <div id="add-drv-pic-placeholder" class="text-gray-400 text-center flex flex-col items-center">
+                          <i class="fas fa-camera text-xl mb-1 text-blue-500"></i>
+                          <span class="text-[9px] font-bold">อัปโหลดรูป</span>
+                      </div>
+                      <div class="absolute inset-0 bg-black/60 hidden group-hover:flex items-center justify-center text-white text-[10px] font-bold transition-all">เปลี่ยนรูป</div>
+                  </div>
+                  <input type="file" id="add-drv-pic-upload" accept="image/*" class="hidden" onchange="window.processDriverImage(this, 'add-drv-pic-preview', 'add-drv-pic-placeholder')">
+                  <p class="text-[9px] text-gray-400 mt-2">รูปถ่ายหน้าตรง (ระบบจะครอปสี่เหลี่ยมอัตโนมัติ)</p>
+              </div>
               
               <div class="grid grid-cols-2 gap-3 bg-blue-50 dark:bg-slate-800/50 p-3 rounded-xl border border-blue-100 dark:border-slate-700">
                   <div>
@@ -1364,6 +1377,11 @@
         let vHtml = '';
         (window.systemVehicleTypes || []).forEach(vt => { vHtml += `<option value="${vt.id}">${vt.name}</option>`; });
         if(vSelect) vSelect.innerHTML = vHtml || '<option value="car">รถยนต์</option>';
+      let addPreview = document.getElementById('add-drv-pic-preview');
+        if(addPreview) { addPreview.src = ''; addPreview.classList.add('hidden'); }
+        let addPlaceholder = document.getElementById('add-drv-pic-placeholder');
+        if(addPlaceholder) addPlaceholder.classList.remove('hidden');
+        document.getElementById('add-drv-pic-upload').removeAttribute('data-base64');
 
         openModal('modalAddDriver');
     }
@@ -1430,11 +1448,15 @@
             isOnline: false 
         };
 
+        let picUpload = document.getElementById('add-drv-pic-upload');
+        let profilePic = picUpload.getAttribute('data-base64') || null;
+
         let driverData = {
             driverId: drvId,  
             pin: pin,         
             name: fullName,
             phone: phone,
+            profilePic: profilePic, // 🌟 เพิ่มบรรทัดนี้
             vehicles: initialVehicles,
             registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
@@ -1461,6 +1483,21 @@
         // กรอกข้อมูลลงฟอร์ม
         document.getElementById('det-sys-id').value = driverId;
         document.getElementById('det-pin-input').value = d.pin || '';
+      // 🌟 จัดการแสดงรูปโปรไฟล์
+        let editPreview = document.getElementById('edit-drv-pic-preview');
+        let editPlaceholder = document.getElementById('edit-drv-pic-placeholder');
+        let editUpload = document.getElementById('edit-drv-pic-upload');
+        editUpload.removeAttribute('data-base64'); // เคลียร์ค่าที่แก้ค้างไว้
+
+        if(d.profilePic) {
+            editPreview.src = d.profilePic;
+            editPreview.classList.remove('hidden');
+            if(editPlaceholder) editPlaceholder.classList.add('hidden');
+        } else {
+            editPreview.src = '';
+            editPreview.classList.add('hidden');
+            if(editPlaceholder) editPlaceholder.classList.remove('hidden');
+        }
         document.getElementById('det-firstname').value = fname;
         document.getElementById('det-lastname').value = lname;
         document.getElementById('det-phone').value = d.phone || '';
@@ -1571,11 +1608,19 @@
         for (let vId in window.currentDriverVehicles) { window.updateTempVehicle(vId); }
 
         db.ref('drivers_profile/' + driverId).update({
+            let picUpload = document.getElementById('edit-drv-pic-upload');
+        let newPic = picUpload.getAttribute('data-base64'); // ดึงรูปใหม่ถ้ามีการอัปโหลด
+        
+        let updateData = {
             pin: newPin,
             name: fullName,
             phone: phone,
             vehicles: window.currentDriverVehicles
-        }).then(() => {
+        };
+        // ถ้าแอดมินเปลี่ยนรูปใหม่ ให้ยัดใส่ข้อมูลที่จะอัปเดตด้วย
+        if(newPic) updateData.profilePic = newPic;
+
+        db.ref('drivers_profile/' + driverId).update(updateData).then(() => {
             showCustomAlert('สำเร็จ', 'บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว', 'success');
             db.ref('driver_logs/' + driverId).push({
                 action: 'admin_updated',
@@ -2254,6 +2299,36 @@
         });
         container.innerHTML = html; openModal('modalViewChatLog'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
     }
+    // 🌟 ฟังก์ชันบีบอัดและครอปรูปให้เป็นสี่เหลี่ยมจัตุรัสแบบอัตโนมัติ (ช่วยลดขนาดไฟล์ Database)
+    window.processDriverImage = function(input, previewId, placeholderId) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let img = new Image();
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
+                    canvas.width = 256; canvas.height = 256; // ล็อกขนาดไว้ที่ 256x256px
+                    
+                    // คำนวณเพื่อครอปตรงกลางภาพให้เป็นจัตุรัส
+                    let size = Math.min(img.width, img.height);
+                    let x = (img.width - size) / 2;
+                    let y = (img.height - size) / 2;
+                    ctx.drawImage(img, x, y, size, size, 0, 0, 256, 256);
+                    
+                    let base64 = canvas.toDataURL('image/jpeg', 0.8); // บีบอัด 80%
+                    document.getElementById(previewId).src = base64;
+                    document.getElementById(previewId).classList.remove('hidden');
+                    if(document.getElementById(placeholderId)) document.getElementById(placeholderId).classList.add('hidden');
+                    
+                    // เก็บข้อมูล Base64 ไว้ในตัว input เพื่อรอเซฟ
+                    input.setAttribute('data-base64', base64);
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
   </script>
 
   <!-- 🌟 หน้าต่างแก้ไขโปรไฟล์คนขับ (เปลี่ยนเป็น Modal ธรรมดา) -->
@@ -2269,7 +2344,17 @@
           </div>
           
           <div class="flex-1 overflow-y-auto p-4 sm:p-5 slim-scroll space-y-5">
-              <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+            <div class="flex flex-col items-center justify-center mb-2">
+                  <div class="relative w-24 h-24 rounded-full bg-gray-100 dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 flex items-center justify-center cursor-pointer hover:opacity-80 transition overflow-hidden group shadow-md" onclick="document.getElementById('edit-drv-pic-upload').click()">
+                      <img id="edit-drv-pic-preview" class="w-full h-full object-cover hidden">
+                      <div id="edit-drv-pic-placeholder" class="text-gray-400 text-center flex flex-col items-center">
+                          <i class="fas fa-user-circle text-3xl mb-1 text-gray-400"></i>
+                      </div>
+                      <div class="absolute inset-0 bg-black/60 hidden group-hover:flex flex-col items-center justify-center text-white text-[10px] font-bold transition-all"><i class="fas fa-camera mb-1"></i>เปลี่ยนรูป</div>
+                  </div>
+                  <input type="file" id="edit-drv-pic-upload" accept="image/*" class="hidden" onchange="window.processDriverImage(this, 'edit-drv-pic-preview', 'edit-drv-pic-placeholder')">
+              </div>  
+            <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
                   <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase mb-3"><i class="fas fa-id-card text-blue-500"></i> บัญชี และ การเข้าสู่ระบบ</h3>
                   <div class="grid grid-cols-2 gap-3 mb-3">
                       <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">รหัสอ้างอิงระบบ (ID)</label><input type="text" id="det-sys-id" readonly class="w-full p-2.5 bg-gray-100 dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-xl outline-none text-sm font-bold tracking-widest text-center cursor-not-allowed"></div>
