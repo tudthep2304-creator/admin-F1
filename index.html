@@ -1319,7 +1319,7 @@
         });
     };
 
-    // ================= ระบบจัดการคนขับโฉมใหม่ (DRV-ID) =================
+    // ================= ระบบจัดการคนขับโฉมใหม่ (DRV-ID + รูป + Tier) =================
     window.filterDrivers = function() {
         let keyword = document.getElementById('search-driver-input').value.toLowerCase();
         let rows = document.querySelectorAll('.driver-row-item');
@@ -1329,8 +1329,6 @@
         });
     };
 
-    // 🌟 ดึงข้อมูลและวาดตาราง (เพิ่มการแสดงผลรูปภาพโปรไฟล์ และ ชื่อ-นามสกุล)
-    // 🌟 ดึงข้อมูลและวาดตารางคนขับ (พร้อมระบบแสดงป้ายระดับ Tier ทั้ง 5 ระดับ)
     db.ref('drivers_profile').on('value', snap => {
         let table = document.getElementById('all-drivers-table'); 
         let html = ''; 
@@ -1341,10 +1339,9 @@
             snap.forEach(child => { 
                 count++;
                 let d = child.val();
-                let displayId = child.key; // DRV-XXXXXX
-                let currentTier = d.tier || 'Standard'; // ค่าเริ่มต้นถ้าไม่มีให้เป็น Standard
+                let displayId = child.key; 
+                let currentTier = d.tier || 'Standard'; 
 
-                // 🎨 ออกแบบป้ายสัญลักษณ์ระดับพนักงานแต่ละขั้น
                 let tierBadgeHtml = '';
                 if(currentTier === 'Silver') {
                     tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40">Silver</span>`;
@@ -1353,7 +1350,6 @@
                 } else if(currentTier === 'Platinum') {
                     tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-[#1da1f2] border border-blue-200">Platinum</span>`;
                 } else if(currentTier === 'F1 Legend') {
-                    // ระดับตำนานเป็นป้ายไล่เฉดสีรุ้ง/ทองพรีเมียม ขยับกระพริบได้เพื่อความเด่นขั้นสุด
                     tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-purple-500 to-indigo-500 text-white border border-purple-400 animate-pulse shadow-sm"><i class="fas fa-crown text-[8px] mr-0.5"></i>LEGEND</span>`;
                 } else {
                     tierBadgeHtml = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200">Standard</span>`;
@@ -1390,24 +1386,14 @@
         let statTotal = document.getElementById('stat-total-drivers');
         if(statTotal) statTotal.innerText = count;
     });
-            table.innerHTML = html;
-        } else if(table) {
-            table.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-gray-400">ยังไม่มีการเพิ่มรายชื่อคนขับ</td></tr>';
-        }
-        
-        let statTotal = document.getElementById('stat-total-drivers');
-        if(statTotal) statTotal.innerText = count;
-    });
 
-    // 🌟 ฟังก์ชันสุ่มรหัสคนขับ 6 หลักไม่ซ้ำ (DRV-XXXXXX)
     window.generateDriverId = function() {
         let rnd = Math.floor(100000 + Math.random() * 900000); 
         let newId = 'DRV-' + rnd;
-        if(allProfiles[newId]) return window.generateDriverId(); // ถ้าสุ่มชนของเดิม ให้หมุนใหม่
+        if(allProfiles[newId]) return window.generateDriverId(); 
         return newId;
     }
 
-    // 🌟 เปิดหน้าต่างเพิ่มคนขับ (เตรียมข้อมูล)
     window.openAddDriverModal = function() {
         document.getElementById('add-drv-id').value = window.generateDriverId();
         document.getElementById('add-drv-pin').value = '';
@@ -1417,21 +1403,23 @@
         document.getElementById('add-drv-vbrand').value = '';
         document.getElementById('add-drv-vcolor').value = '';
         document.getElementById('add-drv-vplate').value = '';
+        if(document.getElementById('add-drv-vprovince')) document.getElementById('add-drv-vprovince').value = '';
         
+        let addPreview = document.getElementById('add-drv-pic-preview');
+        if(addPreview) { addPreview.src = ''; addPreview.classList.add('hidden'); }
+        let addPlaceholder = document.getElementById('add-drv-pic-placeholder');
+        if(addPlaceholder) addPlaceholder.classList.remove('hidden');
+        let picUpload = document.getElementById('add-drv-pic-upload');
+        if(picUpload) { picUpload.removeAttribute('data-base64'); picUpload.value = ''; }
+
         let vSelect = document.getElementById('add-drv-vtype');
         let vHtml = '';
         (window.systemVehicleTypes || []).forEach(vt => { vHtml += `<option value="${vt.id}">${vt.name}</option>`; });
         if(vSelect) vSelect.innerHTML = vHtml || '<option value="car">รถยนต์</option>';
-      let addPreview = document.getElementById('add-drv-pic-preview');
-        if(addPreview) { addPreview.src = ''; addPreview.classList.add('hidden'); }
-        let addPlaceholder = document.getElementById('add-drv-pic-placeholder');
-        if(addPlaceholder) addPlaceholder.classList.remove('hidden');
-        document.getElementById('add-drv-pic-upload').removeAttribute('data-base64');
 
         openModal('modalAddDriver');
     }
 
-    // 🌟 บันทึกข้อมูลพนักงานใหม่ (ให้สิทธิ์เริ่มต้นเป็นระดับ Standard)
     window.saveNewDriver = function() {
         let drvId = document.getElementById('add-drv-id').value;
         let pin = document.getElementById('add-drv-pin').value.trim();
@@ -1448,7 +1436,9 @@
         if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'กรุณาตั้งรหัสผ่าน (PIN) 4 หลักสำหรับการเข้าแอปฯ ครั้งแรก', 'error');
         if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานและเบอร์โทรศัพท์ให้ครบถ้วนก่อนครับ', 'error');
 
-        let isDuplicate = false; let dupReason = "";
+        let isDuplicate = false;
+        let dupReason = "";
+        
         for (let key in allProfiles) {
             let existingUser = allProfiles[key];
             let existingPhone = existingUser.phone || '';
@@ -1456,15 +1446,32 @@
             let existingFname = existingNameParts[0] || '';
             let existingLname = existingNameParts.slice(1).join(' ') || '';
 
-            if (phone && existingPhone === phone) { isDuplicate = true; dupReason = `เบอร์โทรศัพท์ ${phone} มีอยู่ในระบบแล้ว (รหัส: ${key})`; break; }
-            if (fname && lname && existingFname === fname && existingLname === lname) { isDuplicate = true; dupReason = `ชื่อ "${fname} ${lname}" มีพนักงานลงทะเบียนอยู่แล้วในระบบ (รหัส: ${key})`; break; }
+            if (phone && existingPhone === phone) {
+                isDuplicate = true;
+                dupReason = `เบอร์โทรศัพท์ ${phone} มีอยู่ในระบบแล้ว (รหัส: ${key})`;
+                break;
+            }
+            if (fname && lname && existingFname === fname && existingLname === lname) {
+                isDuplicate = true;
+                dupReason = `ชื่อ "${fname} ${lname}" มีพนักงานลงทะเบียนอยู่แล้วในระบบ (รหัส: ${key})`;
+                break;
+            }
         }
+
         if (isDuplicate) return showCustomAlert('ตรวจพบข้อมูลซ้ำ', dupReason, 'error');
 
         let fullName = fname + (lname ? ' ' + lname : '');
         let vId = 'veh_' + Date.now();
         let initialVehicles = {};
-        initialVehicles[vId] = { id: vId, serviceType: vType, brand: vBrand, color: vColor, plate: vPlate, province: vProvince, isOnline: false };
+        initialVehicles[vId] = { 
+            id: vId, 
+            serviceType: vType, 
+            brand: vBrand, 
+            color: vColor, 
+            plate: vPlate, 
+            province: vProvince,
+            isOnline: false 
+        };
 
         let picUpload = document.getElementById('add-drv-pic-upload');
         let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
@@ -1474,8 +1481,8 @@
             pin: pin,         
             name: fullName,
             phone: phone,
-            tier: "Standard", // 🌟 พนักงานใหม่ทุกคนจะเริ่มต้นที่ระดับ Standard เสมอ
-            profilePic: profilePic, 
+            tier: "Standard",
+            profilePic: profilePic,
             vehicles: initialVehicles,
             registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
@@ -1485,10 +1492,9 @@
             closeModal('modalAddDriver');
         });
     }
-    // 🌟 เปิดโปรไฟล์คนขับ (แก้ให้แสดง DRV ID แทน)
+
     window.currentDriverVehicles = {}; 
 
-    // 🌟 ดึงข้อมูลโปรไฟล์คนขับขึ้นมาโชว์ในช่องแก้ไข (ดึงค่า Tier มาปักลงฟอร์ม)
     window.showDriverDetails = function(driverId) {
         let d = allProfiles[driverId]; 
         if(!d) return; 
@@ -1503,14 +1509,12 @@
         document.getElementById('det-firstname').value = fname;
         document.getElementById('det-lastname').value = lname;
         document.getElementById('det-phone').value = d.phone || '';
-        
-        // 🌟 ดึงค่าระดับพนักงานจากฐานข้อมูลมาแสดงใน Dropdown (ถ้าไม่มีให้เลือก Standard อัตโนมัติ)
-        document.getElementById('det-tier').value = d.tier || 'Standard';
+        if(document.getElementById('det-tier')) document.getElementById('det-tier').value = d.tier || 'Standard';
 
         let editPreview = document.getElementById('edit-drv-pic-preview');
         let editPlaceholder = document.getElementById('edit-drv-pic-placeholder');
         let editUpload = document.getElementById('edit-drv-pic-upload');
-        if(editUpload) editUpload.removeAttribute('data-base64'); 
+        if(editUpload) { editUpload.removeAttribute('data-base64'); editUpload.value = ''; }
 
         if(d.profilePic) {
             if(editPreview) { editPreview.src = d.profilePic; editPreview.classList.remove('hidden'); }
@@ -1521,8 +1525,9 @@
         }
 
         let vehicles = {};
-        if (d.vehicles) { vehicles = JSON.parse(JSON.stringify(d.vehicles)); } 
-        else if (d.plate) {
+        if (d.vehicles) {
+            vehicles = JSON.parse(JSON.stringify(d.vehicles)); 
+        } else if (d.plate) {
             let vId = 'veh_' + Date.now();
             vehicles[vId] = { id: vId, serviceType: d.serviceType || 'car', brand: d.brand || '', color: d.color || '', plate: d.plate || '', province: '', isOnline: false };
         }
@@ -1537,10 +1542,9 @@
 
         openModal('pageDriverDetails');
     }
-    
+
     window.closeDriverProfilePage = function() { closeModal('pageDriverDetails'); }
 
-    // 🌟 จัดการวาดกล่องยานพาหนะตอนแก้ไข (เพิ่มช่องจังหวัด)
     window.renderDriverVehicles = function() {
         let container = document.getElementById('driver-vehicles-container');
         let html = '';
@@ -1591,7 +1595,6 @@
         container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">ยังไม่มีรถที่ลงทะเบียน กดปุ่ม + ด้านบนเพื่อเพิ่มรถครับ</p>';
     }
 
-    // 🌟 ระบบเพิ่ม/ลบ/อัปเดตรถยนต์ (พร้อมรองรับ Field จังหวัด)
     window.addDriverVehicle = function() {
         let vId = 'veh_' + Date.now();
         window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', province: '', isOnline: false };
@@ -1609,16 +1612,18 @@
         window.currentDriverVehicles[vId].brand = document.getElementById('v-brand-' + vId).value.trim();
         window.currentDriverVehicles[vId].color = document.getElementById('v-color-' + vId).value.trim();
         window.currentDriverVehicles[vId].plate = document.getElementById('v-plate-' + vId).value.trim();
-        window.currentDriverVehicles[vId].province = document.getElementById('v-province-' + vId).value.trim();
+        let pEl = document.getElementById('v-province-' + vId);
+        window.currentDriverVehicles[vId].province = pEl ? pEl.value.trim() : '';
     }
-    // 🌟 บันทึกข้อมูลแก้ไขพนักงาน (อัปเดตค่าระดับพนักงาน Tier)
+
     window.saveDriverUpdates = function() {
         let driverId = window.currentDriverFocus; 
         let newPin = document.getElementById('det-pin-input').value.trim(); 
         let phone = document.getElementById('det-phone').value.trim();
         let fname = document.getElementById('det-firstname').value.trim();
         let lname = document.getElementById('det-lastname').value.trim();
-        let tier = document.getElementById('det-tier').value; // 🌟 เก็บค่าระดับคนขับที่แอดมินเลือก
+        let tierEl = document.getElementById('det-tier');
+        let tier = tierEl ? tierEl.value : 'Standard';
         let fullName = fname + (lname ? ' ' + lname : '');
         
         if (!newPin || newPin.length !== 4) return showCustomAlert('ข้อผิดพลาด', 'รหัสผ่าน (PIN) ต้องเป็นตัวเลข 4 หลักเท่านั้น', 'error');
@@ -1632,7 +1637,7 @@
             pin: newPin,
             name: fullName,
             phone: phone,
-            tier: tier, // บันทึกระดับลงฐานข้อมูลหลักของระบบ
+            tier: tier, 
             vehicles: window.currentDriverVehicles
         };
         
@@ -1643,12 +1648,12 @@
             db.ref('driver_logs/' + driverId).push({
                 action: 'admin_updated',
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
-                note: "แอดมินแก้ไขโปรไฟล์และปรับเปลี่ยนระดับคนขับ"
+                note: "แอดมินแก้ไขโปรไฟล์และเปลี่ยนรหัสผ่าน"
             });
             closeDriverProfilePage();
         });
     }
-    
+
     window.deleteDriverFromModal = function() {
         let driverId = window.currentDriverFocus;
         showCustomConfirm('ถอดพนักงาน?', `ต้องการลบประวัติคนขับรหัส ${driverId} ถาวรใช่หรือไม่?`, () => { 
