@@ -571,9 +571,10 @@
                       </div>
                       <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อ</label><input type="text" id="add-drv-vbrand" placeholder="เช่น Honda" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
                   </div>
-                  <div class="grid grid-cols-2 gap-2">
+                  <div class="grid grid-cols-3 gap-2">
                       <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="add-drv-vcolor" placeholder="เช่น เทา" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
                       <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ป้ายทะเบียน</label><input type="text" id="add-drv-vplate" placeholder="กท-1234" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-blue-500"></div>
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จังหวัด</label><input type="text" id="add-drv-vprovince" placeholder="เชียงราย" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
                   </div>
               </div>
 
@@ -1364,7 +1365,7 @@
         openModal('modalAddDriver');
     }
 
-    // 🌟 บันทึกข้อมูลพนักงานใหม่
+    // 🌟 บันทึกข้อมูลพนักงานใหม่ (พร้อมระบบตรวจข้อมูลซ้ำ 2 ใน 3)
     window.saveNewDriver = function() {
         let drvId = document.getElementById('add-drv-id').value;
         let pin = document.getElementById('add-drv-pin').value.trim();
@@ -1376,14 +1377,55 @@
         let vBrand = document.getElementById('add-drv-vbrand').value.trim();
         let vColor = document.getElementById('add-drv-vcolor').value.trim();
         let vPlate = document.getElementById('add-drv-vplate').value.trim();
+        let vProvince = document.getElementById('add-drv-vprovince').value.trim();
 
         if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'กรุณาตั้งรหัสผ่าน (PIN) 4 หลักสำหรับการเข้าแอปฯ ครั้งแรก', 'error');
-        if(!fname) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานก่อนครับ', 'error');
+        if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานและเบอร์โทรศัพท์ให้ครบถ้วนก่อนครับ', 'error');
+
+        // ==========================================
+        // 🔒 ระบบตรวจสอบลงทะเบียนซ้ำ (Duplicate Check)
+        // กฎ: ห้ามเบอร์โทรซ้ำเด็ดขาด หรือ ถ้าชื่อ+นามสกุลเหมือนกันเป๊ะถือว่าซ้ำ (2 ใน 3)
+        // ==========================================
+        let isDuplicate = false;
+        let dupReason = "";
+        
+        for (let key in allProfiles) {
+            let existingUser = allProfiles[key];
+            let existingPhone = existingUser.phone || '';
+            let existingNameParts = (existingUser.name || '').split(' ');
+            let existingFname = existingNameParts[0] || '';
+            let existingLname = existingNameParts.slice(1).join(' ') || '';
+
+            // 1. เช็คเบอร์โทร (ถ้าเหมือนกัน 100% คือซ้ำทันที)
+            if (phone && existingPhone === phone) {
+                isDuplicate = true;
+                dupReason = `เบอร์โทรศัพท์ ${phone} มีอยู่ในระบบแล้ว (รหัส: ${key})`;
+                break;
+            }
+            // 2. เช็คชื่อ + นามสกุล (ถ้าเหมือนกันทั้งชื่อและนามสกุล คือซ้ำ)
+            if (fname && lname && existingFname === fname && existingLname === lname) {
+                isDuplicate = true;
+                dupReason = `ชื่อ "${fname} ${lname}" มีพนักงานลงทะเบียนอยู่แล้วในระบบ (รหัส: ${key})`;
+                break;
+            }
+        }
+
+        if (isDuplicate) {
+            return showCustomAlert('ตรวจพบข้อมูลซ้ำ', dupReason, 'error');
+        }
 
         let fullName = fname + (lname ? ' ' + lname : '');
         let vId = 'veh_' + Date.now();
         let initialVehicles = {};
-        initialVehicles[vId] = { id: vId, serviceType: vType, brand: vBrand, color: vColor, plate: vPlate, isOnline: false };
+        initialVehicles[vId] = { 
+            id: vId, 
+            serviceType: vType, 
+            brand: vBrand, 
+            color: vColor, 
+            plate: vPlate, 
+            province: vProvince, // 🌟 เพิ่มข้อมูลจังหวัด 
+            isOnline: false 
+        };
 
         let driverData = {
             driverId: drvId,  
@@ -1441,7 +1483,7 @@
 
     window.closeDriverProfilePage = function() { closeModal('pageDriverDetails'); }
 
-    // 🌟 จัดการวาดรถและลบสวิตช์ออนไลน์
+    // 🌟 จัดการวาดกล่องยานพาหนะตอนแก้ไข (เพิ่มช่องจังหวัด)
     window.renderDriverVehicles = function() {
         let container = document.getElementById('driver-vehicles-container');
         let html = '';
@@ -1460,7 +1502,6 @@
             }
             selectHtml += `</select>`;
 
-            // ป้ายแจ้งสถานะ
             let onlineBadge = v.isOnline 
                 ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-[#1da1f2] border border-blue-200 dark:border-blue-500/30">ออนไลน์รับงานอยู่</span>`
                 : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200 dark:border-slate-700">ออฟไลน์</span>`;
@@ -1476,15 +1517,16 @@
                     </div>
                 </div>
                 
-                <div class="space-y-3">
+                <div class="space-y-2">
                     <div>
                         <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ประเภทรถ</label>
                         ${selectHtml}
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 gap-2">
                         <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="Honda"></div>
                         <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="สีขาว"></div>
                         <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ป้ายทะเบียน</label><input type="text" id="v-plate-${vId}" value="${v.plate||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs font-bold outline-none placeholder-gray-400" placeholder="กท-1234"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จังหวัด</label><input type="text" id="v-province-${vId}" value="${v.province||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="กรุงเทพฯ"></div>
                     </div>
                 </div>
             </div>`;
@@ -1492,10 +1534,10 @@
         container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">ยังไม่มีรถที่ลงทะเบียน กดปุ่ม + ด้านบนเพื่อเพิ่มรถครับ</p>';
     }
 
-    // 🌟 ระบบเพิ่ม/ลบ/อัปเดตรถยนต์
+    // 🌟 ระบบเพิ่ม/ลบ/อัปเดตรถยนต์ (พร้อมรองรับ Field จังหวัด)
     window.addDriverVehicle = function() {
         let vId = 'veh_' + Date.now();
-        window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', isOnline: false };
+        window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', province: '', isOnline: false };
         renderDriverVehicles();
     }
 
@@ -1510,8 +1552,8 @@
         window.currentDriverVehicles[vId].brand = document.getElementById('v-brand-' + vId).value.trim();
         window.currentDriverVehicles[vId].color = document.getElementById('v-color-' + vId).value.trim();
         window.currentDriverVehicles[vId].plate = document.getElementById('v-plate-' + vId).value.trim();
+        window.currentDriverVehicles[vId].province = document.getElementById('v-province-' + vId).value.trim();
     }
-
     // 🌟 ฟังก์ชันบันทึกการแก้ไขโปรไฟล์
     window.saveDriverUpdates = function() {
         let driverId = window.currentDriverFocus; // โฟกัสเป็น DRV-XXXXXX
