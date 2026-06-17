@@ -552,14 +552,17 @@
                   </div>
                   <div>
                       <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">รหัสผ่านล็อกอิน (PIN 4 หลัก)</label>
-                      <input type="text" id="add-drv-pin" maxlength="4" placeholder="เช่น 1234" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-bold text-center tracking-widest">
+                      <input type="text" id="add-drv-pin" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="เช่น 1234" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-bold text-center tracking-widest">
                   </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                   <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ชื่อจริง</label><input type="text" id="add-drv-fname" placeholder="กรอกชื่อ" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500"></div>
                   <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">นามสกุล</label><input type="text" id="add-drv-lname" placeholder="กรอกนามสกุล" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500"></div>
-                  <div class="col-span-2"><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เบอร์โทรศัพท์ติดต่อ</label><input type="tel" id="add-drv-phone" placeholder="09X-XXX-XXXX" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500"></div>
+                  <div class="col-span-2">
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+                      <input type="tel" id="add-drv-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="08XXXXXXXX" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500">
+                  </div>
               </div>
 
               <div class="bg-gray-50 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
@@ -2270,13 +2273,19 @@
                   <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase mb-3"><i class="fas fa-id-card text-blue-500"></i> บัญชี และ การเข้าสู่ระบบ</h3>
                   <div class="grid grid-cols-2 gap-3 mb-3">
                       <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">รหัสอ้างอิงระบบ (ID)</label><input type="text" id="det-sys-id" readonly class="w-full p-2.5 bg-gray-100 dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-xl outline-none text-sm font-bold tracking-widest text-center cursor-not-allowed"></div>
-                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">เปลี่ยนรหัสผ่าน (PIN)</label><input type="text" id="det-pin-input" maxlength="4" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold tracking-widest text-center focus:border-blue-500"></div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">เปลี่ยนรหัสผ่าน (PIN)</label>
+                          <input type="text" id="det-pin-input" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold tracking-widest text-center focus:border-blue-500">
+                      </div>
                   </div>
                   <div class="grid grid-cols-2 gap-3 mb-3">
                       <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">ชื่อ</label><input type="text" id="det-firstname" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500"></div>
                       <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">นามสกุล</label><input type="text" id="det-lastname" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500"></div>
                   </div>
-                  <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">เบอร์โทรศัพท์</label><input type="tel" id="det-phone" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500"></div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">เบอร์โทรศัพท์</label>
+                      <input type="tel" id="det-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-blue-500">
+                  </div>
               </div>
 
               <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
