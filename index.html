@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>F1 Driver - แผงควบคุมระบบหลังบ้าน</title>
   
-  <!-- 🌟 ป้องกันการซูมแบบ 100% -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,28 +17,81 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap');
     
-    /* 🌟 ป้องกันการแตะดับเบิ้ลซูม และการถ่างนิ้ว */
+    /* 🌟 ตั้งค่าระบบสีหลักตามเงื่อนไข (Base Themes) */
     body { 
         font-family: 'Kanit', sans-serif; 
-        touch-action: pan-y; /* อนุญาตให้เลื่อนขึ้นลง แต่ห้ามถ่างซูม */
+        touch-action: pan-y;
         -webkit-text-size-adjust: 100%; 
         overflow-x: hidden;
+        background-color: #E0E0E0 !important;
+        color: #121212 !important;
     }
     
+    html.dark body {
+        background-color: #121212 !important;
+        color: #E0E0E0 !important;
+    }
+
+    /* ปรับสีพื้นหลังกล่องข้อความ/การ์ดเนื้อหาโหมดสว่างให้เด่นขึ้นจากพื้นหลัง */
+    .bg-white, .bg-gray-50 {
+        background-color: #FFFFFF !important;
+        color: #121212 !important;
+        border-color: #CCCCCC !important;
+    }
+    .bg-gray-100 {
+        background-color: #F0F0F0 !important;
+    }
+
+    /* ปรับสีพื้นหลังกล่องข้อความ/การ์ดเนื้อหาโหมดมืดให้สว่างขึ้นกว่าพื้นหลังหลักเล็กน้อยเพื่อให้มีมิติ */
+    html.dark .dark\:bg-slate-900, 
+    html.dark .dark\:bg-slate-800, 
+    html.dark .dark\:bg-slate-800\/50,
+    html.dark .bg-slate-900 {
+        background-color: #1E1E1E !important;
+        color: #E0E0E0 !important;
+        border-color: #333333 !important;
+    }
+    html.dark .dark\:bg-slate-800\/40 {
+        background-color: #252525 !important;
+    }
+
+    /* บังคับสีตัวอักษรรองให้อ่านง่าย */
+    .text-gray-500, .text-slate-400 { color: #666666 !important; }
+    html.dark .dark\:text-slate-400, html.dark .dark\:text-slate-500 { color: #A0A0A0 !important; }
+    
+    html.dark .text-white { color: #E0E0E0 !important; }
+    .text-gray-800 { color: #121212 !important; }
+
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .cropper-container { width: 100%; max-height: 400px; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .slim-scroll::-webkit-scrollbar { width: 4px; }
-    .slim-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-    .radio-label input[type="radio"]:checked + div { background-color: #2563eb; border-color: #3b82f6; color: white; }
+    .slim-scroll::-webkit-scrollbar-thumb { background: #1da1f2; border-radius: 4px; }
+    .radio-label input[type="radio"]:checked + div { background-color: #1da1f2 !important; border-color: #1da1f2 !important; color: white !important; }
     .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
+
+    /* ปรับแต่งความสว่างสวิตช์ Toggle */
+    .peer:checked ~ div {
+        background-color: #1da1f2 !important;
+    }
   </style>
-  <script src="https://cdn.tailwindcss.com"></script>
   
   <script>
-    tailwind.config = { darkMode: 'class' };
+    // 🌟 ตั้งค่าพจนานุกรมสีของ Tailwind ให้แมปกับธีมสีหลัก #1da1f2 ทั้งระบบ
+    tailwind.config = { 
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    blue: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
+                    indigo: { 50: '#e0f2fe', 100: '#e0f2fe', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da', 900: '#0c4d75' },
+                    green: { 400: '#1da1f2', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' }
+                }
+            }
+        }
+    };
     
     // เช็คประวัติการใช้งานก่อนโหลดหน้าจอ ป้องกันจอกระพริบ
     if (localStorage.getItem('admin_theme') === 'light') {
@@ -49,25 +101,23 @@
     }
   </script>
 </head>
-<body class="bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 h-[100dvh] w-full m-0 flex flex-col overflow-hidden transition-colors duration-300">
+<body class="h-[100dvh] w-full m-0 flex flex-col overflow-hidden transition-colors duration-300">
 
-  <!-- 🌟 Header ด้านบน (มีปุ่มย้อนกลับ) -->
-  <!-- 🌟 Header ด้านบน -->
   <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-4 flex justify-between items-center shadow-sm dark:shadow-lg sticky top-0 z-40 transition-colors duration-300 shrink-0">
     <div class="flex items-center gap-2">
         <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-300 hover:text-gray-800 dark:hover:text-white rounded-xl flex items-center justify-center text-lg border border-gray-200 dark:border-slate-700 transition active:scale-95 shrink-0">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <div class="w-9 h-9 bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400 rounded-xl flex items-center justify-center text-lg border border-green-200 dark:border-green-500/30 shrink-0">
+        <div class="w-9 h-9 bg-blue-100 dark:bg-blue-500/10 text-[#1da1f2] rounded-xl flex items-center justify-center text-lg border border-blue-200 dark:border-blue-500/30 shrink-0">
             <i class="fas fa-cogs"></i>
         </div>
         <div class="min-w-0">
             <h1 class="text-lg sm:text-xl font-black text-gray-800 dark:text-white tracking-wide flex items-center gap-2 truncate">
                 F1 DRIVER <span class="text-gray-300 dark:text-slate-500 font-normal hidden sm:inline">|</span> 
-                <span id="current-page-title" class="text-green-600 dark:text-green-400 text-sm sm:text-base truncate">แดชบอร์ด</span>
+                <span id="current-page-title" class="text-[#1da1f2] text-sm sm:text-base truncate">แดชบอร์ด</span>
             </h1>
             <p class="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400 font-bold flex items-center gap-1">
-                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> แผงควบคุมส่วนกลาง
+                <span class="w-1.5 h-1.5 bg-[#1da1f2] rounded-full animate-ping"></span> แผงควบคุมส่วนกลาง
             </p>
         </div>
     </div>
@@ -80,11 +130,10 @@
 
   <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 pb-[100px] max-w-7xl w-full mx-auto hide-scrollbar">
       
-      <!-- ================= 1. หน้าแดชบอร์ด ================= -->
       <section id="content-dashboard" class="tab-content space-y-6">
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm dark:shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
               <div>
-                  <h2 class="text-base font-bold text-gray-800 dark:text-white mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-blue-500 dark:text-blue-400"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
+                  <h2 class="text-base font-bold text-gray-800 dark:text-white mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-[#1da1f2]"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
                   <p class="text-xs text-gray-500 dark:text-slate-400 leading-relaxed max-w-md">เลือกโหมดคุมแมนนวลเพื่อกดส่งงานให้คนขับด้วยตัวเอง หรือเลือกออโต้คิวเพื่อให้ระบบกระจายคิวอัตโนมัติ</p>
               </div>
               <div class="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-xl border border-gray-200 dark:border-slate-700 w-full sm:w-auto shrink-0 relative">
@@ -108,61 +157,59 @@
                   <div class="flex justify-between items-start">
                       <div>
                           <p class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1">คนขับออนไลน์</p>
-                          <h3 class="text-3xl font-black text-green-500 dark:text-green-400" id="stat-online-count">0 คน</h3>
+                          <h3 class="text-3xl font-black text-[#1da1f2]" id="stat-online-count">0 คน</h3>
                       </div>
-                      <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-slate-800 flex items-center justify-center text-green-600 dark:text-slate-400"><i class="fas fa-search"></i></div>
+                      <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-slate-800 flex items-center justify-center text-[#1da1f2]"><i class="fas fa-search"></i></div>
                   </div>
               </div>
           </div>
-        <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm dark:shadow-md transition-colors duration-300">
-              <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-indigo-500 dark:text-indigo-400"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
-              <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  </div>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm dark:shadow-md transition-colors duration-300">
+              <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-[#1da1f2]"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
+              <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
           </div>
       </section>
 
-      <!-- ================= 2. หน้าเมนูระบบ ================= -->
       <section id="content-allmenu" class="tab-content hidden">
-          <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"><i class="fas fa-th-list text-blue-500 dark:text-blue-400"></i> เลือกเมนูจัดการระบบ</h2>
+          <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"><i class="fas fa-th-list text-[#1da1f2]"></i> เลือกเมนูจัดการระบบ</h2>
           
           <div class="grid grid-cols-4 gap-2 sm:gap-4">
               <button onclick="switchTab('drivers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการคนขับ</span>
               </button>
               
               <button onclick="switchTab('passengers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-friends"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-friends"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข้อมูลลูกค้า</span>
               </button>
 
               <button onclick="switchTab('history')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-500 dark:text-purple-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-history"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-history"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ประวัติงาน</span>
               </button>
 
               <button onclick="switchTab('vehicles')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">เรท & ประเภท</span>
               </button>
 
               <button onclick="switchTab('promos')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-500 dark:text-yellow-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ticket-alt"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ticket-alt"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">คูปองส่วนลด</span>
               </button>
 
               <button onclick="switchTab('banners')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการโฆษณา</span>
               </button>
 
               <button onclick="switchTab('news')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-pink-100 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">โพสต์ข่าวสาร</span>
               </button>
 
               <button onclick="switchTab('chatlogs')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-teal-100 dark:bg-teal-900/30 text-teal-500 dark:text-teal-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">บันทึกแชท</span>
               </button>
 
@@ -178,13 +225,12 @@
           </div>
       </section>
 
-      <!-- ================= 3. หน้าแผนที่ (อัปเดตใหม่) ================= -->
       <section id="content-map" class="tab-content hidden flex-1 flex-col pb-2">
           <div class="flex justify-between items-center mb-2 shrink-0">
-              <h2 class="text-base font-bold text-gray-800 dark:text-white"><i class="fas fa-satellite-dish text-green-500 dark:text-green-400 mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
+              <h2 class="text-base font-bold text-gray-800 dark:text-white"><i class="fas fa-satellite-dish text-[#1da1f2] mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
               <div class="flex gap-2">
-                  <span class="text-[10px] bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded border border-blue-200 dark:border-blue-500/30 shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
-                  <span class="text-[10px] bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded border border-green-200 dark:border-green-500/30 shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
+                  <span class="text-[10px] bg-blue-50 dark:bg-slate-800 text-[#1da1f2] px-2 py-1 rounded border border-blue-200 dark:border-slate-700 shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
+                  <span class="text-[10px] bg-blue-50 dark:bg-slate-800 text-[#1da1f2] px-2 py-1 rounded border border-blue-200 dark:border-slate-700 shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
               </div>
           </div>
           
@@ -204,10 +250,9 @@
           </div>
       </section>
 
-      <!-- ================= 4. หน้าจัดการย่อยต่างๆ ================= -->
       <section id="content-drivers" class="tab-content hidden space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <button onclick="openModal('modalAddDriver')" class="bg-green-600 hover:bg-green-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center shrink-0">
+              <button onclick="openModal('modalAddDriver')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center shrink-0">
                   <i class="fas fa-user-plus"></i> ลงทะเบียนคนขับใหม่
               </button>
           </div>
@@ -215,8 +260,8 @@
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm dark:shadow-md transition-colors duration-300">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-gray-200 dark:border-slate-800 pb-4">
                   <div>
-                      <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-address-book text-green-500 dark:text-green-400"></i> ทำเนียบคนขับ</h2>
-                      <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">จำนวนคนขับในระบบ: <span id="stat-total-drivers" class="font-bold text-blue-600 dark:text-blue-400 text-sm">0</span> คน</p>
+                      <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-address-book text-[#1da1f2]"></i> ทำเนียบคนขับ</h2>
+                      <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">จำนวนคนขับในระบบ: <span id="stat-total-drivers" class="font-bold text-[#1da1f2] text-sm">0</span> คน</p>
                   </div>
                   
                   <div class="relative w-full sm:w-64 shrink-0">
@@ -237,139 +282,139 @@
                           </tr>
                       </thead>
                       <tbody id="all-drivers-table" class="text-sm divide-y divide-gray-200 dark:divide-slate-800 bg-white dark:bg-slate-900 transition-colors">
-                          </tbody>
+                      </tbody>
                   </table>
               </div>
           </div>
       </section>
 
       <section id="content-passengers" class="tab-content hidden space-y-4">
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
               <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-                  <div><h2 class="text-lg font-bold text-white"><i class="fas fa-user-friends text-blue-400 mr-1"></i> ระบบรายงานประวัติลูกค้า (CRM)</h2><p class="text-xs text-slate-400 mt-1">คลิกที่รายชื่อลูกค้าเพื่อดูข้อมูลเจาะลึก หรือระงับสิทธิ์</p></div>
+                  <div><h2 class="text-lg font-bold text-gray-800 dark:text-white"><i class="fas fa-user-friends text-[#1da1f2] mr-1"></i> ระบบรายงานประวัติลูกค้า (CRM)</h2><p class="text-xs text-gray-500 dark:text-slate-400 mt-1">คลิกที่รายชื่อลูกค้าเพื่อดูข้อมูลเจาะลึก หรือระงับสิทธิ์</p></div>
                   <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
-                      <select id="filter-passenger" onchange="renderPassengers()" class="w-full sm:w-auto bg-slate-800 text-white text-xs border border-slate-700 rounded-lg px-3 py-2.5 outline-none font-bold">
-                          <option value="all">ลูกค้าทั้งหมด</option><option value="new">ผู้ใช้ใหม่ (0-1 ครั้ง)</option><option value="regular">ลูกค้าประจำ (>1 ครั้ง)</option>
+                      <select id="filter-passenger" onchange="renderPassengers()" class="w-full sm:w-auto bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white text-xs border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2.5 outline-none font-bold">
+                          <option value="all">ลูกค้าทั้งหมด</option><option value="new">ผู้ใช้ใหม่ (0-1 ครั้ง)</option><option value="regular">ลูกค้าประจำ (&gt;1 ครั้ง)</option>
                       </select>
-                      <button onclick="exportPassengersCSV()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg flex justify-center items-center gap-1.5 transition shadow-sm shrink-0"><i class="fas fa-file-csv"></i> Export</button>
+                      <button onclick="exportPassengersCSV()" class="w-full sm:w-auto bg-[#1da1f2] hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg flex justify-center items-center gap-1.5 transition shadow-sm shrink-0"><i class="fas fa-file-csv"></i> Export</button>
                   </div>
               </div>
               <div class="grid grid-cols-3 gap-3 mb-4">
-                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center"><p class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1">ทั้งหมด</p><p class="text-xl sm:text-2xl font-black text-blue-400" id="stat-pass-total">0</p></div>
-                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center"><p class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1">ผู้ใช้ใหม่</p><p class="text-xl sm:text-2xl font-black text-green-400" id="stat-pass-new">0</p></div>
-                  <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 text-center"><p class="text-[10px] sm:text-xs text-slate-400 font-bold mb-1">ลูกค้าประจำ</p><p class="text-xl sm:text-2xl font-black text-yellow-400" id="stat-pass-vip">0</p></div>
+                  <div class="bg-gray-100 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400 font-bold mb-1">ทั้งหมด</p><p class="text-xl sm:text-2xl font-black text-[#1da1f2]" id="stat-pass-total">0</p></div>
+                  <div class="bg-gray-100 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400 font-bold mb-1">ผู้ใช้ใหม่</p><p class="text-xl sm:text-2xl font-black text-blue-500" id="stat-pass-new">0</p></div>
+                  <div class="bg-gray-100 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400 font-bold mb-1">ลูกค้าประจำ</p><p class="text-xl sm:text-2xl font-black text-yellow-500" id="stat-pass-vip">0</p></div>
               </div>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30"><th class="py-3 px-3 text-left rounded-tl-lg">เบอร์ติดต่อ / ชื่อสมาชิกลูกค้า</th><th class="py-3 px-2 text-left">สถานะ</th><th class="py-3 px-2 text-center">ความถี่การเรียก</th><th class="py-3 px-2 text-right">ยอดรวมค่าโดยสาร</th><th class="py-3 px-3 text-left rounded-tr-lg">โค้ดที่เคยใช้</th></tr></thead>
-                      <tbody id="passengers-list" class="text-sm divide-y divide-slate-800"><tr><td colspan="5" class="py-6 text-center text-slate-500">กำลังดึงข้อมูล...</td></tr></tbody>
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-xs uppercase font-bold bg-gray-100 dark:bg-slate-800/30"><th class="py-3 px-3 text-left rounded-tl-lg">เบอร์ติดต่อ / ชื่อสมาชิกลูกค้า</th><th class="py-3 px-2 text-left">สถานะ</th><th class="py-3 px-2 text-center">ความถี่การเรียก</th><th class="py-3 px-2 text-right">ยอดรวมค่าโดยสาร</th><th class="py-3 px-3 text-left rounded-tr-lg">โค้ดที่เคยใช้</th></tr></thead>
+                      <tbody id="passengers-list" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"><tr><td colspan="5" class="py-6 text-center text-gray-400">กำลังดึงข้อมูล...</td></tr></tbody>
                   </table>
               </div>
           </div>
       </section>
 
       <section id="content-history" class="tab-content hidden space-y-4">
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h2 class="text-lg font-bold text-white"><i class="fas fa-history text-green-400 mr-1"></i> ประวัติงานวิ่งทั้งหมดในสารบบ</h2>
-                  <button onclick="syncToGoogleSheet(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"><i class="fas fa-file-excel"></i> สำรองลง Google Sheet</button>
+                  <h2 class="text-lg font-bold text-gray-800 dark:text-white"><i class="fas fa-history text-[#1da1f2] mr-1"></i> ประวัติงานวิ่งทั้งหมดในสารบบ</h2>
+                  <button onclick="syncToGoogleSheet(event)" class="bg-[#1da1f2] hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"><i class="fas fa-file-excel"></i> สำรองลง Google Sheet</button>
               </div>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30"><th class="py-3 px-2 text-left">ข้อมูลผู้โดยสาร</th><th class="py-3 px-2 text-center">ประเภทรถ</th><th class="py-3 px-2 text-left">หมุดตำแหน่งการเดินทาง</th><th class="py-3 px-2 text-left">ระยะรวม</th><th class="py-3 px-2 text-left">สุทธิ</th><th class="py-3 px-2 text-left">พนักงานขับ</th><th class="pb-3 px-2 text-right">สถานะ</th></tr></thead>
-                      <tbody id="history-jobs-list" class="text-sm divide-y divide-slate-800"></tbody>
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-xs uppercase font-bold bg-gray-100 dark:bg-slate-800/30"><th class="py-3 px-2 text-left">ข้อมูลผู้โดยสาร</th><th class="py-3 px-2 text-center">ประเภทรถ</th><th class="py-3 px-2 text-left">หมุดตำแหน่งการเดินทาง</th><th class="py-3 px-2 text-left">ระยะรวม</th><th class="py-3 px-2 text-left">สุทธิ</th><th class="py-3 px-2 text-left">พนักงานขับ</th><th class="pb-3 px-2 text-right">สถานะ</th></tr></thead>
+                      <tbody id="history-jobs-list" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"></tbody>
                   </table>
               </div>
           </div>
       </section>
 
       <section id="content-vehicles" class="tab-content hidden space-y-4">
-          <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-md">
-              <h2 class="text-base font-bold text-white"><i class="fas fa-car-side text-indigo-400 mr-2"></i> ประเภทรถทั้งหมด</h2>
-              <button onclick="window.openManageVehicleModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm"><i class="fas fa-plus"></i> เพิ่มรถใหม่</button>
+          <div class="flex justify-between items-center bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 rounded-2xl shadow-md">
+              <h2 class="text-base font-bold text-gray-800 dark:text-white"><i class="fas fa-car-side text-[#1da1f2] mr-2"></i> ประเภทรถทั้งหมด</h2>
+              <button onclick="window.openManageVehicleModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm"><i class="fas fa-plus"></i> เพิ่มรถใหม่</button>
           </div>
           <div id="vehicle-types-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
       </section>
 
       <section id="content-promos" class="tab-content hidden space-y-4">
-          <div class="flex justify-end"><button onclick="openModal('modalAddPromo')" class="bg-green-600 hover:bg-green-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-ticket-alt"></i> เพิ่มโปรโมชั่นใหม่</button></div>
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-                  <h2 class="text-lg font-bold text-white"><i class="fas fa-list text-blue-400 mr-1"></i> โค้ดส่วนลดในระบบ</h2>
-                  <button onclick="exportRandomCodes()" class="bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm shrink-0"><i class="fas fa-download"></i> ดาวน์โหลดโค้ดสุ่ม</button>
+          <div class="flex justify-end"><button onclick="openModal('modalAddPromo')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-ticket-alt"></i> เพิ่มโปรโมชั่นใหม่</button></div>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
+              <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-slate-800 pb-3">
+                  <h2 class="text-lg font-bold text-gray-800 dark:text-white"><i class="fas fa-list text-[#1da1f2] mr-1"></i> โค้ดส่วนลดในระบบ</h2>
+                  <button onclick="exportRandomCodes()" class="bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 hover:bg-gray-200 text-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm shrink-0"><i class="fas fa-download"></i> ดาวน์โหลดโค้ดสุ่ม</button>
               </div>
-              <div class="flex gap-4 mb-3 border-b border-slate-800 pb-1">
-                  <button onclick="filterPromoList('all')" id="flt-promo-all" class="text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1">แคมเปญหลัก</button>
-                  <button onclick="filterPromoList('random')" id="flt-promo-random" class="text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1">โค้ดสุ่มใบปลิว</button>
+              <div class="flex gap-4 mb-3 border-b border-gray-200 dark:border-slate-800 pb-1">
+                  <button onclick="filterPromoList('all')" id="flt-promo-all" class="text-xs font-bold text-[#1da1f2] border-b-2 border-blue-500 pb-1 px-1">แคมเปญหลัก</button>
+                  <button onclick="filterPromoList('random')" id="flt-promo-random" class="text-xs font-bold text-gray-500 hover:text-blue-500 border-b-2 border-transparent pb-1 px-1">โค้ดสุ่มใบปลิว</button>
               </div>
-              <div class="max-h-[500px] overflow-y-auto pr-2 slim-scroll"><ul id="promo-codes-list" class="divide-y divide-slate-800"></ul></div>
+              <div class="max-h-[500px] overflow-y-auto pr-2 slim-scroll"><ul id="promo-codes-list" class="divide-y divide-gray-200 dark:divide-slate-800"></ul></div>
           </div>
       </section>
 
       <section id="content-banners" class="tab-content hidden space-y-4">
           <div class="flex justify-end"><button onclick="openModal('modalAddBanner')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-images"></i> อัปโหลดแบนเนอร์</button></div>
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-blue-400 mr-1"></i> แบนเนอร์โฆษณาในระบบ</h2>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
+              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-list text-[#1da1f2] mr-1"></i> แบนเนอร์โฆษณาในระบบ</h2>
               <div id="admin-banners-list" class="space-y-2 max-h-[500px] overflow-y-auto pr-1 slim-scroll"></div>
           </div>
       </section>
 
       <section id="content-news" class="tab-content hidden space-y-4">
-          <div class="flex justify-end"><button onclick="openModal('modalAddNews')" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> โพสต์ข่าวสารใหม่</button></div>
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-bullhorn text-yellow-400 mr-1"></i> บอร์ดข่าวสารที่กำลังแสดง</h2>
+          <div class="flex justify-end"><button onclick="openModal('modalAddNews')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> โพสต์ข่าวสารใหม่</button></div>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
+              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-bullhorn text-[#1da1f2] mr-1"></i> บอร์ดข่าวสารที่กำลังแสดง</h2>
               <div id="admin-news-list" class="space-y-2 max-h-[500px] overflow-y-auto pr-1 slim-scroll"></div>
           </div>
       </section>
 
       <section id="content-chatlogs" class="tab-content hidden space-y-4">
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-lg font-bold text-white mb-1"><i class="fas fa-user-secret text-blue-400 mr-1"></i> คลังประวัติแชท (ตรวจสอบย้อนหลัง)</h2>
-              <p class="text-xs text-slate-400 mb-4">ข้อมูลแชททั้งหมดจะถูกเก็บถาวรที่นี่ เพื่อใช้เป็นหลักฐานเวลามีการร้องเรียน</p>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
+              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-1"><i class="fas fa-user-secret text-[#1da1f2] mr-1"></i> คลังประวัติแชท (ตรวจสอบย้อนหลัง)</h2>
+              <p class="text-xs text-gray-500 dark:text-slate-400 mb-4">ข้อมูลแชททั้งหมดจะถูกเก็บถาวรที่นี่ เพื่อใช้เป็นหลักฐานเวลามีการร้องเรียน</p>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold bg-slate-800/30"><th class="py-3 px-3 text-left rounded-tl-lg">รหัสงาน (Job ID)</th><th class="py-3 px-2 text-left">ผู้โดยสาร</th><th class="py-3 px-2 text-left">คนขับ</th><th class="py-3 px-2 text-left">เวลาอัปเดตล่าสุด</th><th class="py-3 px-3 text-right rounded-tr-lg">ตรวจสอบ</th></tr></thead>
-                      <tbody id="chatlogs-table-body" class="text-sm divide-y divide-slate-800"><tr><td colspan="5" class="py-6 text-center text-slate-500">กำลังดึงข้อมูล...</td></tr></tbody>
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-xs uppercase font-bold bg-gray-100 dark:bg-slate-800/30"><th class="py-3 px-3 text-left rounded-tl-lg">รหัสงาน (Job ID)</th><th class="py-3 px-2 text-left">ผู้โดยสาร</th><th class="py-3 px-2 text-left">คนขับ</th><th class="py-3 px-2 text-left">เวลาอัปเดตล่าสุด</th><th class="py-3 px-3 text-right rounded-tr-lg">ตรวจสอบ</th></tr></thead>
+                      <tbody id="chatlogs-table-body" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"><tr><td colspan="5" class="py-6 text-center text-gray-400">กำลังดึงข้อมูล...</td></tr></tbody>
                   </table>
               </div>
           </div>
       </section>
 
       <section id="content-blacklist" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> ระงับสิทธิ์ลูกค้า</h2>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md h-fit">
+              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-user-slash text-red-500 mr-1"></i> ระงับสิทธิ์ลูกค้า</h2>
               <div class="space-y-4">
-                  <input type="tel" id="block-phone" placeholder="กรอกเบอร์ (10 หลัก)" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-center focus:border-red-500">
-                  <input type="text" id="block-reason" placeholder="สาเหตุการระงับ..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm focus:border-red-500">
+                  <input type="tel" id="block-phone" placeholder="กรอกเบอร์ (10 หลัก)" class="w-full p-3 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none font-bold text-center focus:border-red-500">
+                  <input type="text" id="block-reason" placeholder="สาเหตุการระงับ..." class="w-full p-3 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm focus:border-red-500">
                   <button onclick="addNumberToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">ระงับลูกค้า</button>
               </div>
           </div>
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อลูกค้าในบัญชีดำ</h2>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
+              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อลูกค้าในบัญชีดำ</h2>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[400px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs font-bold bg-slate-800/20"><th class="py-3 px-2 text-left">เบอร์มือถือ</th><th class="py-3 px-2 text-left">เหตุผลการบล็อก</th><th class="py-3 px-2 text-right">จัดการ</th></tr></thead>
-                      <tbody id="blacklist-table-body" class="text-sm divide-y divide-slate-800"></tbody>
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-xs font-bold bg-gray-100 dark:bg-slate-800/20"><th class="py-3 px-2 text-left">เบอร์มือถือ</th><th class="py-3 px-2 text-left">เหตุผลการบล็อก</th><th class="py-3 px-2 text-right">จัดการ</th></tr></thead>
+                      <tbody id="blacklist-table-body" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"></tbody>
                   </table>
               </div>
           </div>
       </section>
 
       <section id="content-blockdrivers" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-ban text-red-500 mr-1"></i> ระงับการใช้งานคนขับ</h2>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md h-fit">
+              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-ban text-red-500 mr-1"></i> ระงับการใช้งานคนขับ</h2>
               <div class="space-y-4">
-                  <input type="text" id="block-driver-pin" placeholder="กรอกรหัส PIN (4 หลัก)" class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none font-bold text-center focus:border-red-500 tracking-widest">
-                  <input type="text" id="block-driver-reason" placeholder="สาเหตุการระงับ..." class="w-full p-3 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-sm focus:border-red-500">
+                  <input type="text" id="block-driver-pin" placeholder="กรอกรหัส PIN (4 หลัก)" class="w-full p-3 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none font-bold text-center focus:border-red-500 tracking-widest">
+                  <input type="text" id="block-driver-reason" placeholder="สาเหตุการระงับ..." class="w-full p-3 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm focus:border-red-500">
                   <button onclick="addDriverToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">ระงับพนักงานคนนี้</button>
               </div>
           </div>
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
-              <h2 class="text-lg font-bold text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อคนขับที่ถูกระงับ</h2>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
+              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อคนขับที่ถูกระงับ</h2>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[400px]">
-                      <thead><tr class="border-b border-slate-800 text-slate-400 text-xs font-bold bg-slate-800/20"><th class="py-3 px-2 text-left">รหัส PIN</th><th class="py-3 px-2 text-left">เหตุผลการบล็อก</th><th class="py-3 px-2 text-right">จัดการ</th></tr></thead>
-                      <tbody id="blockdrivers-table-body" class="text-sm divide-y divide-slate-800"></tbody>
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-xs font-bold bg-gray-100 dark:bg-slate-800/20"><th class="py-3 px-2 text-left">รหัส PIN</th><th class="py-3 px-2 text-left">เหตุผลการบล็อก</th><th class="py-3 px-2 text-right">จัดการ</th></tr></thead>
+                      <tbody id="blockdrivers-table-body" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"></tbody>
                   </table>
               </div>
           </div>
@@ -377,157 +422,156 @@
 
   </main>
 
-  <!-- ======================= MODALS ======================= -->
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl transform transition-all animate-fade-in">
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl transform transition-all animate-fade-in">
           <div id="adminAlertIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"></div>
-          <h3 id="adminAlertTitle" class="text-xl font-black text-white mb-2"></h3>
-          <p id="adminAlertMessage" class="text-sm text-slate-400 mb-6 whitespace-pre-line leading-relaxed"></p>
+          <h3 id="adminAlertTitle" class="text-xl font-black text-gray-800 dark:text-white mb-2"></h3>
+          <p id="adminAlertMessage" class="text-sm text-gray-500 dark:text-slate-400 mb-6 whitespace-pre-line leading-relaxed"></p>
           <button onclick="closeAdminAlert()" id="adminAlertBtn" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition">ตกลง</button>
       </div>
   </div>
 
   <div id="adminConfirmModal" class="hidden fixed inset-0 z-[9998] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl animate-fade-in">
-          <div id="adminConfirmIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-900/30 text-blue-500 border border-blue-500/30"><i class="fas fa-question-circle"></i></div>
-          <h3 id="adminConfirmTitle" class="text-xl font-black text-white mb-2"></h3>
-          <p id="adminConfirmMessage" class="text-sm text-slate-400 mb-6 leading-relaxed"></p>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl animate-fade-in">
+          <div id="adminConfirmIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-50 dark:bg-slate-800 text-[#1da1f2] border border-blue-200 dark:border-slate-700"><i class="fas fa-question-circle"></i></div>
+          <h3 id="adminConfirmTitle" class="text-xl font-black text-gray-800 dark:text-white mb-2"></h3>
+          <p id="adminConfirmMessage" class="text-sm text-gray-500 dark:text-slate-400 mb-6 leading-relaxed"></p>
           <div class="flex gap-3">
-              <button onclick="closeAdminConfirm()" class="flex-1 py-3 bg-slate-800 text-slate-300 font-bold rounded-xl border border-slate-700 hover:bg-slate-700 transition">ยกเลิก</button>
+              <button onclick="closeAdminConfirm()" class="flex-1 py-3 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 font-bold rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-200 transition">ยกเลิก</button>
               <button id="adminConfirmBtn" onclick="submitConfirmAction()" class="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition">ตกลง</button>
           </div>
       </div>
   </div>
 
   <div id="modalAddDriver" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col animate-fade-in">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-user-plus mr-1"></i> ลงทะเบียนคนขับ</h2>
-              <button onclick="closeModal('modalAddDriver')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col animate-fade-in">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-[#1da1f2]"><i class="fas fa-user-plus mr-1"></i> ลงทะเบียนคนขับ</h2>
+              <button onclick="closeModal('modalAddDriver')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5 space-y-4">
-              <div class="grid grid-cols-2 gap-3 text-slate-800">
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1">รหัส PIN 4 หลัก</label><input type="text" id="drv-pin" maxlength="4" placeholder="2304" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500 font-bold text-center tracking-widest"></div>
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อ-นามสกุล คนขับ</label><input type="text" id="drv-name" placeholder="ชื่อพนักงาน" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500"></div>
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1">ยี่ห้อรถ</label><input type="text" id="drv-brand" placeholder="Toyota" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500"></div>
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1">สีรถ</label><input type="text" id="drv-color" placeholder="สีดำ" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500"></div>
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1">เลขทะเบียนรถ</label><input type="text" id="drv-plate" placeholder="กข-1234" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500"></div>
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1">เบอร์โทรศัพท์</label><input type="tel" id="drv-phone" placeholder="094637XXXX" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-green-500"></div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">รหัส PIN 4 หลัก</label><input type="text" id="drv-pin" maxlength="4" placeholder="2304" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-bold text-center tracking-widest"></div>
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">ชื่อ-นามสกุล คนขับ</label><input type="text" id="drv-name" placeholder="ชื่อพนักงาน" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500"></div>
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อรถ</label><input type="text" id="drv-brand" placeholder="Toyota" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500"></div>
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="drv-color" placeholder="สีดำ" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500"></div>
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">เลขทะเบียนรถ</label><input type="text" id="drv-plate" placeholder="กข-1234" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500"></div>
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">เบอร์โทรศัพท์</label><input type="tel" id="drv-phone" placeholder="094637XXXX" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500"></div>
               </div>
-              <button onclick="saveDriverProfile()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2"><i class="fas fa-save mr-1"></i> บันทึกข้อมูล</button>
+              <button onclick="saveDriverProfile()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2"><i class="fas fa-save mr-1"></i> บันทึกข้อมูล</button>
           </div>
       </div>
   </div>
 
   <div id="modalAddPromo" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl sticky top-0 z-10">
-              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-ticket-alt mr-1"></i> ออกแบบโปรโมชั่นระบบ</h2>
-              <button onclick="closeModal('modalAddPromo')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 rounded-t-2xl sticky top-0 z-10">
+              <h2 class="text-lg font-bold text-[#1da1f2]"><i class="fas fa-ticket-alt mr-1"></i> ออกแบบโปรโมชั่นระบบ</h2>
+              <button onclick="closeModal('modalAddPromo')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5">
-              <div class="flex mb-4 bg-slate-800 p-1 rounded-lg">
-                  <button onclick="switchPromoBuilder('general')" id="pbtn-general" class="flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition">โค้ดปกติ / แคมเปญ</button>
-                  <button onclick="switchPromoBuilder('random')" id="pbtn-random" class="flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition">สุ่มแจก (พิมพ์)</button>
+              <div class="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg">
+                  <button onclick="switchPromoBuilder('general')" id="pbtn-general" class="flex-1 py-2 text-xs font-bold bg-blue-600 text-white rounded-md shadow transition">โค้ดปกติ / แคมเปญ</button>
+                  <button onclick="switchPromoBuilder('random')" id="pbtn-random" class="flex-1 py-2 text-xs font-bold text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white rounded-md transition">สุ่มแจก (พิมพ์)</button>
               </div>
 
               <div id="pbuild-general" class="space-y-4 animate-fade-in">
                   <div>
-                      <label class="block text-xs font-bold text-slate-400 mb-2">กลุ่มเป้าหมายลูกค้า</label>
+                      <label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-2">กลุ่มเป้าหมายลูกค้า</label>
                       <div class="grid grid-cols-2 gap-2">
-                          <label class="radio-label cursor-pointer relative"><input type="radio" name="promo_target" value="all" checked class="peer sr-only"><div class="p-2 border border-slate-700 bg-slate-800 text-slate-400 rounded-lg text-center font-bold text-xs transition peer-checked:bg-blue-600 peer-checked:border-blue-500 peer-checked:text-white">ลูกค้าทั้งหมด</div></label>
-                          <label class="radio-label cursor-pointer relative"><input type="radio" name="promo_target" value="new_user" class="peer sr-only"><div class="p-2 border border-slate-700 bg-slate-800 text-slate-400 rounded-lg text-center font-bold text-[11px] transition peer-checked:bg-green-600 peer-checked:border-green-500 peer-checked:text-white flex items-center justify-center">เฉพาะผู้ใช้ใหม่</div></label>
+                          <label class="radio-label cursor-pointer relative"><input type="radio" name="promo_target" value="all" checked class="peer sr-only"><div class="p-2 border border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-lg text-center font-bold text-xs transition peer-checked:bg-blue-600 peer-checked:border-blue-500 peer-checked:text-white">ลูกค้าทั้งหมด</div></label>
+                          <label class="radio-label cursor-pointer relative"><input type="radio" name="promo_target" value="new_user" class="peer sr-only"><div class="p-2 border border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-lg text-center font-bold text-[11px] transition peer-checked:bg-blue-600 peer-checked:border-blue-500 peer-checked:text-white flex items-center justify-center">เฉพาะผู้ใช้ใหม่</div></label>
                       </div>
                   </div>
                   <div class="grid grid-cols-2 gap-2">
-                      <div><label class="block text-[11px] font-bold text-slate-400 mb-1">คำโค้ดส่วนลด</label><input type="text" id="promo-code" placeholder="SALE50" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center tracking-wider text-sm focus:border-green-500"></div>
-                      <div><label class="block text-[11px] font-bold text-slate-400 mb-1">ส่วนลด (บาท)</label><input type="number" id="promo-value" placeholder="ลดกี่บาท?" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-sm focus:border-green-500"></div>
+                      <div><label class="block text-[11px] font-bold text-gray-500 dark:text-slate-400 mb-1">คำโค้ดส่วนลด</label><input type="text" id="promo-code" placeholder="SALE50" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none uppercase font-bold text-center tracking-wider text-sm focus:border-blue-500"></div>
+                      <div><label class="block text-[11px] font-bold text-gray-500 dark:text-slate-400 mb-1">ส่วนลด (บาท)</label><input type="number" id="promo-value" placeholder="ลดกี่บาท?" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-center text-sm focus:border-blue-500"></div>
                   </div>
                   <div class="grid grid-cols-2 gap-2">
-                      <div><label class="block text-[11px] font-bold text-slate-400 mb-1">จำกัดสิทธิ์ (โควต้า)</label><input type="number" id="promo-limit" placeholder="ว่าง=ไม่จำกัด" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-center text-xs focus:border-green-500"></div>
-                      <div><label class="block text-[11px] font-bold text-slate-400 mb-1">หมดเขต (เวลา)</label><input type="datetime-local" id="promo-expire" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-[10px] focus:border-green-500"></div>
+                      <div><label class="block text-[11px] font-bold text-gray-500 dark:text-slate-400 mb-1">จำกัดสิทธิ์ (โควต้า)</label><input type="number" id="promo-limit" placeholder="ว่าง=ไม่จำกัด" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-center text-xs focus:border-blue-500"></div>
+                      <div><label class="block text-[11px] font-bold text-gray-500 dark:text-slate-400 mb-1">หมดเขต (เวลา)</label><input type="datetime-local" id="promo-expire" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-blue-500"></div>
                   </div>
-                  <button onclick="addPromoCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2"><i class="fas fa-check mr-1"></i> ยืนยันสร้างคูปอง</button>
+                  <button onclick="addPromoCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2"><i class="fas fa-check mr-1"></i> ยืนยันสร้างคูปอง</button>
               </div>
 
               <div id="pbuild-random" class="hidden space-y-4 animate-fade-in">
-                  <div class="bg-yellow-900/20 border border-yellow-500/30 p-3 rounded-lg mb-2"><p class="text-[10px] text-yellow-500 font-bold leading-relaxed"><i class="fas fa-info-circle"></i> โค้ดสุ่ม <b>ใช้ได้ 1 ครั้ง/รหัส</b> เหมาะสำหรับปริ้นท์คูปองแจก</p></div>
+                  <div class="bg-yellow-550/10 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-500/30 p-3 rounded-lg mb-2"><p class="text-[10px] text-yellow-600 dark:text-yellow-500 font-bold leading-relaxed"><i class="fas fa-info-circle"></i> โค้ดสุ่ม <b>ใช้ได้ 1 ครั้ง/รหัส</b> เหมาะสำหรับปริ้นท์คูปองแจก</p></div>
                   <div class="grid grid-cols-3 gap-2">
-                      <div><label class="block text-[10px] font-bold text-slate-400 mb-1">นำหน้า</label><input type="text" id="promo-rand-prefix" placeholder="F1" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none uppercase font-bold text-center text-xs focus:border-yellow-500"></div>
-                      <div><label class="block text-[10px] font-bold text-slate-400 mb-1">จำนวน</label><input type="number" id="promo-rand-amount" placeholder="ใบ?" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-yellow-500"></div>
-                      <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ลด(บาท)</label><input type="number" id="promo-rand-value" placeholder="บาท" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-yellow-500"></div>
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">นำหน้า</label><input type="text" id="promo-rand-prefix" placeholder="F1" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none uppercase font-bold text-center text-xs focus:border-blue-500"></div>
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จำนวน</label><input type="number" id="promo-rand-amount" placeholder="ใบ?" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-blue-500"></div>
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ลด(บาท)</label><input type="number" id="promo-rand-value" placeholder="บาท" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-blue-500"></div>
                   </div>
-                  <button onclick="generateRandomPromos()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2 flex items-center justify-center gap-2 text-sm"><i class="fas fa-magic"></i> สุ่มสร้างโค้ด</button>
+                  <button onclick="generateRandomPromos()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2 flex items-center justify-center gap-2 text-sm"><i class="fas fa-magic"></i> สุ่มสร้างโค้ด</button>
               </div>
           </div>
       </div>
   </div>
 
   <div id="modalAddBanner" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl sticky top-0 z-10">
-              <h2 class="text-lg font-bold text-blue-400"><i class="fas fa-images mr-1"></i> อัปโหลดแบนเนอร์โฆษณา</h2>
-              <button onclick="closeModal('modalAddBanner')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 rounded-t-2xl sticky top-0 z-10">
+              <h2 class="text-lg font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-images mr-1"></i> อัปโหลดแบนเนอร์โฆษณา</h2>
+              <button onclick="closeModal('modalAddBanner')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5 space-y-4">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1.5">ตำแหน่งจัดวางแบนเนอร์</label>
-                      <select id="cms-banner-position" onchange="window.updateCropperRatio()" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none text-xs font-bold">
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1.5">ตำแหน่งจัดวางแบนเนอร์</label>
+                      <select id="cms-banner-position" onchange="window.updateCropperRatio()" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-xs font-bold">
                           <option value="top">แบนเนอร์หลักส่วนบน (สัดส่วน 16:9)</option>
                           <option value="bottom">แบนเนอร์แถบยาวส่วนล่าง (Slim Banner)</option>
                           <option value="popup">โฆษณาคั่นแบบป๊อปอัปเมื่อเปิดแอป (สัดส่วน 4:5)</option>
                       </select>
                   </div>
-                  <div><label class="block text-xs font-bold text-slate-400 mb-1.5">ดึงภาพแบนเนอร์เข้าระบบ</label><input type="file" id="cms-banner-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500"></div>
+                  <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1.5">ดึงภาพแบนเนอร์เข้าระบบ</label><input type="file" id="cms-banner-file" accept="image/*" class="w-full text-xs text-gray-500 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-500"></div>
               </div>
 
-              <div id="cropArea" class="hidden bg-slate-800 p-4 rounded-xl border border-blue-500/30 mt-2">
+              <div id="cropArea" class="hidden bg-gray-100 dark:bg-slate-800 p-4 rounded-xl border border-blue-500/30 mt-2">
                   <div class="w-full max-h-[300px] overflow-hidden bg-black rounded mb-3"><img id="imageToCrop" class="max-w-full"></div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                      <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ลิงก์ปลายทาง</label><input type="text" id="cms-banner-link" placeholder="https://..." class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500"></div>
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ลิงก์ปลายทาง</label><input type="text" id="cms-banner-link" placeholder="https://..." class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500"></div>
                       <div class="grid grid-cols-2 gap-2">
-                          <div><label class="block text-[10px] font-bold text-slate-400 mb-1">เวลาเริ่มแสดง</label><input type="datetime-local" id="cms-banner-start" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-[10px] outline-none"></div>
-                          <div><label class="block text-[10px] font-bold text-slate-400 mb-1">เวลาซ่อนภาพ</label><input type="datetime-local" id="cms-banner-end" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-[10px] outline-none"></div>
+                          <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เวลาเริ่มแสดง</label><input type="datetime-local" id="cms-banner-start" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none"></div>
+                          <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เวลาซ่อนภาพ</label><input type="datetime-local" id="cms-banner-end" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none"></div>
                       </div>
-                    <div id="popup-only-settings" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-800 p-3 rounded-xl border border-slate-700 mt-2">
-                      <div><label class="block text-[10px] font-bold text-slate-400 mb-1">เวลานับถอยหลัง (วิ)</label><input type="number" id="cms-banner-duration" placeholder="ว่าง=กดปิดเอง" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500 font-bold text-center"></div>
-                      <div><label class="block text-[10px] font-bold text-slate-400 mb-1">ซ่อนกี่วัน (ถ้าลูกค้าติ๊ก)</label><input type="number" id="cms-banner-snooze" placeholder="เช่น 14" value="14" class="w-full p-2 bg-slate-900 text-white border border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500 font-bold text-center"></div>
-                      <div><label class="block text-[10px] font-bold text-slate-400 mb-1">หน้าจอที่แสดง</label><div class="flex flex-col gap-1 text-[10px] text-slate-300"><label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="home" class="cms-banner-pages accent-blue-500" checked> หน้าแรก</label><label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="tracking" class="cms-banner-pages accent-blue-500"> หน้าติดตาม</label></div></div>
+                    <div id="popup-only-settings" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-300 dark:border-slate-700 mt-2">
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เวลานับถอยหลัง (วิ)</label><input type="number" id="cms-banner-duration" placeholder="ว่าง=กดปิดเอง" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500 font-bold text-center"></div>
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ซ่อนกี่วัน (ถ้าลูกค้าติ๊ก)</label><input type="number" id="cms-banner-snooze" placeholder="เช่น 14" value="14" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500 font-bold text-center"></div>
+                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">หน้าจอที่แสดง</label><div class="flex flex-col gap-1 text-[10px] text-gray-700 dark:text-slate-300"><label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="home" class="cms-banner-pages accent-blue-500" checked> หน้าแรก</label><label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" value="tracking" class="cms-banner-pages accent-blue-500"> หน้าติดตาม</label></div></div>
                   </div>
                   </div>
-                  <div class="flex gap-2"><button onclick="cancelCrop()" class="flex-1 py-2 bg-slate-700 text-white font-bold rounded-lg text-sm hover:bg-slate-600 transition">ยกเลิก</button><button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-green-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-green-500 transition">อัปโหลดสไลด์ 🚀</button></div>
+                  <div class="flex gap-2"><button onclick="cancelCrop()" class="flex-1 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-white font-bold rounded-lg text-sm hover:bg-gray-300 transition">ยกเลิก</button><button onclick="saveCroppedImage()" class="flex-[2] py-2 bg-blue-600 text-white font-bold rounded-lg text-sm shadow-md hover:bg-blue-500 transition">อัปโหลดสไลด์ 🚀</button></div>
               </div>
           </div>
       </div>
   </div>
 
   <div id="modalAddNews" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl sticky top-0 z-10">
-              <h2 class="text-lg font-bold text-yellow-400"><i class="fas fa-bullhorn mr-1"></i> โพสต์ประกาศข่าวสาร</h2>
-              <button onclick="closeModal('modalAddNews')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 rounded-t-2xl sticky top-0 z-10">
+              <h2 class="text-lg font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-bullhorn mr-1"></i> โพสต์ประกาศข่าวสาร</h2>
+              <button onclick="closeModal('modalAddNews')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5 space-y-4">
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">รูปภาพประกอบ (ถ้ามี)</label><input type="file" id="cms-news-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:font-bold file:bg-yellow-600/20 file:text-yellow-400 cursor-pointer"></div>
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">หัวข้อ (Title)</label><input type="text" id="cms-news-title" placeholder="เช่น ประกาศอัปเดตแอป" class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-yellow-500 text-sm font-bold"></div>
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">รายละเอียด (Content)</label><textarea id="cms-news-content" rows="4" placeholder="รายละเอียด..." class="w-full p-2.5 bg-slate-800 text-white border border-slate-700 rounded-xl outline-none focus:border-yellow-500 text-sm"></textarea></div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-800/40 p-3 border border-slate-700 rounded-xl"><div class="flex items-center gap-2"><input type="checkbox" id="cms-news-ispromo" class="w-4 h-4 accent-red-500 rounded cursor-pointer"><label for="cms-news-ispromo" class="text-xs font-bold text-slate-300 cursor-pointer">ใส่ป้าย <span class="bg-red-500 text-white px-1 py-0.5 rounded ml-1 text-[10px]">PROMO</span></label></div><div class="grid grid-cols-2 gap-2"><div><label class="block text-[10px] font-bold text-slate-400 mb-1">เวลาเริ่ม</label><input type="datetime-local" id="cms-news-start" class="w-full p-1.5 bg-slate-900 text-white border border-slate-700 rounded md text-[10px] outline-none"></div><div><label class="block text-[10px] font-bold text-slate-400 mb-1">เวลาลบออโต้</label><input type="datetime-local" id="cms-news-end" class="w-full p-1.5 bg-slate-900 text-white border border-slate-700 rounded md text-[10px] outline-none"></div></div></div>
-              <button onclick="addNewsContent()" id="btn-submit-news" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-xl shadow-md transition"><i class="fas fa-paper-plane mr-1"></i> ยืนยันโพสต์ประกาศ</button>
+              <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">รูปภาพประกอบ (ถ้ามี)</label><input type="file" id="cms-news-file" accept="image/*" class="w-full text-xs text-gray-500 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:font-bold file:bg-blue-600/20 file:text-blue-500 cursor-pointer"></div>
+              <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">หัวข้อ (Title)</label><input type="text" id="cms-news-title" placeholder="เช่น ประกาศอัปเดตแอป" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm font-bold"></div>
+              <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">รายละเอียด (Content)</label><textarea id="cms-news-content" rows="4" placeholder="รายละเอียด..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm"></textarea></div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 rounded-xl"><div class="flex items-center gap-2"><input type="checkbox" id="cms-news-ispromo" class="w-4 h-4 accent-red-500 rounded cursor-pointer"><label for="cms-news-ispromo" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">ใส่ป้าย <span class="bg-red-500 text-white px-1 py-0.5 rounded ml-1 text-[10px]">PROMO</span></label></div><div class="grid grid-cols-2 gap-2"><div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เวลาเริ่ม</label><input type="datetime-local" id="cms-news-start" class="w-full p-1.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded md text-[10px] outline-none"></div><div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เวลาลบออโต้</label><input type="datetime-local" id="cms-news-end" class="w-full p-1.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded md text-[10px] outline-none"></div></div></div>
+              <button onclick="addNewsContent()" id="btn-submit-news" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition"><i class="fas fa-paper-plane mr-1"></i> ยืนยันโพสต์ประกาศ</button>
           </div>
       </div>
   </div>
 
   <div id="modalManageVehicle" class="hidden fixed inset-0 z-[120] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-base font-bold text-indigo-400" id="vehicle-modal-title"><i class="fas fa-car"></i> เพิ่มประเภทรถใหม่</h2>
-              <button onclick="closeModal('modalManageVehicle')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-base font-bold text-blue-600 dark:text-[#1da1f2]" id="vehicle-modal-title"><i class="fas fa-car"></i> เพิ่มประเภทรถใหม่</h2>
+              <button onclick="closeModal('modalManageVehicle')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5 space-y-3">
               <input type="hidden" id="veh-id">
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">รหัสอ้างอิง (ภาษาอังกฤษห้ามเว้นวรรค เช่น car, vip_car)</label><input type="text" id="veh-key" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs"></div>
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อประเภทรถ (โชว์ให้ลูกค้าเห็น)</label><input type="text" id="veh-name" placeholder="รถยนต์ 4 ที่นั่ง" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-sm font-bold"></div>
-              <div><label class="block text-xs font-bold text-slate-400 mb-1">ชื่อไอคอน FontAwesome (เช่น fa-car, fa-motorcycle)</label><input type="text" id="veh-icon" value="fa-car-side" class="w-full p-2 bg-slate-800 text-white border border-slate-700 rounded-lg outline-none text-xs font-mono"></div>
+              <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">รหัสอ้างอิง (ภาษาอังกฤษห้ามเว้นวรรค เช่น car, vip_car)</label><input type="text" id="veh-key" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs"></div>
+              <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">ชื่อประเภทรถ (โชว์ให้ลูกค้าเห็น)</label><input type="text" id="veh-name" placeholder="รถยนต์ 4 ที่นั่ง" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-sm font-bold"></div>
+              <div><label class="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-1">ชื่อไอคอน FontAwesome (เช่น fa-car, fa-motorcycle)</label><input type="text" id="veh-icon" value="fa-car-side" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-mono"></div>
               
               <div class="grid grid-cols-2 gap-3 mt-4 border-t border-gray-200 dark:border-slate-800 pt-3">
                   <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เริ่มสตาร์ท (บาท)</label><input type="number" id="veh-base" oninput="window.updatePricePreview()" class="w-full p-2 bg-white dark:bg-slate-800 text-green-600 dark:text-green-400 border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-center text-xs focus:border-indigo-500"></div>
@@ -553,41 +597,40 @@
                       </div>
                   </div>
 
-                  <div class="col-span-2 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl p-3 mt-1 transition-colors">
+                  <div class="col-span-2 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-slate-700 rounded-xl p-3 mt-1 transition-colors">
                       <div class="flex justify-between items-start mb-1">
-                          <p class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400"><i class="fas fa-eye"></i> พรีวิวราคาโชว์ผู้โดยสาร</p>
+                          <p class="text-[10px] font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-eye"></i> พรีวิวราคาโชว์ผู้โดยสาร</p>
                           <p class="text-[9px] text-gray-500 dark:text-slate-400">(สมมติลูกค้านั่ง: 10 กม. / รถห่าง: 2 ถึง 15 กม.)</p>
                       </div>
-                      <h3 class="text-xl font-black text-indigo-600 dark:text-indigo-400" id="preview-price-result">~฿0 - 0</h3>
+                      <h3 class="text-xl font-black text-blue-600 dark:text-[#1da1f2]" id="preview-price-result">~฿0 - 0</h3>
                   </div>
 
-                  <div class="col-span-2 mt-1"><button onclick="window.saveVehicleData()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition text-sm">บันทึกตั้งค่าระบบ</button></div>
-              </div>
+                  <div class="col-span-2 mt-1"><button onclick="window.saveVehicleData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow transition text-sm">บันทึกตั้งค่าระบบ</button></div>
               </div>
           </div>
       </div>
   </div>
 
   <div id="modalPendingJobs" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-yellow-500"><i class="fas fa-clock"></i> กระดานคิวงานเรียกรถ (รอผู้ขับขี่)</h2>
-              <button onclick="closeModal('modalPendingJobs')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-yellow-600"><i class="fas fa-clock"></i> กระดานคิวงานเรียกรถ (รอผู้ขับขี่)</h2>
+              <button onclick="closeModal('modalPendingJobs')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
               <table class="w-full text-left border-collapse min-w-[700px]">
-                  <thead><tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase font-bold bg-slate-800/20"><th class="py-3 px-2 text-left">ผู้โดยสาร</th><th class="py-3 px-2 text-left">จุดรับ-ปลายทาง</th><th class="py-3 px-2 text-center">รถ</th><th class="py-3 px-2 text-left font-bold">ราคา</th><th class="py-3 px-2 text-right">การจ่ายงาน</th></tr></thead>
-                  <tbody id="modal-pending-list" class="text-sm divide-y divide-slate-800"></tbody>
+                  <thead><tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold bg-gray-100 dark:bg-slate-800/20"><th class="py-3 px-2 text-left">ผู้โดยสาร</th><th class="py-3 px-2 text-left">จุดรับ-ปลายทาง</th><th class="py-3 px-2 text-center">รถ</th><th class="py-3 px-2 text-left font-bold">ราคา</th><th class="py-3 px-2 text-right">การจ่ายงาน</th></tr></thead>
+                  <tbody id="modal-pending-list" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"></tbody>
               </table>
           </div>
       </div>
   </div>
 
   <div id="modalAssignDriver" class="hidden fixed inset-0 z-[150] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-blue-500/50 rounded-3xl w-full max-w-md shadow-2xl flex flex-col max-h-[80vh] overflow-hidden animate-fade-in">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/80">
-              <h2 class="text-base font-bold text-blue-400"><i class="fas fa-hand-pointer mr-1"></i> จ่ายงาน: เลือกคนขับ</h2>
-              <button onclick="closeModal('modalAssignDriver')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-blue-500/50 rounded-3xl w-full max-w-md shadow-2xl flex flex-col max-h-[80vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/80">
+              <h2 class="text-base font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-hand-pointer mr-1"></i> จ่ายงาน: เลือกคนขับ</h2>
+              <button onclick="closeModal('modalAssignDriver')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-4 overflow-y-auto flex-1 slim-scroll">
               <div id="assign-driver-list" class="space-y-2"></div>
@@ -596,66 +639,53 @@
   </div>
 
   <div id="modalOnlineDrivers" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh]">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-green-400"><i class="fas fa-radar"></i> คนขับออนไลน์</h2>
-              <button onclick="closeModal('modalOnlineDrivers')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh]">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 rounded-t-2xl">
+              <h2 class="text-lg font-bold text-[#1da1f2]"><i class="fas fa-radar"></i> คนขับออนไลน์</h2>
+              <button onclick="closeModal('modalOnlineDrivers')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
               <table class="w-full text-left border-collapse">
-                  <tbody id="modal-online-list" class="text-sm divide-y divide-slate-800"></tbody>
+                  <tbody id="modal-online-list" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"></tbody>
               </table>
           </div>
       </div>
   </div>
 
   <div id="modalPassengerDetails" class="hidden fixed inset-0 z-[110] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-blue-500/30 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col overflow-hidden text-left">
-          <div class="p-5 border-b border-slate-800 bg-slate-800/50 relative">
-              <button onclick="closeModal('modalPassengerDetails')" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-blue-500/30 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col overflow-hidden text-left">
+          <div class="p-5 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 relative">
+              <button onclick="closeModal('modalPassengerDetails')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fas fa-times"></i></button>
               <div class="flex items-center gap-4">
-                  <div class="w-14 h-14 bg-blue-900/50 text-blue-400 rounded-full flex items-center justify-center text-2xl border border-blue-500/30 shrink-0"><i class="fas fa-user-astronaut"></i></div>
+                  <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 text-[#1da1f2] rounded-full flex items-center justify-center text-2xl border border-blue-200 dark:border-slate-700 shrink-0"><i class="fas fa-user-astronaut"></i></div>
                   <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2"><h2 class="text-lg font-black text-white truncate" id="pdet-name">ชื่อลูกค้า</h2><span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></div>
-                      <p class="text-xs font-bold text-blue-400 mt-0.5" id="pdet-phone">เบอร์โทร: -</p>
-                      <p class="text-[10px] text-slate-400 font-mono mt-0.5" id="pdet-id">ID: -</p>
-                      <p class="text-[10px] text-slate-400 mt-1" id="pdet-join">ใช้งานครั้งแรก: -</p>
+                      <div class="flex items-center gap-2"><h2 class="text-lg font-black text-gray-800 dark:text-white truncate" id="pdet-name">ชื่อลูกค้า</h2><span class="bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-500 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></div>
+                      <p class="text-xs font-bold text-blue-500 dark:text-[#1da1f2] mt-0.5" id="pdet-phone">เบอร์โทร: -</p>
+                      <p class="text-[10px] text-gray-500 dark:text-slate-400 font-mono mt-0.5" id="pdet-id">ID: -</p>
+                      <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1" id="pdet-join">ใช้งานครั้งแรก: -</p>
                   </div>
               </div>
           </div>
           <div class="p-5 space-y-4">
               <div class="grid grid-cols-2 gap-3">
-                  <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><p class="text-[10px] text-slate-400 font-bold uppercase mb-1">เรียกใช้บริการ</p><p class="text-xl font-black text-white" id="pdet-rides">0 <span class="text-[10px] text-slate-500 font-normal">ครั้ง</span></p></div>
-                  <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><p class="text-[10px] text-slate-400 font-bold uppercase mb-1">ยอดชำระสะสม</p><p class="text-xl font-black text-green-400" id="pdet-spend">฿0</p></div>
+                  <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">เรียกใช้บริการ</p><p class="text-xl font-black text-gray-800 dark:text-white" id="pdet-rides">0 <span class="text-[10px] text-gray-400 font-normal">ครั้ง</span></p></div>
+                  <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">ยอดชำระสะสม</p><p class="text-xl font-black text-green-500" id="pdet-spend">฿0</p></div>
               </div>
-              <div class="bg-slate-800 p-3 rounded-xl border border-slate-700"><p class="text-[10px] text-slate-400 font-bold uppercase mb-1">ประวัติการเคลมส่วนลด</p><p class="text-xs text-slate-300 break-words" id="pdet-promos">-</p></div>
-              <button onclick="blockPassengerFromModal()" class="w-full bg-red-900/30 hover:bg-red-600 text-red-400 hover:text-white font-bold py-3 rounded-xl border border-red-900/50 transition mt-2 text-sm flex items-center justify-center gap-2"><i class="fas fa-ban"></i> ระงับสิทธิ์การใช้งาน (Block)</button>
+              <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">ประวัติการเคลมส่วนลด</p><p class="text-xs text-gray-700 dark:text-slate-300 break-words" id="pdet-promos">-</p></div>
+              <button onclick="blockPassengerFromModal()" class="w-full bg-red-100 dark:bg-red-900/30 hover:bg-red-600 text-red-600 hover:text-white font-bold py-3 rounded-xl border border-red-200 dark:border-red-900/50 transition mt-2 text-sm flex items-center justify-center gap-2"><i class="fas fa-ban"></i> ระงับสิทธิ์การใช้งาน (Block)</button>
           </div>
       </div>
   </div>
 
   <div id="modalViewChatLog" class="hidden fixed inset-0 z-[150] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-blue-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col h-[80vh] overflow-hidden animate-fade-in">
-          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/80">
-              <h2 class="text-base font-bold text-blue-400"><i class="fas fa-comments mr-1"></i> ประวัติสนทนา</h2>
-              <button onclick="closeModal('modalViewChatLog')" class="text-slate-400 hover:text-white bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+      <div class="bg-white dark:bg-slate-900 border border-blue-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col h-[80vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/80">
+              <h2 class="text-base font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-comments mr-1"></i> ประวัติสนทนา</h2>
+              <button onclick="closeModal('modalViewChatLog')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
-          <div id="chatlog-messages-container" class="p-4 overflow-y-auto flex-1 slim-scroll bg-slate-900 space-y-3">
+          <div id="chatlog-messages-container" class="p-4 overflow-y-auto flex-1 slim-scroll bg-white dark:bg-slate-900 space-y-3">
           </div>
       </div>
-  </div>
-
-  <!-- 🌟 บาร์ด้านล่างสุดของจอ (Bottom Navigation) -->
-  <div class="fixed bottom-0 left-0 right-0 h-[68px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200 dark:border-slate-800 z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_20px_rgba(0,0,0,0.3)] transition-colors duration-300">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-blue-600 dark:text-blue-400 transition active:scale-90">
-          <i class="fas fa-home text-xl mb-1"></i><span class="text-[10px] font-bold">หน้าหลัก</span>
-      </button>
-      <button onclick="switchTab('allmenu')" id="nav-allmenu" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition active:scale-90">
-          <i class="fas fa-th-large text-xl mb-1"></i><span class="text-[10px] font-bold">เมนูระบบ</span>
-      </button>
-      <button onclick="switchTab('map')" id="nav-map" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition active:scale-90 relative">
-          <i class="fas fa-map-marked-alt text-xl mb-1"></i><span class="text-[10px] font-bold">แผนที่รถ</span>
-      </button>
   </div>
 
   <script>
@@ -676,7 +706,8 @@
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
     const db = firebase.database();
-// ==========================================
+    
+    // ==========================================
     // 🌟 ระบบสลับโหมด มืด/สว่าง สำหรับแอดมิน
     // ==========================================
     window.toggleAdminTheme = function() {
@@ -705,15 +736,15 @@
         if(!icon || !btn) return;
 
         if(type === 'success') {
-            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-green-900/30 text-green-500 border border-green-500/30';
+            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-50 dark:bg-slate-800 text-[#1da1f2] border border-blue-200 dark:border-slate-700';
             icon.innerHTML = '<i class="fas fa-check"></i>';
-            btn.className = 'w-full py-3 bg-green-600 text-white font-bold rounded-xl shadow-md hover:bg-green-700 transition';
+            btn.className = 'w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition';
         } else if(type === 'error') {
             icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-red-900/30 text-red-500 border border-red-500/30';
             icon.innerHTML = '<i class="fas fa-times"></i>';
             btn.className = 'w-full py-3 bg-red-600 text-white font-bold rounded-xl shadow-md hover:bg-red-700 transition';
         } else {
-            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-900/30 text-blue-500 border border-blue-500/30';
+            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-50 dark:bg-slate-800 text-[#1da1f2] border border-blue-200 dark:border-slate-700';
             icon.innerHTML = '<i class="fas fa-info"></i>';
             btn.className = 'w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition';
         }
@@ -732,7 +763,7 @@
             icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
             btn.className = 'flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-md hover:bg-red-700 transition';
         } else {
-            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-900/30 text-blue-500 border border-blue-500/30';
+            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-blue-50 dark:bg-slate-800 text-[#1da1f2] border border-blue-200 dark:border-slate-700';
             icon.innerHTML = '<i class="fas fa-question-circle"></i>';
             btn.className = 'flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition';
         }
@@ -758,10 +789,9 @@
             if(tabId === 'map') targetContent.classList.add('flex');
         }
 
-        // จัดการ History Stack
         if(!isBack) {
             if(tabId === 'dashboard' || tabId === 'allmenu' || tabId === 'map') {
-                window.adminHistoryStack = [tabId]; // หน้าหลักไม่ซ้อน
+                window.adminHistoryStack = [tabId];
             } else {
                 if(window.adminHistoryStack[window.adminHistoryStack.length - 1] !== tabId) {
                     window.adminHistoryStack.push(tabId);
@@ -769,7 +799,6 @@
             }
         }
 
-        // เปิด/ปิด ปุ่มย้อนกลับ
         let backBtn = document.getElementById('admin-back-btn');
         if(backBtn) {
             if(window.adminHistoryStack.length > 1) backBtn.classList.remove('hidden');
@@ -779,12 +808,12 @@
         let titleEl = document.getElementById('current-page-title');
         if(titleEl) titleEl.innerText = tabTitles[tabId] || 'แดชบอร์ด';
 
-        document.querySelectorAll('.nav-bottom-btn').forEach(btn => { btn.classList.remove('text-blue-600', 'dark:text-blue-400'); btn.classList.add('text-gray-400', 'dark:text-slate-500'); });
+        document.querySelectorAll('.nav-bottom-btn').forEach(btn => { btn.classList.remove('text-blue-600', 'dark:text-[#1da1f2]'); btn.classList.add('text-gray-400', 'dark:text-slate-500'); });
         
         let bottomMap = { 'dashboard': 'nav-dashboard', 'map': 'nav-map' };
         let activeNavId = bottomMap[tabId] || 'nav-allmenu'; 
         let activeNav = document.getElementById(activeNavId);
-        if(activeNav) { activeNav.classList.remove('text-gray-400', 'dark:text-slate-500'); activeNav.classList.add('text-blue-600', 'dark:text-blue-400'); }
+        if(activeNav && activeNavId !== 'nav-allmenu') { activeNav.classList.remove('text-gray-400', 'dark:text-slate-500'); activeNav.classList.add('text-blue-600', 'dark:text-[#1da1f2]'); }
 
         if(tabId === 'passengers') renderPassengers();
         if(tabId === 'promos') renderPromoList();
@@ -859,18 +888,18 @@
 
         if(jobsArr.length === 0) {
              let lst = document.getElementById('history-jobs-list');
-             if(lst) lst.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-500">ยังไม่มีข้อมูลในประวัติสารบบคิว</td></tr>'; return;
+             if(lst) lst.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-gray-400">ยังไม่มีข้อมูลในประวัติสารบบคิว</td></tr>'; return;
         }
         jobsArr.forEach(j => {
-            let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-400 text-base"></i>' : '<i class="fas fa-car-side text-green-400 text-base"></i>';
-            html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/20">
-                <td class="py-3 px-2 font-bold text-white text-left">${j.name || 'ลูกค้า'}<br><span class="text-[10px] text-slate-500 font-normal">${j.phone || '-'}</span></td>
+            let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-[#1da1f2] text-base"></i>' : '<i class="fas fa-car-side text-[#1da1f2] text-base"></i>';
+            html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/20">
+                <td class="py-3 px-2 font-bold text-gray-800 dark:text-white text-left">${j.name || 'ลูกค้า'}<br><span class="text-[10px] text-gray-400 dark:text-slate-500 font-normal">${j.phone || '-'}</span></td>
                 <td class="py-3 px-2 text-center">${srvIcon}</td>
-                <td class="py-3 px-2 text-xs text-slate-400 max-w-[150px] truncate text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
+                <td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400 max-w-[150px] truncate text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
                 <td class="py-3 px-2 text-left">${j.distance || '0'} กม.</td>
-                <td class="py-3 px-2 font-bold text-green-400 text-left">฿${j.price}</td>
-                <td class="py-3 px-2 font-bold cursor-pointer hover:text-green-400 text-left" onclick="showDriverDetails('${j.driverPin}')"><u>${j.driverPin || '-'}</u></td>
-                <td class="py-3 px-2 text-right"><span class="px-2 py-0.5 rounded border text-[10px] font-bold text-green-400 bg-green-500/10 border-green-500/20">${j.status}</span></td>
+                <td class="py-3 px-2 font-bold text-blue-500 dark:text-[#1da1f2] text-left">฿${j.price}</td>
+                <td class="py-3 px-2 font-bold cursor-pointer hover:text-blue-500 text-left" onclick="showDriverDetails('${j.driverPin}')"><u>${j.driverPin || '-'}</u></td>
+                <td class="py-3 px-2 text-right"><span class="px-2 py-0.5 rounded border text-[10px] font-bold text-blue-500 dark:text-[#1da1f2] bg-blue-500/10 border-blue-500/20">${j.status}</span></td>
             </tr>`;
         });
         let lst = document.getElementById('history-jobs-list'); if(lst) lst.innerHTML = html;
@@ -880,7 +909,6 @@
     let adminMap = null; let liveMarkers = {};
     window.mapFilterUser = 'all'; window.mapFilterVehicle = 'all';
 
-    // 🌟 ระบบคุมตัวกรอง
     window.refreshMapFilters = function() {
         window.mapFilterUser = document.getElementById('map-filter-user').value;
         window.mapFilterVehicle = document.getElementById('map-filter-vehicle').value;
@@ -894,29 +922,27 @@
         }
     }
 
-    // 🌟 แยกสไตล์แผนที่เป็น 2 โหมด
     let darkMapStyle = [
-        { elementType: "geometry", stylers: [{ color: "#0f172a" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
-        { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
-        { featureType: "water", elementType: "geometry", stylers: [{ color: "#020617" }] },
+        { elementType: "geometry", stylers: [{ color: "#121212" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#121212" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#A0A0A0" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#252525" }] },
+        { featureType: "water", elementType: "geometry", stylers: [{ color: "#1A1A1A" }] },
         { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } 
     ];
     let lightMapStyle = [
-        { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] } // คลีนๆ แบบสว่าง
+        { featureType: "poi", elementType: "labels.icon", stylers: [{ visibility: "off" }] }
     ];
 
     window.initAdminMap = function() {
         if(typeof google === 'undefined' || adminMap) return;
         
-        // เช็คว่าตอนนี้เป็นโหมดไหน
         let isDark = document.documentElement.classList.contains('dark');
 
         adminMap = new google.maps.Map(document.getElementById('adminLiveMap'), {
             zoom: 13, center: {lat: 19.910479, lng: 99.840576},
             mapTypeId: 'roadmap', 
-            styles: isDark ? darkMapStyle : lightMapStyle, // 🌟 สลับสีแผนที่อัตโนมัติ
+            styles: isDark ? darkMapStyle : lightMapStyle,
             disableDefaultUI: true, gestureHandling: 'greedy'
         });
         
@@ -925,7 +951,6 @@
             if(loader) loader.style.display = 'none';
         });
         
-        // 🌟 1. ดึงข้อมูลลูกค้า (ส่ง pictureUrl ไปให้หมุดด้วย)
         db.ref('active_passengers').on('value', snap => {
             let passCount = 0; let now = Date.now();
             if(snap.exists()) {
@@ -933,7 +958,6 @@
                     let p = child.val();
                     if(now - p.timestamp < 300000) { 
                         passCount++; 
-                        // ส่ง p.pictureUrl พ่วงเข้าไปเป็น Parameter ตัวสุดท้าย
                         updateAdminMarker(child.key, p.lat, p.lng, p.name, 'passenger', 'none', p.pictureUrl); 
                     } 
                     else { removeAdminMarker(child.key); }
@@ -942,7 +966,6 @@
             document.getElementById('map-pass-count').innerText = passCount;
         });
 
-        // 🌟 2. ดึงข้อมูลคนขับ (ใส่ null ตรงช่องรูปโปรไฟล์ เพราะเราจะใช้ไอคอนรูปรถแทน)
         setInterval(() => {
             let drvCount = 0;
             if(windowContext.onlineDrivers) {
@@ -957,7 +980,6 @@
         }, 3000);
     }
 
-    // 🌟 3. ฟังก์ชันอัปเดตหมุด (รองรับการใส่รูปโปรไฟล์ LINE)
     function updateAdminMarker(id, lat, lng, title, type, vehicleType, profilePic) {
         if(!adminMap) return;
         
@@ -965,19 +987,17 @@
         if(window.mapFilterUser !== 'all' && type !== window.mapFilterUser) show = false;
         if(type === 'driver' && window.mapFilterVehicle !== 'all' && vehicleType !== window.mapFilterVehicle) show = false;
 
-        // กำหนดรูปไอคอน และขนาด
-        let iconUrl = "https://img.icons8.com/color/48/marker--v1.png"; // ไอคอนลูกค้า (กรณีไม่มีรูปไลน์)
-        let sizeX = 35, sizeY = 35; // ขนาดไอคอนปกติ
+        let iconUrl = "https://img.icons8.com/color/48/marker--v1.png"; 
+        let sizeX = 35, sizeY = 35; 
 
         if (type === 'driver') {
-            iconUrl = "https://img.icons8.com/color/48/car-top-view.png"; // รูปรถ
+            iconUrl = "https://img.icons8.com/color/48/car-top-view.png"; 
         } else if (type === 'passenger' && profilePic) {
-            // 🌟 ถ้าเป็นลูกค้า และมีรูป LINE ส่งมา ให้เอารูป LINE มาแสดงเลย!
             iconUrl = profilePic;
-            sizeX = 32; sizeY = 32; // ปรับขนาดรูปโปรไฟล์ให้เล็กลงนิดนึงจะได้ไม่บังแผนที่
+            sizeX = 32; sizeY = 32; 
         }
 
-        let labelColor = type === 'driver' ? '#4ade80' : '#60a5fa';
+        let labelColor = '#1da1f2';
 
         if(!liveMarkers[id]) {
             let m = new google.maps.Marker({ 
@@ -987,7 +1007,7 @@
                 icon: { 
                     url: iconUrl, 
                     scaledSize: new google.maps.Size(sizeX, sizeY), 
-                    labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10) // ดันข้อความให้อยู่ใต้รูปภาพ
+                    labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10)
                 },
                 label: { text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' }
             });
@@ -1007,7 +1027,6 @@
             liveMarkers[id].marker.setMap(show ? adminMap : null);
             liveMarkers[id].marker.setLabel({ text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' });
             
-            // 🌟 อัปเดตไอคอนเผื่อรูปลูกค้าเพิ่งโหลดเสร็จ
             liveMarkers[id].marker.setIcon({
                 url: iconUrl, 
                 scaledSize: new google.maps.Size(sizeX, sizeY), 
@@ -1018,8 +1037,7 @@
 
     function removeAdminMarker(id) { if(liveMarkers[id]) { liveMarkers[id].marker.setMap(null); delete liveMarkers[id]; } }
 
-// ================= ระบบจัดการคนขับ (ทำเนียบคนขับโฉมใหม่) =================
-    // 🌟 ระบบค้นหา
+    // ================= ระบบจัดการคนขับ =================
     window.filterDrivers = function() {
         let keyword = document.getElementById('search-driver-input').value.toLowerCase();
         let rows = document.querySelectorAll('.driver-row-item');
@@ -1039,42 +1057,36 @@
             snap.forEach(child => { 
                 count++;
                 let d = child.val();
-                // 🌟 โชว์เฉพาะรหัส ชื่อ และเบอร์ ตามที่คุณต้องการ
                 html += `
-                <tr class="driver-row-item cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors" onclick="showDriverDetails('${d.pin}')">
-                    <td class="py-3.5 px-3 font-black text-green-600 dark:text-green-400 w-20">${d.pin}</td>
+                <tr class="driver-row-item cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800/60 transition-colors" onclick="showDriverDetails('${d.pin}')">
+                    <td class="py-3.5 px-3 font-black text-[#1da1f2] w-20">${d.pin}</td>
                     <td class="py-3.5 px-3 font-bold text-gray-800 dark:text-white">${d.name}</td>
                     <td class="py-3.5 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono">${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-gray-400 ml-1"></i></td>
                 </tr>`;
             });
             table.innerHTML = html;
         } else if(table) {
-            table.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-gray-500">ยังไม่มีการเพิ่มรายชื่อคนขับ</td></tr>';
+            table.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-gray-400">ยังไม่มีการเพิ่มรายชื่อคนขับ</td></tr>';
         }
         
         let statTotal = document.getElementById('stat-total-drivers');
         if(statTotal) statTotal.innerText = count;
     });
 
-    // ==========================================
-    // 🌟 ระบบโปรไฟล์คนขับแบบเต็มจอ (รองรับรถหลายคัน & Logs)
-    // ==========================================
-    window.currentDriverVehicles = {}; // ตัวแปรเก็บข้อมูลรถชั่วคราวขณะแก้ไข
+    window.currentDriverVehicles = {}; 
 
     window.showDriverDetails = function(pin) {
         let d = allProfiles[pin]; 
         if(!d) return; 
         window.currentDriverFocus = pin;
 
-        // ใส่ข้อมูลพื้นฐาน
         document.getElementById('det-name').innerText = d.name;
         document.getElementById('det-pin').innerText = "PIN: " + d.pin;
         document.getElementById('det-phone').value = d.phone || '';
 
-        // 🌟 ดึงข้อมูลรถ (ถ้าเป็นแบบเก่า จะแปลงเป็นรูปแบบรถหลายคันให้อัตโนมัติ)
         let vehicles = {};
         if (d.vehicles) {
-            vehicles = JSON.parse(JSON.stringify(d.vehicles)); // ก๊อปปี้ข้อมูลมาแก้ไข
+            vehicles = JSON.parse(JSON.stringify(d.vehicles)); 
         } else if (d.plate) {
             let vId = 'veh_' + Date.now();
             vehicles[vId] = { id: vId, serviceType: d.serviceType || 'car', brand: d.brand || '', color: d.color || '', plate: d.plate || '', isOnline: false };
@@ -1083,7 +1095,6 @@
         renderDriverVehicles();
         renderDriverLogs(pin);
 
-        // คำนวณรายได้และคะแนนเหมือนเดิม
         let rEl = document.getElementById('det-rating'); let cEl = document.getElementById('det-rating-count');
         if (d.ratings) {
             let total = 0; let count = 0; Object.values(d.ratings).forEach(r => { total += parseInt(r.score); count++; });
@@ -1104,7 +1115,6 @@
         document.getElementById('det-today-earn').innerText = "฿" + todayEarn.toLocaleString();
         document.getElementById('det-total-earn').innerText = "฿" + totalEarn.toLocaleString();
 
-        // 🌟 เลื่อนหน้าต่าง Slide-out ออกมา
         document.getElementById('pageDriverDetails').classList.remove('translate-x-full');
     }
 
@@ -1112,7 +1122,6 @@
         document.getElementById('pageDriverDetails').classList.add('translate-x-full');
     }
 
-    // 🌟 ระบบวาดกล่องรถยนต์หลายคัน
     window.renderDriverVehicles = function() {
         let container = document.getElementById('driver-vehicles-container');
         let html = '';
@@ -1120,7 +1129,6 @@
         for (let vId in window.currentDriverVehicles) {
             let v = window.currentDriverVehicles[vId];
             
-            // 🌟 สร้าง Dropdown โดยดึงรายชื่อจากตัวแปรกลาง (window.systemVehicleTypes)
             let selectHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-indigo-500">`;
             
             if (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) {
@@ -1138,9 +1146,10 @@
                 <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 w-7 h-7 rounded-lg flex items-center justify-center transition shadow-sm border border-red-100 dark:border-red-500/20"><i class="fas fa-trash-alt text-[11px]"></i></button>
                 
                 <div class="flex justify-between items-center mb-3 pr-10">
+                    <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="v-online-${vId}" onchange="toggleVehicleOnline('${vId}', this.checked)" class="sr-only peer" ${v.isOnline ? 'checked' : ''}>
                         <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
-                        <span class="ml-2 text-xs font-bold ${v.isOnline ? 'text-green-600 dark:text-green-500' : 'text-gray-500 dark:text-slate-400'}">${v.isOnline ? 'ออนไลน์' : 'ออฟไลน์'}</span>
+                        <span class="ml-2 text-xs font-bold ${v.isOnline ? 'text-blue-500' : 'text-gray-500 dark:text-slate-400'}">${v.isOnline ? 'ออนไลน์' : 'ออฟไลน์'}</span>
                     </label>
                 </div>
                 
@@ -1157,9 +1166,9 @@
                 </div>
             </div>`;
         }
-        container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-100 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">ยังไม่มีรถที่ลงทะเบียน กดปุ่ม + ด้านบนเพื่อเพิ่มรถครับ</p>';
+        container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">ยังไม่มีรถที่ลงทะเบียน กดปุ่ม + ด้านบนเพื่อเพิ่มรถครับ</p>';
     }
-    // ฟังก์ชันจัดการชั่วคราว
+
     window.addDriverVehicle = function() {
         let vId = 'veh_' + Date.now();
         window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', isOnline: false };
@@ -1175,10 +1184,9 @@
     }
     window.toggleVehicleOnline = function(vId, isOnline) {
         window.currentDriverVehicles[vId].isOnline = isOnline;
-        renderDriverVehicles(); // อัปเดตสีตัวหนังสือ
+        renderDriverVehicles();
     }
 
-    // 🌟 ระบบดึง Log การใช้งาน (ออฟไลน์/ออนไลน์ + พิกัด)
     window.renderDriverLogs = function(pin) {
         let tbody = document.getElementById('det-logs-table');
         tbody.innerHTML = '<tr><td class="py-4 text-center text-gray-400">กำลังโหลด...</td></tr>';
@@ -1193,22 +1201,21 @@
             let html = '';
             logs.forEach(lg => {
                 let timeStr = new Date(lg.timestamp).toLocaleString('th-TH');
-                let color = lg.action === 'online' ? 'text-green-500' : 'text-gray-500 dark:text-slate-400';
-                let txt = lg.action === 'online' ? '🟢 เปิดรับงาน (Online)' : '⚫ ปิดรับงาน (Offline)';
+                let color = lg.action === 'online' ? 'text-blue-500' : 'text-gray-500 dark:text-slate-400';
+                let txt = lg.action === 'online' ? '🔵 เปิดรับงาน (Online)' : '⚫ ปิดรับงาน (Offline)';
                 let loc = (lg.lat && lg.lng) ? `พิกัด: ${lg.lat.toFixed(5)}, ${lg.lng.toFixed(5)}` : 'ไม่ระบุพิกัด';
-                html += `<tr class="hover:bg-gray-50 dark:hover:bg-slate-800 transition border-b border-gray-100 dark:border-slate-800 last:border-0">
+                html += `<tr class="hover:bg-gray-100 dark:hover:bg-slate-800 transition border-b border-gray-200 dark:border-slate-800 last:border-0">
                     <td class="py-2 px-3">
                         <p class="font-bold ${color} text-[11px]">${txt}</p>
                         <p class="text-[9px] text-gray-400 dark:text-slate-500">${timeStr}</p>
                     </td>
-                    <td class="py-2 px-3 text-right text-[9px] text-blue-500 dark:text-blue-400 cursor-pointer" onclick="window.open('https://maps.google.com/?q=${lg.lat},${lg.lng}', '_blank')">${loc}</td>
+                    <td class="py-2 px-3 text-right text-[9px] text-blue-500 dark:text-[#1da1f2] cursor-pointer" onclick="window.open('http://maps.google.com/?q=${lg.lat},${lg.lng}', '_blank')">${loc}</td>
                 </tr>`;
             });
             tbody.innerHTML = html;
         });
     }
 
-    // 🌟 บันทึกข้อมูลลงฐานข้อมูลจริง
     window.saveDriverUpdates = function() {
         let pin = window.currentDriverFocus;
         let phone = document.getElementById('det-phone').value.trim();
@@ -1220,14 +1227,11 @@
             vehicles: window.currentDriverVehicles
         }).then(() => {
             showCustomAlert('สำเร็จ', 'บันทึกข้อมูลส่วนตัวและยานพาหนะเรียบร้อยแล้ว', 'success');
-            
-            // 🌟 (ถ้าแอดมินบังคับออนไลน์/ออฟไลน์ เราจะยิง Log ให้ด้วย)
             db.ref('driver_logs/' + pin).push({
                 action: 'admin_updated',
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
                 note: "แอดมินแก้ไขโปรไฟล์และสถานะ"
             });
-            
             closeDriverProfilePage();
         });
     }
@@ -1246,24 +1250,22 @@
     function renderPassengers() {
         let passMap = {};
         
-        // 🌟 1. ดึงข้อมูลจากประวัติที่จบงานแล้ว
         Object.values(allCompletedJobs).forEach(job => {
-            let uid = job.userId; // 🌟 ใช้ LINE User ID เป็นตัวแบ่งแยกหลัก
-            if(!uid) uid = job.phone; // ถ้าเกิดเป็นข้อมูลเก่ามากที่ไม่มี LINE ID ค่อยสำรองใช้เบอร์แทน
+            let uid = job.userId; 
+            if(!uid) uid = job.phone; 
             if(!uid) return;
             
             if(!passMap[uid]) {
                 passMap[uid] = { 
                     userId: uid,
-                    phone: job.phone || '-', // เบอร์โทร
-                    name: job.name || 'สมาชิกลูกค้า', // ชื่อ
+                    phone: job.phone || '-', 
+                    name: job.name || 'สมาชิกลูกค้า', 
                     rides: 0, 
                     spend: 0, 
                     promos: [], 
                     firstRide: job.completedAt || job.timestamp || Date.now() 
                 };
             } else {
-                // 🌟 ถ้าระบบเจอว่าใช้ LINE ID เดิม แต่พิมพ์เบอร์/ชื่อมาใหม่ จะอัปเดตเป็นของล่าสุดเสมอ
                 if(job.phone) passMap[uid].phone = job.phone;
                 if(job.name) passMap[uid].name = job.name;
             }
@@ -1274,7 +1276,6 @@
             if((job.completedAt || job.timestamp || Date.now()) < passMap[uid].firstRide) passMap[uid].firstRide = job.completedAt || job.timestamp;
         });
 
-        // 🌟 2. ดึงข้อมูลจากงานที่กำลังรอคิว (เผื่อเป็นลูกค้าใหม่เพิ่งเรียกครั้งแรก)
         if(allBookings) {
             Object.values(allBookings).forEach(job => {
                 let uid = job.userId; 
@@ -1303,26 +1304,25 @@
         if(filter === 'new') passArray = passArray.filter(p => p.rides <= 1);
         if(filter === 'regular') passArray = passArray.filter(p => p.rides > 1);
         
-        // เรียงลำดับตามคนที่จ่ายเงินให้เราเยอะสุดขึ้นก่อน (VIP)
         passArray.sort((a,b) => b.spend - a.spend);
 
         let html = '';
-        if(passArray.length === 0) { html = `<tr><td colspan="5" class="py-6 text-center text-slate-500">ไม่มีข้อมูลลิสต์รายชื่อในกลุ่มนี้</td></tr>`; } 
+        if(passArray.length === 0) { html = `<tr><td colspan="5" class="py-6 text-center text-gray-400">ไม่มีข้อมูลลิสต์รายชื่อในกลุ่มนี้</td></tr>`; } 
         else {
             passArray.forEach(p => {
                 let isNew = p.rides <= 1;
-                let badge = isNew ? `<span class="bg-green-950 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded border border-green-500/20">ผู้ใช้ใหม่</span>` : `<span class="bg-yellow-950 text-yellow-400 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-500/20">ลูกค้าประจำ</span>`;
+                let badge = isNew ? `<span class="bg-blue-950 text-[#1da1f2] text-[10px] font-bold px-2 py-0.5 rounded border border-blue-500/20">ผู้ใช้ใหม่</span>` : `<span class="bg-yellow-950 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-500/20">ลูกค้าประจำ</span>`;
                 let pDataStr = encodeURIComponent(JSON.stringify(p));
 
-                html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/50 transition cursor-pointer text-left" onclick="viewPassengerDetails('${pDataStr}')">
+                html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition cursor-pointer text-left" onclick="viewPassengerDetails('${pDataStr}')">
                     <td class="py-3 px-3 text-left">
-                        <p class="font-bold text-white hover:text-blue-400 transition flex items-center gap-2">${p.phone} <span class="bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-400 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></p>
-                        <p class="text-[10px] text-slate-400 font-medium truncate max-w-[180px]">${p.name} <span class="text-slate-600 font-normal">|</span> <span class="font-mono text-slate-500">ID: ${p.userId || '-'}</span></p>
+                        <p class="font-bold text-gray-800 dark:text-white hover:text-blue-500 transition flex items-center gap-2">${p.phone} <span class="bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-500 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></p>
+                        <p class="text-[10px] text-gray-400 dark:text-slate-500 font-medium truncate max-w-[180px]">${p.name} <span class="text-gray-300 dark:text-slate-600 font-normal">|</span> <span class="font-mono text-gray-400">ID: ${p.userId || '-'}</span></p>
                     </td>
                     <td class="py-3 px-2 text-left">${badge}</td>
-                    <td class="py-3 px-2 text-center font-bold text-blue-400">${p.rides} ครั้ง</td>
-                    <td class="py-3 px-2 text-right font-black text-green-400">฿${p.spend.toLocaleString()}</td>
-                    <td class="py-3 px-3 text-left text-[10px] text-slate-400 max-w-[120px] truncate">${p.promos.length > 0 ? p.promos.join(', ') : '-'}</td>
+                    <td class="py-3 px-2 text-center font-bold text-blue-500 dark:text-[#1da1f2]">${p.rides} ครั้ง</td>
+                    <td class="py-3 px-2 text-right font-black text-gray-800 dark:text-white">฿${p.spend.toLocaleString()}</td>
+                    <td class="py-3 px-3 text-left text-[10px] text-gray-400 max-w-[120px] truncate">${p.promos.length > 0 ? p.promos.join(', ') : '-'}</td>
                 </tr>`;
             });
         }
@@ -1337,10 +1337,10 @@
     function viewPassengerDetails(encodedData) {
         let p = JSON.parse(decodeURIComponent(encodedData));
         document.getElementById('pdet-name').innerText = p.name; document.getElementById('pdet-phone').innerText = "เบอร์โทร: " + p.phone;
-      let idEl = document.getElementById('pdet-id'); if(idEl) idEl.innerText = "ID: " + (p.userId || '-');  
-      let dateStr = p.firstRide ? new Date(p.firstRide).toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric' }) : '-';
+        let idEl = document.getElementById('pdet-id'); if(idEl) idEl.innerText = "ID: " + (p.userId || '-');  
+        let dateStr = p.firstRide ? new Date(p.firstRide).toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric' }) : '-';
         document.getElementById('pdet-join').innerText = "ใช้งานครั้งแรก: " + dateStr;
-        document.getElementById('pdet-rides').innerHTML = `${p.rides} <span class="text-[10px] text-slate-500 font-normal">ครั้ง</span>`;
+        document.getElementById('pdet-rides').innerHTML = `${p.rides} <span class="text-[10px] text-gray-400 font-normal">ครั้ง</span>`;
         document.getElementById('pdet-spend').innerText = `฿${p.spend.toLocaleString()}`;
         document.getElementById('pdet-promos').innerText = p.promos.length > 0 ? p.promos.join(', ') : 'ไม่เคยใช้งานโค้ดส่วนลด';
         windowContext.focusPassengerPhone = p.phone; openModal('modalPassengerDetails');
@@ -1369,8 +1369,8 @@
         let bGen = document.getElementById('pbtn-general'); let bRnd = document.getElementById('pbtn-random');
         if(!gen || !rnd || !bGen || !bRnd) return;
         gen.classList.toggle('hidden', type !== 'general'); rnd.classList.toggle('hidden', type !== 'random');
-        bGen.className = type === 'general' ? "flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition";
-        bRnd.className = type === 'random' ? "flex-1 py-2 text-xs font-bold bg-slate-700 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-md transition";
+        bGen.className = type === 'general' ? "flex-1 py-2 text-xs font-bold bg-blue-600 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-gray-500 dark:text-slate-400 hover:text-white rounded-md transition";
+        bRnd.className = type === 'random' ? "flex-1 py-2 text-xs font-bold bg-blue-600 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-gray-500 dark:text-slate-400 hover:text-white rounded-md transition";
     }
 
     function addPromoCode() {
@@ -1401,8 +1401,8 @@
         currentPromoFilter = type; 
         let a = document.getElementById('flt-promo-all'); let r = document.getElementById('flt-promo-random');
         if(a && r) {
-            a.className = type === 'all' ? "text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1 transition" : "text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1 transition";
-            r.className = type === 'random' ? "text-xs font-bold text-green-400 border-b-2 border-green-400 pb-1 px-1 transition" : "text-xs font-bold text-slate-500 hover:text-slate-300 border-b-2 border-transparent pb-1 px-1 transition";
+            a.className = type === 'all' ? "text-xs font-bold text-[#1da1f2] border-b-2 border-blue-500 pb-1 px-1 transition" : "text-xs font-bold text-gray-500 hover:text-gray-700 border-b-2 border-transparent pb-1 px-1 transition";
+            r.className = type === 'random' ? "text-xs font-bold text-[#1da1f2] border-b-2 border-blue-500 pb-1 px-1 transition" : "text-xs font-bold text-gray-500 hover:text-gray-700 border-b-2 border-transparent pb-1 px-1 transition";
         }
         renderPromoList(); 
     }
@@ -1422,24 +1422,24 @@
             let isFull = p.maxLimit ? (p.usageCount >= p.maxLimit) : false;
             let isActive = p.isActive !== false && !isExpired && !isFull;
             
-            let toggleClass = isActive ? 'text-green-400' : 'text-slate-500'; let toggleIcon = p.isActive !== false ? 'fa-toggle-on' : 'fa-toggle-off'; let opacityClass = isActive ? 'opacity-100' : 'opacity-60 grayscale-[30%]';
-            let badge = p.isSingleUse ? `<span class="bg-yellow-950 text-yellow-400 border border-yellow-500/20 text-[8px] px-1 rounded">สุ่ม(ทิ้ง)</span>` : (p.target === 'new_user' ? `<span class="bg-blue-950 text-blue-400 border border-blue-500/20 text-[8px] px-1 rounded">ผู้ใช้ใหม่</span>` : `<span class="bg-slate-800 text-slate-300 text-[8px] px-1 rounded border border-slate-700">ทั่วไป</span>`);
-            let limitTxt = p.maxLimit ? ` / ${p.maxLimit}` : ''; let expTxt = isExpired ? '<span class="text-red-400 ml-2">(หมดเวลา)</span>' : (isFull ? '<span class="text-red-400 ml-2">(เต็ม)</span>' : '');
+            let toggleClass = isActive ? 'text-blue-500' : 'text-gray-400'; let toggleIcon = p.isActive !== false ? 'fa-toggle-on' : 'fa-toggle-off'; let opacityClass = isActive ? 'opacity-100' : 'opacity-60 grayscale-[30%]';
+            let badge = p.isSingleUse ? `<span class="bg-yellow-100 dark:bg-yellow-950 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-500/20 text-[8px] px-1 rounded">สุ่ม(ทิ้ง)</span>` : (p.target === 'new_user' ? `<span class="bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-[#1da1f2] border border-blue-200 dark:border-blue-500/20 text-[8px] px-1 rounded">ผู้ใช้ใหม่</span>` : `<span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 text-[8px] px-1 rounded border border-gray-200 dark:border-slate-700">ทั่วไป</span>`);
+            let limitTxt = p.maxLimit ? ` / ${p.maxLimit}` : ''; let expTxt = isExpired ? '<span class="text-red-500 ml-2">(หมดเวลา)</span>' : (isFull ? '<span class="text-red-500 ml-2">(เต็ม)</span>' : '');
 
-            html += `<li class="py-3 flex justify-between items-center text-slate-200 border-b border-slate-800 last:border-0 px-1 ${opacityClass}">
+            html += `<li class="py-3 flex justify-between items-center text-gray-700 dark:text-slate-200 border-b border-gray-200 dark:border-slate-800 last:border-0 px-1 ${opacityClass}">
                 <div class="flex-1 min-w-0 pr-2 text-left">
-                    <div class="flex items-center gap-1.5 mb-1 flex-wrap"><span class="font-mono bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-700 tracking-wide text-xs">${p.code}</span>${badge}</div>
-                    <p class="text-[10px] text-slate-400">ใช้ไปแล้ว <span class="text-white font-bold">${p.usageCount || 0}</span>${limitTxt} สิทธิ์ ${expTxt}</p>
+                    <div class="flex items-center gap-1.5 mb-1 flex-wrap"><span class="font-mono bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-white font-bold px-2 py-0.5 rounded border border-gray-200 dark:border-slate-700 tracking-wide text-xs">${p.code}</span>${badge}</div>
+                    <p class="text-[10px] text-gray-400 dark:text-slate-500">ใช้ไปแล้ว <span class="text-gray-800 dark:text-white font-bold">${p.usageCount || 0}</span>${limitTxt} สิทธิ์ ${expTxt}</p>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-xs font-bold text-green-400 mr-2">฿${p.value}</span>
+                    <span class="text-xs font-bold text-blue-500 dark:text-[#1da1f2] mr-2">฿${p.value}</span>
                     <button onclick="db.ref('promotions/${p.code}').update({isActive: ${p.isActive === false}})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
-                    <button onclick="viewPromoHistory('${p.code}')" class="bg-slate-800 w-7 h-7 flex items-center justify-center rounded border border-slate-700 text-xs hover:bg-slate-700"><i class="fas fa-list"></i></button>
-                    <button onclick="showCustomConfirm('ยืนยันลบโค้ด?', 'ลบโค้ดนี้ถาวรแล้วจะไม่สามารถกู้คืนได้', () => { db.ref('promotions/${p.code}').remove(); }, 'ลบเลย', 'red')" class="text-red-400 bg-red-950/20 w-7 h-7 flex items-center justify-center rounded border border-red-500/20 text-xs hover:bg-red-600 hover:text-white"><i class="fas fa-trash-alt"></i></button>
+                    <button onclick="viewPromoHistory('${p.code}')" class="bg-gray-50 dark:bg-slate-800 w-7 h-7 flex items-center justify-center rounded border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-100"><i class="fas fa-list"></i></button>
+                    <button onclick="showCustomConfirm('ยืนยันลบโค้ด?', 'ลบโค้ดนี้ถาวรแล้วจะไม่สามารถกู้คืนได้', () => { db.ref('promotions/${p.code}').remove(); }, 'ลบเลย', 'red')" class="text-red-500 bg-red-100 dark:bg-red-950/20 w-7 h-7 flex items-center justify-center rounded border border-red-200 dark:border-red-500/20 text-xs hover:bg-red-600 hover:text-white"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </li>`;
         }
-        listContainer.innerHTML = html || `<p class="text-center text-slate-500 text-xs py-6">ไม่มีข้อมูลคูปองในหมวดหมู่นี้</p>`;
+        listContainer.innerHTML = html || `<p class="text-center text-gray-400 text-xs py-6">ไม่มีข้อมูลคูปองในหมวดหมู่นี้</p>`;
     }
 
     function exportRandomCodes() {
@@ -1519,24 +1519,24 @@
                 if(snap.exists()) {
                     snap.forEach(child => {
                         let b = child.val();
-                        let timer = (b.startTime || b.endTime) ? `<p class="text-[9px] text-yellow-500">⏱ ${b.startTime ? b.startTime.replace('T',' '):'เริ่ม'} ถึง ${b.endTime ? b.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-green-400">✅ แสดงผล 24 ชม.</p>`;
+                        let timer = (b.startTime || b.endTime) ? `<p class="text-[9px] text-yellow-600 dark:text-yellow-500">⏱ ${b.startTime ? b.startTime.replace('T',' '):'เริ่ม'} ถึง ${b.endTime ? b.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-blue-500 dark:text-[#1da1f2]">✅ แสดงผล 24 ชม.</p>`;
                         let extraRules = '';
                         if (path === 'config/popup_ad') {
                             let pagesMap = { 'home': 'หน้าแรก', 'tracking': 'หน้าติดตามงาน' };
                             let displayPages = b.targetPages ? b.targetPages.map(p => pagesMap[p] || p).join(', ') : 'หน้าแรก';
                             let displayDur = b.duration ? `${b.duration} วิ` : 'รอปิดเอง'; let displaySnooze = b.snoozeDays !== undefined ? b.snoozeDays : 14;
-                            extraRules = `<p class="text-[9px] text-blue-400 font-bold mt-0.5">📌 โชว์ที่: ${displayPages} (${displayDur}) | ซ่อน: ${displaySnooze} วัน</p>`;
+                            extraRules = `<p class="text-[9px] text-blue-500 dark:text-blue-400 font-bold mt-0.5">📌 โชว์ที่: ${displayPages} (${displayDur}) | ซ่อน: ${displaySnooze} วัน</p>`;
                         }
-                        listContainer.innerHTML += `<div class="flex gap-3 bg-slate-800/40 p-2 rounded-xl border border-slate-700 items-center shrink-0 animate-fade-in text-left">
-                            <div class="w-20 h-12 bg-black rounded border border-slate-600 overflow-hidden shrink-0"><img src="${b.imageUrl}" class="w-full h-full object-contain"></div>
-                            <div class="flex-1 min-w-0 text-left"><p class="text-xs font-bold text-white truncate">ตำแหน่ง: ${lbl}</p>${timer}${extraRules}</div>
-                            <button onclick="showCustomConfirm('ลบแบนเนอร์?', 'ต้องการลบรูปภาพนี้ออกจากระบบใช่หรือไม่?', () => { db.ref('${path}/${child.key}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-400 bg-red-950/20 w-8 h-8 rounded-lg border border-red-500/20 text-sm flex items-center justify-center shrink-0 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
+                        listContainer.innerHTML += `<div class="flex gap-3 bg-gray-50 dark:bg-slate-800/40 p-2 rounded-xl border border-gray-200 dark:border-slate-700 items-center shrink-0 animate-fade-in text-left">
+                            <div class="w-20 h-12 bg-black rounded border border-gray-300 dark:border-slate-600 overflow-hidden shrink-0"><img src="${b.imageUrl}" class="w-full h-full object-contain"></div>
+                            <div class="flex-1 min-w-0 text-left"><p class="text-xs font-bold text-gray-800 dark:text-white truncate">ตำแหน่ง: ${lbl}</p>${timer}${extraRules}</div>
+                            <button onclick="showCustomConfirm('ลบแบนเนอร์?', 'ต้องการลบรูปภาพนี้ออกจากระบบใช่หรือไม่?', () => { db.ref('${path}/${child.key}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 dark:bg-red-950/20 w-8 h-8 rounded-lg border border-red-200 dark:border-red-500/20 text-sm flex items-center justify-center shrink-0 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
                         </div>`;
                     });
                 }
             };
             drawItem(snap1, 'บน (16:9)', 'config/banners'); drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); drawItem(snap3, '💥 โฆษณาคั่นป๊อปอัป (เปิดแอป)', 'config/popup_ad');
-            if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-slate-500 text-xs py-4">ไม่มีรูปแบนเนอร์ในระบบ</p>';
+            if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">ไม่มีรูปแบนเนอร์ในระบบ</p>';
         });
     }
 
@@ -1566,15 +1566,15 @@
         if(snap.exists()) {
             let items = []; snap.forEach(child => { items.push({ id: child.key, ...child.val() }); }); items.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
             items.forEach(n => { 
-                let timer = (n.startTime || n.endTime) ? `<p class="text-[9px] text-yellow-500 mt-1">⏱ ${n.startTime ? n.startTime.replace('T',' '):'เริ่ม'} - ${n.endTime ? n.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-slate-500 mt-1">แสดงผลถาวรจนกว่าจะลบ</p>`;
+                let timer = (n.startTime || n.endTime) ? `<p class="text-[9px] text-yellow-600 dark:text-yellow-500 mt-1">⏱ ${n.startTime ? n.startTime.replace('T',' '):'เริ่ม'} - ${n.endTime ? n.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-gray-400 dark:text-slate-500 mt-1">แสดงผลถาวรจนกว่าจะลบ</p>`;
                 let imgHtml = n.imageUrl ? `<div class="w-12 h-12 bg-black rounded-lg overflow-hidden shrink-0 mt-2"><img src="${n.imageUrl}" class="w-full h-full object-cover"></div>` : '';
-                html += `<div class="flex justify-between items-start bg-slate-800/40 p-3 border border-slate-700 rounded-xl mb-2 animate-fade-in text-left"><div class="min-w-0 flex-1 text-left"><div class="flex gap-2 text-left">${imgHtml}<div class="flex-1 min-w-0 text-left"><p class="text-sm font-bold text-white truncate text-left">${n.title} ${n.isPromo ? '<span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded ml-1">PROMO</span>':''}</p>${timer}</div></div></div><button onclick="showCustomConfirm('ลบข่าวนี้?', 'ยืนยันลบโพสต์ข่าวนี้ออกจากบอร์ด', () => { db.ref('news_promotions/${n.id}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-400 bg-red-950/20 w-8 h-8 rounded-lg border border-red-500/20 text-sm shrink-0 flex items-center justify-center ml-2 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button></div>`;
+                html += `<div class="flex justify-between items-start bg-gray-50 dark:bg-slate-800/40 p-3 border border-gray-200 dark:border-slate-700 rounded-xl mb-2 animate-fade-in text-left"><div class="min-w-0 flex-1 text-left"><div class="flex gap-2 text-left">${imgHtml}<div class="flex-1 min-w-0 text-left"><p class="text-sm font-bold text-gray-800 dark:text-white truncate text-left">${n.title} ${n.isPromo ? '<span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded ml-1">PROMO</span>':''}</p>${timer}</div></div></div><button onclick="showCustomConfirm('ลบข่าวนี้?', 'ยืนยันลบโพสต์ข่าวนี้ออกจากบอร์ด', () => { db.ref('news_promotions/${n.id}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 dark:bg-red-950/20 w-8 h-8 rounded-lg border border-red-200 dark:border-red-500/20 text-sm shrink-0 flex items-center justify-center ml-2 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button></div>`;
             });
         }
-        container.innerHTML = html || '<p class="text-slate-500 text-xs text-center py-4">บอร์ดประกาศว่างเปล่า</p>';
+        container.innerHTML = html || '<p class="text-gray-400 text-xs text-center py-4">บอร์ดประกาศว่างเปล่า</p>';
     });
 
-    // ================= กู้คืนระบบคุมคิวและคนขับ =================
+    // ================= ระบบคุมคิวและคนขับ =================
     windowContext.activeNodeDrivers = []; windowContext.singleNodeDriver = [];
     
     function mergeAdminDrivers() {
@@ -1584,13 +1584,12 @@
         
         unique.forEach(d => {
             count++; let name = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงานประจำฟลีท";
-            let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="text-green-400 bg-green-900/30 px-2 py-1 rounded-lg text-xs hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
-            modalHtml += `<tr class="border-b border-slate-800 last:border-0 hover:bg-slate-800/30 transition text-left"><td class="py-3 px-2 font-bold text-white cursor-pointer hover:text-blue-400 transition" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td><td class="py-3 px-2 text-right flex items-center justify-end gap-2 text-slate-400">${d.driverPhone || '-'} ${callBtn}</td></tr>`;
+            let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="text-blue-500 bg-blue-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-xs hover:text-blue-600 transition"><i class="fas fa-phone-alt"></i></a>` : '';
+            modalHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 last:border-0 hover:bg-gray-100 dark:hover:bg-slate-800/30 transition text-left"><td class="py-3 px-2 font-bold text-gray-800 dark:text-white cursor-pointer hover:text-blue-500 transition" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td><td class="py-3 px-2 text-right flex items-center justify-end gap-2 text-gray-500 dark:text-slate-400">${d.driverPhone || '-'} ${callBtn}</td></tr>`;
         });
         
         let cEl = document.getElementById('stat-online-count'); if(cEl) cEl.innerText = count + " คน";
-        let badge = document.getElementById('menu-badge-online'); if(badge) { if(count > 0) { badge.innerText = count + " ออนไลน์"; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
-        let mList = document.getElementById('modal-online-list'); if(mList) mList.innerHTML = modalHtml || '<tr><td colspan="2" class="py-6 text-center text-slate-500">ไม่มีคนขับสแตนบายออนไลน์ในขณะนี้</td></tr>';
+        let mList = document.getElementById('modal-online-list'); if(mList) mList.innerHTML = modalHtml || '<tr><td colspan="2" class="py-6 text-center text-gray-400">ไม่มีคนขับสแตนบายออนไลน์ในขณะนี้</td></tr>';
     }
 
     db.ref('active_drivers').on('value', snap => {
@@ -1609,10 +1608,10 @@
         window.activeJobToAssign = jobId; let listContainer = document.getElementById('assign-driver-list'); listContainer.innerHTML = '';
         if(windowContext.onlineDrivers && windowContext.onlineDrivers.length > 0) {
             windowContext.onlineDrivers.forEach(d => {
-                let dName = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงาน"; let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="w-10 h-10 bg-green-900/30 text-green-400 flex items-center justify-center rounded-xl border border-green-500/30 hover:bg-green-600 hover:text-white transition"><i class="fas fa-phone-alt"></i></a>` : '';
-                listContainer.innerHTML += `<div class="flex items-center justify-between bg-slate-800 border border-slate-700 p-3 rounded-xl mb-2 text-left"><div class="text-left"><p class="font-bold text-white text-sm">${dName}</p><p class="text-[10px] text-slate-400">PIN: ${d.pin}</p></div><div class="flex gap-2">${callBtn}<button onclick="confirmAssignDriver('${d.pin}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition">ส่งงาน</button></div></div>`;
+                let dName = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงาน"; let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="w-10 h-10 bg-blue-50 dark:bg-slate-800 text-[#1da1f2] flex items-center justify-center rounded-xl border border-blue-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition"><i class="fas fa-phone-alt"></i></a>` : '';
+                listContainer.innerHTML += `<div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl mb-2 text-left"><div class="text-left"><p class="font-bold text-gray-800 dark:text-white text-sm">${dName}</p><p class="text-[10px] text-gray-400 dark:text-slate-500">PIN: ${d.pin}</p></div><div class="flex gap-2">${callBtn}<button onclick="confirmAssignDriver('${d.pin}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition">ส่งงาน</button></div></div>`;
             });
-        } else { listContainer.innerHTML = '<p class="text-center text-slate-500 py-4 text-sm">ยังไม่มีคนขับออนไลน์ในระบบ</p>'; }
+        } else { listContainer.innerHTML = '<p class="text-center text-gray-400 py-4 text-sm">ยังไม่มีคนขับออนไลน์ในระบบ</p>'; }
         openModal('modalAssignDriver');
     }
 
@@ -1634,20 +1633,20 @@
                 let j = allBookings[key]; 
                 if (j.status !== "รอผู้ขับขี่ตอบรับ") continue; 
                 
-                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-500 dark:text-blue-400 text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-green-500 dark:text-green-400 text-base" title="รถยนต์"></i>';
+                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-500 dark:text-[#1da1f2] text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-blue-500 dark:text-[#1da1f2] text-base" title="รถยนต์"></i>';
                 let statusColor = "text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-500/10 border-yellow-200 dark:border-yellow-500/20"; 
                 let priceDisplay = `฿${j.price}`;
                 
-                if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-1 rounded border border-green-200 dark:border-green-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
+                if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-blue-600 dark:text-[#1da1f2] bg-blue-50 dark:bg-blue-900/30 px-1 rounded border border-blue-200 dark:border-blue-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
                 countPending++;
                 
                 let dispatchControl = dispatchMode === 'auto' ? `<span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-500/30 px-2 py-1 rounded-lg"><i class="fas fa-robot"></i> จัดการออโต้คิว</span>` : `<button onclick="openAssignModal('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition">เลือกคนขับ</button>`;
                 
-                if(j.assignedDriver && dispatchMode === 'manual') { dispatchControl = `<div class="text-[10px] text-gray-500 dark:text-slate-400">ยิงงานให้ PIN <b class="text-yellow-600 dark:text-yellow-400 text-xs ml-1">#${j.assignedDriver}</b><br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-red-500 dark:text-red-400 underline mt-1 hover:text-red-600 dark:hover:text-red-300">ดึงงานกลับมาจ่ายใหม่</button></div>`; }
+                if(j.assignedDriver && dispatchMode === 'manual') { dispatchControl = `<div class="text-[10px] text-gray-500 dark:text-slate-400">ยิงงานให้ PIN <b class="text-blue-600 dark:text-[#1da1f2] text-xs ml-1">#${j.assignedDriver}</b><br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-red-500 underline mt-1 hover:text-red-600">ดึงงานกลับมาจ่ายใหม่</button></div>`; }
                 
-                let callCusBtn = j.phone ? `<a href="tel:${j.phone}" class="ml-2 text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 p-1.5 rounded-lg hover:text-green-700 dark:hover:text-green-300 transition"><i class="fas fa-phone-alt"></i></a>` : '';
+                let callCusBtn = j.phone ? `<a href="tel:${j.phone}" class="ml-2 text-blue-600 dark:text-[#1da1f2] bg-blue-50 dark:bg-slate-800 p-1.5 rounded-lg hover:text-blue-700 transition"><i class="fas fa-phone-alt"></i></a>` : '';
 
-                modalPendingHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition"><td class="py-3 px-2 font-bold text-gray-800 dark:text-white text-left flex flex-col items-start gap-1"><div class="flex items-center">${srvIcon} <span class="ml-2">${j.name || 'ลูกค้า'}</span> ${callCusBtn}</div><span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded border inline-block mt-0.5">${j.status}</span></td><td class="py-3 px-2 text-[11px] text-gray-500 dark:text-slate-400 max-w-[200px] truncate leading-relaxed text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td><td class="py-3 px-2 font-black text-green-500 dark:text-green-400 text-sm text-left"> ${priceDisplay}</td><td class="py-3 px-2 text-right">${dispatchControl}</td></tr>`;
+                modalPendingHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/40 transition"><td class="py-3 px-2 font-bold text-gray-800 dark:text-white text-left flex flex-col items-start gap-1"><div class="flex items-center">${srvIcon} <span class="ml-2">${j.name || 'ลูกค้า'}</span> ${callCusBtn}</div><span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded border inline-block mt-0.5">${j.status}</span></td><td class="py-3 px-2 text-[11px] text-gray-500 dark:text-slate-400 max-w-[200px] truncate leading-relaxed text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td><td class="py-3 px-2 font-black text-blue-600 dark:text-[#1da1f2] text-sm text-left"> ${priceDisplay}</td><td class="py-3 px-2 text-right">${dispatchControl}</td></tr>`;
                 
                 if(dispatchMode === 'auto' && j.status === "รอผู้ขับขี่ตอบรับ" && !j.assignedDriver) { 
                     if(typeof executeAutoDispatchBalancing === 'function') executeAutoDispatchBalancing(key, j); 
@@ -1655,21 +1654,18 @@
             }
         }
         
-        // 🌟 1. อัปเดตตัวเลขหน้าแดชบอร์ดหลัก
         let pCountEl = document.getElementById('stat-pending-count'); 
         if(pCountEl) pCountEl.innerText = countPending + " งาน";
         
-        // 🌟 2. อัปเดตตารางข้างใน Modal เสมอ (แยกเป็นอิสระแล้ว โค้ดจะไม่พัง)
         let mpList = document.getElementById('modal-pending-list'); 
         if(mpList) {
             if(countPending > 0) {
                 mpList.innerHTML = modalPendingHtml;
             } else {
-                mpList.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-gray-500 dark:text-slate-500">ไม่มีงานเรียกรถค้างคิวในขณะนี้</td></tr>';
+                mpList.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-gray-400">ไม่มีงานเรียกรถค้างคิวในขณะนี้</td></tr>';
             }
         }
 
-        // 🌟 3. อัปเดตตัวแจ้งเตือนจุดสีแดง (ถ้ามีสร้างไว้ในอนาคต)
         if(badgeMenu && headerAlert) {
             if(countPending > 0) { 
                 badgeMenu.innerText = countPending + " งานรอ"; badgeMenu.classList.remove('hidden'); headerAlert.classList.remove('hidden'); 
@@ -1680,17 +1676,14 @@
     });
 
     db.ref('blacklist').on('value', snap => {
-        let list = snap.val(); let count = 0; let mainHtml = ''; let modalHtml = ''; let badge = document.getElementById('menu-badge-block');
+        let list = snap.val(); let count = 0; let mainHtml = ''; let modalHtml = '';
         if(list) {
             for(let k in list) { count++; let b = list[k];
-                mainHtml += `<tr class="border-b border-slate-800 text-slate-300 text-left"><td class="py-3 px-2 font-bold text-red-400 text-left">${b.phone}</td><td class="py-3 px-2 text-xs text-slate-400 text-left">${b.reason}</td><td class="py-3 px-2 text-xs text-left">${b.timestamp}</td><td class="py-3 px-2 text-right"><button onclick="removeFormBlacklist('${b.phone}')" class="bg-green-600/20 text-green-400 px-3 py-1.5 rounded-xl text-xs font-bold border border-green-500/20 hover:bg-green-600 hover:text-white transition">ปลดแบน</button></td></tr>`;
-                modalHtml += `<tr class="border-b border-slate-800 text-slate-300 text-left"><td class="py-3 px-2 font-bold text-red-400 text-left">${b.phone}</td><td class="py-3 px-2 text-xs text-slate-400 text-left">${b.reason}</td><td class="py-3 px-2 text-right text-xs text-slate-500">${b.timestamp.split(' ')[0]}</td></tr>`;
+                mainHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 text-left"><td class="py-3 px-2 font-bold text-red-500 text-left">${b.phone}</td><td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400 text-left">${b.reason}</td><td class="py-3 px-2 text-xs text-left">${b.timestamp}</td><td class="py-3 px-2 text-right"><button onclick="removeFormBlacklist('${b.phone}')" class="bg-red-100 dark:bg-red-950/20 text-red-500 px-3 py-1.5 rounded-xl text-xs font-bold border border-red-200 dark:border-red-500/20 hover:bg-red-600 hover:text-white transition">ปลดแบน</button></td></tr>`;
+                modalHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 text-left"><td class="py-3 px-2 font-bold text-red-500 text-left">${b.phone}</td><td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400 text-left">${b.reason}</td><td class="py-3 px-2 text-right text-xs text-gray-400">${b.timestamp.split(' ')[0]}</td></tr>`;
             }
         }
-        let sBlock = document.getElementById('stat-block-count'); if(sBlock) sBlock.innerText = count + " เบอร์";
-        if(badge) { if(count > 0) { badge.innerText = count; badge.classList.remove('hidden'); } else badge.classList.add('hidden'); }
-        let tMain = document.getElementById('blacklist-table-body'); if(tMain) tMain.innerHTML = mainHtml || '<tr><td colspan="4" class="py-6 text-center text-slate-500">ทำเนียบบัญชีดำว่างเปล่า</td></tr>';
-        let tModal = document.getElementById('modal-blacklist-list'); if(tModal) tModal.innerHTML = modalHtml || '<tr><td colspan="3" class="py-6 text-center text-slate-500">ไม่มีเบอร์ถูกแบน</td></tr>';
+        let tMain = document.getElementById('blacklist-table-body'); if(tMain) tMain.innerHTML = mainHtml || '<tr><td colspan="4" class="py-6 text-center text-gray-400">ทำเนียบบัญชีดำว่างเปล่า</td></tr>';
     });
 
     // ================= 🌟 4. ระบบจัดการประเภทรถแบบไดนามิก =================
@@ -1707,16 +1700,15 @@
                 let id = child.key; let v = child.val();
                 let vData = encodeURIComponent(JSON.stringify({id: id, ...v}));
                 
-                // 🌟 เก็บข้อมูล forceOnline เข้าไปในตัวแปรกลางด้วย
                 window.systemVehicleTypes.push({ id: id, name: v.name, icon: v.icon, forceOnline: v.forceOnline || false });
 
                 html += `
-                <div class="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center text-xl text-gray-500 dark:text-slate-300 border border-gray-200 dark:border-slate-700"><i class="fas ${v.icon || 'fa-car'}"></i></div>
+                        <div class="w-12 h-12 bg-gray-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-xl text-gray-500 dark:text-slate-300 border border-gray-200 dark:border-slate-700"><i class="fas ${v.icon || 'fa-car'}"></i></div>
                         <div>
                             <h3 class="font-bold text-gray-800 dark:text-white text-sm leading-tight">${v.name}</h3>
-                            <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1">เริ่ม: <span class="text-green-500 dark:text-green-400">฿${v.baseFare}</span> | กม.ละ ฿${v.kmRate}</p>
+                            <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1">เริ่ม: <span class="text-blue-500 dark:text-[#1da1f2]">฿${v.baseFare}</span> | กม.ละ ฿${v.kmRate}</p>
                         </div>
                     </div>
                     <div class="flex flex-col gap-2">
@@ -1730,18 +1722,15 @@
         if(filterSelect) filterSelect.innerHTML = filterHtml;
         
         if(typeof renderDriverVehicles === 'function') renderDriverVehicles();
-        if(typeof renderDashboardVehicleToggles === 'function') renderDashboardVehicleToggles(); // 🌟 อัปเดตสวิตช์แดชบอร์ด
+        if(typeof renderDashboardVehicleToggles === 'function') renderDashboardVehicleToggles(); 
     });
 
-    // 🌟 ฟังก์ชันวาดสวิตช์เปิด-ปิด และนับจำนวนรถบนหน้าแดชบอร์ด
-    // 🌟 ฟังก์ชันแยกสำหรับกดสวิตช์ (แก้ปัญหากดไม่ได้)
     window.toggleForceOnline = function(vehicleId, isChecked) {
         db.ref('system_settings/vehicle_types/' + vehicleId).update({
             forceOnline: isChecked
         });
     };
 
-    // 🌟 ฟังก์ชันวาดสวิตช์เปิด-ปิด และนับจำนวนรถบนหน้าแดชบอร์ด (รองรับข้อมูลทั้งเก่าและใหม่)
     window.renderDashboardVehicleToggles = function() {
         let container = document.getElementById('dashboard-vehicle-toggles');
         if(!container) return;
@@ -1754,26 +1743,22 @@
                 let p = allProfiles[pin];
                 let hasThisVehicle = false;
                 
-                // 🌟 เช็ค 1: ถ้าคนขับมีรถแบบใหม่ (ตะกร้า vehicles หลายคัน)
                 if (p.vehicles && Object.values(p.vehicles).some(veh => veh.serviceType === v.id)) {
                     hasThisVehicle = true;
                 } 
-                // 🌟 เช็ค 2: ถ้าคนขับเป็นข้อมูลระบบเก่า (มีรถคันเดียวฝังในโปรไฟล์หลัก)
                 else if (!p.vehicles && (p.serviceType || 'car') === v.id) {
                     hasThisVehicle = true;
                 }
 
-                // ถ้าระบบพบว่าคนขับมีรถประเภทนี้ ให้นับยอด
                 if (hasThisVehicle) {
                     total++;
-                    // เช็คว่าคนขับคนนี้อยู่ในรายชื่อคนขับที่เปิดแอปออนไลน์อยู่หรือไม่
                     let isOnline = (windowContext.onlineDrivers || []).some(od => String(od.pin) === String(pin) || String(od.driverPin) === String(pin));
                     if (isOnline) online++;
                 }
             }
             
             let isForced = v.forceOnline === true;
-            let badgeColor = online > 0 ? 'text-green-500 dark:text-green-400' : 'text-gray-400 dark:text-slate-500';
+            let badgeColor = online > 0 ? 'text-[#1da1f2]' : 'text-gray-400 dark:text-slate-500';
             
             html += `
             <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
@@ -1786,14 +1771,13 @@
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer z-10">
                     <input type="checkbox" onchange="window.toggleForceOnline('${v.id}', this.checked)" class="sr-only peer" ${isForced ? 'checked' : ''}>
-                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1da1f2]"></div>
                 </label>
             </div>`;
         });
         container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-2">กำลังโหลดข้อมูลรถ...</p>';
     }
 
-    // 🌟 สั่งให้หน้าแดชบอร์ดนับจำนวนใหม่ทุกครั้งที่มีคนขับออนไลน์/ออฟไลน์
     db.ref('active_drivers').on('value', () => { setTimeout(() => { if(typeof renderDashboardVehicleToggles === 'function') renderDashboardVehicleToggles(); }, 500); });
 
     window.openManageVehicleModal = function(encodedData = null) {
@@ -1826,12 +1810,11 @@
             else lbl.innerText = 'ไม่ต้องระบุ';
             window.updatePricePreview();
         };
-        algoTypeEl.dispatchEvent(new Event('change')); // อัปเดต label และพรีวิวทันที
+        algoTypeEl.dispatchEvent(new Event('change')); 
         
         openModal('modalManageVehicle');
     }
 
-    // 🌟 ระบบจำลองคำนวณราคาแบบเรียลไทม์ (จำลองลอจิกเดียวกันกับแอปผู้โดยสาร)
     window.updatePricePreview = function() {
         let base = parseFloat(document.getElementById('veh-base').value) || 0;
         let km = parseFloat(document.getElementById('veh-km').value) || 0;
@@ -1839,18 +1822,15 @@
         let aType = document.getElementById('veh-algo-type').value;
         let aParam = parseFloat(document.getElementById('veh-algo-param').value) || 0;
 
-        // สมมติสถานการณ์ให้แอดมินเห็นภาพ: ผู้โดยสารนั่ง 10 กม.
         let distRideKm = 10;
         let baseRidePrice = base + (distRideKm * km);
         
-        // สมมติ: คนขับใกล้สุดอยู่ห่าง 2 กม. และคนขับที่หลุดขอบ (ไกลสุด) อยู่ห่าง 15 กม.
         let finalMinDist = 2;
         let finalMaxDist = 15;
 
         let rawMinPrice = baseRidePrice + (finalMinDist * pick);
         let rawMaxPrice = baseRidePrice + (finalMaxDist * pick);
 
-        // นำอัลกอริทึมมาคำนวณบีบเพดานราคาสูงสุด
         if (aType === 'radius_cap') {
             if (finalMaxDist > aParam) finalMaxDist = aParam;
             rawMaxPrice = baseRidePrice + (finalMaxDist * pick);
@@ -1859,7 +1839,6 @@
             if (rawMaxPrice > maxLimit) rawMaxPrice = maxLimit;
         }
 
-        // ปัดเศษหลักสิบตามสูตรแอปผู้โดยสาร
         let minPrice = Math.floor(rawMinPrice / 10) * 10;
         let maxPrice = Math.ceil(rawMaxPrice / 10) * 10;
         
@@ -1875,7 +1854,6 @@
         let pick = parseInt(document.getElementById('veh-pick').value) || 0;
         let mockDist = parseFloat(document.getElementById('veh-mock-dist').value) || 2; 
         
-        // 🌟 รับค่าอัลกอริทึม
         let aType = document.getElementById('veh-algo-type').value;
         let aParam = parseFloat(document.getElementById('veh-algo-param').value) || 0;
 
@@ -1891,7 +1869,8 @@
     window.deleteVehicleType = function(id, name) {
         showCustomConfirm('ลบประเภทรถ?', `คุณแน่ใจหรือไม่ที่จะลบ "${name}" ออกจากระบบ? (ลูกค้าจะเรียกไม่ได้)`, () => { db.ref('system_settings/vehicle_types/' + id).remove().then(()=>{ showCustomAlert('ลบสำเร็จ', `ลบประเภทรถ ${name} ออกแล้ว`, 'success'); }); }, 'ลบทิ้ง', 'red');
     }
-    // ================= ระบบคลังแชทลับ (ADMIN CHAT LOGS) =================
+    
+    // ================= ระบบคลังแชทลึกลับ =================
     let allChatLogsGrouped = {};
     db.ref('admin_chat_logs').on('value', snap => {
         let logs = snap.val() || {}; let grouped = {};
@@ -1906,11 +1885,11 @@
     function renderChatLogsTable() {
         let tbody = document.getElementById('chatlogs-table-body'); if(!tbody) return;
         let chatArr = Object.values(allChatLogsGrouped); chatArr.sort((a,b) => b.lastTime - a.lastTime); 
-        if(chatArr.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-500">ไม่มีประวัติการสนทนาในระบบ</td></tr>'; return; }
+        if(chatArr.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-400">ไม่มีประวัติการสนทนาในระบบ</td></tr>'; return; }
         let html = '';
         chatArr.forEach(chat => {
             let dateStr = new Date(chat.lastTime).toLocaleString('th-TH'); let shortId = chat.jobId.substring(chat.jobId.length - 8).toUpperCase();
-            html += `<tr class="border-b border-slate-800 text-slate-300 hover:bg-slate-800/50 transition"><td class="py-3 px-3 font-mono text-xs text-blue-400">#${shortId}</td><td class="py-3 px-2 font-bold text-white">${chat.passengerName}</td><td class="py-3 px-2 text-xs text-slate-400">PIN: <span class="text-green-400 font-bold">${chat.driverPin}</span><br>${chat.driverName}</td><td class="py-3 px-2 text-[11px] text-slate-500">${dateStr}</td><td class="py-3 px-3 text-right"><button onclick="openChatLogDetail('${chat.jobId}')" class="bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-500/20 hover:bg-blue-600 hover:text-white transition shadow-sm"><i class="fas fa-eye"></i> ดูแชท</button></td></tr>`;
+            html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition"><td class="py-3 px-3 font-mono text-xs text-blue-500 dark:text-[#1da1f2]">#${shortId}</td><td class="py-3 px-2 font-bold text-gray-800 dark:text-white">${chat.passengerName}</td><td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400">PIN: <span class="text-blue-500 dark:text-[#1da1f2] font-bold">${chat.driverPin}</span><br>${chat.driverName}</td><td class="py-3 px-2 text-[11px] text-gray-400">${dateStr}</td><td class="py-3 px-3 text-right"><button onclick="openChatLogDetail('${chat.jobId}')" class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition shadow-sm"><i class="fas fa-eye"></i> ดูแชท</button></td></tr>`;
         });
         tbody.innerHTML = html;
     }
@@ -1920,21 +1899,20 @@
         let container = document.getElementById('chatlog-messages-container'); container.innerHTML = '';
         chat.messages.sort((a,b) => a.timestamp - b.timestamp); let html = '';
         chat.messages.forEach(msg => {
-            let isPassenger = (msg.sender === 'passenger'); let align = isPassenger ? 'justify-end' : 'justify-start'; let bg = isPassenger ? 'bg-[#fae100] text-gray-900' : 'bg-white text-gray-800 border border-gray-200'; let senderName = isPassenger ? `<span class="text-[10px] text-yellow-500 font-bold mb-1 mr-1 text-right w-full block">ผู้โดยสาร (${chat.passengerName})</span>` : `<span class="text-[10px] text-green-500 font-bold mb-1 ml-1 text-left w-full block">คนขับ (${chat.driverPin})</span>`; let timeStr = new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-            html += `<div class="flex w-full ${align} mb-2"><div class="flex flex-col max-w-[80%]">${senderName}<div class="${bg} px-4 py-2.5 rounded-2xl text-[13px] font-normal shadow-sm break-words w-full">${msg.text}</div><span class="text-[9px] text-slate-500 mt-1 ${isPassenger ? 'text-right mr-1' : 'text-left ml-1'}">${timeStr}</span></div></div>`;
+            let isPassenger = (msg.sender === 'passenger'); let align = isPassenger ? 'justify-end' : 'justify-start'; let bg = isPassenger ? 'bg-[#1da1f2] text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-200 dark:border-slate-700'; let senderName = isPassenger ? `<span class="text-[10px] text-blue-600 dark:text-[#1da1f2] font-bold mb-1 mr-1 text-right w-full block">ผู้โดยสาร (${chat.passengerName})</span>` : `<span class="text-[10px] text-gray-500 dark:text-slate-400 font-bold mb-1 ml-1 text-left w-full block">คนขับ (${chat.driverPin})</span>`; let timeStr = new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            html += `<div class="flex w-full ${align} mb-2"><div class="flex flex-col max-w-[80%]">${senderName}<div class="${bg} px-4 py-2.5 rounded-2xl text-[13px] font-normal shadow-sm break-words w-full">${msg.text}</div><span class="text-[9px] text-gray-400 dark:text-slate-500 mt-1 ${isPassenger ? 'text-right mr-1' : 'text-left ml-1'}">${timeStr}</span></div></div>`;
         });
         container.innerHTML = html; openModal('modalViewChatLog'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
     }
   </script>
 
-<div id="pageDriverDetails" class="fixed inset-y-0 right-0 w-full md:w-[480px] bg-white dark:bg-slate-900 z-[999] transform translate-x-full transition-transform duration-300 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.5)] border-l border-gray-200 dark:border-slate-800">
-      
+  <div id="pageDriverDetails" class="fixed inset-y-0 right-0 w-full md:w-[480px] bg-white dark:bg-slate-900 z-[999] transform translate-x-full transition-transform duration-300 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.5)] border-l border-gray-200 dark:border-slate-800">
       <div class="h-16 px-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 shrink-0">
           <div class="flex items-center gap-3">
               <button onclick="closeDriverProfilePage()" class="w-10 h-10 bg-gray-200 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white rounded-full flex items-center justify-center transition active:scale-95"><i class="fas fa-arrow-right"></i></button>
               <div>
                   <h2 class="text-lg font-black text-gray-800 dark:text-white leading-tight" id="det-name">ชื่อคนขับ</h2>
-                  <p class="text-[10px] font-bold text-green-600 dark:text-green-400 mt-0.5" id="det-pin">PIN: 0000</p>
+                  <p class="text-[10px] font-bold text-blue-500 dark:text-[#1da1f2] mt-0.5" id="det-pin">PIN: 0000</p>
               </div>
           </div>
           <div class="bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-500/30 px-2 py-1 rounded-lg text-yellow-600 dark:text-yellow-400 font-bold flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition text-xs" onclick="editDriverRating()"><i class="fas fa-star"></i> <span id="det-rating">5.0</span> <span id="det-rating-count" class="font-normal text-[10px]">(0)</span></div>
@@ -1948,21 +1926,20 @@
 
           <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
               <div class="flex justify-between items-center mb-3">
-                  <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase"><i class="fas fa-car text-indigo-500"></i> ยานพาหนะที่ลงทะเบียน</h3>
-                  <button onclick="addDriverVehicle()" class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-indigo-200 dark:hover:bg-indigo-800 transition shadow-sm border border-indigo-200 dark:border-indigo-500/30"><i class="fas fa-plus"></i> เพิ่มรถ</button>
+                  <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase"><i class="fas fa-car text-blue-500"></i> ยานพาหนะที่ลงทะเบียน</h3>
+                  <button onclick="addDriverVehicle()" class="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-blue-600 hover:text-white transition shadow-sm border border-blue-200 dark:border-slate-700"><i class="fas fa-plus"></i> เพิ่มรถ</button>
               </div>
-              <div id="driver-vehicles-container" class="space-y-3">
-                  </div>
+              <div id="driver-vehicles-container" class="space-y-3"></div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
-              <div class="bg-green-50 dark:bg-green-900/10 p-3 rounded-xl border border-green-200 dark:border-green-500/20 text-center">
-                  <p class="text-[10px] font-bold text-green-600 dark:text-green-500 uppercase mb-1">รายรับวันนี้</p>
-                  <h3 class="text-xl font-black text-green-600 dark:text-green-400" id="det-today-earn">฿0</h3>
+              <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-slate-700 text-center">
+                  <p class="text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase mb-1">รายรับวันนี้</p>
+                  <h3 class="text-xl font-black text-blue-600 dark:text-[#1da1f2]" id="det-today-earn">฿0</h3>
               </div>
-              <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-500/20 text-center">
-                  <p class="text-[10px] font-bold text-blue-600 dark:text-blue-500 uppercase mb-1">รายรับสะสมรวม</p>
-                  <h3 class="text-xl font-black text-blue-600 dark:text-blue-400" id="det-total-earn">฿0</h3>
+              <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-slate-700 text-center">
+                  <p class="text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase mb-1">รายรับสะสมรวม</p>
+                  <h3 class="text-xl font-black text-blue-600 dark:text-[#1da1f2]" id="det-total-earn">฿0</h3>
               </div>
           </div>
 
@@ -1970,8 +1947,7 @@
               <h3 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase mb-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-red-500"></i> บันทึกพิกัด & สถานะล่าสุด</h3>
               <div class="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 max-h-40 overflow-y-auto slim-scroll">
                   <table class="w-full text-left text-[10px]">
-                      <tbody id="det-logs-table" class="divide-y divide-gray-200 dark:divide-slate-700">
-                          </tbody>
+                      <tbody id="det-logs-table" class="divide-y divide-gray-200 dark:divide-slate-700"></tbody>
                   </table>
               </div>
           </div>
@@ -1983,26 +1959,21 @@
       </div>
   </div>
   
-  <!-- 🌟 บาร์ด้านล่างสุดของจอ (Bottom Navigation) แบบหลังเต่า (Floating Center) -->
   <div class="fixed bottom-0 left-0 right-0 h-[68px] bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 z-50 flex justify-around items-center px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_20px_rgba(0,0,0,0.4)] transition-colors duration-300">
       
-      <!-- ปุ่มซ้าย: หน้าหลัก -->
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-blue-600 dark:text-blue-400 transition active:scale-90">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-blue-600 dark:text-[#1da1f2] transition active:scale-90">
           <i class="fas fa-home text-xl mb-1"></i><span class="text-[10px] font-bold">หน้าหลัก</span>
       </button>
 
-      <!-- 🌟 ปุ่มตรงกลางที่ลอยขึ้นมาและใหญ่ขึ้น (ทรงหลังเต่า) -->
       <div class="relative w-full h-full flex justify-center">
           <button onclick="switchTab('allmenu')" id="nav-allmenu" class="nav-bottom-btn flex flex-col items-center justify-end w-full h-full pb-1.5 transition group cursor-pointer text-gray-400 dark:text-slate-500">
-              <!-- วงกลมที่ลอยขึ้นมาและมีขอบหนา 6px เพื่อเจาะช่องเว้าให้กลืนกับพื้นหลังจอ -->
-              <div class="absolute -top-6 w-[70px] h-[70px] bg-gradient-to-tr from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-400 text-white rounded-full flex items-center justify-center shadow-[0_8px_15px_rgba(37,99,235,0.4)] border-[6px] border-slate-50 dark:border-[#0f172a] transform transition-transform group-hover:-translate-y-1 group-active:scale-95 z-10 duration-300">
+              <div class="absolute -top-6 w-[70px] h-[70px] bg-gradient-to-tr from-blue-500 to-blue-400 text-white rounded-full flex items-center justify-center shadow-[0_8px_15px_rgba(29,161,242,0.4)] border-[6px] border-slate-50 dark:border-[#121212] transform transition-transform group-hover:-translate-y-1 group-active:scale-95 z-10 duration-300">
                   <i class="fas fa-th-large text-[24px]"></i>
               </div>
               <span class="text-[10px] font-bold mt-auto relative z-20 transition-colors duration-300">เมนูระบบ</span>
           </button>
       </div>
 
-      <!-- ปุ่มขวา: แผนที่รถ -->
       <button onclick="switchTab('map')" id="nav-map" class="nav-bottom-btn flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition active:scale-90 relative">
           <i class="fas fa-map-marked-alt text-xl mb-1"></i><span class="text-[10px] font-bold">แผนที่รถ</span>
       </button>
