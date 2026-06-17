@@ -76,6 +76,37 @@
     .peer:checked ~ div {
         background-color: #1da1f2 !important;
     }
+    /* =========================================
+         🌟 บังคับฟอนต์ 11px และตัวบาง (Weight 300) ทั้งหน้า 
+         ========================================= */
+      body * {
+        font-size: 11px !important;
+        font-weight: 300 !important;
+      }
+      
+      /* คืนค่าขนาดและความหนาให้ไอคอน FontAwesome ไม่งั้นจะเล็กจนกด/มองลำบากครับ */
+      i.fas, i.far, i.fab {
+        font-size: 16px !important;
+        font-weight: 900 !important; 
+      }
+
+      /* =========================================
+         🌟 บังคับสีตัวอักษร 
+         โหมดสว่าง: #111111 (สีดำเข้ม)
+         โหมดมืด: #E0E0E0 (สีเทาสว่าง)
+         ========================================= */
+      body, body *:not(i) {
+        color: #111111 !important; 
+      }
+      
+      html.dark body, html.dark body *:not(i) {
+        color: #E0E0E0 !important;
+      }
+
+      /* 🌟 ข้อยกเว้นฉุกเฉิน: ป้องกันตัวหนังสือสีดำไปกลืนกับปุ่มสีทึบจนอ่านไม่ออก 🌟 */
+      button, button *, .text-white, .bg-blue-600 *, .bg-red-600 *, .bg-green-600 * {
+        color: #ffffff !important;
+      }
   </style>
   
   <script>
