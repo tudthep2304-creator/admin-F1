@@ -177,6 +177,11 @@
                   <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการคนขับ</span>
               </button>
+
+            <button onclick="switchTab('wallet'); renderWalletTab();" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition hover:-translate-y-1 group flex flex-col items-center justify-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fas fa-wallet"></i></div>
+              <span class="text-xs font-bold text-gray-700 dark:text-slate-300">กระเป๋าเงิน</span>
+          </button>
               
               <button onclick="switchTab('passengers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                   <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-friends"></i></div>
@@ -513,7 +518,47 @@
               </div>
           </div>
       </section>
-
+<section id="content-wallet" class="tab-content hidden space-y-4">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
+                  <h2 class="text-lg font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-wallet mr-1.5"></i> ศูนย์จัดการระบบการเงินและเครดิต</h2>
+                  <div class="flex gap-2 w-full sm:w-auto">
+                      <button onclick="openTierAirdropModal()" class="flex-1 sm:flex-none bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-gift"></i> แจกโบนัสกลุ่ม</button>
+                      <button onclick="openCommissionSettings()" class="flex-1 sm:flex-none bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-blue-200 dark:border-blue-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-cog"></i> ตั้งค่าหักเงิน</button>
+                  </div>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                  <div class="bg-green-50 dark:bg-green-900/10 p-4 rounded-xl border border-green-200 dark:border-green-900/30 text-center shadow-sm">
+                      <p class="text-[10px] font-bold text-green-600 dark:text-green-500 uppercase mb-1">ยอดเงินสดในระบบ (ถอนได้)</p>
+                      <h3 class="text-2xl font-black text-green-600 dark:text-green-400" id="wallet-stat-cash">฿0</h3>
+                  </div>
+                  <div class="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 text-center shadow-sm">
+                      <p class="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase mb-1">ยอดโบนัสในระบบ (ถอนไม่ได้)</p>
+                      <h3 class="text-2xl font-black text-yellow-600 dark:text-yellow-400" id="wallet-stat-bonus">฿0</h3>
+                  </div>
+                  <div class="col-span-2 bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700 flex flex-col justify-center shadow-sm">
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5">ค้นหาคนขับเพื่อจัดการเครดิต</label>
+                      <div class="relative">
+                          <input type="text" id="wallet-search-input" onkeyup="renderWalletTab()" placeholder="ค้นหาด้วย ชื่อ, รหัส หรือเบอร์โทร..." class="w-full p-2.5 pl-9 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-sm focus:border-emerald-500 shadow-inner">
+                          <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
+                      </div>
+                  </div>
+              </div>
+              <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse min-w-[700px]">
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold bg-gray-100 dark:bg-slate-800/50">
+                          <th class="py-3 px-3 w-28 rounded-tl-lg">ไอดีคนขับ</th>
+                          <th class="py-3 px-3">พนักงาน</th>
+                          <th class="py-3 px-3 text-right">เงินสด (Cash)</th>
+                          <th class="py-3 px-3 text-right">โบนัส (Bonus)</th>
+                          <th class="py-3 px-3 text-center rounded-tr-lg">จัดการกระเป๋าเงิน</th>
+                      </tr></thead>
+                      <tbody id="wallet-drivers-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50"></tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
+    
   </main>
 
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
@@ -2438,6 +2483,160 @@
             document.getElementById('fullImageViewerSrc').src = '';
         }, 200); // รอให้ transition ทำงานเสร็จก่อนเคลียร์ src
     }
+    // ==========================================
+    // 🌟 ระบบจัดการกระเป๋าเงินและเครดิต (Wallet Dashboard)
+    // ==========================================
+    window.renderWalletTab = function() {
+        let keyword = (document.getElementById('wallet-search-input')?.value || '').toLowerCase();
+        let lst = document.getElementById('wallet-drivers-list');
+        let html = '';
+        
+        let totalCash = 0;
+        let totalBonus = 0;
+
+        // วนลูปรายชื่อคนขับทั้งหมด (allProfiles ถูกดึงมาจาก Firebase อยู่แล้ว)
+        for (let drvId in allProfiles) {
+            let d = allProfiles[drvId];
+            
+            // กรองคำค้นหา
+            let searchString = `${drvId} ${d.name || ''} ${d.phone || ''}`.toLowerCase();
+            if (keyword && !searchString.includes(keyword)) continue;
+
+            let cashVal = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
+            let bonusVal = parseFloat(d.creditBonus || 0);
+
+            totalCash += cashVal;
+            totalBonus += bonusVal;
+
+            let profilePicHtml = d.profilePic 
+                ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover border border-gray-200 shrink-0">` 
+                : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/50 hover:bg-gray-50 dark:hover:bg-slate-800/60 transition">
+                <td class="py-3 px-3 font-bold text-emerald-600 dark:text-emerald-400 text-xs">${drvId}</td>
+                <td class="py-3 px-3">
+                    <div class="flex items-center gap-2">
+                        ${profilePicHtml}
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-800 dark:text-white text-[13px]">${d.name}</span>
+                            <span class="text-[10px] text-gray-400">${d.phone}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="py-3 px-3 text-right font-bold text-green-600 dark:text-green-400 text-[13px]">฿${cashVal.toFixed(2)}</td>
+                <td class="py-3 px-3 text-right font-bold text-yellow-600 dark:text-yellow-500 text-[13px]">฿${bonusVal.toFixed(2)}</td>
+                <td class="py-3 px-3 text-center">
+                    <button onclick="openAdjustCreditModal('${drvId}')" class="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-white hover:bg-emerald-100 dark:hover:bg-emerald-900/40 hover:text-emerald-600 dark:hover:text-emerald-400 px-3 py-1.5 rounded-lg text-[11px] font-bold transition shadow-sm border border-gray-200 dark:border-slate-700"><i class="fas fa-edit mr-1"></i> จัดการ</button>
+                </td>
+            </tr>`;
+        }
+
+        if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูลคนขับที่ค้นหา</td></tr>';
+        
+        let elCash = document.getElementById('wallet-stat-cash'); if(elCash) elCash.innerText = '฿' + totalCash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        let elBonus = document.getElementById('wallet-stat-bonus'); if(elBonus) elBonus.innerText = '฿' + totalBonus.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    }
+
+    // 🌟 ระบบ Popup ทำรายการปรับปรุงยอด
+    let currentWalletDriverId = null;
+
+    window.openAdjustCreditModal = function(drvId) {
+        currentWalletDriverId = drvId;
+        let d = allProfiles[drvId];
+        if(!d) return;
+
+        document.getElementById('adj-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
+        document.getElementById('adj-drv-id').innerText = drvId;
+        document.getElementById('adj-amount').value = '';
+        document.getElementById('adj-note').value = '';
+        document.getElementById('adj-wallet-type').value = 'cash';
+        document.getElementById('adj-action-type').value = 'add';
+        toggleAdjustColors();
+
+        document.getElementById('modalAdjustCredit').classList.remove('hidden');
+    }
+
+    window.closeAdjustCreditModal = function() {
+        document.getElementById('modalAdjustCredit').classList.add('hidden');
+        currentWalletDriverId = null;
+    }
+
+    window.toggleAdjustColors = function() {
+        let action = document.getElementById('adj-action-type').value;
+        let el = document.getElementById('adj-action-type');
+        if(action === 'add') {
+            el.className = "w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold focus:border-emerald-500";
+        } else {
+            el.className = "w-full p-2.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-xl outline-none text-sm font-bold focus:border-red-500";
+        }
+    }
+
+    window.submitCreditAdjustment = function() {
+        if(!currentWalletDriverId) return;
+        
+        let walletType = document.getElementById('adj-wallet-type').value; // 'cash' หรือ 'bonus'
+        let actionType = document.getElementById('adj-action-type').value; // 'add' หรือ 'deduct'
+        let amount = parseFloat(document.getElementById('adj-amount').value);
+        let note = document.getElementById('adj-note').value.trim();
+
+        if (isNaN(amount) || amount <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนเงินให้ถูกต้องครับ', 'error');
+        if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุหมายเหตุการทำรายการด้วยครับ (เพื่อการตรวจสอบย้อนหลัง)', 'error');
+
+        // อ่านยอดเดิม
+        let d = allProfiles[currentWalletDriverId];
+        let currentCash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
+        let currentBonus = parseFloat(d.creditBonus || 0);
+
+        let newCash = currentCash;
+        let newBonus = currentBonus;
+
+        // คำนวณยอดใหม่
+        if (walletType === 'cash') {
+            if (actionType === 'add') newCash += amount;
+            else newCash -= amount;
+        } else {
+            if (actionType === 'add') newBonus += amount;
+            else newBonus -= amount;
+        }
+
+        // แจ้งเตือนถ้าเงินติดลบ (แต่แอดมินบังคับทำรายการติดลบได้)
+        if (newCash < 0 || newBonus < 0) {
+            let confirmMsg = `การทำรายการนี้จะทำให้กระเป๋าเงิน ${walletType === 'cash' ? 'เงินสด' : 'โบนัส'} ของพนักงานติดลบ คุณยืนยันที่จะดำเนินการต่อหรือไม่?`;
+            if(!confirm(confirmMsg)) return;
+        }
+
+        // เซฟลง Database
+        let updateRef = db.ref('drivers_profile/' + currentWalletDriverId);
+        updateRef.update({
+            creditCash: newCash,
+            creditBonus: newBonus,
+            credit: newCash // อัปเดตกลับไปที่ฟิลด์เดิมด้วย เผื่อมีบางโค้ดยังเรียกใช้ credit ตัวเก่า
+        }).then(() => {
+            // 🌟 สร้าง Log ประวัติการทำรายการ (Transaction History) ที่ลบไม่ได้
+            db.ref('wallet_transactions/' + currentWalletDriverId).push({
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                walletType: walletType, // cash, bonus
+                actionType: actionType, // add, deduct
+                amount: amount,
+                note: note,
+                balanceAfter: walletType === 'cash' ? newCash : newBonus,
+                adminName: "แอดมินศูนย์" // อนาคตถ้ามีระบบ Login แอดมินค่อยดึงชื่อมาใส่
+            });
+
+            showCustomAlert('ทำรายการสำเร็จ', `ปรับปรุงยอดเงิน ${walletType === 'cash'?'เงินสด':'โบนัส'} เรียบร้อยแล้ว`, 'success');
+            closeAdjustCreditModal();
+            renderWalletTab(); // รีเฟรชตาราง
+        });
+    }
+
+    // ฟังก์ชันเปล่าๆ เผื่อไว้กดปุ่มที่เราทำหลอกไว้ด้านบน
+    window.openTierAirdropModal = function() {
+        showCustomAlert('เร็วๆ นี้', 'ระบบแจกโบนัสแบบกลุ่ม (Airdrop) กำลังอยู่ระหว่างการพัฒนาในสเต็ปต่อไปครับ!', 'info');
+    }
+    window.openCommissionSettings = function() {
+        showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังอยู่ระหว่างการพัฒนาในสเต็ปต่อไปครับ!', 'info');
+    }
   </script>
 
   <!-- 🌟 หน้าต่างแก้ไขโปรไฟล์คนขับ (เปลี่ยนเป็น Modal ธรรมดา) -->
@@ -2617,6 +2816,49 @@
 <div id="modalImageViewer" class="hidden fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 transition-opacity">
       <button onclick="closeImageViewer()" class="absolute top-4 right-4 text-white hover:text-gray-300 bg-gray-800/50 hover:bg-gray-700 rounded-full w-10 h-10 flex items-center justify-center z-10 transition"><i class="fas fa-times text-xl"></i></button>
       <img id="fullImageViewerSrc" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-fade-in" src="">
+  </div>
+  <div id="modalAdjustCredit" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+              <h2 class="text-base font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-exchange-alt mr-1"></i> ปรับปรุงยอดเงิน</h2>
+              <button onclick="closeAdjustCreditModal()" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-slate-700 text-blue-500 flex items-center justify-center text-lg shrink-0"><i class="fas fa-user"></i></div>
+                  <div class="min-w-0">
+                      <p id="adj-drv-name" class="font-bold text-sm text-gray-800 dark:text-white truncate">ชื่อคนขับ</p>
+                      <p id="adj-drv-id" class="text-[10px] text-gray-500 dark:text-slate-400">DRV-000000</p>
+                  </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">เลือกกระเป๋า</label>
+                      <select id="adj-wallet-type" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold focus:border-emerald-500">
+                          <option value="cash">🟢 เงินสด (Cash)</option>
+                          <option value="bonus">🟡 โบนัส (Bonus)</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ประเภทรายการ</label>
+                      <select id="adj-action-type" onchange="toggleAdjustColors()" class="w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold">
+                          <option value="add">➕ เติมเงินเข้า</option>
+                          <option value="deduct">➖ หักเงินออก</option>
+                      </select>
+                  </div>
+              </div>
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จำนวนเงิน (บาท)</label>
+                  <input type="number" id="adj-amount" placeholder="0" min="1" class="w-full p-3 bg-white dark:bg-slate-900 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-lg font-black text-center focus:border-emerald-500 shadow-inner">
+              </div>
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">หมายเหตุ (จำเป็นต้องระบุ)</label>
+                  <input type="text" id="adj-note" placeholder="เช่น ลูกค้าโอนเงินเข้าบริษัท, หักค่าปรับ..." class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-xs focus:border-emerald-500">
+              </div>
+              <button onclick="submitCreditAdjustment()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> ยืนยันทำรายการ</button>
+          </div>
+      </div>
   </div>
 </body>
 </html>
