@@ -1244,10 +1244,39 @@
         }
     }
 
-    // 🌟 2. ระบบสไลด์ย้อนกลับ (Swipe to go back)
+    // 🌟 2. ระบบสัมผัสสไลด์หน้าจอ (Swipe Actions: Go Back & Sidebar)
     let touchStartX = 0; let touchStartY = 0;
     document.addEventListener('touchstart', e => {
         touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+    }, {passive: true});
+    
+    document.addEventListener('touchend', e => {
+        // ข้ามการจับสไลด์ถ้าลูกค้ากำลังเลื่อนแผนที่ ตัดรูป หรือเลื่อนตาราง
+        if(e.target.closest('#adminLiveMap') || e.target.closest('.cropper-container') || e.target.closest('.overflow-x-auto')) return;
+        
+        let touchEndX = e.changedTouches[0].clientX; let touchEndY = e.changedTouches[0].clientY;
+        let diffX = touchEndX - touchStartX; let diffY = Math.abs(touchEndY - touchStartY);
+        
+        let sidebar = document.getElementById('sidebar-menu');
+        let isSidebarOpen = sidebar && !sidebar.classList.contains('-translate-x-full');
+
+        // เงื่อนไข 1: สไลด์ไปทางซ้ายเพื่อ "ปิด Sidebar" (สไลด์แนวนอนมากกว่าแนวตั้ง)
+        if (isSidebarOpen && diffX < -50 && Math.abs(diffX) > diffY) {
+            window.toggleSidebar();
+            return;
+        }
+
+        // เงื่อนไข 2: สไลด์ไปทางขวา
+        if (diffX > 60 && diffX > diffY) {
+            // ถ้านิ้วเริ่มลากจาก "ขอบจอซ้ายสุด" (ไม่เกิน 40px) -> ให้เปิด Sidebar
+            if (touchStartX <= 40 && !isSidebarOpen) {
+                window.toggleSidebar();
+            } 
+            // ถ้านิ้วลากจากกลางจอ (เกิน 40px) และ Sidebar ปิดอยู่ -> ทำหน้าที่เป็นปุ่มย้อนกลับ
+            else if (!isSidebarOpen && touchStartX > 40) {
+                window.goBackAdmin();
+            }
+        }
     }, {passive: true});
     
     document.addEventListener('touchend', e => {
