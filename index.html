@@ -173,14 +173,20 @@
           <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"><i class="fas fa-th-list text-[#1da1f2]"></i> เลือกเมนูจัดการระบบ</h2>
           
           <div class="grid grid-cols-4 gap-2 sm:gap-4">
+              
               <button onclick="switchTab('drivers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                   <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการคนขับ</span>
               </button>
 
-            <button onclick="switchTab('tiers'); renderTiersTab();" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition hover:-translate-y-1 group flex flex-col items-center justify-center gap-3">
-                  <div class="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center text-xl group-hover:scale-110 transition"><i class="fas fa-trophy"></i></div>
-                  <span class="text-xs font-bold text-gray-700 dark:text-slate-300">ระดับ & ดาว</span>
+              <button onclick="switchTab('wallet'); renderWalletTab();" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-wallet"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">กระเป๋าเงิน</span>
+              </button>
+
+              <button onclick="switchTab('tiers'); renderTiersTab();" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-trophy"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ระดับ & ดาว</span>
               </button>
               
               <button onclick="switchTab('passengers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
@@ -1637,7 +1643,17 @@
         if(document.getElementById('det-cash')) document.getElementById('det-cash').value = cash;
         if(document.getElementById('det-bonus')) document.getElementById('det-bonus').value = bonus;
 
-        if(document.getElementById('det-tier')) document.getElementById('det-tier').value = d.tier || 'Standard';
+        // ส่งข้อมูลระดับมาโชว์ที่ช่องแบบอ่านอย่างเดียว
+        if(document.getElementById('det-tier-display')) {
+            let t = d.tier || 'Standard';
+            if (t === 'owner super legend') t = '🚀 Owner Super Legend';
+            else if (t === 'F1 Legend') t = '👑 F1 Legend';
+            else if (t === 'Platinum') t = '💎 Platinum';
+            else if (t === 'Gold') t = '🥇 Gold';
+            else if (t === 'Silver') t = '🥈 Silver';
+            else t = '🥉 Standard';
+            document.getElementById('det-tier-display').value = t;
+        }
 
         let editPreview = document.getElementById('edit-drv-pic-preview');
         let editPlaceholder = document.getElementById('edit-drv-pic-placeholder');
@@ -2900,14 +2916,11 @@
                       </div>
                   </div>                 
                   <div>
-                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ระดับชั้นของคนขับ (Driver Tier)</label>
-                      <div>
                       <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">ระดับชั้นของคนขับ (Driver Tier)</label>
                       <div class="relative">
                           <input type="text" id="det-tier-display" readonly title="ปรับระดับและคะแนนดาวได้ที่เมนูกระเป๋าเงินเท่านั้น" class="w-full p-2.5 bg-gray-200 dark:bg-slate-800/80 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold cursor-not-allowed pr-8">
                           <i class="fas fa-lock absolute right-3 top-3.5 text-gray-400 text-xs"></i>
                       </div>
-                  </div>
                   </div>
               </div>
 
