@@ -2881,6 +2881,66 @@
         }
         if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูลพนักงาน</td></tr>';
     }
+    // ========================================================
+    // 🌟 ฟังก์ชันปรับระดับชั้นพนักงานแบบแมนนวล (Manual Tier Adjustment)
+    // ========================================================
+    let currentWalletDriverId = null;
+
+    window.openAdjustTierRatingModal = function(drvId) {
+        currentWalletDriverId = drvId;
+        let d = allProfiles[drvId]; if(!d) return;
+        document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
+        document.getElementById('trm-drv-id').innerText = drvId;
+        
+        let cTier = d.tier || 'New';
+        document.getElementById('trm-tier-select').value = cTier;
+        document.getElementById('trm-note').value = '';
+        
+        let currentRating = d.rating !== undefined ? d.rating : "5.0";
+        if(cTier === 'owner super legend') currentRating = "100";
+        else if(cTier === 'F1 Legend') currentRating = "10";
+        document.getElementById('trm-rating-input').value = currentRating;
+
+        openModal('modalAdjustTierRating');
+    }
+
+    window.closeTierRatingModal = function() { 
+        closeModal('modalAdjustTierRating'); 
+        currentWalletDriverId = null; 
+    }
+
+    window.autoFillOverrideStars = function() {
+        let tier = document.getElementById('trm-tier-select').value;
+        let rInput = document.getElementById('trm-rating-input');
+        if(tier === 'owner super legend') rInput.value = "100";
+        else if(tier === 'F1 Legend') rInput.value = "10";
+        else rInput.value = "5.0";
+    }
+
+    window.submitTierRatingAdjustment = function() {
+        if(!currentWalletDriverId) return;
+        let newTier = document.getElementById('trm-tier-select').value;
+        let newRating = parseFloat(document.getElementById('trm-rating-input').value) || 5.0;
+        let note = document.getElementById('trm-note').value.trim();
+
+        if(!note) return showCustomAlert('ระบุหมายเหตุ', 'กรุณากรอกเหตุผลเพื่อบันทึกประวัติการปรับสิทธิ์', 'error');
+
+        db.ref('drivers_profile/' + currentWalletDriverId).update({ 
+            tier: newTier, 
+            rating: newRating.toFixed(1) 
+        }).then(() => {
+            db.ref('security_tier_logs/' + currentWalletDriverId).push({ 
+                timestamp: firebase.database.ServerValue.TIMESTAMP, 
+                newTier: newTier, 
+                assignedRating: newRating.toFixed(1), 
+                reason: note, 
+                adminName: "ผู้บริหารระบบ" 
+            });
+            showCustomAlert('สำเร็จ', 'ปรับเปลี่ยนระดับ Tier และคะแนนดาวเรียบร้อยแล้ว', 'success');
+            closeTierRatingModal(); 
+            if(typeof renderTiersTab === 'function') renderTiersTab(); 
+        });
+    }
     
   </script>
 
