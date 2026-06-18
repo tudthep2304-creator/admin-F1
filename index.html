@@ -573,28 +573,35 @@
           </div>
       </section>
 
-      <section id="content-blockdrivers" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-2 pb-8">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm h-fit">
-              <h2 class="text-sm font-black text-gray-800 dark:text-white mb-2"><i class="fas fa-ban text-red-500 mr-1"></i> ระงับการใช้งานคนขับ</h2>
-              <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-4 leading-relaxed">บล็อกพนักงานผ่านรหัสอ้างอิงระบบ (Driver ID) เพื่อป้องกันการเปิดออนไลน์รับงาน</p>
+      <section id="content-blockdrivers" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
               
-              <button onclick="openModal('modalSearchToBlock')" class="w-full bg-red-50 dark:bg-red-900/20 hover:bg-red-100 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 font-medium py-3 rounded-xl shadow-sm transition flex items-center justify-center gap-2 text-[11px]"><i class="fas fa-search"></i> ระบุ ID คนขับเพื่อบล็อก</button>
-          </div>
-          
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm md:col-span-2">
-              <h2 class="text-sm font-black text-gray-800 dark:text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อคนขับที่ถูกระงับสิทธิ์</h2>
-              <div class="overflow-x-auto hide-scrollbar">
-                  <table class="w-full text-left border-collapse min-w-[400px]">
-                      <thead>
-                          <tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-[11px] font-medium bg-gray-50 dark:bg-slate-800/30">
-                              <th class="py-2.5 px-3 text-left rounded-tl-lg">รหัสอ้างอิง (ID)</th>
-                              <th class="py-2.5 px-2 text-left">เหตุผลการบล็อก</th>
-                              <th class="py-2.5 px-3 text-right rounded-tr-lg">จัดการ</th>
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
+                  <h2 class="text-sm font-black text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-list text-red-500"></i> รายชื่อคนขับที่ถูกระงับสิทธิ์</h2>
+                  
+                  <div class="flex items-center gap-2 w-full sm:w-auto">
+                      <div class="relative w-full sm:w-56">
+                          <input type="text" id="search-blocked-input" onkeyup="filterBlockedDrivers()" placeholder="ค้นหาด้วย ID หรือ ชื่อ..." class="w-full bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg pl-8 pr-3 py-2 outline-none focus:border-red-500 transition">
+                          <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-[10px]"></i>
+                      </div>
+                      <button onclick="openModal('modalSearchToBlock')" class="bg-red-50 dark:bg-red-900/20 hover:bg-red-100 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 font-medium py-2 px-3 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5 text-[11px] whitespace-nowrap"><i class="fas fa-ban"></i> บล็อกเพิ่ม</button>
+                  </div>
+              </div>
+
+              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
+                  <table class="w-full text-left border-collapse min-w-[500px]">
+                      <thead class="sticky top-0 z-10 bg-gray-100 dark:bg-slate-800 shadow-sm border-b border-gray-200 dark:border-slate-700">
+                          <tr class="text-gray-500 dark:text-slate-400 text-[11px] font-medium">
+                              <th class="py-2.5 px-3 text-left">รหัสอ้างอิง (ID)</th>
+                              <th class="py-2.5 px-2 text-left w-1/2">เหตุผลการบล็อก</th>
+                              <th class="py-2.5 px-3 text-right">จัดการ</th>
                           </tr>
                       </thead>
-                      <tbody id="blockdrivers-table-body" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50"></tbody>
+                      <tbody id="blockdrivers-table-body" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                          </tbody>
                   </table>
               </div>
+              <p class="text-right text-[9px] text-gray-400 mt-2 shrink-0">* แสดงข้อมูลคนขับที่ถูกบล็อกสูงสุด 50 รายการล่าสุด</p>
           </div>
       </section>
     
@@ -1171,7 +1178,8 @@
           <div id="chatlog-messages-container" class="p-4 overflow-y-auto flex-1 slim-scroll bg-white dark:bg-slate-900 space-y-3">
           </div>
       </div>
-  </div> 
+  </div>
+  
   <script>
     const windowContext = window;
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
@@ -2795,61 +2803,9 @@
             showDriverDetails(driverId); 
         });
     }
-
-    window.unblockDriver = function(driverId) {
-        showCustomConfirm('ปลดบล็อกคนขับ?', 'ยืนยันการคืนสิทธิ์ให้พนักงานคนนี้สามารถเปิดออนไลน์รับงานได้ตามปกติ?', () => {
-            db.ref('blocked_drivers/' + driverId).remove().then(() => {
-                db.ref('blocked_history/' + driverId).push({ pin: driverId, reason: 'แอดมินพิจารณาปลดบล็อกให้แล้ว', action: 'unblock', timestamp: firebase.database.ServerValue.TIMESTAMP });
-                showCustomAlert('สำเร็จ', 'ปลดบล็อกคนขับเรียบร้อยแล้ว', 'success');
-                closeModal('modalBlockDriver');
-                showDriverDetails(driverId); 
-            });
-        });
-    }
-
     // ==========================================
     // 🌟 ระบบหน้าจัดการ Blocked Drivers (ตารางรายชื่อ)
     // ==========================================
-    db.ref('blocked_drivers').on('value', snap => {
-        let tbody = document.getElementById('blockdrivers-table-body');
-        if(!tbody) return;
-        let html = '';
-        if(snap.exists()) {
-            snap.forEach(child => {
-                let driverId = child.key;
-                let b = child.val();
-                let now = Date.now();
-                
-                // ถ้าหมดเวลาแบนแล้ว ให้ลบประวัติแบนปัจจุบันทิ้ง
-                if(b.expireAt !== 0 && b.expireAt < now) {
-                    db.ref('blocked_drivers/' + driverId).remove();
-                    return; 
-                }
-                
-                let d = allProfiles[driverId] || {};
-                let name = d.name || 'ไม่ทราบชื่อ';
-                let dateStr = b.expireAt === 0 ? 'แบนถาวร' : new Date(b.expireAt).toLocaleString('th-TH');
-                
-                html += `
-                <tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
-                    <td class="py-3 px-3">
-                        <p class="font-bold text-red-500 text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${driverId}')">${driverId}</p>
-                        <p class="text-[10px] text-gray-500">${name}</p>
-                    </td>
-                    <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">
-                        <p class="font-bold mb-0.5"><i class="fas fa-exclamation-circle text-red-400"></i> ${b.reason}</p>
-                        <p class="text-[9px] text-gray-400">ปลดบล็อก: ${dateStr}</p>
-                    </td>
-                    <td class="py-3 px-3 text-right">
-                        <button onclick="unblockDriver('${driverId}')" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition shadow-sm">ปลดบล็อก</button>
-                    </td>
-                </tr>`;
-            });
-        }
-        tbody.innerHTML = html || '<tr><td colspan="3" class="py-10 text-center text-gray-400 text-xs">ปัจจุบันไม่มีพนักงานที่ถูกระงับสิทธิ์ 🎉</td></tr>';
-    });
-
-    // ฟังก์ชันรับ ID จากหน้าต่างค้นหา แล้วส่งไปหน้าตั้งเวลาบล็อก
     window.submitSearchToBlock = function() {
         let driverId = document.getElementById('search-block-id').value.trim().toUpperCase();
         if(!driverId) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกรหัส Driver ID ด้วยครับ', 'error');
@@ -2863,47 +2819,162 @@
         openBlockDriverModal(driverId); // ส่งไม้ต่อให้ป๊อปอัปบล็อกตัวหลักทำงานต่อ
     }
 
-    // อัปเดตตารางรายชื่อคนขับที่ถูกระงับให้โชว์ DRV-ID ถูกต้อง
+    // ==========================================
+    // 🌟 1. ดึงข้อมูลตารางบล็อกคนขับ (แสดงสูงสุด 50 แถว & ค้นหาได้)
+    // ==========================================
+    let allBlockedDataForTable = [];
+    
     db.ref('blocked_drivers').on('value', snap => {
-        let tbody = document.getElementById('blockdrivers-table-body');
-        if(!tbody) return;
-        let html = '';
+        allBlockedDataForTable = [];
+        let now = Date.now();
+        
         if(snap.exists()) {
             snap.forEach(child => {
                 let driverId = child.key;
                 let b = child.val();
-                let now = Date.now();
                 
+                // ถ้าหมดเวลาแบนแล้ว ให้ลบข้อมูลแบนปัจจุบันทิ้ง
                 if(b.expireAt !== 0 && b.expireAt < now) {
                     db.ref('blocked_drivers/' + driverId).remove();
-                    return; 
+                } else {
+                    allBlockedDataForTable.push({ driverId: driverId, ...b });
                 }
-                
-                let d = allProfiles[driverId] || {};
-                let name = d.name || 'ไม่ทราบชื่อ';
-                let dateStr = b.expireAt === 0 ? 'แบนถาวร' : new Date(b.expireAt).toLocaleString('th-TH');
-                
-                html += `
-                <tr class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
-                    <td class="py-3 px-3 min-w-[120px]">
-                        <p class="font-bold text-red-500 text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${driverId}')">${driverId}</p>
-                        <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">${name}</p>
-                    </td>
-                    <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed max-w-[150px] sm:max-w-xs">
-                        <p class="font-medium text-gray-800 dark:text-slate-200 mb-0.5 truncate" title="${b.reason}"><i class="fas fa-exclamation-circle text-red-400 mr-0.5"></i> ${b.reason}</p>
-                        <p class="text-[9px] text-gray-400">ปลดบล็อก: ${dateStr}</p>
-                    </td>
-                    <td class="py-3 px-3 text-right">
-                        <button onclick="unblockDriver('${driverId}')" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-[10px] font-medium border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition shadow-sm whitespace-nowrap">ปลดบล็อก</button>
-                    </td>
-                </tr>`;
             });
         }
-        tbody.innerHTML = html || '<tr><td colspan="3" class="py-10 text-center text-gray-400 text-[11px]">ปัจจุบันไม่มีพนักงานที่ถูกระงับสิทธิ์ 🎉</td></tr>';
+        
+        // เรียงจากโดนบล็อกล่าสุดขึ้นก่อน
+        allBlockedDataForTable.sort((a,b) => b.timestamp - a.timestamp);
+        window.filterBlockedDrivers(); // เรียกฟังก์ชันวาดตาราง
     });
-    
-    window.viewBlockHistory = function() {
-        showCustomAlert('ระบบประวัติ (เร็วๆนี้)', 'หน้านี้จะเก็บประวัติการถูกบล็อกและการโดนระบบ Auto-Block หักคะแนนทั้งหมดของพนักงานคนนี้ครับ', 'info');
+
+    window.filterBlockedDrivers = function() {
+        let tbody = document.getElementById('blockdrivers-table-body');
+        if(!tbody) return;
+        
+        let keyword = (document.getElementById('search-blocked-input')?.value || '').toLowerCase();
+        
+        // ค้นหาข้อมูล (ถ้าพิมพ์หา)
+        let filtered = allBlockedDataForTable.filter(b => {
+            let d = allProfiles[b.driverId] || {};
+            let searchStr = `${b.driverId} ${d.name || ''} ${d.phone || ''}`.toLowerCase();
+            return searchStr.includes(keyword);
+        });
+        
+        // 🌟 จำกัดจำนวนสูงสุดที่ 50 แถว ป้องกันหน้าเว็บอืด
+        filtered = filtered.slice(0, 50);
+        
+        let html = '';
+        filtered.forEach(b => {
+            let driverId = b.driverId;
+            let d = allProfiles[driverId] || {};
+            let name = d.name || 'ไม่ทราบชื่อ';
+            let dateStr = b.expireAt === 0 ? '<span class="text-red-500 font-bold">แบนถาวร</span>' : new Date(b.expireAt).toLocaleString('th-TH');
+            
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <td class="py-3 px-3 min-w-[120px]">
+                    <p class="font-bold text-red-500 text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${driverId}')">${driverId}</p>
+                    <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">${name}</p>
+                </td>
+                <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">
+                    <p class="font-medium text-gray-800 dark:text-slate-200 mb-0.5 truncate" title="${b.reason}"><i class="fas fa-exclamation-circle text-red-400 mr-0.5"></i> ${b.reason}</p>
+                    <p class="text-[9px] text-gray-400">ปลดบล็อก: ${dateStr}</p>
+                </td>
+                <td class="py-3 px-3 text-right">
+                    <button onclick="unblockDriver('${driverId}')" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-[10px] font-medium border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition shadow-sm whitespace-nowrap">ปลดบล็อก</button>
+                </td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = html || '<tr><td colspan="3" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบพนักงานที่ถูกระงับสิทธิ์</td></tr>';
+    }
+
+    // ==========================================
+    // 🌟 2. ลอจิกการปลดบล็อก (แก้บั๊กการเด้งสลับหน้า)
+    // ==========================================
+    window.unblockDriver = function(driverId) {
+        showCustomConfirm('ปลดบล็อกคนขับ?', 'ยืนยันการคืนสิทธิ์ให้พนักงานคนนี้สามารถเปิดออนไลน์รับงานได้ตามปกติ?', () => {
+            db.ref('blocked_drivers/' + driverId).remove().then(() => {
+                // บันทึกประวัติลง History
+                db.ref('blocked_history/' + driverId).push({ pin: driverId, reason: 'แอดมินพิจารณาปลดบล็อกให้แล้ว', action: 'unblock', timestamp: firebase.database.ServerValue.TIMESTAMP });
+                
+                showCustomAlert('สำเร็จ', 'ปลดบล็อกคนขับเรียบร้อยแล้ว', 'success');
+                closeModal('modalBlockDriver'); // ปิดหน้าต่าง Modal ถ้าเปิดอยู่
+                
+                // 🌟 ตรวจสอบว่าแอดมินกำลังอยู่หน้าไหน
+                let currentTab = window.adminHistoryStack[window.adminHistoryStack.length - 1];
+                if (currentTab === 'driver-details') {
+                    // ถ้าแอดมินอยู่ในหน้า "ข้อมูลส่วนตัวคนขับ" -> ให้โหลดข้อมูลโปรไฟล์ใหม่
+                    showDriverDetails(driverId); 
+                } 
+                // แต่ถ้าอยู่หน้า "จัดการแบล็กลิสต์" (blockdrivers) ระบบ Firebase On Value จะรีเฟรชตารางให้เองโดยไม่ต้องเด้งไปไหน!
+            });
+        });
+    }
+
+    // ==========================================
+    // 🌟 3. ระบบแสดงประวัติการบล็อก (Block History Timeline)
+    // ==========================================
+    window.viewBlockHistory = function(driverId = null) {
+        // หากไม่ได้ส่ง ID มา (เช่น กดจากหน้าต่าง Modal Block) ให้ดึง ID จาก UI
+        if(!driverId) {
+            let el = document.getElementById('block-drv-id');
+            if(el) driverId = el.innerText.replace('PIN: ', '').replace('ID: ', '').trim();
+        }
+        if(!driverId) return;
+        
+        let d = allProfiles[driverId];
+        document.getElementById('bh-drv-name').innerText = d ? d.name : 'พนักงาน';
+        document.getElementById('bh-drv-id').innerText = 'ID: ' + driverId;
+        
+        // ดึงประวัติย้อนหลังทั้งหมดของคนขับคนนี้มาเรียงเป็น Timeline
+        db.ref('blocked_history/' + driverId).once('value', snap => {
+            let container = document.getElementById('block-history-timeline');
+            let html = '';
+            
+            if(snap.exists()) {
+                let logs = [];
+                snap.forEach(child => logs.push(child.val()));
+                
+                // เรียงเหตุการณ์ล่าสุดขึ้นก่อน
+                logs.sort((a,b) => b.timestamp - a.timestamp);
+                
+                logs.forEach(log => {
+                    let isUnblock = log.action === 'unblock';
+                    let icon = isUnblock ? '<i class="fas fa-unlock text-emerald-500 text-[10px]"></i>' : '<i class="fas fa-ban text-red-500 text-[10px]"></i>';
+                    let bg = isUnblock ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30' : 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800/30';
+                    let title = isUnblock ? 'ปลดบล็อกคืนสิทธิ์' : 'ถูกระงับสิทธิ์';
+                    let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+                    
+                    html += `
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active text-left">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-gray-50 dark:border-slate-900 bg-white dark:bg-slate-800 text-center z-10 shadow-sm shrink-0">
+                            ${icon}
+                        </div>
+                        <div class="w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] p-3 rounded-xl border shadow-sm ${bg} flex flex-col text-left">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="font-bold text-[11px] text-gray-800 dark:text-white">${title}</h4>
+                                <span class="text-[9px] text-gray-500">${dateStr}</span>
+                            </div>
+                            <p class="text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">${log.reason}</p>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                html = '<p class="text-center text-[11px] text-gray-400 py-10">ประวัติขาวสะอาด ไม่เคยถูกระงับสิทธิ์ ✨</p>';
+            }
+            
+            container.innerHTML = html;
+            
+            // ปิด Modal บล็อก แล้วสลับมาเปิด Modal ประวัติแทน เพื่อไม่ให้หน้าต่างซ้อนกันหนาเกินไป
+            let oldModal = document.getElementById('modalBlockDriver');
+            if(oldModal && !oldModal.classList.contains('hidden')) {
+                closeModal('modalBlockDriver');
+                setTimeout(() => { openModal('modalBlockHistory'); }, 200); // หน่วงนิดนึงให้แอนิเมชันสมูท
+            } else {
+                openModal('modalBlockHistory');
+            }
+        });
     }
 
     window.closeDriverProfilePage = function() { switchTab('drivers', true); }
