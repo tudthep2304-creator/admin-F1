@@ -701,15 +701,11 @@
                           <option value="female">👩 หญิง (Female)</option>
                       </select>
                   </div>
-                  <!-- 🌟 โซนวันที่สมัครและโบนัสอัตโนมัติ (ซ่อนช่องแก้ไขเงิน) -->
-                  <div class="mb-4 bg-blue-50 dark:bg-slate-800/50 p-3 rounded-xl border border-blue-100 dark:border-slate-700 flex items-center justify-between">
+                  <!-- 🌟 โซนวันที่สมัคร (ลบโบนัสตายตัวออกไปแล้ว) -->
+                  <div class="mb-4 bg-blue-50 dark:bg-slate-800/50 p-3 rounded-xl border border-blue-100 dark:border-slate-700 flex items-center justify-center text-center">
                       <div>
                           <p class="text-[10px] font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-calendar-check"></i> วันที่ลงทะเบียน</p>
                           <p class="text-xs font-bold text-gray-800 dark:text-white mt-0.5" id="add-drv-date-display">กำลังโหลด...</p>
-                      </div>
-                      <div class="text-right">
-                          <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-gift"></i> โบนัสผู้ใช้ใหม่</p>
-                          <p class="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">+100.00 🟡</p>
                       </div>
                   </div>
               </div>
@@ -1576,6 +1572,41 @@
         if(vSelect) vSelect.innerHTML = vHtml || '<option value="car">รถยนต์</option>';
 
         openModal('modalAddDriver');
+    }
+
+    // ================= อัปเดตฟังก์ชันลงทะเบียน (ตั้งค่าเริ่มต้นกระเป๋าเป็น 0 ให้ระบบ Quest จัดการ) =================
+    window.saveNewDriver = function() {
+        let drvId = document.getElementById('add-drv-id').value.trim();
+        let pin = document.getElementById('add-drv-pin').value.trim();
+        let fname = document.getElementById('add-drv-fname').value.trim();
+        let lname = document.getElementById('add-drv-lname').value.trim();
+        let phone = document.getElementById('add-drv-phone').value.trim();
+        let gender = document.getElementById('add-drv-gender').value;
+        
+        if(!drvId) return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุรหัสประจำตัว (เช่น DRV-123456)', 'error');
+        if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'กรุณาตั้งรหัสผ่าน (PIN) 4 หลักสำหรับการเข้าแอปฯ ครั้งแรก', 'error');
+        if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานและเบอร์โทรศัพท์ให้ครบถ้วนก่อนครับ', 'error');
+
+        let fullName = fname + (lname ? ' ' + lname : '');
+        let vType = document.getElementById('add-drv-vtype').value;
+        let vId = 'veh_' + Date.now();
+        let initialVehicles = {};
+        initialVehicles[vId] = { id: vId, serviceType: vType, brand: document.getElementById('add-drv-vbrand').value.trim(), color: document.getElementById('add-drv-vcolor').value.trim(), plate: document.getElementById('add-drv-vplate').value.trim(), province: document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '', isOnline: false };
+
+        let picUpload = document.getElementById('add-drv-pic-upload');
+        let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
+
+        // 🌟 ตั้งให้ทุกคนเริ่มที่ระดับ New และกระเป๋าโบนัส 0 บาท (ให้ Quest แจกออโต้ตอนสมัครสำเร็จ)
+        let driverData = {
+            driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
+            creditCash: 0, creditBonus: 0, tier: "New", rating: "5.0", 
+            profilePic: profilePic, vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
+            showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เข้าระบบเรียบร้อย!`, 'success');
+            closeModal('modalAddDriver');
+        });
     }
 
     window.currentDriverVehicles = {}; 
