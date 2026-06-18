@@ -580,10 +580,20 @@
                   <h2 class="text-sm font-black text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-list text-red-500"></i> รายชื่อคนขับที่ถูกระงับสิทธิ์</h2>
                   
                   <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-                      <select id="filter-blocked-reason" onchange="filterBlockedDrivers()" class="w-full sm:w-48 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
+                      <select id="filter-blocked-tier" onchange="filterBlockedDrivers()" class="w-full sm:w-32 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
+                          <option value="all">ทุกระดับชั้น</option>
+                          <option value="New">🔰 New</option>
+                          <option value="Standard">🥉 Standard</option>
+                          <option value="Silver">🥈 Silver</option>
+                          <option value="Gold">🥇 Gold</option>
+                          <option value="Platinum">💎 Platinum</option>
+                          <option value="F1 Legend">👑 F1 Legend</option>
+                          <option value="owner super legend">🚀 Owner</option>
+                      </select>
+                      <select id="filter-blocked-reason" onchange="filterBlockedDrivers()" class="w-full sm:w-36 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
                           <option value="all">แสดงทุกสาเหตุ</option>
                       </select>
-                      <div class="relative w-full sm:w-56">
+                      <div class="relative w-full sm:w-48">
                           <input type="text" id="search-blocked-input" onkeyup="filterBlockedDrivers()" placeholder="ค้นหาด้วย ID หรือ ชื่อ..." class="w-full bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg pl-8 pr-3 py-2 outline-none focus:border-red-500 transition">
                           <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-[10px]"></i>
                       </div>
@@ -591,19 +601,18 @@
               </div>
 
               <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
-                  <table class="w-full text-left border-collapse min-w-[500px]">
+                  <table class="w-full text-left border-collapse min-w-[350px]">
                       <thead class="sticky top-0 z-10 bg-gray-100 dark:bg-slate-800 shadow-sm border-b border-gray-200 dark:border-slate-700">
                           <tr class="text-gray-500 dark:text-slate-400 text-[11px] font-medium">
-                              <th class="py-2.5 px-3 text-left">รหัสอ้างอิง (ID)</th>
-                              <th class="py-2.5 px-2 text-left w-1/2">เหตุผล / หมายเหตุ</th>
-                              <th class="py-2.5 px-3 text-right">จัดการ</th>
+                              <th class="py-2.5 px-3 text-left rounded-tl-lg w-[40%]">รหัสอ้างอิง / ชื่อพนักงาน</th>
+                              <th class="py-2.5 px-3 text-left rounded-tr-lg w-[60%]">เหตุผล / หมายเหตุ</th>
                           </tr>
                       </thead>
                       <tbody id="blockdrivers-table-body" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
                       </tbody>
                   </table>
               </div>
-              <p class="text-right text-[9px] text-gray-400 mt-2 shrink-0">* แสดงข้อมูลจำกัด 50 รายการล่าสุด</p>
+              <p class="text-right text-[9px] text-gray-400 mt-2 shrink-0">* แสดงข้อมูลจำกัด 50 รายการล่าสุด (กดที่รายชื่อเพื่อจัดการปลดบล็อก)</p>
           </div>
       </section>
     
@@ -2915,13 +2924,20 @@
         
         let keyword = (document.getElementById('search-blocked-input')?.value || '').toLowerCase();
         let reasonFilter = document.getElementById('filter-blocked-reason')?.value || 'all';
+        let tierFilter = document.getElementById('filter-blocked-tier')?.value || 'all'; // 🌟 ดึงค่าตัวกรองระดับชั้น
         
         let filtered = allBlockedDataForTable.filter(b => {
             let d = allProfiles[b.driverId] || {};
             let searchStr = `${b.driverId} ${d.name || ''} ${d.phone || ''}`.toLowerCase();
+            
             let matchKeyword = searchStr.includes(keyword);
             let matchReason = (reasonFilter === 'all') ? true : (b.reason === reasonFilter);
-            return matchKeyword && matchReason;
+            
+            // 🌟 เช็คว่าตรงกับตัวกรองระดับชั้นไหม
+            let dTier = d.tier || 'New';
+            let matchTier = (tierFilter === 'all') ? true : (dTier === tierFilter);
+            
+            return matchKeyword && matchReason && matchTier;
         });
         
         filtered = filtered.slice(0, 50);
@@ -2933,25 +2949,27 @@
             let name = d.name || 'ไม่ทราบชื่อ';
             let dateStr = b.expireAt === 0 ? '<span class="text-red-500 font-bold">แบนถาวร</span>' : new Date(b.expireAt).toLocaleString('th-TH');
             let noteHtml = b.note ? `<br><span class="text-gray-500 text-[9px]">หมายเหตุ: ${b.note}</span>` : '';
+            
+            // 🌟 สร้างป้าย Tier โชว์สวยๆ ในตาราง
+            let tierBadge = window.getTierBadgeHtml ? window.getTierBadgeHtml(d.tier || 'New') : `<span class="text-[9px] text-gray-500">${d.tier || 'New'}</span>`;
 
+            // 🌟 ใส่ onclick ไว้ที่แถวเลย พอกดปุ๊บ เด้ง Modal ปลดบล็อกทันที
             html += `
-            <tr class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
-                <td class="py-3 px-3 min-w-[120px]">
-                    <p class="font-bold text-red-500 text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${driverId}')">${driverId}</p>
-                    <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">${name}</p>
+            <tr onclick="openBlockDriverModal('${driverId}')" class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer group">
+                <td class="py-3 px-3 align-top">
+                    <p class="font-bold text-red-500 text-[11px] group-hover:underline">${driverId}</p>
+                    <p class="text-[10px] text-gray-800 dark:text-white font-bold mt-0.5 mb-1">${name}</p>
+                    <div>${tierBadge}</div>
                 </td>
-                <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">
+                <td class="py-3 px-3 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed align-top">
                     <p class="font-bold text-gray-800 dark:text-slate-200 mb-0.5"><i class="fas fa-exclamation-circle text-red-400 mr-0.5"></i> ${b.reason}</p>
                     <p class="text-[9px] text-gray-400">ปลดบล็อก: ${dateStr}</p>
                     ${noteHtml}
                 </td>
-                <td class="py-3 px-3 text-right">
-                    <button onclick="unblockDriver('${driverId}')" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition shadow-sm whitespace-nowrap">ปลดบล็อก</button>
-                </td>
             </tr>`;
         });
         
-        tbody.innerHTML = html || '<tr><td colspan="3" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบพนักงานที่ตรงกับเงื่อนไขการค้นหา</td></tr>';
+        tbody.innerHTML = html || '<tr><td colspan="2" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบพนักงานที่ตรงกับเงื่อนไขการค้นหา</td></tr>';
     }
 
     // ==========================================
