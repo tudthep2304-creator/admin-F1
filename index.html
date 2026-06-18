@@ -3247,7 +3247,7 @@
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
             rewardBonus: rewardBonus, 
-            rewardExpireDays: rewardExpireDays, // 🌟 ส่งขึ้นไปบันทึกบนฐานข้อมูล Firebase
+            rewardExpireDays: rewardExpireDays, // 🌟 บันทึกอายุโบนัสลงฐานข้อมูล
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
@@ -3449,15 +3449,14 @@
       <button onclick="closeImageViewer()" class="absolute top-4 right-4 text-white hover:text-gray-300 bg-gray-800/50 hover:bg-gray-700 rounded-full w-10 h-10 flex items-center justify-center z-10 transition"><i class="fas fa-times text-xl"></i></button>
       <img id="fullImageViewerSrc" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-fade-in" src="">
   </div>
-  <div class="p-3 sm:p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-start sm:items-center bg-gray-50 dark:bg-slate-800/50">
-              <div class="flex flex-wrap items-center gap-2 pr-4">
-                  <h2 class="text-base font-bold text-emerald-600 dark:text-emerald-400 leading-none mt-1"><i class="fas fa-exchange-alt mr-1"></i> ปรับปรุงยอดเงิน</h2>
-                  <button onclick="viewBonusLedger(currentWalletTargetId)" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded text-[10px] font-bold transition shadow-sm border border-yellow-300 mt-1">
-                      <i class="fas fa-history mr-1"></i> เช็คอายุโบนัส
+  <div id="modalAdjustCredit" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+          <div class="flex items-center gap-2">
+                  <h2 class="text-base font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-exchange-alt mr-1"></i> ปรับปรุงยอดเงิน</h2>
+                  <button onclick="viewBonusLedger(currentWalletTargetId)" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded text-[10px] font-bold transition shadow-sm border border-yellow-300">
+                      <i class="fas fa-history mr-1"></i> เช็คโบนัส
                   </button>
               </div>
-              <button onclick="closeAdjustCreditModal()" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white shrink-0 pt-1"><i class="fas fa-times text-lg"></i></button>
-          </div>
           
           <div class="p-5 space-y-4">
               <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
@@ -3544,13 +3543,15 @@
                       </div>
                       <div id="quest-veh-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
                           <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllVehs(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
-                          <div id="quest-target-vehicle-container" class="flex flex-col gap-2"></div>
+                          <div id="quest-target-vehicle-container" class="flex flex-col gap-2">
+                              </div>
                       </div>
                   </div>
               </div>
 
               <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
                   <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (ติ๊กเลือกผสมกันได้)</h3>
+                  
                   <div class="space-y-3 mt-3">
                       <div class="flex items-center gap-2">
                           <input type="checkbox" id="cond-rides-check" onchange="document.getElementById('cond-rides-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-rides-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
@@ -3558,29 +3559,37 @@
                           <input type="number" id="cond-rides-val" disabled class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
                           <span class="text-[10px] font-bold text-gray-500">รอบ</span>
                       </div>
+                      
                       <div class="flex items-center gap-2">
                           <input type="checkbox" id="cond-star-check" onchange="document.getElementById('cond-star-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-star-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
                           <label for="cond-star-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24">⭐ รีวิว 5 ดาวติดกัน</label>
                           <input type="number" id="cond-star-val" disabled class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
                           <span class="text-[10px] font-bold text-gray-500">ครั้ง</span>
                       </div>
+
                       <div class="flex items-center gap-2">
                           <input type="checkbox" id="cond-days-check" onchange="document.getElementById('cond-days-val').disabled = !this.checked; document.getElementById('cond-days-unit').disabled = !this.checked; if(this.checked) document.getElementById('cond-days-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
                           <label for="cond-days-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24">⏱️ อายุสมาชิกครบ</label>
                           <input type="number" id="cond-days-val" disabled class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
                           <select id="cond-days-unit" disabled class="p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
-                              <option value="days">วัน</option><option value="months">เดือน</option><option value="years">ปี</option>
+                              <option value="days">วัน</option>
+                              <option value="months">เดือน</option>
+                              <option value="years">ปี</option>
                           </select>
                       </div>
+
+                      <!-- 🌟 โบนัสสมัครใหม่ (ใส่ onchange เพื่อล็อก UI) -->
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
                           <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (สำหรับแจกคนใหม่)</label>
                       </div>
+
                       <div class="flex items-center gap-2 pt-1">
                           <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
                           <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (แจกแมนนวล)</label>
                       </div>
                   </div>
+                  <p class="text-[9px] text-gray-400 mt-3 leading-relaxed">* หากติ๊กเลือกหลายข้อ คนขับจะต้องทำภารกิจให้สำเร็จ <b>"ครบทุกข้อที่ติ๊ก"</b> ระบบจึงจะจ่ายรางวัลอัตโนมัติ</p>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
@@ -3594,6 +3603,27 @@
                   </div>
               </div>
 
+              <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
+                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ</h3>
+                  <div class="grid grid-cols-2 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">แจกโบนัส (เครดิต 🟡)</label>
+                          <input type="number" id="quest-reward-bonus" placeholder="เช่น 100" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-sm font-bold text-center">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เลื่อนเป็นระดับ</label>
+                          <select id="quest-reward-tier" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold">
+                              <option value="none">-- ไม่เลื่อนระดับ --</option>
+                              <option value="Standard">🥉 Standard</option>
+                              <option value="Silver">🥈 Silver</option>
+                              <option value="Gold">🥇 Gold</option>
+                              <option value="Platinum">💎 Platinum</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+
+<!-- 🎁 ของรางวัล -->
               <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
                   <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกอย่างใดอย่างหนึ่ง หรือทั้งคู่)</h3>
                   <div class="grid grid-cols-3 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
@@ -3617,7 +3647,7 @@
                       </div>
                   </div>
               </div>
-
+            
               <div class="flex items-center gap-2 mt-2">
                   <input type="checkbox" id="quest-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
                   <label for="quest-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญนี้ทันที 🟢</label>
