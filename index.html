@@ -2481,7 +2481,12 @@
     db.ref('system_settings/vehicle_types').on('value', snap => {
         let container = document.getElementById('vehicle-types-container');
         let filterSelect = document.getElementById('map-filter-vehicle');
-        let html = ''; let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; 
+        let questVehSelect = document.getElementById('quest-target-vehicle'); // 🌟 จับกล่องเลือกรถในหน้าภารกิจ
+        
+        let html = ''; 
+        let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; 
+        let questVehHtml = '<option value="all">🚗+🏍️ รถทุกประเภท</option>'; // 🌟 Option ตั้งต้นของหน้าภารกิจ
+        
         window.systemVehicleTypes = []; 
 
         if(snap.exists()) {
@@ -2504,16 +2509,19 @@
                         <button onclick="window.openManageVehicleModal('${vData}')" class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded text-xs hover:bg-blue-200 dark:hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit"></i></button>
                     </div>
                 </div>`;
+                
                 filterHtml += `<option value="${id}">${v.name}</option>`;
+                questVehHtml += `<option value="${id}">${v.name}</option>`; // 🌟 ยัดชื่อรถเข้าหน้าภารกิจ
             });
         }
         if(container) container.innerHTML = html;
         if(filterSelect) filterSelect.innerHTML = filterHtml;
+        if(questVehSelect) questVehSelect.innerHTML = questVehHtml; // 🌟 อัปเดต Dropdown หน้าสร้างภารกิจ
         
         if(typeof renderDriverVehicles === 'function') renderDriverVehicles();
         if(typeof renderDashboardVehicleToggles === 'function') renderDashboardVehicleToggles(); 
     });
-
+    
     window.toggleForceOnline = function(vehicleId, isChecked) {
         db.ref('system_settings/vehicle_types/' + vehicleId).update({
             forceOnline: isChecked
@@ -2870,165 +2878,169 @@
         let elBonus = document.getElementById('wallet-stat-bonus'); if(elBonus) elBonus.innerText = '฿' + totalBonus.toLocaleString();
     }
 
-    // 🌟 ระบบจัดการระดับ (Tiers & Gamification)
-    window.renderTiersTab = function() {
-        let lst = document.getElementById('tiers-drivers-list');
-        let html = '';
+    // ========================================================
+    // 🌟 ระบบสร้างแคมเปญและภารกิจแบบผสมเงื่อนไข (Composite Quest Center)
+    // ========================================================
+    let allQuests = {};
 
-        for (let drvId in allProfiles) {
-            let d = allProfiles[drvId];
-            let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
+    db.ref('system_settings/quests').on('value', snap => {
+        allQuests = snap.val() || {};
+        if(typeof renderQuestsTable === 'function') renderQuestsTable();
+    });
 
-            let displayRating = "5.0";
-            if (d.tier === 'owner super legend') displayRating = "100.0";
-            else if (d.tier === 'F1 Legend') displayRating = "10.0";
-            else if (d.rating) displayRating = parseFloat(d.rating).toFixed(1);
+    window.renderQuestsTable = function() {
+        let fStatus = document.getElementById('filter-quest-status')?.value || 'all';
+        let fTier = document.getElementById('filter-quest-tier')?.value || 'all';
+        let fVeh = document.getElementById('filter-quest-vehicle')?.value || 'all';
+        
+        let lst = document.getElementById('campaigns-list'); let html = '';
+        let questsArr = Object.entries(allQuests).map(([k,v]) => ({id:k, ...v}));
+        
+        let filtered = questsArr.filter(q => {
+            if (fStatus === 'active' && !q.isActive) return false;
+            if (fStatus === 'inactive' && q.isActive) return false;
+            if (fTier !== 'all' && q.targetTier !== fTier && q.targetTier !== 'all') return false;
+            if (fVeh !== 'all' && q.targetVehicle !== fVeh && q.targetVehicle !== 'all') return false;
+            return true;
+        });
 
-            let pic = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
+        if (filtered.length === 0) {
+            if(lst) lst.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-gray-400 text-xs">ไม่พบข้อมูลแคมเปญที่ตรงกับตัวกรอง</td></tr>`; return;
+        }
+
+        filtered.sort((a, b) => b.timestamp - a.timestamp).forEach(q => {
+            let timeStr = "ไม่มีวันหมดอายุ";
+            if (q.startTime || q.endTime) {
+                timeStr = `${q.startTime ? q.startTime.replace('T',' ') : 'เริ่มแล้ว'} - ${q.endTime ? q.endTime.replace('T',' ') : 'ตลอดไป'}`;
+            }
+
+            // 🌟 สร้างข้อความเงื่อนไขผสม
+            let conditionStr = "";
+            let condArr = [];
+            let c = q.conditions || {};
+            if (c.manual) condArr.push("🏆 แอดมินพิจารณา");
+            else {
+                if (c.rides > 0) condArr.push(`วิ่งครบ <b>${c.rides}</b> รอบ`);
+                if (c.stars > 0) condArr.push(`5 ดาว <b>${c.stars}</b> ครั้ง`);
+                if (c.days > 0) condArr.push(`สมาชิกครบ <b>${c.days}</b> วัน`);
+            }
+            if(condArr.length === 0) condArr.push("📝 สมัครเข้าระบบสำเร็จ");
+            conditionStr = condArr.join(' <span class="text-blue-500 font-black">+</span> ');
+
+            let rewardStr = "";
+            if (q.rewardBonus > 0) rewardStr += `<span class="text-yellow-600 font-bold text-xs">+${q.rewardBonus} 🟡</span><br>`;
+            if (q.rewardTier && q.rewardTier !== 'none') rewardStr += `<span class="text-blue-500 font-bold text-[10px]">เลื่อนเป็น ${q.rewardTier}</span>`;
+
+            let toggleClass = q.isActive ? 'text-emerald-500' : 'text-gray-300';
+            let toggleIcon = q.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
 
             html += `
-            <tr class="border-b border-gray-100 dark:border-slate-800/50 hover:bg-gray-50 transition">
-                <td class="py-3 px-3 font-bold text-amber-600 text-xs text-left">${drvId}</td>
-                <td class="py-3 px-3 flex items-center gap-2 text-left">${pic} <span class="font-bold text-[13px] text-gray-800 dark:text-white">${d.name}</span></td>
-                <td class="py-3 px-2 text-center">${tierBadgeHtml}</td>
-                <td class="py-3 px-2 text-center font-bold text-yellow-500 text-xs"><i class="fas fa-star text-[10px]"></i> ${displayRating}</td>
-                <td class="py-3 px-3 text-center"><button onclick="openAdjustTierRatingModal('${drvId}')" class="bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition border border-amber-200">ปรับระดับ</button></td>
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition border-b border-gray-100 dark:border-slate-800">
+                <td class="py-3 px-3">
+                    <p class="font-bold text-gray-800 dark:text-white text-xs">${q.name}</p>
+                    <p class="text-[9px] text-gray-400 mt-1">${timeStr}</p>
+                </td>
+                <td class="py-3 px-2 text-[10px] text-gray-500 dark:text-slate-400">
+                    ระดับ: <b class="text-blue-500">${q.targetTier}</b><br>รถ: <b>${q.targetVehicle === 'all' ? 'ทุกประเภท' : q.targetVehicle}</b>
+                </td>
+                <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-300 leading-relaxed">${conditionStr}</td>
+                <td class="py-3 px-2 text-right">${rewardStr}</td>
+                <td class="py-3 px-3 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <button onclick="toggleQuestStatus('${q.id}', ${!q.isActive})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
+                        <button onclick="openQuestModal('${q.id}')" class="bg-blue-50 text-blue-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit text-[11px]"></i></button>
+                        <button onclick="deleteQuest('${q.id}')" class="bg-red-50 text-red-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt text-[11px]"></i></button>
+                    </div>
+                </td>
             </tr>`;
-        }
-        if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูล</td></tr>';
-    }
-
-    // ================= อัปเดต Modal จัดการระดับ =================
-    window.openAdjustTierRatingModal = function(drvId) {
-        currentWalletDriverId = drvId;
-        let d = allProfiles[drvId]; if(!d) return;
-        document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
-        document.getElementById('trm-drv-id').innerText = drvId;
-        
-        // คืนอิสระการเลือกระดับ (เอาโค้ดซ่อนออก)
-        document.getElementById('trm-tier-select').value = d.tier || 'Standard';
-        document.getElementById('trm-note').value = '';
-        
-        let currentRating = d.rating !== undefined ? d.rating : "5.0";
-        if(d.tier === 'owner super legend') currentRating = "100";
-        else if(d.tier === 'F1 Legend') currentRating = "10";
-        document.getElementById('trm-rating-input').value = currentRating;
-
-        openModal('modalAdjustTierRating');
-    }
-
-    window.autoFillOverrideStars = function() {
-        let tier = document.getElementById('trm-tier-select').value;
-        let rInput = document.getElementById('trm-rating-input');
-        if(tier === 'owner super legend') rInput.value = "100";
-        else if(tier === 'F1 Legend') rInput.value = "10";
-        else rInput.value = "5.0";
-    }
-    
-    window.closeTierRatingModal = function() { closeModal('modalAdjustTierRating'); currentWalletDriverId = null; }
-    
-    window.autoFillOverrideStars = function() {
-        let tier = document.getElementById('trm-tier-select').value;
-        let rInput = document.getElementById('trm-rating-input');
-        if(tier === 'F1 Legend') rInput.value = "10"; else rInput.value = "5.0";
-    }
-
-    window.submitTierRatingAdjustment = function() {
-        if(!currentWalletDriverId) return;
-        let newTier = document.getElementById('trm-tier-select').value;
-        let newRating = parseFloat(document.getElementById('trm-rating-input').value) || 5.0;
-        let note = document.getElementById('trm-note').value.trim();
-
-        if(!note) return showCustomAlert('ระบุหมายเหตุ', 'กรุณากรอกเหตุผลเพื่อบันทึกประวัติการปรับสิทธิ์', 'error');
-
-        db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: newTier, rating: newRating.toFixed(1) }).then(() => {
-            db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: newTier, assignedRating: newRating.toFixed(1), reason: note, adminName: "ผู้บริหารระบบ" });
-            showCustomAlert('สำเร็จ', 'ปรับเปลี่ยนระดับ Tier และคะแนนดาวเรียบร้อยแล้ว', 'success');
-            closeTierRatingModal(); renderTiersTab(); renderWalletTab();
         });
+        if(lst) lst.innerHTML = html;
     }
 
-    // 🌟 ระบบกระเป๋าเงินลูกค้า CRM
-    let currentWalletRole = 'driver'; 
-    window.openAdjustCreditModal = function(targetId, role = 'driver') {
-        currentWalletTargetId = targetId;
-        currentWalletRole = role;
-        
-        if(role === 'driver') {
-            let d = allProfiles[targetId]; if(!d) return;
-            document.getElementById('adj-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
-            document.getElementById('adj-drv-id').innerText = "คนขับ: " + targetId;
+    window.openQuestModal = function(questId = null) {
+        // เคลียร์ค่าทั้งหมดก่อนเปิด
+        ['rides','star','days'].forEach(type => {
+            document.getElementById(`cond-${type}-check`).checked = false;
+            document.getElementById(`cond-${type}-val`).value = '';
+            document.getElementById(`cond-${type}-val`).disabled = true;
+        });
+        document.getElementById('cond-manual-check').checked = false;
+
+        if (questId && allQuests[questId]) {
+            let q = allQuests[questId]; let c = q.conditions || {};
+            document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญ';
+            document.getElementById('quest-id').value = questId;
+            document.getElementById('quest-name').value = q.name;
+            document.getElementById('quest-target-tier').value = q.targetTier;
+            document.getElementById('quest-target-vehicle').value = q.targetVehicle || 'all';
+            document.getElementById('quest-start').value = q.startTime || '';
+            document.getElementById('quest-end').value = q.endTime || '';
+            document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
+            document.getElementById('quest-reward-tier').value = q.rewardTier || 'none';
+            document.getElementById('quest-is-active').checked = q.isActive;
+
+            // นำค่าเงื่อนไขกลับมาติ๊ก
+            if(c.manual) document.getElementById('cond-manual-check').checked = true;
+            if(c.rides > 0) { document.getElementById('cond-rides-check').checked = true; document.getElementById('cond-rides-val').value = c.rides; document.getElementById('cond-rides-val').disabled = false; }
+            if(c.stars > 0) { document.getElementById('cond-star-check').checked = true; document.getElementById('cond-star-val').value = c.stars; document.getElementById('cond-star-val').disabled = false; }
+            if(c.days > 0) { document.getElementById('cond-days-check').checked = true; document.getElementById('cond-days-val').value = c.days; document.getElementById('cond-days-val').disabled = false; }
+
         } else {
-            document.getElementById('adj-drv-name').innerText = windowContext.focusPassengerName || 'ลูกค้า';
-            document.getElementById('adj-drv-id').innerText = "ลูกค้า: " + targetId;
-            closeModal('modalPassengerDetails'); // ซ่อนหน้าต่างลูกค้าชั่วคราว
+            document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
+            document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
+            document.getElementById('quest-target-tier').value = 'all'; document.getElementById('quest-target-vehicle').value = 'all';
+            document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
+            document.getElementById('quest-reward-bonus').value = ''; document.getElementById('quest-reward-tier').value = 'none';
+            document.getElementById('quest-is-active').checked = true;
         }
-
-        document.getElementById('adj-amount').value = ''; document.getElementById('adj-note').value = '';
-        document.getElementById('adj-wallet-type').value = 'cash'; document.getElementById('adj-action-type').value = 'add';
-        toggleAdjustColors(); 
-        openModal('modalAdjustCredit');
+        openModal('modalAddQuest');
     }
 
-    window.closeAdjustCreditModal = function() { 
-        closeModal('modalAdjustCredit'); 
-        if(currentWalletRole === 'passenger') openModal('modalPassengerDetails');
-        currentWalletTargetId = null; 
-    }
+    window.saveQuestCampaign = function() {
+        let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
+        let name = document.getElementById('quest-name').value.trim();
+        let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
+        let rewardTier = document.getElementById('quest-reward-tier').value;
 
-    window.toggleAdjustColors = function() {
-        let action = document.getElementById('adj-action-type').value; let el = document.getElementById('adj-action-type');
-        if(action === 'add') el.className = "w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold focus:border-emerald-500";
-        else el.className = "w-full p-2.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-xl outline-none text-sm font-bold focus:border-red-500";
-    }
+        if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญให้คนขับเข้าใจง่ายๆ ด้วยครับ', 'error');
+        if (rewardBonus === 0 && rewardTier === 'none') return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ (โบนัส หรือ เลื่อนขั้น)', 'error');
 
-    window.submitCreditAdjustment = function() {
-        if(!currentWalletTargetId) return;
-        let walletType = document.getElementById('adj-wallet-type').value; 
-        let actionType = document.getElementById('adj-action-type').value; 
-        let amount = parseFloat(document.getElementById('adj-amount').value);
-        let note = document.getElementById('adj-note').value.trim();
-        
-        if (isNaN(amount) || amount <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนเงิน', 'error');
-        if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุหมายเหตุการทำรายการ', 'error');
+        // รวบรวมเงื่อนไขที่ติ๊ก
+        let conditions = {
+            manual: document.getElementById('cond-manual-check').checked,
+            rides: document.getElementById('cond-rides-check').checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
+            stars: document.getElementById('cond-star-check').checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
+            days: document.getElementById('cond-days-check').checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
+        };
 
-        let path = currentWalletRole === 'driver' ? 'drivers_profile/' + currentWalletTargetId : 'passengers_profile/' + currentWalletTargetId;
+        let payload = {
+            name: name, 
+            targetTier: document.getElementById('quest-target-tier').value, 
+            targetVehicle: document.getElementById('quest-target-vehicle').value,
+            conditions: conditions,
+            startTime: document.getElementById('quest-start').value || null,
+            endTime: document.getElementById('quest-end').value || null,
+            rewardBonus: rewardBonus, 
+            rewardTier: rewardTier,
+            isActive: document.getElementById('quest-is-active').checked,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
 
-        db.ref(path).once('value', snap => {
-            let d = snap.val() || {};
-            let currentCash = parseFloat(d.creditCash || d.credit || 0);
-            let currentBonus = parseFloat(d.creditBonus || 0);
-            let newCash = currentCash; let newBonus = currentBonus;
-
-            if (walletType === 'cash') { if (actionType === 'add') newCash += amount; else newCash -= amount; } 
-            else { if (actionType === 'add') newBonus += amount; else newBonus -= amount; }
-
-            if (newCash < 0 || newBonus < 0) { if(!confirm(`กระเป๋าเงินจะติดลบ ยืนยันดำเนินการต่อหรือไม่?`)) return; }
-
-            let updatePayload = { creditCash: newCash, creditBonus: newBonus };
-            if(currentWalletRole === 'driver') updatePayload.credit = newCash;
-
-            db.ref(path).update(updatePayload).then(() => {
-                db.ref('wallet_transactions/' + currentWalletTargetId).push({ 
-                    timestamp: firebase.database.ServerValue.TIMESTAMP, role: currentWalletRole, walletType, actionType, amount, note, balanceAfter: walletType === 'cash' ? newCash : newBonus, adminName: "แอดมินศูนย์" 
-                });
-                
-                showCustomAlert('สำเร็จ', `ปรับปรุงยอดเงินเรียบร้อยแล้ว`, 'success'); 
-                closeAdjustCreditModal(); 
-                
-                if(currentWalletRole === 'driver') renderWalletTab(); 
-                else {
-                    let rStr = document.getElementById('pdet-rides').innerText.replace(/[^0-9]/g, '');
-                    let sStr = document.getElementById('pdet-spend').innerText.replace(/[^0-9]/g, '');
-                    let payloadStr = encodeURIComponent(JSON.stringify({userId: currentWalletTargetId, phone: windowContext.focusPassengerPhone, name: windowContext.focusPassengerName, rides: rStr, spend: sStr}));
-                    viewPassengerDetails(payloadStr); 
-                }
-            });
+        db.ref('system_settings/quests/' + qId).update(payload).then(() => {
+            showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success');
+            closeModal('modalAddQuest');
         });
     }
-    
-    window.openTierAirdropModal = function() { showCustomAlert('เร็วๆ นี้', 'ระบบแจกโบนัสกลุ่ม (Airdrop) กำลังพัฒนา!', 'info'); }
-    window.openCommissionSettings = function() { showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังพัฒนา!', 'info'); }
+
+    window.toggleQuestStatus = function(qId, status) {
+        db.ref('system_settings/quests/' + qId).update({ isActive: status });
+    }
+
+    window.deleteQuest = function(qId) {
+        showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกจากระบบอย่างถาวร?', () => {
+            db.ref('system_settings/quests/' + qId).remove();
+        }, 'ลบทิ้ง', 'red');
+    }
     
   </script>
 
@@ -3273,44 +3285,44 @@
                   <input type="text" id="quest-name" placeholder="เช่น โปรต้อนรับคนใหม่, Silver วิ่งครบ 10 รอบ..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
               </div>
 
-              <div class="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
-                  <div class="col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1 mb-2"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
-                      <select id="quest-target-tier" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
-                          <option value="all">🌐 ทุกระดับ</option>
-                          <option value="New">🔰 เฉพาะ New</option>
-                          <option value="Standard">🥉 เฉพาะ Standard</option>
-                          <option value="Silver">🥈 เฉพาะ Silver</option>
-                          <option value="Gold">🥇 เฉพาะ Gold</option>
-                      </select>
-                  </div>
-                  <div>
+              <div>
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
                       <select id="quest-target-vehicle" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
                           <option value="all">🚗+🏍️ รถทุกประเภท</option>
-                          <option value="car">🚗 เฉพาะรถยนต์</option>
-                          <option value="bike">🏍️ เฉพาะมอเตอร์ไซค์</option>
                       </select>
                   </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-3 bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
-                  <div class="col-span-2"><h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (Condition)</h3></div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">รูปแบบภารกิจ</label>
-                      <select id="quest-condition-type" class="w-full p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
-                          <option value="rides">🚕 สะสมรอบวิ่ง</option>
-                          <option value="tenure">⏱️ อายุการเป็นสมาชิก</option>
-                          <option value="signup">📝 สมัครใหม่ปุ๊บได้เลย (0 รอบ)</option>
-                      </select>
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เป้าหมายตัวเลข (รอบ / วัน)</label>
-                      <input type="number" id="quest-condition-value" placeholder="เช่น 10 (รอบ)" class="w-full p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 rounded-lg outline-none text-sm font-black text-center focus:border-amber-500">
-                  </div>
-              </div>
+              <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
+                  <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (ติ๊กเลือกผสมกันได้)</h3>
+                  
+                  <div class="space-y-2 mt-2">
+                      <div class="flex items-center gap-2">
+                          <input type="checkbox" id="cond-rides-check" onchange="document.getElementById('cond-rides-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-rides-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                          <label for="cond-rides-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 w-[120px] cursor-pointer">🚕 วิ่งสะสมให้ครบ</label>
+                          <input type="number" id="cond-rides-val" placeholder="รอบ" disabled class="w-24 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
+                      </div>
+                      
+                      <div class="flex items-center gap-2">
+                          <input type="checkbox" id="cond-star-check" onchange="document.getElementById('cond-star-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-star-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                          <label for="cond-star-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 w-[120px] cursor-pointer">⭐ ได้ 5 ดาวติดกัน</label>
+                          <input type="number" id="cond-star-val" placeholder="ครั้ง" disabled class="w-24 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
+                      </div>
 
+                      <div class="flex items-center gap-2">
+                          <input type="checkbox" id="cond-days-check" onchange="document.getElementById('cond-days-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-days-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                          <label for="cond-days-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 w-[120px] cursor-pointer">⏱️ อายุสมาชิกครบ</label>
+                          <input type="number" id="cond-days-val" placeholder="วัน" disabled class="w-24 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
+                      </div>
+
+                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
+                          <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (ทำงานเงื่อนไขนี้ข้อเดียว)</label>
+                      </div>
+                  </div>
+                  <p class="text-[9px] text-gray-400 mt-2 leading-relaxed">* หากติ๊กเลือกหลายข้อ คนขับจะต้องทำภารกิจให้สำเร็จ <b>"ครบทุกข้อที่ติ๊ก"</b> ระบบจึงจะจ่ายรางวัลอัตโนมัติ</p>
+              </div>
+        
               <div class="grid grid-cols-2 gap-3">
                   <div>
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มแคมเปญ (ว่าง=เริ่มทันที)</label>
