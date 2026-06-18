@@ -968,102 +968,7 @@
           <div id="chatlog-messages-container" class="p-4 overflow-y-auto flex-1 slim-scroll bg-white dark:bg-slate-900 space-y-3">
           </div>
       </div>
-  </div>
-
-  <!-- 🌟 หน้าต่างสร้างภารกิจ (Quest Builder) -->
-  <div id="modalAddQuest" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-slate-900 border border-amber-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 sticky top-0 z-10">
-              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500" id="quest-modal-title"><i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่</h2>
-              <button onclick="closeModal('modalAddQuest')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="p-5 space-y-4">
-              <input type="hidden" id="quest-id"> <div>
-                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ (โชว์ให้คนขับเห็น)</label>
-                  <input type="text" id="quest-name" placeholder="เช่น โปรวิ่งวันหยุด, สู้ฝนแจกโบนัส, รักษา 5 ดาว..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
-              </div>
-
-              <div class="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
-                  <div class="col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1 mb-1"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
-                      <select id="quest-target-tier" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
-                          <option value="all">🌐 ทุกระดับ</option>
-                          <option value="New">🔰 เฉพาะ New</option>
-                          <option value="Standard">🥉 เฉพาะ Standard</option>
-                          <option value="Silver">🥈 เฉพาะ Silver</option>
-                          <option value="Gold">🥇 เฉพาะ Gold</option>
-                          <option value="Platinum">💎 เฉพาะ Platinum</option>
-                      </select>
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
-                      <select id="quest-target-vehicle" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
-                          <option value="all">🚗+🏍️ รถทุกประเภท</option>
-                      </select>
-                  </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
-                  <div class="sm:col-span-2"><h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-1"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ</h3></div>
-                  <div class="sm:col-span-2">
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">รูปแบบภารกิจ</label>
-                      <select id="quest-condition-type" onchange="toggleQuestConditionInput()" class="w-full p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
-                          <option value="rides">🚕 วิ่งสะสมให้ครบ (นับรอบ)</option>
-                          <option value="consecutive_5star">⭐ ได้รีวิว 5 ดาวติดกัน (รักษาคุณภาพ)</option>
-                          <option value="tenure_days">⏱️ อายุการเป็นสมาชิกครบ (วัน)</option>
-                          <option value="signup">📝 สมัครลงทะเบียนสำเร็จปุ๊บได้เลย</option>
-                          <option value="manual_reward">🏆 รางวัลคนขับดีเด่น (แอดมินกดแจกแมนนวล)</option>
-                      </select>
-                  </div>
-                  <div id="quest-condition-value-wrapper" class="sm:col-span-2">
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เป้าหมายตัวเลข (รอบ / ครั้ง / วัน)</label>
-                      <input type="number" id="quest-condition-value" placeholder="เช่น 10" class="w-full p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 rounded-lg outline-none text-sm font-black text-center focus:border-amber-500">
-                  </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มภารกิจ (ว่าง=เริ่มทันที)</label>
-                      <input type="datetime-local" id="quest-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none">
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=แจกตลอด)</label>
-                      <input type="datetime-local" id="quest-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none">
-                  </div>
-              </div>
-
-              <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกอย่างใดอย่างหนึ่ง หรือทั้งคู่)</h3>
-                  <div class="grid grid-cols-2 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">แจกโบนัส (เครดิต 🟡)</label>
-                          <input type="number" id="quest-reward-bonus" placeholder="เช่น 100" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-sm font-bold text-center">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เลื่อนเป็นระดับ</label>
-                          <select id="quest-reward-tier" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-xs font-bold">
-                              <option value="none">-- ไม่เลื่อนระดับ --</option>
-                              <option value="Standard">🥉 Standard</option>
-                              <option value="Silver">🥈 Silver</option>
-                              <option value="Gold">🥇 Gold</option>
-                              <option value="Platinum">💎 Platinum</option>
-                          </select>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="flex items-center gap-2 mt-2">
-                  <input type="checkbox" id="quest-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                  <label for="quest-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญนี้ทันที 🟢</label>
-              </div>
-
-              <button onclick="saveQuestCampaign()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกแคมเปญ</button>
-          </div>
-      </div>
-  </div>
-  
+  </div> 
   <script>
     const windowContext = window;
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
@@ -3115,17 +3020,32 @@
   <div id="modalAddQuest" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 border border-amber-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
           <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 sticky top-0 z-10">
-              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500"><i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญ / ภารกิจ</h2>
+              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500" id="quest-modal-title"><i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่</h2>
               <button onclick="closeModal('modalAddQuest')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
           </div>
           
           <div class="p-5 space-y-4">
+              <input type="hidden" id="quest-id">
+              
               <div>
                   <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ (โชว์ให้คนขับเห็น)</label>
-                  <input type="text" id="quest-name" placeholder="เช่น โปรต้อนรับคนใหม่, Silver วิ่งครบ 10 รอบ..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
+                  <input type="text" id="quest-name" placeholder="เช่น โปรวิ่งวันหยุด, สู้ฝนแจกโบนัส, รักษา 5 ดาว..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
               </div>
 
-              <div>
+              <div class="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div class="col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1 mb-1"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
+                      <select id="quest-target-tier" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                          <option value="all">🌐 ทุกระดับ</option>
+                          <option value="New">🔰 เฉพาะ New</option>
+                          <option value="Standard">🥉 เฉพาะ Standard</option>
+                          <option value="Silver">🥈 เฉพาะ Silver</option>
+                          <option value="Gold">🥇 เฉพาะ Gold</option>
+                          <option value="Platinum">💎 เฉพาะ Platinum</option>
+                      </select>
+                  </div>
+                  <div>
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
                       <select id="quest-target-vehicle" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
                           <option value="all">🚗+🏍️ รถทุกประเภท</option>
@@ -3157,15 +3077,15 @@
 
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
-                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (ทำงานเงื่อนไขนี้ข้อเดียว)</label>
+                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (แจกแมนนวล)</label>
                       </div>
                   </div>
                   <p class="text-[9px] text-gray-400 mt-2 leading-relaxed">* หากติ๊กเลือกหลายข้อ คนขับจะต้องทำภารกิจให้สำเร็จ <b>"ครบทุกข้อที่ติ๊ก"</b> ระบบจึงจะจ่ายรางวัลอัตโนมัติ</p>
               </div>
-        
+
               <div class="grid grid-cols-2 gap-3">
                   <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มแคมเปญ (ว่าง=เริ่มทันที)</label>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มภารกิจ (ว่าง=เริ่มทันที)</label>
                       <input type="datetime-local" id="quest-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none">
                   </div>
                   <div>
@@ -3194,7 +3114,12 @@
                   </div>
               </div>
 
-              <button onclick="saveCampaignQuest()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-rocket"></i> ปล่อยแคมเปญ</button>
+              <div class="flex items-center gap-2 mt-2">
+                  <input type="checkbox" id="quest-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                  <label for="quest-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญนี้ทันที 🟢</label>
+              </div>
+
+              <button onclick="saveQuestCampaign()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกแคมเปญ</button>
           </div>
       </div>
   </div>
