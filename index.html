@@ -2999,7 +2999,7 @@
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
         
-        // 🌟 ดึงค่า "อายุโบนัส"
+        // 🌟 1. ย้ายมาดึงค่าอายุโบนัสไว้ตรงนี้ (ดึงจากหน้าจอ)
         let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
         
         let rewardTier = document.getElementById('quest-reward-tier').value;
@@ -3021,15 +3021,18 @@
             daysUnit: document.getElementById('cond-days-unit').value
         };
 
-        // 🌟 สังเกตตรงนี้ เอา rewardExpireDays มาใส่ในกล่อง payload ให้ถูกต้อง
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
             rewardBonus: rewardBonus, 
+            
+            // 🌟 2. เอามาใส่ใน payload ตรงนี้! เพื่อให้ระบบมันบันทึกลง Firebase ได้ครับ
             rewardExpireDays: rewardExpireDays, 
+            
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
+        // 🌟 3. สั่งอัปเดตลงฐานข้อมูล แล้วปิดหน้าต่าง จบแบบคลีนๆ
         db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
             showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); 
             closeModal('modalAddQuest'); 
