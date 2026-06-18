@@ -2999,7 +2999,7 @@
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
         
-        // 🌟 ดึงค่า "อายุโบนัส" จากหน้าจอ (ถ้าไม่ใส่ให้เป็น 0 คือถาวร)
+        // 🌟 ดึงค่า "อายุโบนัส"
         let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
         
         let rewardTier = document.getElementById('quest-reward-tier').value;
@@ -3021,11 +3021,12 @@
             daysUnit: document.getElementById('cond-days-unit').value
         };
 
+        // 🌟 สังเกตตรงนี้ เอา rewardExpireDays มาใส่ในกล่อง payload ให้ถูกต้อง
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
             rewardBonus: rewardBonus, 
-            rewardExpireDays: rewardExpireDays, // 🌟 บันทึกอายุโบนัสลงฐานข้อมูล
+            rewardExpireDays: rewardExpireDays, 
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
