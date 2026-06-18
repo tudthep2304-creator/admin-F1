@@ -1142,7 +1142,7 @@
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(event) {
         let now = (new Date()).getTime();
-        if (event.cancelable && now - lastTouchEnd <= 300) { event.preventDefault(); }
+        if (now - lastTouchEnd <= 300) { event.preventDefault(); }
         lastTouchEnd = now;
     }, { passive: false });
 
@@ -2722,15 +2722,14 @@
         document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
         document.getElementById('trm-drv-id').innerText = drvId;
         
-        // 🌟 ดึงค่าระดับจริงๆ มาแสดงเลย (ลบโค้ดซ่อน Owner ออกแล้ว)
         let cTier = d.tier || 'New';
+        if(cTier === 'owner super legend' || cTier === 'New') cTier = 'Standard'; // ซ่อน New และ Owner จาก Dropdown
         document.getElementById('trm-tier-select').value = cTier;
         document.getElementById('trm-note').value = '';
         
-        // เซ็ตดาวตั้งต้นตามระดับให้ถูกต้อง
         let currentRating = d.rating !== undefined ? d.rating : "5.0";
-        if(cTier === 'owner super legend') currentRating = "100";
-        else if(cTier === 'F1 Legend') currentRating = "10";
+        if(d.tier === 'owner super legend') currentRating = "100";
+        else if(d.tier === 'F1 Legend') currentRating = "10";
         document.getElementById('trm-rating-input').value = currentRating;
 
         openModal('modalAdjustTierRating');
@@ -2741,10 +2740,7 @@
     window.autoFillOverrideStars = function() {
         let tier = document.getElementById('trm-tier-select').value;
         let rInput = document.getElementById('trm-rating-input');
-        // 🌟 เพิ่มเงื่อนไขให้ดึงดาว 100 ดวงอัตโนมัติ ถ้าเลือก Owner จาก Dropdown
-        if(tier === 'owner super legend') rInput.value = "100";
-        else if(tier === 'F1 Legend') rInput.value = "10"; 
-        else rInput.value = "5.0";
+        if(tier === 'F1 Legend') rInput.value = "10"; else rInput.value = "5.0";
     }
 
     window.submitTierRatingAdjustment = function() {
@@ -2758,6 +2754,18 @@
         db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: newTier, rating: newRating.toFixed(1) }).then(() => {
             db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: newTier, assignedRating: newRating.toFixed(1), reason: note, adminName: "ผู้บริหารระบบ" });
             showCustomAlert('สำเร็จ', 'ปรับเปลี่ยนระดับ Tier และคะแนนดาวเรียบร้อยแล้ว', 'success');
+            closeTierRatingModal(); renderTiersTab(); renderWalletTab();
+        });
+    }
+
+    // 🌟 ปุ่มลับ (Easter Egg): ยืนยันสิทธิ์ Owner Super Legend
+    window.grantOwnerSuperLegend = function() {
+        if(!currentWalletDriverId) return;
+        if(!confirm('⭐ [SECRET MODE] ⭐\nคุณพบปุ่มลับ! ต้องการมอบสิทธิ์ "Owner Super Legend" (100 ดาว) ให้คนขับคนนี้ ยืนยันหรือไม่?')) return;
+        
+        db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: 'owner super legend', rating: "100.0" }).then(() => {
+            db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: 'owner super legend', assignedRating: "100.0", reason: "เปิดใช้สิทธิ์ลับ OWNER", adminName: "ผู้ดูแลระบบสูงสุด" });
+            showCustomAlert('อนุมัติสิทธิ์สูงสุด', 'พนักงานคนนี้ได้รับการตั้งเป็น Owner Super Legend เรียบร้อยแล้ว 🚀', 'success');
             closeTierRatingModal(); renderTiersTab(); renderWalletTab();
         });
     }
@@ -2843,6 +2851,8 @@
     
     window.openTierAirdropModal = function() { showCustomAlert('เร็วๆ นี้', 'ระบบแจกโบนัสกลุ่ม (Airdrop) กำลังพัฒนา!', 'info'); }
     window.openCommissionSettings = function() { showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังพัฒนา!', 'info'); }
+    
+  </script>
 
   <!-- 🌟 หน้าต่างแก้ไขโปรไฟล์คนขับ (เปลี่ยนเป็น Modal ธรรมดา) -->
   <div id="pageDriverDetails" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
