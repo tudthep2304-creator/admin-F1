@@ -3184,6 +3184,10 @@
             document.getElementById('quest-start').value = q.startTime || '';
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
+            
+            // 🌟 ดึงค่า "อายุโบนัส" กลับมาโชว์ตอนแก้ไขแคมเปญ
+            document.getElementById('quest-reward-expire').value = q.rewardExpireDays || ''; 
+            
             document.getElementById('quest-reward-tier').value = q.rewardTier || 'none';
             document.getElementById('quest-is-active').checked = q.isActive;
 
@@ -3200,7 +3204,12 @@
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
             document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
             document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
-            document.getElementById('quest-reward-bonus').value = ''; document.getElementById('quest-reward-tier').value = 'none';
+            document.getElementById('quest-reward-bonus').value = ''; 
+            
+            // 🌟 ล้างค่า "อายุโบนัส" เป็นช่องว่างตอนสร้างแคมเปญใหม่
+            document.getElementById('quest-reward-expire').value = ''; 
+            
+            document.getElementById('quest-reward-tier').value = 'none';
             document.getElementById('quest-is-active').checked = true;
         }
         window.updateQuestDropdownText();
@@ -3211,6 +3220,10 @@
         let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
+        
+        // 🌟 ดึงค่า "อายุโบนัส" จากหน้าจอ (ถ้าไม่ใส่ให้เป็น 0 คือถาวร)
+        let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
+        
         let rewardTier = document.getElementById('quest-reward-tier').value;
 
         let targetTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
@@ -3233,10 +3246,15 @@
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
-            rewardBonus: rewardBonus, rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
+            rewardBonus: rewardBonus, 
+            rewardExpireDays: rewardExpireDays, // 🌟 ส่งขึ้นไปบันทึกบนฐานข้อมูล Firebase
+            rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
-        db.ref('system_settings/quests/' + qId).update(payload).then(() => { showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); closeModal('modalAddQuest'); rewardExpireDays: parseInt(document.getElementById('quest-reward-expire').value) || 0,});
+        db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
+            showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); 
+            closeModal('modalAddQuest'); 
+        });
     }
 
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
