@@ -724,7 +724,7 @@
           <div class="grid grid-cols-3 gap-2 pt-2">
               <button onclick="warpToHistory()" class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center">ประวัติงาน</button>
               <button onclick="warpToLogs()" class="bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center">ดู Log พิกัด</button>
-              <button onclick="openBlockDriverModal(currentDriverFocus)" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-lg py-2.5 text-[11px] font-medium transition flex items-center justify-center">บล็อก / ปลดบล็อก</button>
+              <button id="btn-profile-block-action" onclick="openBlockDriverModal(currentDriverFocus)" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center">บล็อกคนขับ</button>
           </div>
 
           <div class="grid grid-cols-2 gap-2 mt-2">
@@ -2656,14 +2656,15 @@
             if(editPlaceholder) editPlaceholder.classList.remove('hidden');
         }
 
-        // 🌟 เช็คสถานะ (ออนไลน์ / ออฟไลน์ / บล็อก)
         let isOnline = false;
         if(windowContext.onlineDrivers) {
             isOnline = windowContext.onlineDrivers.some(od => String(od.pin) === String(d.pin) || String(od.driverPin) === String(d.pin));
         }
-        let statusEl = document.getElementById('det-online-status');
         
-        // 🌟 ดึงข้อมูลจากฐานข้อมูลดูว่าโดนบล็อกอยู่ไหม
+        let statusEl = document.getElementById('det-online-status');
+        let btnAction = document.getElementById('btn-profile-block-action');
+        
+        // 🌟 ดึงข้อมูลจากฐานข้อมูลดูว่าโดนบล็อกอยู่ไหม เพื่อเปลี่ยนสีป้ายและชื่อปุ่ม
         db.ref('blocked_drivers/' + d.pin).once('value', snap => {
             let b = snap.val();
             let now = Date.now();
@@ -2671,11 +2672,23 @@
             
             if(statusEl) {
                 if(isBlocked) {
-                    statusEl.innerHTML = '<span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-lg flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold border border-red-200 dark:border-red-800/50 shadow-sm animate-pulse"><i class="fas fa-ban"></i> ถูกระงับสิทธิ์ (Blocked)</span>';
+                    statusEl.innerHTML = '<span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold border border-red-200 dark:border-red-800/50 shadow-sm animate-pulse">ถูกระงับสิทธิ์</span>';
+                    if(btnAction) {
+                        btnAction.innerText = "ปลดบล็อก";
+                        btnAction.className = "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center";
+                    }
                 } else if(isOnline) {
-                    statusEl.innerHTML = '<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded-lg flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold border border-green-200 dark:border-green-800/50 shadow-sm"><i class="fas fa-circle text-[8px] animate-pulse"></i> ออนไลน์</span>';
+                    statusEl.innerHTML = '<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold border border-green-200 dark:border-green-800/50 shadow-sm">ออนไลน์</span>';
+                    if(btnAction) {
+                        btnAction.innerText = "บล็อกคนขับ";
+                        btnAction.className = "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center";
+                    }
                 } else {
-                    statusEl.innerHTML = '<span class="bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-2 py-1 rounded-lg flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold border border-gray-200 dark:border-slate-700 shadow-sm"><i class="fas fa-circle text-[8px]"></i> ออฟไลน์</span>';
+                    statusEl.innerHTML = '<span class="bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold border border-gray-200 dark:border-slate-700 shadow-sm">ออฟไลน์</span>';
+                    if(btnAction) {
+                        btnAction.innerText = "บล็อกคนขับ";
+                        btnAction.className = "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center";
+                    }
                 }
             }
         });
@@ -2694,7 +2707,7 @@
     }
 
     // ==========================================
-    // 🌟 ระบบจัดการบล็อกคนขับผ่านป๊อปอัป
+    // 🌟 ระบบจัดการบล็อกคนขับผ่านป๊อปอัป (ปรับปรุงให้ยืดหยุ่น)
     // ==========================================
     window.openBlockDriverModal = function(pin) {
         if(!pin) return;
@@ -2702,7 +2715,6 @@
         document.getElementById('block-drv-name').innerText = d ? d.name : 'พนักงาน';
         document.getElementById('block-drv-id').innerText = 'PIN: ' + pin;
         
-        // ตรวจสอบว่าปัจจุบันโดนบล็อกอยู่ไหม
         db.ref('blocked_drivers/' + pin).once('value', snap => {
             let b = snap.val();
             let now = Date.now();
@@ -2713,7 +2725,6 @@
             let submitBtn = document.getElementById('btn-submit-block');
 
             if(isBlocked) {
-                // ถ้าโดนบล็อกอยู่ -> โชว์สาเหตุ โชว์เวลาปลดบล็อก และเปลี่ยนปุ่มเป็น "ปลดบล็อก"
                 inputZone.classList.add('hidden');
                 statusZone.classList.remove('hidden');
                 document.getElementById('blocked-reason-display').innerText = b.reason;
@@ -2725,17 +2736,18 @@
                 }
                 
                 submitBtn.className = "w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5";
-                submitBtn.innerHTML = '<i class="fas fa-unlock"></i> ปลดบล็อกคนขับ';
+                submitBtn.innerText = 'ปลดบล็อกคนขับ';
                 submitBtn.onclick = function() { unblockDriver(pin); };
             } else {
-                // ถ้ายังไม่โดนบล็อก -> โชว์หน้ากรอกข้อมูลเพื่อสั่งบล็อก
                 inputZone.classList.remove('hidden');
                 statusZone.classList.add('hidden');
-                document.getElementById('block-duration').value = "10";
+                document.getElementById('block-duration-num').value = "";
+                document.getElementById('block-duration-num').disabled = false;
+                document.getElementById('block-duration-unit').value = "minutes";
                 document.getElementById('block-reason-input').value = "";
                 
                 submitBtn.className = "w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5";
-                submitBtn.innerHTML = '<i class="fas fa-ban"></i> ยืนยันการบล็อก';
+                submitBtn.innerText = 'ยืนยันการบล็อก';
                 submitBtn.onclick = function() { submitBlockDriver(pin); };
             }
             openModal('modalBlockDriver');
@@ -2743,11 +2755,27 @@
     }
 
     window.submitBlockDriver = function(pin) {
-        let durationMins = parseInt(document.getElementById('block-duration').value);
+        let numStr = document.getElementById('block-duration-num').value;
+        let unit = document.getElementById('block-duration-unit').value;
         let reason = document.getElementById('block-reason-input').value.trim();
-        if(!reason) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุสาเหตุการระงับสิทธิ์ด้วยครับ (คนขับจะเห็นข้อความนี้)', 'error');
+        
+        if(!reason) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุสาเหตุการระงับสิทธิ์ด้วยครับ', 'error');
 
-        let expireAt = durationMins === 0 ? 0 : Date.now() + (durationMins * 60 * 1000);
+        let expireAt = 0;
+        if (unit !== 'permanent') {
+            let num = parseFloat(numStr);
+            if (isNaN(num) || num <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุตัวเลขระยะเวลาให้ถูกต้อง', 'error');
+            
+            let multiplier = 1;
+            if (unit === 'minutes') multiplier = 60 * 1000;
+            else if (unit === 'hours') multiplier = 60 * 60 * 1000;
+            else if (unit === 'days') multiplier = 24 * 60 * 60 * 1000;
+            else if (unit === 'months') multiplier = 30 * 24 * 60 * 60 * 1000;
+            else if (unit === 'years') multiplier = 365 * 24 * 60 * 60 * 1000;
+            
+            expireAt = Date.now() + (num * multiplier);
+        }
+
         let payload = { pin: pin, reason: reason, expireAt: expireAt, timestamp: firebase.database.ServerValue.TIMESTAMP };
 
         db.ref('blocked_drivers/' + pin).set(payload).then(() => {
@@ -2756,7 +2784,7 @@
             
             showCustomAlert('ระงับสิทธิ์สำเร็จ', 'คนขับถูกระงับสิทธิ์และถูกตัดออกจากระบบออนไลน์แล้ว', 'success');
             closeModal('modalBlockDriver');
-            showDriverDetails(pin); // รีเฟรชหน้าโปรไฟล์เพื่อเปลี่ยนหัวเป็นสถานะ "ถูกระงับสิทธิ์"
+            showDriverDetails(pin); // รีเฟรชหน้าโปรไฟล์
         });
     }
 
@@ -3803,15 +3831,17 @@
               <div id="block-input-zone" class="space-y-4">
                   <div>
                       <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-1">ระยะเวลาการระงับสิทธิ์</label>
-                      <select id="block-duration" class="w-full p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-[11px] font-normal focus:border-red-500 transition">
-                          <option value="5">ระงับ 5 นาที (เตือนเบาๆ)</option>
-                          <option value="10">ระงับ 10 นาที</option>
-                          <option value="60">ระงับ 1 ชั่วโมง</option>
-                          <option value="1440">ระงับ 1 วัน (24 ชม.)</option>
-                          <option value="4320">ระงับ 3 วัน</option>
-                          <option value="10080">ระงับ 7 วัน</option>
-                          <option value="0">ระงับถาวร (Blacklist)</option>
-                      </select>
+                      <div class="flex gap-2">
+                          <input type="number" id="block-duration-num" placeholder="ระบุจำนวน" min="1" class="w-1/2 p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-[11px] focus:border-red-500 transition">
+                          <select id="block-duration-unit" class="w-1/2 p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-[11px] focus:border-red-500 transition" onchange="document.getElementById('block-duration-num').disabled = (this.value === 'permanent')">
+                              <option value="minutes">นาที</option>
+                              <option value="hours">ชั่วโมง</option>
+                              <option value="days">วัน</option>
+                              <option value="months">เดือน</option>
+                              <option value="years">ปี</option>
+                              <option value="permanent">ถาวร (Blacklist)</option>
+                          </select>
+                      </div>
                   </div>
                   <div>
                       <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-1">สาเหตุการระงับสิทธิ์</label>
