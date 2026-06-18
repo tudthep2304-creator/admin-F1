@@ -2927,7 +2927,75 @@
         openModal('modalBonusLedger');
     }
     
-    window.openTierAirdropModal = function() { showCustomAlert('เร็วๆ นี้', 'ระบบแจกโบนัสกลุ่ม (Airdrop) กำลังพัฒนา!', 'info'); }
+    // ==========================================================
+    // 🌟 ระบบแจกโบนัสกลุ่มแบบไม่มีเงื่อนไข (Airdrop System)
+    // ==========================================================
+    window.openTierAirdropModal = function() {
+        document.getElementById('airdrop-amount').value = '';
+        document.getElementById('airdrop-expire-days').value = '0';
+        document.getElementById('airdrop-note').value = '';
+        document.getElementById('airdrop-tier-select').value = 'all';
+        openModal('modalTierAirdrop');
+    }
+
+    window.submitTierAirdrop = async function() {
+        let targetTier = document.getElementById('airdrop-tier-select').value;
+        let amount = parseFloat(document.getElementById('airdrop-amount').value);
+        let expireDays = parseInt(document.getElementById('airdrop-expire-days').value) || 0;
+        let note = document.getElementById('airdrop-note').value.trim();
+
+        if (isNaN(amount) || amount <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนเงินโบนัสด้วยครับ', 'error');
+        if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกหมายเหตุหรือชื่อกิจกรรมเพื่อบันทึกประวัติด้วยครับ', 'error');
+
+        // คัดกรองรายชื่อคนขับที่ตรงกับกลุ่มระดับที่เราจะแจก
+        let driversToReward = [];
+        for (let drvId in allProfiles) {
+            let d = allProfiles[drvId];
+            let currentTier = d.tier || 'New';
+            if (targetTier === 'all' || currentTier === targetTier) {
+                driversToReward.push({ id: drvId, currentBonus: parseFloat(d.creditBonus || 0) });
+            }
+        }
+
+        if (driversToReward.length === 0) return showCustomAlert('ไม่พบเป้าหมาย', 'ไม่มีคนขับในระบบที่อยู่ในกลุ่มระดับที่เลือกครับ', 'error');
+
+        if (!confirm(`ยืนยันดำเนินการยิงโบนัสอัดฉีดคนละ ฿${amount} ให้คนขับกลุ่ม [${targetTier}] ทั้งหมดจำนวน ${driversToReward.length} คน พร้อมกันทันทีใช่หรือไม่?`)) return;
+
+        let now = Date.now();
+        let expireAt = expireDays > 0 ? now + (expireDays * 24 * 60 * 60 * 1000) : 0;
+        let batchUpdates = {};
+
+        // วนลูปสร้างคิวบันทึกข้อมูลแบบกลุ่มรอบเดียวจบ (Firebase Multi-Location Update)
+        driversToReward.forEach(drv => {
+            let newBonus = drv.currentBonus + amount;
+            
+            // 1. ปรับยอดเงินรวมในกระเป๋าโบนัสของโปรไฟล์คนขับ
+            batchUpdates[`drivers_profile/${drv.id}/creditBonus`] = newBonus;
+            
+            // 2. หยอดประวัติธุรกรรม (Transaction Log)
+            let txRef = db.ref('wallet_transactions/' + drv.id).push();
+            batchUpdates[`wallet_transactions/${drv.id}/${txRef.key}`] = {
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                role: 'driver', walletType: 'bonus', actionType: 'add', amount: amount,
+                note: `อัดฉีดโบนัสกลุ่ม: ${note}`, balanceAfter: newBonus, adminName: "ผู้บริหารระบบ"
+            };
+
+            // 3. ผูกเข้ากับสมุดบัญชีโบนัส (Bonus Ledger FIFO) เพื่อให้ตรวจเช็ควันหมดอายุรายก้อนได้
+            let ledgerRef = db.ref(`bonus_ledger/${drv.id}`).push();
+            batchUpdates[`bonus_ledger/${drv.id}/${ledgerRef.key}`] = {
+                amount: amount, remaining: amount, expireAt: expireAt,
+                note: `รับโบนัสอัดฉีดกลุ่ม: ${note}`, timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+        });
+
+        // ยิงข้อมูลขึ้นฐานข้อมูลรอบเดียวรวด (ปลอดภัย ลื่นไหล ไม่หน่วงเว็บ)
+        db.ref().update(batchUpdates).then(() => {
+            showCustomAlert('แจกโบนัสกลุ่มสำเร็จ', `ระบบทำการกระจายโบนัสอัดฉีดเงิน ฿${amount} ให้คนขับจำนวน ${driversToReward.length} คน เรียบร้อยแล้วครับ! 🎉`, 'success');
+            closeModal('modalTierAirdrop');
+            if (typeof renderWalletTab === 'function') renderWalletTab();
+        });
+    }
+    
     window.openCommissionSettings = function() { showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังพัฒนา!', 'info'); }
 
     // 🌟 ระบบการจัดการระดับและรายชื่อพนักงาน (Tiers Tab)
@@ -3696,5 +3764,42 @@
           </div>
       </div>
   </div>
+<div id="modalTierAirdrop" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-yellow-500/50 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-yellow-50 dark:bg-yellow-900/20">
+              <h2 class="text-base font-bold text-yellow-600"><i class="fas fa-gift mr-1"></i> แจกโบนัสกลุ่มพิเศษ (Airdrop)</h2>
+              <button onclick="closeModal('modalTierAirdrop')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-5 space-y-4 text-left">
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 mb-1">เลือกระดับกลุ่มเป้าหมายที่จะแจกเงิน</label>
+                  <select id="airdrop-tier-select" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-yellow-500">
+                      <option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>
+                      <option value="New">🔰 แจกเฉพาะกลุ่ม New</option>
+                      <option value="Standard">🥉 แจกเฉพาะกลุ่ม Standard</option>
+                      <option value="Silver">🥈 แจกเฉพาะกลุ่ม Silver</option>
+                      <option value="Gold">🥇 แจกเฉพาะกลุ่ม Gold</option>
+                      <option value="Platinum">💎 แจกเฉพาะกลุ่ม Platinum</option>
+                  </select>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">จำนวนเงินโบนัส (บาท)</label>
+                      <input type="number" id="airdrop-amount" placeholder="เช่น 100" min="1" class="w-full p-2.5 bg-white dark:bg-slate-900 text-yellow-600 border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-black text-center focus:border-yellow-500">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">อายุโบนัส (วัน) *0=ถาวร</label>
+                      <input type="number" id="airdrop-expire-days" placeholder="0" min="0" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold text-center focus:border-yellow-500">
+                  </div>
+              </div>
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 mb-1">ชื่อกิจกรรม / หมายเหตุรายการ (จำเป็น)</label>
+                  <input type="text" id="airdrop-note" placeholder="เช่น โบนัสเยียวยาระบบปรับปรุง, แจกปีใหม่..." class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-xs focus:border-yellow-500">
+              </div>
+              <button onclick="submitTierAirdrop()" class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-paper-plane"></i> อัดฉีดเงินให้กลุ่มเป้าหมาย 🚀</button>
+          </div>
+      </div>
+  </div>
+  
 </body>
 </html>
