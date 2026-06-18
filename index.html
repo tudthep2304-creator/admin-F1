@@ -2772,7 +2772,10 @@
                 document.getElementById('block-duration-num').value = "10";
                 document.getElementById('block-duration-num').disabled = false;
                 document.getElementById('block-duration-unit').value = "minutes";
-                document.getElementById('block-reason-input').value = "";
+                
+                // 🌟 แก้ไขตรงนี้: สั่งล้างค่าให้ตรงกับ ID Dropdown และ หมายเหตุ ตัวใหม่ 🌟
+                if(document.getElementById('block-reason-dropdown')) document.getElementById('block-reason-dropdown').selectedIndex = 0;
+                if(document.getElementById('block-note-input')) document.getElementById('block-note-input').value = "";
                 
                 submitBtn.className = "w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5";
                 submitBtn.innerHTML = '<i class="fas fa-ban"></i> ยืนยันการบล็อก';
