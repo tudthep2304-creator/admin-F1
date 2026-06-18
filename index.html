@@ -2779,18 +2779,6 @@
         });
     }
 
-    // 🌟 ปุ่มลับ (Easter Egg): ยืนยันสิทธิ์ Owner Super Legend
-    window.grantOwnerSuperLegend = function() {
-        if(!currentWalletDriverId) return;
-        if(!confirm('⭐ [SECRET MODE] ⭐\nคุณพบปุ่มลับ! ต้องการมอบสิทธิ์ "Owner Super Legend" (100 ดาว) ให้คนขับคนนี้ ยืนยันหรือไม่?')) return;
-        
-        db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: 'owner super legend', rating: "100.0" }).then(() => {
-            db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: 'owner super legend', assignedRating: "100.0", reason: "เปิดใช้สิทธิ์ลับ OWNER", adminName: "ผู้ดูแลระบบสูงสุด" });
-            showCustomAlert('อนุมัติสิทธิ์สูงสุด', 'พนักงานคนนี้ได้รับการตั้งเป็น Owner Super Legend เรียบร้อยแล้ว 🚀', 'success');
-            closeTierRatingModal(); renderTiersTab(); renderWalletTab();
-        });
-    }
-
     // 🌟 ระบบกระเป๋าเงินลูกค้า CRM
     let currentWalletRole = 'driver'; 
     window.openAdjustCreditModal = function(targetId, role = 'driver') {
@@ -3105,10 +3093,6 @@
   <!-- 🌟 หน้าต่างปรับระดับ Tier & ดาว -->
   <div id="modalAdjustTierRating" class="hidden fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
-          
-          <!-- 🚀 ปุ่มลับ (Easter Egg): ดับเบิ้ลคลิกที่มุมซ้ายบนสุดของกล่องเพื่อเสกสิทธิ์ Owner -->
-          <div class="absolute top-0 left-0 w-16 h-12 z-50 cursor-default" ondblclick="grantOwnerSuperLegend()" title="Secret Area"></div>
-
           <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
               <h2 class="text-base font-bold text-amber-600 dark:text-amber-500 pl-2"><i class="fas fa-trophy mr-1"></i> ปรับระดับ & ดาวควบคุม</h2>
               <button onclick="closeTierRatingModal()" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white relative z-50"><i class="fas fa-times"></i></button>
