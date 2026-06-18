@@ -615,6 +615,47 @@
               <p class="text-right text-[9px] text-gray-400 mt-2 shrink-0">* แสดงข้อมูลจำกัด 50 รายการล่าสุด (กดที่รายชื่อเพื่อจัดการปลดบล็อก)</p>
           </div>
       </section>
+
+    <section id="content-wallet" class="tab-content hidden space-y-4">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
+                  <h2 class="text-lg font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-wallet mr-1.5"></i> ศูนย์จัดการระบบการเงินและเครดิต</h2>
+                  <div class="flex gap-2 w-full sm:w-auto">
+                      <button onclick="openTierAirdropModal()" class="flex-1 sm:flex-none bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-gift"></i> แจกโบนัสกลุ่ม</button>
+                      <button onclick="openCommissionSettings()" class="flex-1 sm:flex-none bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-blue-200 dark:border-blue-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-cog"></i> ตั้งค่าหักเงิน</button>
+                  </div>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                  <div class="bg-green-50 dark:bg-green-900/10 p-4 rounded-xl border border-green-200 dark:border-green-900/30 text-center shadow-sm">
+                      <p class="text-[10px] font-bold text-green-600 dark:text-green-500 uppercase mb-1">ยอดเงินสดในระบบ (ถอนได้)</p>
+                      <h3 class="text-2xl font-black text-green-600 dark:text-green-400" id="wallet-stat-cash">฿0</h3>
+                  </div>
+                  <div class="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 text-center shadow-sm">
+                      <p class="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase mb-1">ยอดโบนัสในระบบ (ถอนไม่ได้)</p>
+                      <h3 class="text-2xl font-black text-yellow-600 dark:text-yellow-400" id="wallet-stat-bonus">฿0</h3>
+                  </div>
+                  <div class="col-span-2 bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700 flex flex-col justify-center shadow-sm">
+                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5">ค้นหาคนขับเพื่อจัดการเครดิต</label>
+                      <div class="relative">
+                          <input type="text" id="wallet-search-input" onkeyup="renderWalletTab()" placeholder="ค้นหาด้วย ชื่อ, รหัส หรือเบอร์โทร..." class="w-full p-2.5 pl-9 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-sm focus:border-emerald-500 shadow-inner">
+                          <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
+                      </div>
+                  </div>
+              </div>
+              <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse min-w-[700px]">
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold bg-gray-100 dark:bg-slate-800/50">
+                          <th class="py-3 px-3 w-28 rounded-tl-lg">ไอดีคนขับ</th>
+                          <th class="py-3 px-3">พนักงาน</th>
+                          <th class="py-3 px-3 text-right">เงินสด (Cash)</th>
+                          <th class="py-3 px-3 text-right">โบนัส (Bonus)</th>
+                          <th class="py-3 px-3 text-center rounded-tr-lg">จัดการกระเป๋าเงิน</th>
+                      </tr></thead>
+                      <tbody id="wallet-drivers-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50"></tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
     
     <!-- ================= หน้าข้อมูลส่วนตัวคนขับ (เปลี่ยนจาก Modal เป็นหน้า Page) ================= -->
       <section id="content-driver-details" class="tab-content hidden space-y-3 pb-8 mt-2">
@@ -3721,6 +3762,52 @@
             enableSmoothSwipeToClose(modal.id, () => closeModal(modal.id));
         });
     });
+    // ========================================================
+    // 🌟 ระบบปัดหน้าจอเพื่อย้อนกลับ และ เปิด/ปิด Sidebar
+    // ========================================================
+    let navTouchStartX = 0; 
+    let navTouchStartY = 0;
+    
+    document.addEventListener('touchstart', e => {
+        // ไม่ดักจับถ้ากดโดนแผนที่, ที่ครอบตัดรูป, ตารางเลื่อนขวาง หรือ หน้าต่างป๊อปอัป (Modal)
+        if(e.target.closest('#adminLiveMap, .cropper-container, .overflow-x-auto, div[id^="modal"]')) return;
+        navTouchStartX = e.touches[0].clientX;
+        navTouchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+        if(navTouchStartX === 0) return;
+        
+        // เช็คว่ามีหน้าต่าง Modal เปิดซ้อนอยู่ไหม ถ้ามีให้ยกเลิกการสไลด์ย้อนกลับทันที!
+        let openModals = Array.from(document.querySelectorAll('div[id^="modal"]')).filter(m => !m.classList.contains('hidden'));
+        if (openModals.length > 0) { navTouchStartX = 0; return; }
+
+        let navTouchEndX = e.changedTouches[0].clientX;
+        let navTouchEndY = e.changedTouches[0].clientY;
+        let diffX = navTouchEndX - navTouchStartX;
+        let diffY = Math.abs(navTouchEndY - navTouchStartY);
+
+        let sidebar = document.getElementById('sidebar-menu');
+        let isSidebarOpen = sidebar && !sidebar.classList.contains('-translate-x-full');
+
+        // ปัดไปทางซ้าย: เพื่อปิดเมนู Sidebar
+        if (isSidebarOpen && diffX < -50 && Math.abs(diffX) > diffY) {
+            if(typeof window.toggleSidebar === 'function') window.toggleSidebar();
+            navTouchStartX = 0; return;
+        }
+
+        // ปัดไปทางขวา: เปิด Sidebar หรือ กดย้อนกลับ
+        if (diffX > 60 && diffX > diffY) {
+            if (navTouchStartX <= 40 && !isSidebarOpen) { 
+                // ลากจากขอบจอซ้ายสุด -> เปิดเมนู Sidebar
+                if(typeof window.toggleSidebar === 'function') window.toggleSidebar();
+            } else if (!isSidebarOpen && navTouchStartX > 40) { 
+                // ลากจากกลางจอ -> สั่งกดปุ่มย้อนกลับ
+                if(typeof window.goBackAdmin === 'function') window.goBackAdmin();
+            }
+        }
+        navTouchStartX = 0;
+    }, { passive: true });
     
 </script>
 
