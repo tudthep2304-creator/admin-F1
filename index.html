@@ -2690,6 +2690,12 @@
                 statusZone.classList.remove('hidden');
                 document.getElementById('blocked-reason-display').innerText = b.reason;
                 
+                if(b.timestamp) {
+                    document.getElementById('blocked-start-display').innerText = new Date(b.timestamp).toLocaleString('th-TH');
+                } else {
+                    document.getElementById('blocked-start-display').innerText = 'ไม่ระบุ';
+                }
+
                 if(b.expireAt === 0) {
                     document.getElementById('blocked-expire-display').innerText = 'แบนถาวร (Permanent)';
                 } else {
@@ -2705,8 +2711,6 @@
                 document.getElementById('block-duration-num').value = "10";
                 document.getElementById('block-duration-num').disabled = false;
                 document.getElementById('block-duration-unit').value = "minutes";
-                
-                // 🌟 แก้ไขตรงนี้: สั่งล้างค่าให้ตรงกับ ID Dropdown และ หมายเหตุ ตัวใหม่ 🌟
                 if(document.getElementById('block-reason-dropdown')) document.getElementById('block-reason-dropdown').selectedIndex = 0;
                 if(document.getElementById('block-note-input')) document.getElementById('block-note-input').value = "";
                 
@@ -2717,7 +2721,7 @@
             openModal('modalBlockDriver');
         });
     }
-
+    
     window.submitBlockDriver = function(driverId) {
         let numStr = document.getElementById('block-duration-num').value;
         let unit = document.getElementById('block-duration-unit').value;
@@ -2846,7 +2850,7 @@
         
         let keyword = (document.getElementById('search-blocked-input')?.value || '').toLowerCase();
         let reasonFilter = document.getElementById('filter-blocked-reason')?.value || 'all';
-        let tierFilter = document.getElementById('filter-blocked-tier')?.value || 'all'; // 🌟 ดึงค่าตัวกรองระดับชั้น
+        let tierFilter = document.getElementById('filter-blocked-tier')?.value || 'all';
         
         let filtered = allBlockedDataForTable.filter(b => {
             let d = allProfiles[b.driverId] || {};
@@ -2854,8 +2858,6 @@
             
             let matchKeyword = searchStr.includes(keyword);
             let matchReason = (reasonFilter === 'all') ? true : (b.reason === reasonFilter);
-            
-            // 🌟 เช็คว่าตรงกับตัวกรองระดับชั้นไหม
             let dTier = d.tier || 'New';
             let matchTier = (tierFilter === 'all') ? true : (dTier === tierFilter);
             
@@ -2869,13 +2871,11 @@
             let driverId = b.driverId;
             let d = allProfiles[driverId] || {};
             let name = d.name || 'ไม่ทราบชื่อ';
-            let dateStr = b.expireAt === 0 ? '<span class="text-red-500 font-bold">แบนถาวร</span>' : new Date(b.expireAt).toLocaleString('th-TH');
+            let expireStr = b.expireAt === 0 ? '<span class="text-red-500 font-bold">แบนถาวร</span>' : new Date(b.expireAt).toLocaleString('th-TH');
+            let startStr = b.timestamp ? new Date(b.timestamp).toLocaleString('th-TH') : '-';
             let noteHtml = b.note ? `<br><span class="text-gray-500 text-[9px]">หมายเหตุ: ${b.note}</span>` : '';
-            
-            // 🌟 สร้างป้าย Tier โชว์สวยๆ ในตาราง
             let tierBadge = window.getTierBadgeHtml ? window.getTierBadgeHtml(d.tier || 'New') : `<span class="text-[9px] text-gray-500">${d.tier || 'New'}</span>`;
 
-            // 🌟 ใส่ onclick ไว้ที่แถวเลย พอกดปุ๊บ เด้ง Modal ปลดบล็อกทันที
             html += `
             <tr onclick="openBlockDriverModal('${driverId}')" class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition cursor-pointer group">
                 <td class="py-3 px-3 align-top">
@@ -2885,7 +2885,8 @@
                 </td>
                 <td class="py-3 px-3 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed align-top">
                     <p class="font-bold text-gray-800 dark:text-slate-200 mb-0.5"><i class="fas fa-exclamation-circle text-red-400 mr-0.5"></i> ${b.reason}</p>
-                    <p class="text-[9px] text-gray-400">ปลดบล็อก: ${dateStr}</p>
+                    <p class="text-[9px] text-gray-400 mb-0.5">เริ่มบล็อก: ${startStr}</p>
+                    <p class="text-[9px] text-gray-400">ระงับสิทธิ์ถึง: ${expireStr}</p>
                     ${noteHtml}
                 </td>
             </tr>`;
@@ -4221,7 +4222,8 @@
               <div id="blocked-status-zone" class="hidden bg-red-50 dark:bg-red-900/10 p-3 rounded-lg border border-red-200 dark:border-red-800/30">
                   <p class="text-[11px] font-bold text-red-600 mb-1.5"><i class="fas fa-lock"></i> สถานะ: ถูกระงับการใช้งาน</p>
                   <p class="text-[10px] text-gray-700 dark:text-gray-300 mb-0.5">เหตุผล: <span id="blocked-reason-display" class="font-bold text-gray-900 dark:text-white">...</span></p>
-                  <p class="text-[10px] text-gray-700 dark:text-gray-300">ปลดบล็อกเวลา: <span id="blocked-expire-display" class="font-bold text-red-500">...</span></p>
+                  <p class="text-[10px] text-gray-700 dark:text-gray-300 mb-0.5">เริ่มบล็อกเมื่อ: <span id="blocked-start-display" class="font-bold text-gray-900 dark:text-white">...</span></p>
+                  <p class="text-[10px] text-gray-700 dark:text-gray-300">ระงับสิทธิ์ถึง: <span id="blocked-expire-display" class="font-bold text-red-500">...</span></p>
               </div>
               
               <div class="grid grid-cols-2 gap-2 pt-2">
