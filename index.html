@@ -618,19 +618,50 @@
 
       <!-- ================= หน้าจัดการระดับคนขับ (Tiers & ดาว) ================= -->
       <section id="content-tiers" class="tab-content hidden space-y-4">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-users mr-1.5 text-blue-500"></i> รายชื่อและระดับชั้นพนักงานปัจจุบัน (Manual Override)</h2>
-              <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
-                  <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold bg-gray-100 dark:bg-slate-800/50">
-                          <th class="py-3 px-3 w-24">ไอดีคนขับ</th>
-                          <th class="py-3 px-3">พนักงาน</th>
-                          <th class="py-3 px-2 text-center">ระดับปัจจุบัน</th>
-                          <th class="py-3 px-2 text-center">เรตติ้งดาว</th>
-                          <th class="py-3 px-3 text-center">ปรับแมนนวล</th>
-                      </tr></thead>
-                      <tbody id="tiers-drivers-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50"></tbody>
-                  </table>
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3 border-b border-gray-200 dark:border-slate-800 pb-4">
+                  <div>
+                      <h2 class="text-lg font-bold text-amber-600 dark:text-amber-500"><i class="fas fa-balance-scale mr-1.5"></i> กฎระเบียบและบทลงโทษ (Penalties)</h2>
+                      <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">ตั้งค่าการหักคะแนนดาวและลดระดับอัตโนมัติเมื่อคนขับทำผิดกฎ</p>
+                  </div>
+                  <button onclick="savePenaltyRules()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 shrink-0"><i class="fas fa-save"></i> บันทึกกฎ</button>
+              </div>
+
+              <div class="space-y-5">
+                  <div class="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-200 dark:border-red-800/30">
+                      <h3 class="text-sm font-bold text-red-600 dark:text-red-400 mb-3"><i class="fas fa-ban"></i> การยกเลิกงาน (Cancellation)</h3>
+                      <div class="flex items-center justify-between gap-4">
+                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หักคะแนนดาวเมื่อคนขับ "กดยกเลิกงาน" หลังรับงานไปแล้ว</label>
+                          <div class="flex items-center gap-2 shrink-0">
+                              <span class="text-xs text-red-500 font-bold">-</span>
+                              <input type="number" id="rule-cancel-penalty" step="0.1" placeholder="0.5" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-red-500">
+                              <span class="text-xs font-bold text-gray-500">ดาว</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-xl border border-orange-200 dark:border-orange-800/30">
+                      <h3 class="text-sm font-bold text-orange-600 dark:text-orange-400 mb-3"><i class="fas fa-star-half-alt"></i> การถูกลูกค้ารีวิวต่ำกว่าเกณฑ์</h3>
+                      <div class="flex items-center justify-between gap-4">
+                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หักคะแนนเมื่อถูกลูกค้า "รีวิว 1 ดาว"</label>
+                          <div class="flex items-center gap-2 shrink-0">
+                              <span class="text-xs text-orange-500 font-bold">-</span>
+                              <input type="number" id="rule-1star-penalty" step="0.1" placeholder="1.0" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-orange-500">
+                              <span class="text-xs font-bold text-gray-500">ดาว</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                      <h3 class="text-sm font-bold text-gray-700 dark:text-slate-300 mb-3"><i class="fas fa-arrow-down text-gray-500"></i> การตกชั้นอัตโนมัติ (Demotion)</h3>
+                      <div class="flex items-center justify-between gap-4">
+                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หากคะแนนดาวต่ำกว่าเกณฑ์นี้ จะถูกลดไปอยู่ระดับ "Standard" ทันที</label>
+                          <div class="flex items-center gap-2 shrink-0">
+                              <input type="number" id="rule-demote-threshold" step="0.1" placeholder="4.5" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-gray-500">
+                              <span class="text-xs font-bold text-gray-500">ดาว</span>
+                          </div>
+                      </div>
+                  </div>
               </div>
           </div>
       </section>
@@ -2717,32 +2748,31 @@
     
     window.openCommissionSettings = function() { showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังพัฒนา!', 'info'); }
 
-    // 🌟 ระบบการจัดการระดับและรายชื่อพนักงาน (Tiers Tab)
-    window.renderTiersTab = function() {
-        let lst = document.getElementById('tiers-drivers-list');
-        let html = '';
-
-        for (let drvId in allProfiles) {
-            let d = allProfiles[drvId];
-            let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
-
-            let displayRating = "5.0";
-            if (d.tier === 'owner super legend') displayRating = "100.0";
-            else if (d.tier === 'F1 Legend') displayRating = "10.0";
-            else if (d.rating) displayRating = parseFloat(d.rating).toFixed(1);
-
-            let pic = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
-
-            html += `
-            <tr class="border-b border-gray-100 dark:border-slate-800/50 hover:bg-gray-50 transition text-left">
-                <td class="py-3 px-3 font-bold text-amber-600 text-xs">${drvId}</td>
-                <td class="py-3 px-3 flex items-center gap-2"><div class="shrink-0">${pic}</div> <span class="font-bold text-[13px] text-gray-800 dark:text-white truncate">${d.name}</span></td>
-                <td class="py-3 px-2 text-center">${tierBadgeHtml}</td>
-                <td class="py-3 px-2 text-center font-bold text-yellow-500 text-xs"><i class="fas fa-star text-[10px]"></i> ${displayRating}</td>
-                <td class="py-3 px-3 text-center"><button onclick="openAdjustTierRatingModal('${drvId}')" class="bg-amber-50 text-amber-600 px-3 py-1 rounded text-xs font-bold border border-amber-200 hover:bg-amber-500 hover:text-white transition">ปรับแมนนวล</button></td>
-            </tr>`;
+    // ========================================================
+    // 🌟 ระบบตั้งค่ากฎระเบียบและบทลงโทษ (Penalty Rules)
+    // ========================================================
+    db.ref('system_settings/penalties').on('value', snap => {
+        if(snap.exists()) {
+            let rules = snap.val();
+            let elC = document.getElementById('rule-cancel-penalty'); if(elC) elC.value = rules.cancelPenalty || '';
+            let el1S = document.getElementById('rule-1star-penalty'); if(el1S) el1S.value = rules.oneStarPenalty || '';
+            let elDem = document.getElementById('rule-demote-threshold'); if(elDem) elDem.value = rules.demoteThreshold || '';
         }
-        if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูลพนักงาน</td></tr>';
+    });
+
+    window.savePenaltyRules = function() {
+        let cp = parseFloat(document.getElementById('rule-cancel-penalty').value) || 0;
+        let sp = parseFloat(document.getElementById('rule-1star-penalty').value) || 0;
+        let dt = parseFloat(document.getElementById('rule-demote-threshold').value) || 0;
+
+        db.ref('system_settings/penalties').set({
+            cancelPenalty: cp,
+            oneStarPenalty: sp,
+            demoteThreshold: dt,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            showCustomAlert('บันทึกสำเร็จ', 'อัปเดตระบบกฎระเบียบและบทลงโทษเรียบร้อยแล้ว', 'success');
+        });
     }
 
     let currentWalletDriverId = null;
@@ -3130,9 +3160,12 @@
                       </div>
                   </div>                 
                   <div>
-                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500 mb-1">ระดับชั้นของคนขับ (Driver Tier)</label>
+                      <div class="flex justify-between items-center mb-1">
+                          <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-500">ระดับชั้นของคนขับ (Driver Tier)</label>
+                          <button onclick="closeDriverProfilePage(); openAdjustTierRatingModal(currentDriverFocus);" class="text-[9px] font-bold text-amber-600 hover:text-amber-700 underline flex items-center gap-1"><i class="fas fa-gavel"></i> ปรับระดับแมนนวล</button>
+                      </div>
                       <div class="relative">
-                          <input type="text" id="det-tier-display" readonly title="ปรับระดับและคะแนนดาวได้ที่เมนูกระเป๋าเงินเท่านั้น" class="w-full p-2.5 bg-gray-200 dark:bg-slate-800/80 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold cursor-not-allowed pr-8">
+                          <input type="text" id="det-tier-display" readonly class="w-full p-2.5 bg-gray-200 dark:bg-slate-800/80 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold cursor-not-allowed pr-8">
                           <i class="fas fa-lock absolute right-3 top-3.5 text-gray-400 text-xs"></i>
                       </div>
                   </div>
