@@ -1607,25 +1607,6 @@
         }
     });
 
-    // ================= ระบบดึงข้อมูลและบันทึกแคมเปญ (Gamification) =================
-    let currentGamification = { newActive: true, newBonus: 100 };
-    db.ref('system_settings/gamification').on('value', snap => {
-        if(snap.exists()) {
-            let g = snap.val(); currentGamification = g;
-            if(document.getElementById('camp-new-active')) {
-                document.getElementById('camp-new-active').checked = g.newActive;
-                document.getElementById('camp-new-bonus').value = g.newBonus || 0;
-                document.getElementById('camp-silver-rides').value = g.silverRides || '';
-                document.getElementById('camp-silver-bonus').value = g.silverBonus || '';
-                document.getElementById('camp-gold-rides').value = g.goldRides || '';
-                document.getElementById('camp-gold-bonus').value = g.goldBonus || '';
-                document.getElementById('camp-plat-rides').value = g.platRides || '';
-                document.getElementById('camp-plat-bonus').value = g.platBonus || '';
-                document.getElementById('camp-auto-demote').checked = g.autoDemote || false;
-            }
-        }
-    });
-
     window.saveGamificationSettings = function() {
         let payload = {
             newActive: document.getElementById('camp-new-active').checked,
@@ -1642,8 +1623,7 @@
             showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญโบนัสและเงื่อนไขการเลื่อนระดับเรียบร้อยแล้ว', 'success');
         });
     }
-
-    // ================= อัปเดตฟังก์ชันลงทะเบียน (ดึงโบนัสผู้ใช้ใหม่ตามแคมเปญ) =================
+    // ================= อัปเดตฟังก์ชันลงทะเบียน (อิงตามแคมเปญ) =================
     window.saveNewDriver = function() {
         let drvId = document.getElementById('add-drv-id').value.trim();
         let pin = document.getElementById('add-drv-pin').value.trim();
@@ -1656,20 +1636,7 @@
         if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'กรุณาตั้งรหัสผ่าน (PIN) 4 หลักสำหรับการเข้าแอปฯ ครั้งแรก', 'error');
         if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานและเบอร์โทรศัพท์ให้ครบถ้วนก่อนครับ', 'error');
 
-        let isDuplicate = false; let dupReason = "";
-        for (let key in allProfiles) {
-            let existingUser = allProfiles[key];
-            let existingPhone = existingUser.phone || '';
-            let existingNameParts = (existingUser.name || '').split(' ');
-            let existingFname = existingNameParts[0] || '';
-            let existingLname = existingNameParts.slice(1).join(' ') || '';
-
-            if (phone && existingPhone === phone) { isDuplicate = true; dupReason = `เบอร์โทรศัพท์ ${phone} มีอยู่ในระบบแล้ว (รหัส: ${key})`; break; }
-            if (fname && lname && existingFname === fname && existingLname === lname) { isDuplicate = true; dupReason = `ชื่อ "${fname} ${lname}" มีพนักงานลงทะเบียนอยู่แล้วในระบบ (รหัส: ${key})`; break; }
-        }
-        if (isDuplicate) return showCustomAlert('ตรวจพบข้อมูลซ้ำ', dupReason, 'error');
-
-        // 🌟 ดึงการตั้งค่าแคมเปญผู้ใช้ใหม่มาใช้งาน (Dynamic Campaign)
+        // ดึงการตั้งค่าแคมเปญผู้ใช้ใหม่มาใช้งาน
         let startTier = currentGamification.newActive ? "New" : "Standard";
         let startBonus = currentGamification.newActive ? currentGamification.newBonus : 0;
 
@@ -1689,14 +1656,10 @@
         };
 
         db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
-            // บันทึก Log แจกโบนัสคนใหม่
             if(startBonus > 0) {
-                db.ref('wallet_transactions/' + drvId).push({ 
-                    timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', 
-                    amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" 
-                });
+                db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
             }
-            showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เรียบร้อย!\nได้รับระดับ ${startTier} และโบนัส ${startBonus} 🟡 ตามแคมเปญ`, 'success');
+            showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เรียบร้อย!\nได้รับระดับ ${startTier} และโบนัส ${startBonus} 🟡`, 'success');
             closeModal('modalAddDriver');
         });
     }
@@ -2801,7 +2764,6 @@
         if(tier === 'F1 Legend') rInput.value = "10"; else rInput.value = "5.0";
     }
 
-    // ฟังก์ชันเลื่อนขั้นพนักงาน (พร้อมยิงระบบตรวจสอบโบนัสแคมเปญ)
     window.submitTierRatingAdjustment = function() {
         if(!currentWalletDriverId) return;
         let newTier = document.getElementById('trm-tier-select').value;
@@ -2809,36 +2771,23 @@
         let note = document.getElementById('trm-note').value.trim();
 
         if(!note) return showCustomAlert('ระบุหมายเหตุ', 'กรุณากรอกเหตุผลเพื่อบันทึกประวัติการปรับสิทธิ์', 'error');
-        
-        let d = allProfiles[currentWalletDriverId];
-        let oldTier = d.tier || 'Standard';
 
         db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: newTier, rating: newRating.toFixed(1) }).then(() => {
-            // บันทึกประวัติการเปลี่ยนระดับ (Log)
             db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: newTier, assignedRating: newRating.toFixed(1), reason: note, adminName: "ผู้บริหารระบบ" });
-            
-            // ตรวจสอบแคมเปญ: แจกโบนัสอัตโนมัติเฉพาะตอน "เลื่อนระดับใหม่" เท่านั้น
-            let bonusToAdd = 0;
-            if (newTier !== oldTier) {
-                if(newTier === 'Silver') bonusToAdd = currentGamification.silverBonus || 0;
-                else if(newTier === 'Gold') bonusToAdd = currentGamification.goldBonus || 0;
-                else if(newTier === 'Platinum') bonusToAdd = currentGamification.platBonus || 0;
-            }
+            showCustomAlert('สำเร็จ', 'ปรับเปลี่ยนระดับ Tier และคะแนนดาวเรียบร้อยแล้ว', 'success');
+            closeTierRatingModal(); renderTiersTab(); renderWalletTab();
+        });
+    }
 
-            if (bonusToAdd > 0) {
-                let currentBonus = parseFloat(d.creditBonus || 0);
-                let newTotalBonus = currentBonus + bonusToAdd;
-                
-                db.ref('drivers_profile/' + currentWalletDriverId).update({ creditBonus: newTotalBonus }).then(() => {
-                    db.ref('wallet_transactions/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: bonusToAdd, note: `โบนัสแคมเปญเลื่อนขั้นเป็น ${newTier}`, balanceAfter: newTotalBonus, adminName: "SYSTEM_AUTO" });
-                    
-                    showCustomAlert('สำเร็จ', `เลื่อนเป็นระดับ ${newTier} สำเร็จ!\nระบบจ่ายโบนัสแคมเปญ ${bonusToAdd} 🟡 เข้ากระเป๋าคนขับแล้ว`, 'success');
-                    closeTierRatingModal(); renderTiersTab(); renderWalletTab();
-                });
-            } else {
-                showCustomAlert('สำเร็จ', `ปรับเปลี่ยนระดับเป็น ${newTier} เรียบร้อยแล้ว (ไม่มีโบนัสแคมเปญเสริม)`, 'success');
-                closeTierRatingModal(); renderTiersTab(); renderWalletTab();
-            }
+    // 🌟 ปุ่มลับ (Easter Egg): ยืนยันสิทธิ์ Owner Super Legend
+    window.grantOwnerSuperLegend = function() {
+        if(!currentWalletDriverId) return;
+        if(!confirm('⭐ [SECRET MODE] ⭐\nคุณพบปุ่มลับ! ต้องการมอบสิทธิ์ "Owner Super Legend" (100 ดาว) ให้คนขับคนนี้ ยืนยันหรือไม่?')) return;
+        
+        db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: 'owner super legend', rating: "100.0" }).then(() => {
+            db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: 'owner super legend', assignedRating: "100.0", reason: "เปิดใช้สิทธิ์ลับ OWNER", adminName: "ผู้ดูแลระบบสูงสุด" });
+            showCustomAlert('อนุมัติสิทธิ์สูงสุด', 'พนักงานคนนี้ได้รับการตั้งเป็น Owner Super Legend เรียบร้อยแล้ว 🚀', 'success');
+            closeTierRatingModal(); renderTiersTab(); renderWalletTab();
         });
     }
 
