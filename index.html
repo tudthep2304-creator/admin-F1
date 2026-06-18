@@ -594,178 +594,144 @@
       </section>
     
     <!-- ================= หน้าข้อมูลส่วนตัวคนขับ (เปลี่ยนจาก Modal เป็นหน้า Page) ================= -->
-      <section id="content-driver-details" class="tab-content hidden space-y-4 pb-10">
-          <div class="flex justify-between items-center bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
+      <section id="content-driver-details" class="tab-content hidden space-y-3 pb-8 mt-2">
+          <div class="flex justify-between items-center bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-sm">
               <h2 class="text-sm font-black text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-user-edit text-[#1da1f2]"></i> ข้อมูลพนักงาน</h2>
               
               <div class="flex items-center gap-2">
                   <div id="det-online-status">
                       </div>
-                  <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 px-2 py-1 rounded-lg text-blue-600 dark:text-[#1da1f2] font-medium flex items-center gap-1.5 text-[11px] shadow-sm">
+                  <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 px-2 py-1 rounded-lg text-blue-600 dark:text-[#1da1f2] font-medium flex items-center gap-1.5 text-[10px] sm:text-[11px] shadow-sm">
                       <i class="fas fa-car-side"></i> มีรถ <span id="det-vehicle-count" class="font-bold">0</span> คัน
                   </div>
               </div>
           </div>
 
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm space-y-4">
-              <div class="flex gap-4 sm:gap-6 items-center border-b border-gray-100 dark:border-slate-800 pb-4">
-                  <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-600 flex items-center justify-center shadow-sm shrink-0">
-                      <img id="edit-drv-pic-preview" class="w-full h-full object-cover rounded-2xl hidden cursor-pointer hover:opacity-90 transition" onclick="viewFullImage(this.src)" title="ดูรูปเต็ม">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-sm space-y-3">
+              <div class="flex gap-4 items-center border-b border-gray-100 dark:border-slate-800 pb-3">
+                  <div class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-600 flex items-center justify-center shadow-sm shrink-0">
+                      <img id="edit-drv-pic-preview" class="w-full h-full object-cover rounded-xl hidden cursor-pointer hover:opacity-90 transition" onclick="viewFullImage(this.src)" title="ดูรูปเต็ม">
                       <div id="edit-drv-pic-placeholder" class="text-gray-400 text-center flex flex-col items-center">
-                          <i class="fas fa-user text-3xl mb-1 text-gray-300 dark:text-slate-600"></i>
+                          <i class="fas fa-user text-2xl text-gray-300 dark:text-slate-600"></i>
                       </div>
-                      <button onclick="document.getElementById('edit-drv-pic-upload').click()" class="absolute -bottom-2 -right-2 bg-blue-600 hover:bg-blue-700 text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-900 transition hover:scale-110 z-10" title="เปลี่ยนรูปโปรไฟล์">
-                          <i class="fas fa-camera text-[10px]"></i>
+                      <button onclick="document.getElementById('edit-drv-pic-upload').click()" class="absolute -bottom-2 -right-2 bg-blue-600 hover:bg-blue-700 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md border border-white dark:border-slate-900 transition hover:scale-110 z-10" title="เปลี่ยนรูปโปรไฟล์">
+                          <i class="fas fa-camera text-[9px]"></i>
                       </button>
                       <input type="file" id="edit-drv-pic-upload" accept="image/*" class="hidden" onchange="window.processDriverImage(this, 'edit-drv-pic-preview', 'edit-drv-pic-placeholder')">
                   </div>
-                  <div class="flex-1 flex flex-col justify-center gap-3 min-w-0">
+                  <div class="flex-1 flex flex-col justify-center gap-2 min-w-0">
                       <div>
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">รหัสอ้างอิง (ID)</label>
-                          <input type="text" id="det-sys-id" readonly class="w-full p-2 bg-gray-100 dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed text-left">
+                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">รหัสอ้างอิง (ID)</label>
+                          <input type="text" id="det-sys-id" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed text-center tracking-wide">
                       </div>
                       <div>
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">วันที่เริ่มงาน</label>
-                          <input type="text" id="det-reg-date" readonly class="w-full p-2 bg-gray-100 dark:bg-slate-900/50 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed text-left">
+                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">วันที่เริ่มงาน</label>
+                          <input type="text" id="det-reg-date" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 dark:bg-slate-900/50 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed text-center">
                       </div>
                   </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-2 gap-2 sm:gap-3">
                   <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">เพศ (Gender)</label>
-                      <select id="det-gender" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">เพศ (Gender)</label>
+                      <select id="det-gender" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
                           <option value="male">ชาย</option>
                           <option value="female">หญิง</option>
                       </select>
                   </div>
                   <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">เบอร์โทรศัพท์</label>
-                      <input type="tel" id="det-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">เบอร์โทรศัพท์</label>
+                      <input type="tel" id="det-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
                   </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-2 gap-2 sm:gap-3">
                   <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">ชื่อจริง</label>
-                      <input type="text" id="det-firstname" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">ชื่อจริง</label>
+                      <input type="text" id="det-firstname" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
                   </div>
                   <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">นามสกุล</label>
-                      <input type="text" id="det-lastname" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">นามสกุล</label>
+                      <input type="text" id="det-lastname" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
                   </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-3 border-t border-gray-100 dark:border-slate-800 pt-4">
+              <div>
+                  <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">รหัสผ่านแอป (PIN 4 หลัก)</label>
+                  <input type="text" id="det-pin-input" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal tracking-widest text-center sm:text-left focus:border-blue-500 transition">
+              </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-sm space-y-3">
+              <h3 class="text-[11px] font-medium text-gray-500 dark:text-slate-400 uppercase border-b border-gray-100 dark:border-slate-800 pb-2"><i class="fas fa-id-badge text-amber-500 mr-1"></i> สถานะและกระเป๋าเงิน</h3>
+              
+              <div class="grid grid-cols-2 gap-2 sm:gap-3 bg-amber-50/50 dark:bg-amber-900/10 p-2 sm:p-3 rounded-lg border border-amber-100 dark:border-amber-800/30">
                   <div>
-                      <div class="flex justify-between items-center mb-1">
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400">ระดับชั้น (Tier)</label>
+                      <div class="flex justify-between items-center mb-0.5">
+                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400">ระดับชั้น</label>
                       </div>
                       <div class="relative">
-                          <input type="text" id="det-tier-display" readonly class="w-full p-2 bg-gray-50 dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed pr-8 text-left">
-                          <i class="fas fa-lock absolute right-3 top-2.5 text-gray-400 text-[10px]"></i>
+                          <input type="text" id="det-tier-display" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed pr-7 text-center">
+                          <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
                       </div>
                   </div>
                   <div>
-                      <div class="flex justify-between items-center mb-1">
+                      <div class="flex justify-between items-center mb-0.5">
                           <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400">คะแนนดาว</label>
                       </div>
                       <div class="relative">
-                          <input type="text" id="det-rating-display" readonly class="w-full p-2 bg-gray-50 dark:bg-slate-900/50 text-yellow-600 dark:text-yellow-500 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed pr-8 text-left">
-                          <i class="fas fa-lock absolute right-3 top-2.5 text-gray-400 text-[10px]"></i>
+                          <input type="text" id="det-rating-display" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-yellow-600 dark:text-yellow-500 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed pr-7 text-center">
+                          <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
                       </div>
                   </div>
                   <div class="col-span-2 mt-1">
-                      <button onclick="openAdjustTierRatingModal(currentDriverFocus);" class="w-full bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 rounded-lg py-2 text-[11px] font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-gavel"></i> แอดมินปรับระดับ / แจกดาวแมนนวล</button>
+                      <button onclick="openAdjustTierRatingModal(currentDriverFocus);" class="w-full bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50 rounded-lg py-1.5 sm:py-2 text-[11px] font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-gavel"></i> แอดมินปรับระดับ / แจกดาวแมนนวล</button>
                   </div>
               </div>
 
-              <div class="pt-2">
-                  <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">เปลี่ยนรหัสผ่านแอป (PIN 4 หลัก)</label>
-                  <input type="text" id="det-pin-input" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal tracking-widest text-left focus:border-blue-500 transition">
-              </div>
-          </div>
-
-          <div class="grid grid-cols-3 gap-2">
-              <button onclick="warpToHistory()" class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 rounded-full py-2.5 text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-history"></i> ประวัติงาน</button>
-              <button onclick="warpToLogs()" class="bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 rounded-full py-2.5 text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> ดู Log พิกัด</button>
-              <button onclick="warpToBlockDriver()" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-full py-2.5 text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-ban"></i> บล็อกคนขับ</button>
-          </div>
-
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm space-y-4">
-              <h3 class="text-[11px] font-medium text-gray-500 dark:text-slate-400 uppercase border-b border-gray-100 dark:border-slate-800 pb-2"><i class="fas fa-wallet text-emerald-500 mr-1"></i> กระเป๋าเงินพนักงาน</h3>
-              <div class="grid grid-cols-2 gap-3">
-                  <div class="bg-green-50 dark:bg-green-900/10 p-3 rounded-xl border border-green-200 dark:border-green-800/30">
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-500 mb-1">เงินสด (Cash 🟢)</label>
-                      <input type="text" id="det-cash" readonly class="w-full p-1 bg-transparent text-green-600 dark:text-green-400 outline-none text-base font-bold cursor-not-allowed text-center truncate">
-                  </div>
-                  <div class="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-xl border border-yellow-200 dark:border-yellow-800/30 relative">
-                      <div class="flex justify-between items-center mb-1">
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-500">โบนัส (Bonus 🟡)</label>
-                          <button onclick="viewBonusLedger(currentDriverFocus)" class="text-[9px] font-bold text-yellow-600 hover:text-yellow-700 underline absolute top-2 right-2">รายละเอียด</button>
+              <div class="grid grid-cols-2 gap-2 sm:gap-3 bg-emerald-50/50 dark:bg-emerald-900/10 p-2 sm:p-3 rounded-lg border border-emerald-100 dark:border-emerald-800/30">
+                  <div>
+                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-500 mb-0.5">เงินสด (Cash 🟢)</label>
+                      <div class="relative">
+                          <input type="text" id="det-cash" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-green-600 dark:text-green-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed text-center pr-7 truncate">
+                          <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
                       </div>
-                      <input type="text" id="det-bonus" readonly class="w-full p-1 bg-transparent text-yellow-600 dark:text-yellow-500 outline-none text-base font-bold cursor-not-allowed text-center truncate">
                   </div>
-                  <div class="col-span-2">
-                      <button onclick="openAdjustCreditModal(currentDriverFocus, 'driver')" class="w-full bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white font-medium py-2 rounded-lg border border-emerald-300 dark:border-emerald-700 transition text-[11px] flex items-center justify-center gap-2 shadow-sm">
+                  <div class="relative">
+                      <div class="flex justify-between items-center mb-0.5">
+                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-500">โบนัส (Bonus 🟡)</label>
+                          <button onclick="viewBonusLedger(currentDriverFocus)" class="text-[9px] font-medium text-yellow-600 hover:text-yellow-700 underline absolute top-0 right-1">รายละเอียด</button>
+                      </div>
+                      <div class="relative mt-1.5">
+                          <input type="text" id="det-bonus" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-yellow-600 dark:text-yellow-500 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed text-center pr-7 truncate">
+                          <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
+                      </div>
+                  </div>
+                  <div class="col-span-2 mt-1">
+                      <button onclick="openAdjustCreditModal(currentDriverFocus, 'driver')" class="w-full bg-emerald-100 dark:bg-emerald-900/40 hover:bg-emerald-200 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700/50 rounded-lg py-1.5 sm:py-2 text-[11px] font-medium transition flex items-center justify-center gap-1.5 shadow-sm">
                           <i class="fas fa-exchange-alt"></i> เติม/หักเครดิต (Adjust)
                       </button>
                   </div>
               </div>
           </div>
 
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm">
-              <div class="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-slate-800 pb-2">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-sm">
+              <div class="flex justify-between items-center mb-3 border-b border-gray-100 dark:border-slate-800 pb-2">
                   <h3 class="text-[11px] font-medium text-gray-500 dark:text-slate-400 uppercase"><i class="fas fa-car text-blue-500 mr-1"></i> ยานพาหนะ (Vehicles)</h3>
-                  <button onclick="addDriverVehicle()" class="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-[#1da1f2] px-3 py-1.5 rounded-lg text-[10px] font-medium hover:bg-blue-100 dark:hover:bg-slate-700 transition shadow-sm border border-blue-200 dark:border-slate-700"><i class="fas fa-plus"></i> เพิ่มรถ</button>
+                  <button onclick="addDriverVehicle()" class="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-[#1da1f2] px-2.5 py-1 rounded-lg text-[10px] font-medium hover:bg-blue-100 dark:hover:bg-slate-700 transition shadow-sm border border-blue-200 dark:border-slate-700"><i class="fas fa-plus"></i> เพิ่มรถ</button>
               </div>
-              <div id="driver-vehicles-container" class="space-y-4"></div>
+              <div id="driver-vehicles-container" class="space-y-3"></div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <button onclick="deleteDriverFromModal()" class="w-full py-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium rounded-xl border border-red-200 dark:border-red-500/30 hover:bg-red-600 hover:text-white transition text-[11px] flex justify-center items-center gap-2 shadow-sm"><i class="fas fa-trash-alt"></i> ถอดพนักงานออก</button>
-              <button onclick="window.saveDriverUpdates()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-md transition text-[11px] flex justify-center items-center gap-2"><i class="fas fa-save"></i> บันทึกการแก้ไขข้อมูล</button>
+          <div class="grid grid-cols-3 gap-2 pt-2">
+              <button onclick="warpToHistory()" class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 rounded-full py-2 text-[10px] sm:text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-history"></i> ประวัติงาน</button>
+              <button onclick="warpToLogs()" class="bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 rounded-full py-2 text-[10px] sm:text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> ดู Log พิกัด</button>
+              <button onclick="warpToBlockDriver()" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-full py-2 text-[10px] sm:text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-ban"></i> บล็อกคนขับ</button>
           </div>
-      </section>
-    
-    <section id="content-wallet" class="tab-content hidden space-y-4">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
-                  <h2 class="text-lg font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-wallet mr-1.5"></i> ศูนย์จัดการระบบการเงินและเครดิต</h2>
-                  <div class="flex gap-2 w-full sm:w-auto">
-                      <button onclick="openTierAirdropModal()" class="flex-1 sm:flex-none bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-gift"></i> แจกโบนัสกลุ่ม</button>
-                      <button onclick="openCommissionSettings()" class="flex-1 sm:flex-none bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-blue-200 dark:border-blue-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-cog"></i> ตั้งค่าหักเงิน</button>
-                  </div>
-              </div>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-                  <div class="bg-green-50 dark:bg-green-900/10 p-4 rounded-xl border border-green-200 dark:border-green-900/30 text-center shadow-sm">
-                      <p class="text-[10px] font-bold text-green-600 dark:text-green-500 uppercase mb-1">ยอดเงินสดในระบบ (ถอนได้)</p>
-                      <h3 class="text-2xl font-black text-green-600 dark:text-green-400" id="wallet-stat-cash">฿0</h3>
-                  </div>
-                  <div class="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 text-center shadow-sm">
-                      <p class="text-[10px] font-bold text-yellow-600 dark:text-yellow-500 uppercase mb-1">ยอดโบนัสในระบบ (ถอนไม่ได้)</p>
-                      <h3 class="text-2xl font-black text-yellow-600 dark:text-yellow-400" id="wallet-stat-bonus">฿0</h3>
-                  </div>
-                  <div class="col-span-2 bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700 flex flex-col justify-center shadow-sm">
-                      <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5">ค้นหาคนขับเพื่อจัดการเครดิต</label>
-                      <div class="relative">
-                          <input type="text" id="wallet-search-input" onkeyup="renderWalletTab()" placeholder="ค้นหาด้วย ชื่อ, รหัส หรือเบอร์โทร..." class="w-full p-2.5 pl-9 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-sm focus:border-emerald-500 shadow-inner">
-                          <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
-                      </div>
-                  </div>
-              </div>
-              <div class="overflow-x-auto">
-                  <table class="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold bg-gray-100 dark:bg-slate-800/50">
-                          <th class="py-3 px-3 w-28 rounded-tl-lg">ไอดีคนขับ</th>
-                          <th class="py-3 px-3">พนักงาน</th>
-                          <th class="py-3 px-3 text-right">เงินสด (Cash)</th>
-                          <th class="py-3 px-3 text-right">โบนัส (Bonus)</th>
-                          <th class="py-3 px-3 text-center rounded-tr-lg">จัดการกระเป๋าเงิน</th>
-                      </tr></thead>
-                      <tbody id="wallet-drivers-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50"></tbody>
-                  </table>
-              </div>
+
+          <div class="grid grid-cols-2 gap-2 mt-2">
+              <button onclick="deleteDriverFromModal()" class="w-full py-2.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium rounded-xl border border-red-200 dark:border-red-500/30 hover:bg-red-600 hover:text-white transition text-[11px] flex justify-center items-center gap-1.5 shadow-sm"><i class="fas fa-trash-alt"></i> ถอดพนักงาน</button>
+              <button onclick="window.saveDriverUpdates()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-md transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
           </div>
       </section>
     
