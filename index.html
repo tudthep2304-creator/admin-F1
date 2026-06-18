@@ -64,6 +64,8 @@
 
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-out { animation: fadeOut 0.2s ease-in forwards; }
+    @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
     .cropper-container { width: 100%; max-height: 400px; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -1187,7 +1189,31 @@
     function submitConfirmAction() { if(confirmCallback) confirmCallback(); closeAdminConfirm(); }
 
     function openModal(modalId) { let m = document.getElementById(modalId); if(m) m.classList.remove('hidden'); }
-    function closeModal(modalId) { let m = document.getElementById(modalId); if(m) m.classList.add('hidden'); windowContext.activeJobToAssign = null; }
+    window.openModal = function(modalId) { let m = document.getElementById(modalId); if(m) m.classList.remove('hidden'); }
+    
+    window.closeModal = function(modalId) { 
+        let m = document.getElementById(modalId); 
+        if(!m) return;
+        
+        let contentBox = m.querySelector('.animate-fade-in');
+        if (contentBox) {
+            // เล่นแอนิเมชันสไลด์ออก
+            contentBox.classList.remove('animate-fade-in');
+            contentBox.classList.add('animate-fade-out');
+            m.classList.add('opacity-0', 'transition-opacity', 'duration-200'); // ให้พื้นหลังดำค่อยๆ จาง
+            
+            // รอแอนิเมชันเล่นจบ 0.2 วิ ค่อยซ่อนกล่องจริงๆ
+            setTimeout(() => {
+                m.classList.add('hidden');
+                m.classList.remove('opacity-0', 'transition-opacity', 'duration-200');
+                contentBox.classList.remove('animate-fade-out');
+                contentBox.classList.add('animate-fade-in'); // คืนค่าไว้ใช้ตอนเปิดรอบหน้า
+            }, 200);
+        } else {
+            m.classList.add('hidden'); 
+        }
+        windowContext.activeJobToAssign = null; 
+    }
 
     const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ' };
 
@@ -1244,37 +1270,43 @@
         }
     }
 
-    // 🌟 2. ระบบสัมผัสสไลด์หน้าจอ (Swipe Actions: Go Back & Sidebar)
+    // 🌟 2. ระบบสัมผัสสไลด์หน้าจอ (Swipe Actions)
     let touchStartX = 0; let touchStartY = 0;
     document.addEventListener('touchstart', e => {
         touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
     }, {passive: true});
     
     document.addEventListener('touchend', e => {
-        // ข้ามการจับสไลด์ถ้าลูกค้ากำลังเลื่อนแผนที่ ตัดรูป หรือเลื่อนตาราง
         if(e.target.closest('#adminLiveMap') || e.target.closest('.cropper-container') || e.target.closest('.overflow-x-auto')) return;
-        
         let touchEndX = e.changedTouches[0].clientX; let touchEndY = e.changedTouches[0].clientY;
         let diffX = touchEndX - touchStartX; let diffY = Math.abs(touchEndY - touchStartY);
         
         let sidebar = document.getElementById('sidebar-menu');
         let isSidebarOpen = sidebar && !sidebar.classList.contains('-translate-x-full');
 
-        // เงื่อนไข 1: สไลด์ไปทางซ้ายเพื่อ "ปิด Sidebar" (สไลด์แนวนอนมากกว่าแนวตั้ง)
+        // สไลด์ไปซ้าย (ปิด Sidebar)
         if (isSidebarOpen && diffX < -50 && Math.abs(diffX) > diffY) {
-            window.toggleSidebar();
-            return;
+            window.toggleSidebar(); return;
         }
 
-        // เงื่อนไข 2: สไลด์ไปทางขวา
+        // สไลด์ไปขวา (ระยะเกิน 60px)
         if (diffX > 60 && diffX > diffY) {
-            // ถ้านิ้วเริ่มลากจาก "ขอบจอซ้ายสุด" (ไม่เกิน 40px) -> ให้เปิด Sidebar
+            // 1. ถ้านิ้วเริ่มจากขอบซ้ายสุด -> เปิด Sidebar
             if (touchStartX <= 40 && !isSidebarOpen) {
-                window.toggleSidebar();
+                if(typeof window.toggleSidebar === 'function') window.toggleSidebar();
             } 
-            // ถ้านิ้วลากจากกลางจอ (เกิน 40px) และ Sidebar ปิดอยู่ -> ทำหน้าที่เป็นปุ่มย้อนกลับ
+            // 2. ถ้าเริ่มลากจากกลางจอ
             else if (!isSidebarOpen && touchStartX > 40) {
-                window.goBackAdmin();
+                // เช็คว่ามีหน้าต่างย่อย (Modal) อะไรเปิดอยู่ไหม
+                let openModals = Array.from(document.querySelectorAll('div[id^="modal"], div[id^="page"]')).filter(m => !m.classList.contains('hidden') && !m.classList.contains('opacity-0'));
+                
+                if (openModals.length > 0) {
+                    // ถ้ามีหน้าต่างเปิดอยู่ ให้ปิดหน้าต่างตัวบนสุดทิ้ง (ฟีลปัดหน้าจอทิ้ง)
+                    closeModal(openModals[openModals.length - 1].id);
+                } else {
+                    // ถ้าไม่มีอะไรเปิดอยู่ ให้ย้อนกลับเมนูหลักตามปกติ
+                    window.goBackAdmin();
+                }
             }
         }
     }, {passive: true});
