@@ -3004,13 +3004,49 @@
         }
     }
 
+// 🌟 ฟังก์ชันล็อก UI เมื่อเลือกเงื่อนไข "แจกคนใหม่"
+    window.handleSignupConditionChange = function(checkbox) {
+        let isSignup = checkbox.checked;
+
+        if (isSignup) {
+            // 1. บังคับเลือกเป้าหมายเป็น New อย่างเดียว
+            document.querySelectorAll('.quest-target-tier').forEach(cb => {
+                if (cb.value === 'New') cb.checked = true;
+                else { cb.checked = false; cb.disabled = true; }
+            });
+            window.updateQuestDropdownText();
+
+            // 2. ปิดการติ๊กเงื่อนไขอื่นๆ ทั้งหมด (เพราะเพิ่งสมัคร จะมีรอบวิ่งได้ยังไง)
+            ['rides', 'star', 'days'].forEach(type => {
+                let chk = document.getElementById(`cond-${type}-check`);
+                if(chk) { chk.checked = false; chk.disabled = true; }
+                let val = document.getElementById(`cond-${type}-val`);
+                if(val) { val.value = ''; val.disabled = true; }
+            });
+            document.getElementById('cond-days-unit').disabled = true;
+            
+            let manualChk = document.getElementById('cond-manual-check');
+            if(manualChk) { manualChk.checked = false; manualChk.disabled = true; }
+
+        } else {
+            // ปลดล็อกทุกอย่างกลับมาเป็นปกติ
+            document.querySelectorAll('.quest-target-tier').forEach(cb => cb.disabled = false);
+            ['rides', 'star', 'days', 'manual'].forEach(type => {
+                let chk = document.getElementById(`cond-${type}-check`);
+                if(chk) chk.disabled = false;
+            });
+        }
+    }
+    
     window.openQuestModal = function(questId = null) {
         ['rides','star','days','signup','manual'].forEach(type => {
-            let chk = document.getElementById(`cond-${type}-check`); if(chk) chk.checked = false;
-            let val = document.getElementById(`cond-${type}-val`); if(val) { val.value = ''; val.disabled = true; }
+            let chk = document.getElementById(`cond-${type}-check`); 
+            if(chk) { chk.checked = false; chk.disabled = false; }
+            let val = document.getElementById(`cond-${type}-val`); 
+            if(val) { val.value = ''; val.disabled = true; }
         });
         document.getElementById('cond-days-unit').disabled = true; document.getElementById('cond-days-unit').value = 'days';
-        document.querySelectorAll('.quest-target-tier').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
 
         if (questId && allQuests[questId]) {
@@ -3386,8 +3422,9 @@
                           </select>
                       </div>
 
+                      <!-- 🌟 โบนัสสมัครใหม่ (ใส่ onchange เพื่อล็อก UI) -->
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
-                          <input type="checkbox" id="cond-signup-check" class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                          <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
                           <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (สำหรับแจกคนใหม่)</label>
                       </div>
 
