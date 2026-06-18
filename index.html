@@ -188,6 +188,11 @@
                   <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-trophy"></i></div>
                   <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ระดับ & ดาว</span>
               </button>
+
+            <button onclick="switchTab('quests'); renderQuestsTable();" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullseye"></i></div>
+                  <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ภารกิจแคมเปญ</span>
+              </button>
               
               <button onclick="switchTab('passengers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                   <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-friends"></i></div>
@@ -565,8 +570,8 @@
           </div>
       </section>
     <!-- ================= หน้าจัดการระดับคนขับ (Tiers & Gamification) ================= -->
-      <section id="content-tiers" class="tab-content hidden space-y-4">
-          
+      <!-- ================= หน้าแคมเปญและภารกิจ (Quest Center) ================= -->
+      <section id="content-quests" class="tab-content hidden space-y-4">
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                   <h2 class="text-lg font-bold text-amber-600 dark:text-amber-500"><i class="fas fa-bullseye mr-1.5"></i> ระบบแคมเปญและภารกิจ (Quest Center)</h2>
@@ -609,9 +614,12 @@
                   </table>
               </div>
           </div>
+      </section>
 
+      <!-- ================= หน้าจัดการระดับคนขับ (Tiers & ดาว) ================= -->
+      <section id="content-tiers" class="tab-content hidden space-y-4">
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
-              <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-users mr-1.5 text-blue-500"></i> รายชื่อและระดับชั้นพนักงานปัจจุบัน</h2>
+              <h2 class="text-base font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-users mr-1.5 text-blue-500"></i> รายชื่อและระดับชั้นพนักงานปัจจุบัน (Manual Override)</h2>
               <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
                   <table class="w-full text-left border-collapse min-w-[700px]">
                       <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[11px] uppercase font-bold bg-gray-100 dark:bg-slate-800/50">
@@ -1052,7 +1060,7 @@
     function openModal(modalId) { let m = document.getElementById(modalId); if(m) m.classList.remove('hidden'); }
     function closeModal(modalId) { let m = document.getElementById(modalId); if(m) m.classList.add('hidden'); windowContext.activeJobToAssign = null; }
 
-    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ' };
+    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ' };
 
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
@@ -1095,6 +1103,7 @@
         if(tabId === 'passengers') renderPassengers();
         if(tabId === 'promos') renderPromoList();
         if(tabId === 'history') renderHistoryTab();
+        if(tabId === 'quests') renderQuestsTable();
         if(tabId === 'map') { if(adminMap) google.maps.event.trigger(adminMap, 'resize'); }
     }
 
