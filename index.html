@@ -577,7 +577,10 @@
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
               
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
-                  <h2 class="text-sm font-black text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-list text-red-500"></i> รายชื่อคนขับที่ถูกระงับสิทธิ์</h2>
+                  <div class="flex items-center gap-3">
+                      <h2 class="text-sm font-black text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-list text-red-500"></i> รายชื่อคนขับที่ถูกระงับสิทธิ์</h2>
+                      <button onclick="switchTab('all-block-history')" class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 px-3 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5 shadow-sm"><i class="fas fa-history"></i> ประวัติทั้งหมด</button>
+                  </div>
                   
                   <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                       <select id="filter-blocked-tier" onchange="filterBlockedDrivers()" class="w-full sm:w-32 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
@@ -905,7 +908,71 @@
               </div>
               </div>
           </div>
-        
+      </section>
+
+<!-- ================= หน้าประวัติการบล็อกทั้งหมด (All Block History) ================= -->
+      <section id="content-all-block-history" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
+              
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
+                  <h2 class="text-sm font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-2"><i class="fas fa-history"></i> ประวัติการถูกระงับสิทธิ์ (ทุกรายการ)</h2>
+                  <button onclick="exportAllBlockHistory()" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800/50 px-3 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5 shadow-sm"><i class="fas fa-file-csv"></i> Export Data</button>
+              </div>
+
+              <!-- 🌟 แผงตัวกรองข้อมูล -->
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4 shrink-0 bg-gray-50 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ตั้งแต่วันที่</label>
+                      <input type="date" id="abh-filter-start" onchange="renderAllBlockHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
+                  </div>
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ถึงวันที่</label>
+                      <input type="date" id="abh-filter-end" onchange="renderAllBlockHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
+                  </div>
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
+                      <select id="abh-filter-tier" onchange="renderAllBlockHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
+                          <option value="all">ทุกระดับชั้น</option>
+                          <option value="New">New</option>
+                          <option value="Standard">Standard</option>
+                          <option value="Silver">Silver</option>
+                          <option value="Gold">Gold</option>
+                          <option value="Platinum">Platinum</option>
+                          <option value="F1 Legend">F1 Legend</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">สาเหตุความผิด</label>
+                      <select id="abh-filter-reason" onchange="renderAllBlockHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
+                          <option value="all">ทุกสาเหตุ</option>
+                      </select>
+                  </div>
+                  <div class="col-span-2 md:col-span-1">
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ค้นหา (ID/ชื่อ)</label>
+                      <div class="relative">
+                          <input type="text" id="abh-search-input" onkeyup="renderAllBlockHistory()" placeholder="ค้นหา..." class="w-full p-2 pl-7 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500">
+                          <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-[10px]"></i>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- 🌟 ตารางแสดงประวัติรวม (กดที่หัวเพื่อเรียงลำดับ) -->
+              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
+                  <table class="w-full text-left border-collapse min-w-[600px]">
+                      <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
+                          <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
+                              <th onclick="sortAllBlockHistory('timestamp')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition whitespace-nowrap">วัน/เวลา <i id="sort-icon-timestamp" class="fas fa-sort-down text-indigo-500 ml-1"></i></th>
+                              <th onclick="sortAllBlockHistory('driverId')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition whitespace-nowrap">พนักงาน <i id="sort-icon-driverId" class="fas fa-sort text-gray-400 ml-1"></i></th>
+                              <th onclick="sortAllBlockHistory('tier')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition whitespace-nowrap">ระดับ <i id="sort-icon-tier" class="fas fa-sort text-gray-400 ml-1"></i></th>
+                              <th onclick="sortAllBlockHistory('reason')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition w-1/2">สาเหตุ / หมายเหตุ <i id="sort-icon-reason" class="fas fa-sort text-gray-400 ml-1"></i></th>
+                              <th onclick="sortAllBlockHistory('action')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition text-center whitespace-nowrap">การกระทำ <i id="sort-icon-action" class="fas fa-sort text-gray-400 ml-1"></i></th>
+                          </tr>
+                      </thead>
+                      <tbody id="all-block-history-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                      </tbody>
+                  </table>
+              </div>
+          </div>
       </section>
     
   </main>
@@ -1395,7 +1462,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน' };
+    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด' };
 
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
@@ -2804,6 +2871,7 @@
         let ul = document.getElementById('block-reasons-list'); if(ul) ul.innerHTML = listHtml || '<p class="text-[10px] text-gray-400 text-center py-2">ยังไม่มีหัวข้อ กรุณาเพิ่มหัวข้อด้านบน</p>';
         let dd = document.getElementById('block-reason-dropdown'); if(dd) dd.innerHTML = dropHtml || '<option value="อื่นๆ">อื่นๆ</option>';
         let flt = document.getElementById('filter-blocked-reason'); if(flt) flt.innerHTML = filterHtml;
+      let abhFlt = document.getElementById('abh-filter-reason'); if(abhFlt) abhFlt.innerHTML = filterHtml;
     });
 
     window.addBlockReasonDef = function() {
@@ -3693,6 +3761,159 @@
     window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
 
 // ========================================================
+    // 🌟 ระบบประวัติการบล็อกทั้งหมด (All Block History) + จัดเรียง (Sort)
+    // ========================================================
+    let globalBlockHistoryData = [];
+    let abhSortCol = 'timestamp';
+    let abhSortAsc = false; // false = มากไปน้อย (ใหม่สุดขึ้นก่อน), true = น้อยไปมาก
+
+    db.ref('blocked_history').on('value', snap => {
+        globalBlockHistoryData = [];
+        if(snap.exists()) {
+            snap.forEach(driverNode => {
+                let dId = driverNode.key;
+                driverNode.forEach(logNode => {
+                    let log = logNode.val();
+                    log.driverId = log.pin || dId; 
+                    globalBlockHistoryData.push(log);
+                });
+            });
+        }
+        
+        let targetEl = document.getElementById('content-all-block-history');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderAllBlockHistory();
+        }
+    });
+
+    window.sortAllBlockHistory = function(col) {
+        // ถ้ากดซ้ำคอลัมน์เดิม ให้สลับการเรียง (มากไปน้อย <-> น้อยไปมาก)
+        if(abhSortCol === col) {
+            abhSortAsc = !abhSortAsc;
+        } else {
+            // ถ้าเปลี่ยนคอลัมน์ ค่าตั้งต้นให้เป็น มากไปน้อย (desc) เสมอ
+            abhSortCol = col;
+            abhSortAsc = false; 
+        }
+        window.renderAllBlockHistory();
+    }
+
+    window.renderAllBlockHistory = function() {
+        let tbody = document.getElementById('all-block-history-tbody');
+        if(!tbody) return;
+
+        // 1. ดึงค่าตัวกรองทั้งหมด
+        let fStart = document.getElementById('abh-filter-start').value;
+        let fEnd = document.getElementById('abh-filter-end').value;
+        let fTier = document.getElementById('abh-filter-tier').value;
+        let fReason = document.getElementById('abh-filter-reason').value;
+        let search = document.getElementById('abh-search-input').value.toLowerCase();
+
+        let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
+        let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
+
+        // 2. กรองข้อมูล (Filter)
+        let filtered = globalBlockHistoryData.filter(log => {
+            let d = allProfiles[log.driverId] || {};
+            let dTier = d.tier || 'New';
+            let dName = d.name || '';
+
+            if (log.timestamp < startTime || log.timestamp > endTime) return false;
+            if (fTier !== 'all' && dTier !== fTier) return false;
+            if (fReason !== 'all' && log.reason !== fReason) return false;
+
+            let searchStr = `${log.driverId} ${dName}`.toLowerCase();
+            if (search && !searchStr.includes(search)) return false;
+
+            return true;
+        });
+
+        // 3. จัดเรียงข้อมูล (Sort)
+        filtered.sort((a, b) => {
+            let valA, valB;
+            if(abhSortCol === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
+            else if(abhSortCol === 'driverId') { valA = a.driverId; valB = b.driverId; }
+            else if(abhSortCol === 'tier') { 
+                valA = (allProfiles[a.driverId] || {}).tier || 'New'; 
+                valB = (allProfiles[b.driverId] || {}).tier || 'New'; 
+            }
+            else if(abhSortCol === 'reason') { valA = a.reason; valB = b.reason; }
+            else if(abhSortCol === 'action') { valA = a.action || 'block'; valB = b.action || 'block'; }
+
+            if (valA < valB) return abhSortAsc ? -1 : 1;
+            if (valA > valB) return abhSortAsc ? 1 : -1;
+            return 0;
+        });
+
+        // 4. อัปเดตไอคอนลูกศรบนหัวตาราง
+        let cols = ['timestamp', 'driverId', 'tier', 'reason', 'action'];
+        cols.forEach(c => {
+            let icon = document.getElementById('sort-icon-' + c);
+            if(icon) {
+                if(abhSortCol === c) {
+                    icon.className = abhSortAsc ? 'fas fa-sort-up text-indigo-500 ml-1' : 'fas fa-sort-down text-indigo-500 ml-1';
+                } else {
+                    icon.className = 'fas fa-sort text-gray-400 ml-1';
+                }
+            }
+        });
+
+        // 5. วาดตาราง
+        let html = '';
+        filtered.forEach(log => {
+            let d = allProfiles[log.driverId] || {};
+            let name = d.name || 'ไม่ทราบชื่อ';
+            let tierBadge = window.getTierBadgeHtml ? window.getTierBadgeHtml(d.tier || 'New') : d.tier || 'New';
+            let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+            
+            let isUnblock = log.action === 'unblock';
+            let actionBadge = isUnblock 
+                ? '<span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-bold border border-emerald-200 dark:border-emerald-800">ปลดบล็อก</span>'
+                : '<span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded text-[9px] font-bold border border-red-200 dark:border-red-800">ระงับสิทธิ์</span>';
+            let noteHtml = log.note ? `<br><span class="text-[9px] text-gray-400">หมายเหตุ: ${log.note}</span>` : '';
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-left">
+                <td class="py-2.5 px-3 text-[10px] text-gray-500 dark:text-slate-400 align-top whitespace-nowrap">${dateStr}</td>
+                <td class="py-2.5 px-3 align-top">
+                    <p class="font-bold text-[#1da1f2] text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${log.driverId}')">${log.driverId}</p>
+                    <p class="text-[10px] text-gray-800 dark:text-white mt-0.5">${name}</p>
+                </td>
+                <td class="py-2.5 px-3 align-top">${tierBadge}</td>
+                <td class="py-2.5 px-3 text-[10px] leading-relaxed align-top">
+                    <p class="font-bold text-gray-800 dark:text-slate-200">${log.reason}</p>
+                    ${noteHtml}
+                </td>
+                <td class="py-2.5 px-3 text-center align-top">${actionBadge}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html || '<tr><td colspan="5" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบข้อมูลประวัติที่ตรงกับเงื่อนไข</td></tr>';
+    }
+
+    // ฟังก์ชัน Export ข้อมูลเป็น Excel (CSV)
+    window.exportAllBlockHistory = function() {
+        if(globalBlockHistoryData.length === 0) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีข้อมูลประวัติให้ Export', 'error');
+        let csv = "\uFEFFวัน/เวลา,ID พนักงาน,ชื่อพนักงาน,ระดับชั้น,การกระทำ,เหตุผลหลัก,หมายเหตุ\n";
+        
+        globalBlockHistoryData.forEach(log => {
+            let d = allProfiles[log.driverId] || {};
+            let dName = d.name || 'ไม่ทราบชื่อ';
+            let dTier = d.tier || 'New';
+            let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+            let actionStr = log.action === 'unblock' ? 'ปลดบล็อก' : 'ถูกระงับสิทธิ์';
+            let noteStr = log.note || '-';
+            csv += `"${dateStr}","${log.driverId}","${dName}","${dTier}","${actionStr}","${log.reason}","${noteStr}"\n`;
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", `F1_BlockHistory_${Date.now()}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+        
+    // ========================================================
     // 🌟 ระบบสไลด์หน้าต่างเพื่อปิด (Smooth Swipe to Close)
     // ========================================================
     function enableSmoothSwipeToClose(modalId, closeCallback) {
