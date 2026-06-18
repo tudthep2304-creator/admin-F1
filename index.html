@@ -1574,42 +1574,88 @@
         openModal('modalAddDriver');
     }
 
-    // ================= อัปเดตฟังก์ชันลงทะเบียน (ตั้งค่าเริ่มต้นกระเป๋าเป็น 0 ให้ระบบ Quest จัดการ) =================
+    // ================= อัปเดตฟังก์ชันลงทะเบียน (แจกโบนัสเข้ากระเป๋าหลัก + ลงสมุดบัญชีวันหมดอายุ) =================
     window.saveNewDriver = function() {
-        let drvId = document.getElementById('add-drv-id').value.trim();
+        let drvId = document.getElementById('add-drv-id').value.trim(); 
         let pin = document.getElementById('add-drv-pin').value.trim();
-        let fname = document.getElementById('add-drv-fname').value.trim();
+        let fname = document.getElementById('add-drv-fname').value.trim(); 
         let lname = document.getElementById('add-drv-lname').value.trim();
-        let phone = document.getElementById('add-drv-phone').value.trim();
+        let phone = document.getElementById('add-drv-phone').value.trim(); 
         let gender = document.getElementById('add-drv-gender').value;
         
-        if(!drvId) return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุรหัสประจำตัว (เช่น DRV-123456)', 'error');
-        if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'กรุณาตั้งรหัสผ่าน (PIN) 4 หลักสำหรับการเข้าแอปฯ ครั้งแรก', 'error');
-        if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานและเบอร์โทรศัพท์ให้ครบถ้วนก่อนครับ', 'error');
+        if(!drvId) return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุรหัสประจำตัว', 'error');
+        if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'ตั้งรหัสผ่าน (PIN) 4 หลักด้วยครับ', 'error');
+        if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อและเบอร์โทรศัพท์', 'error');
 
-        let fullName = fname + (lname ? ' ' + lname : '');
-        let vType = document.getElementById('add-drv-vtype').value;
+        let fullName = fname + (lname ? ' ' + lname : ''); 
+        let vType = document.getElementById('add-drv-vtype').value; 
         let vId = 'veh_' + Date.now();
         let initialVehicles = {};
         initialVehicles[vId] = { id: vId, serviceType: vType, brand: document.getElementById('add-drv-vbrand').value.trim(), color: document.getElementById('add-drv-vcolor').value.trim(), plate: document.getElementById('add-drv-vplate').value.trim(), province: document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '', isOnline: false };
 
-        let picUpload = document.getElementById('add-drv-pic-upload');
+        let picUpload = document.getElementById('add-drv-pic-upload'); 
         let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
 
-        // 🌟 ตั้งให้ทุกคนเริ่มที่ระดับ New และกระเป๋าโบนัส 0 บาท (ให้ Quest แจกออโต้ตอนสมัครสำเร็จ)
+        // 🌟 ลอจิกดึงโบนัสจาก Quest Center ที่แอดมินตั้งค่าเงื่อนไข "สมัครลงทะเบียนแอปสำเร็จ" ไว้
+        let startTier = "New"; 
+        let startBonus = 0; 
+        let now = Date.now();
+        let newLedgerEntries = []; 
+
+        if (typeof allQuests === 'object') {
+            for (let qId in allQuests) {
+                let q = allQuests[qId];
+                if (!q.isActive) continue;
+                if (q.startTime && new Date(q.startTime).getTime() > now) continue;
+                if (q.endTime && new Date(q.endTime).getTime() < now) continue;
+                
+                let c = q.conditions || {};
+                if (c.signup) {
+                    if (!q.targetTiers || q.targetTiers.includes('all') || q.targetTiers.includes('New')) {
+                        let bAmt = parseInt(q.rewardBonus) || 0;
+                        if (bAmt > 0) {
+                            startBonus += bAmt;
+                            let expDays = parseInt(q.rewardExpireDays) || 0;
+                            let expAt = expDays > 0 ? now + (expDays * 24 * 60 * 60 * 1000) : 0;
+                            
+                            // คิวบันทึกรายละเอียดลงสมุดบัญชีโบนัส (Ledger)
+                            newLedgerEntries.push({
+                                amount: bAmt,
+                                remaining: bAmt,
+                                expireAt: expAt,
+                                note: `โบนัสคนขับใหม่ (แคมเปญ: ${q.name})`,
+                                timestamp: firebase.database.ServerValue.TIMESTAMP
+                            });
+                        }
+                        if (q.rewardTier && q.rewardTier !== 'none') { startTier = q.rewardTier; }
+                    }
+                }
+            }
+        }
+
         let driverData = {
             driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
-            creditCash: 0, creditBonus: 0, tier: "New", rating: "5.0", 
+            creditCash: 0, creditBonus: startBonus, tier: startTier, rating: "5.0", 
             profilePic: profilePic, vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
 
         db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
+            if(startBonus > 0) {
+                // บันทึกธุรกรรมประวัติหลัก
+                db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
+                
+                // กระจายลงสมุดบัญชีแยกประเภทเพื่อเช็ควันหมดอายุรายก้อน (ซ่อมจุดนี้ให้เด้งขึ้นโชว์แล้ว)
+                newLedgerEntries.forEach(entry => {
+                    db.ref(`bonus_ledger/${drvId}`).push(entry);
+                });
+            }
             showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เข้าระบบเรียบร้อย!`, 'success');
             closeModal('modalAddDriver');
         });
     }
 
-    window.currentDriverVehicles = {}; 
+    // 🌟 ตัวแปรหน่วยความจำรถของคนขับคนปัจจุบัน (ห้ามลบเด็ดขาด)
+    window.currentDriverVehicles = {};
 
     window.showDriverDetails = function(driverId) {
         let d = allProfiles[driverId]; 
