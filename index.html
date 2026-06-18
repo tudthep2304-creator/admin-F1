@@ -1276,13 +1276,20 @@
     let touchStartX = 0; let touchStartY = 0; let currentTouchX = 0;
     let isDraggingModal = false; let activeDragBox = null; let activeDragOverlay = null;
 
+    // ฟังก์ชันช่วยเช็คว่า Element กำลังแสดงผลอยู่บนจอจริงๆ ใช่ไหม
+    function isElementVisible(el) {
+        if (!el || el.classList.contains('hidden') || el.classList.contains('opacity-0') || el.style.display === 'none') return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+    }
+
     document.addEventListener('touchstart', e => {
         touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
         currentTouchX = touchStartX;
 
-        // เช็คว่ามีหน้าต่างย่อย (Modal) เปิดอยู่ข้างบนสุดหรือไม่
+        // เช็คว่ามีหน้าต่างย่อย (Modal) เปิดอยู่ข้างบนสุดแบบมองเห็นจริงๆ หรือไม่
         let openModals = Array.from(document.querySelectorAll('div[id^="modal"], div[id^="page"]'))
-                              .filter(m => !m.classList.contains('hidden'));
+                              .filter(m => isElementVisible(m));
         
         if (openModals.length > 0) {
             // ป้องกันไม่ให้ทำงานถ้ากำลังเลื่อนดูตาราง พิมพ์ข้อความ หรือตัดรูป
@@ -1377,7 +1384,7 @@
             }
         }
     }, {passive: true});
-
+    
     // ================= โหมดจ่ายงาน (DISPATCH MODE) =================
     db.ref('config/dispatchMode').on('value', snap => {
         if(snap.exists()) {
