@@ -599,8 +599,7 @@
               <h2 class="text-sm font-black text-gray-800 dark:text-white flex items-center gap-2"><i class="fas fa-user-edit text-[#1da1f2]"></i> ข้อมูลพนักงาน</h2>
               
               <div class="flex items-center gap-2">
-                  <div id="det-online-status">
-                      </div>
+                  <div id="det-online-status"></div>
                   <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 px-2 py-1 rounded-lg text-blue-600 dark:text-[#1da1f2] font-medium flex items-center gap-1.5 text-[10px] sm:text-[11px] shadow-sm">
                       <i class="fas fa-car-side"></i> มีรถ <span id="det-vehicle-count" class="font-bold">0</span> คัน
                   </div>
@@ -619,68 +618,67 @@
                       </button>
                       <input type="file" id="edit-drv-pic-upload" accept="image/*" class="hidden" onchange="window.processDriverImage(this, 'edit-drv-pic-preview', 'edit-drv-pic-placeholder')">
                   </div>
-                  <div class="flex-1 flex flex-col justify-center gap-2 min-w-0">
+                  <div class="flex-1 grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
                       <div>
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">รหัสอ้างอิง (ID)</label>
-                          <input type="text" id="det-sys-id" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed text-center tracking-wide">
+                          <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">รหัสอ้างอิง (ID)</label>
+                          <input type="text" id="det-sys-id" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed text-center tracking-wide">
                       </div>
                       <div>
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">วันที่เริ่มงาน</label>
-                          <input type="text" id="det-reg-date" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 dark:bg-slate-900/50 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed text-center">
+                          <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">วันที่เริ่มงาน</label>
+                          <input type="text" id="det-reg-date" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 dark:bg-slate-900/50 text-black dark:text-white border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed text-center">
                       </div>
                   </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-2 sm:gap-3">
-                  <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">เพศ (Gender)</label>
-                      <select id="det-gender" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+              <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                  <div class="col-span-1">
+                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">เพศ (Gender)</label>
+                      <select id="det-gender" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
                           <option value="male">ชาย</option>
                           <option value="female">หญิง</option>
                       </select>
                   </div>
-                  <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">เบอร์โทรศัพท์</label>
-                      <input type="tel" id="det-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                  <div class="col-span-1">
+                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ชื่อจริง</label>
+                      <input type="text" id="det-firstname" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                  </div>
+                  <div class="col-span-1">
+                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">นามสกุล</label>
+                      <input type="text" id="det-lastname" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
                   </div>
               </div>
 
               <div class="grid grid-cols-2 gap-2 sm:gap-3">
                   <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">ชื่อจริง</label>
-                      <input type="text" id="det-firstname" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">เบอร์โทรศัพท์</label>
+                      <input type="tel" id="det-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
                   </div>
                   <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">นามสกุล</label>
-                      <input type="text" id="det-lastname" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 transition">
+                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">รหัสผ่านแอป (PIN)</label>
+                      <input type="text" id="det-pin-input" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal tracking-widest text-center focus:border-blue-500 transition">
                   </div>
-              </div>
-
-              <div>
-                  <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-0.5">รหัสผ่านแอป (PIN 4 หลัก)</label>
-                  <input type="text" id="det-pin-input" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal tracking-widest text-center sm:text-left focus:border-blue-500 transition">
               </div>
           </div>
 
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-sm space-y-3">
-              <h3 class="text-[11px] font-medium text-gray-500 dark:text-slate-400 uppercase border-b border-gray-100 dark:border-slate-800 pb-2"><i class="fas fa-id-badge text-amber-500 mr-1"></i> สถานะและกระเป๋าเงิน</h3>
+              <h3 class="text-[11px] font-medium text-gray-800 dark:text-slate-300 uppercase border-b border-gray-100 dark:border-slate-800 pb-2"><i class="fas fa-id-badge text-amber-500 mr-1"></i> สถานะและกระเป๋าเงิน</h3>
               
               <div class="grid grid-cols-2 gap-2 sm:gap-3 bg-amber-50/50 dark:bg-amber-900/10 p-2 sm:p-3 rounded-lg border border-amber-100 dark:border-amber-800/30">
                   <div>
                       <div class="flex justify-between items-center mb-0.5">
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400">ระดับชั้น</label>
+                          <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300">ระดับชั้น (Tier)</label>
                       </div>
                       <div class="relative">
-                          <input type="text" id="det-tier-display" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed pr-7 text-center">
+                          <input type="text" id="det-tier-display" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-blue-600 dark:text-[#1da1f2] border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed pr-7 text-center">
                           <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
                       </div>
                   </div>
                   <div>
                       <div class="flex justify-between items-center mb-0.5">
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400">คะแนนดาว</label>
+                          <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300">คะแนนดาว</label>
                       </div>
                       <div class="relative">
-                          <input type="text" id="det-rating-display" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-yellow-600 dark:text-yellow-500 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal cursor-not-allowed pr-7 text-center">
+                          <input type="text" id="det-rating-display" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-yellow-600 dark:text-yellow-500 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed pr-7 text-center">
                           <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
                       </div>
                   </div>
@@ -691,7 +689,7 @@
 
               <div class="grid grid-cols-2 gap-2 sm:gap-3 bg-emerald-50/50 dark:bg-emerald-900/10 p-2 sm:p-3 rounded-lg border border-emerald-100 dark:border-emerald-800/30">
                   <div>
-                      <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-500 mb-0.5">เงินสด (Cash 🟢)</label>
+                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">เงินสด (Cash 🟢)</label>
                       <div class="relative">
                           <input type="text" id="det-cash" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-green-600 dark:text-green-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed text-center pr-7 truncate">
                           <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
@@ -699,7 +697,7 @@
                   </div>
                   <div class="relative">
                       <div class="flex justify-between items-center mb-0.5">
-                          <label class="block text-[11px] font-medium text-gray-500 dark:text-slate-500">โบนัส (Bonus 🟡)</label>
+                          <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300">โบนัส (Bonus 🟡)</label>
                           <button onclick="viewBonusLedger(currentDriverFocus)" class="text-[9px] font-medium text-yellow-600 hover:text-yellow-700 underline absolute top-0 right-1">รายละเอียด</button>
                       </div>
                       <div class="relative mt-1.5">
@@ -717,21 +715,21 @@
 
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-sm">
               <div class="flex justify-between items-center mb-3 border-b border-gray-100 dark:border-slate-800 pb-2">
-                  <h3 class="text-[11px] font-medium text-gray-500 dark:text-slate-400 uppercase"><i class="fas fa-car text-blue-500 mr-1"></i> ยานพาหนะ (Vehicles)</h3>
+                  <h3 class="text-[11px] font-medium text-gray-800 dark:text-slate-300 uppercase"><i class="fas fa-car text-blue-500 mr-1"></i> ยานพาหนะ (Vehicles)</h3>
                   <button onclick="addDriverVehicle()" class="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-[#1da1f2] px-2.5 py-1 rounded-lg text-[10px] font-medium hover:bg-blue-100 dark:hover:bg-slate-700 transition shadow-sm border border-blue-200 dark:border-slate-700"><i class="fas fa-plus"></i> เพิ่มรถ</button>
               </div>
               <div id="driver-vehicles-container" class="space-y-3"></div>
           </div>
 
           <div class="grid grid-cols-3 gap-2 pt-2">
-              <button onclick="warpToHistory()" class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 rounded-full py-2 text-[10px] sm:text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-history"></i> ประวัติงาน</button>
-              <button onclick="warpToLogs()" class="bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 rounded-full py-2 text-[10px] sm:text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-map-marker-alt"></i> ดู Log พิกัด</button>
-              <button onclick="warpToBlockDriver()" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-full py-2 text-[10px] sm:text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1"><i class="fas fa-ban"></i> บล็อกคนขับ</button>
+              <button onclick="warpToHistory()" class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1.5"><i class="fas fa-history"></i> ประวัติงาน</button>
+              <button onclick="warpToLogs()" class="bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 hover:bg-teal-100 border border-teal-200 dark:border-teal-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1.5"><i class="fas fa-map-marker-alt"></i> ดู Log พิกัด</button>
+              <button onclick="warpToBlockDriver()" class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 border border-red-200 dark:border-red-800/50 rounded-xl py-2.5 text-[11px] font-medium transition flex flex-col sm:flex-row items-center justify-center gap-1.5"><i class="fas fa-ban"></i> บล็อกคนขับ</button>
           </div>
 
           <div class="grid grid-cols-2 gap-2 mt-2">
-              <button onclick="deleteDriverFromModal()" class="w-full py-2.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium rounded-xl border border-red-200 dark:border-red-500/30 hover:bg-red-600 hover:text-white transition text-[11px] flex justify-center items-center gap-1.5 shadow-sm"><i class="fas fa-trash-alt"></i> ถอดพนักงาน</button>
-              <button onclick="window.saveDriverUpdates()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-md transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
+              <button onclick="deleteDriverFromModal()" class="w-full py-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium rounded-xl border border-red-200 dark:border-red-500/30 hover:bg-red-600 hover:text-white transition text-[11px] flex justify-center items-center gap-1.5 shadow-sm"><i class="fas fa-trash-alt"></i> ถอดพนักงาน</button>
+              <button onclick="window.saveDriverUpdates()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-md transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
           </div>
       </section>
     
@@ -2702,24 +2700,24 @@
         for (let vId in window.currentDriverVehicles) {
             let v = window.currentDriverVehicles[vId];
             
-            // เพิ่มคลาส truncate และ min-w-0 ป้องกัน Dropdown ทะลักขอบ
-            let selectHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 truncate transition">`;
+            let selectHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 truncate transition">`;
             if (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) {
                 window.systemVehicleTypes.forEach(vt => { let sel = (v.serviceType === vt.id) ? 'selected' : ''; selectHtml += `<option value="${vt.id}" ${sel}>${vt.name}</option>`; });
             } else { selectHtml += `<option value="car">รถยนต์</option><option value="bike">มอเตอร์ไซค์</option>`; }
             selectHtml += `</select>`;
 
             html += `
-            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm relative transition-colors duration-300 min-w-0">
-                <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 w-7 h-7 rounded-lg flex items-center justify-center transition shadow-sm border border-red-100 dark:border-red-500/20"><i class="fas fa-trash-alt text-[11px]"></i></button>
-                <div class="flex items-center gap-2 mb-3"><i class="fas fa-car-side text-gray-400 dark:text-slate-500"></i> <span class="text-[11px] font-medium text-gray-500">ยานพาหนะ</span></div>
-                <div class="space-y-2">
-                    <div><label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">ประเภทรถ</label>${selectHtml}</div>
+            <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm relative transition-colors duration-300 min-w-0">
+                <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-100 dark:bg-red-900/20 w-6 h-6 rounded-lg flex items-center justify-center transition shadow-sm border border-red-200 dark:border-red-500/20"><i class="fas fa-trash-alt text-[10px]"></i></button>
+                <div class="space-y-2 pr-6">
                     <div class="grid grid-cols-2 gap-2">
-                        <div><label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none placeholder-gray-400 transition" placeholder="Honda"></div>
-                        <div><label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none placeholder-gray-400 transition" placeholder="สีขาว"></div>
-                        <div><label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">ป้ายทะเบียน</label><input type="text" id="v-plate-${vId}" value="${v.plate||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none placeholder-gray-400 transition" placeholder="กท-1234"></div>
-                        <div><label class="block text-[11px] font-medium text-gray-500 dark:text-slate-400 mb-1">จังหวัด</label><input type="text" id="v-province-${vId}" value="${v.province||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none placeholder-gray-400 transition" placeholder="กรุงเทพฯ"></div>
+                        <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ประเภทรถ</label>${selectHtml}</div>
+                        <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none transition"></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none transition"></div>
+                        <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ป้ายทะเบียน</label><input type="text" id="v-plate-${vId}" value="${v.plate||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none transition"></div>
+                        <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">จังหวัด</label><input type="text" id="v-province-${vId}" value="${v.province||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none transition"></div>
                     </div>
                 </div>
             </div>`;
