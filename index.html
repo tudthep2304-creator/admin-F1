@@ -999,11 +999,11 @@
             localStorage.setItem('admin_theme', 'dark');
         }
         
+        // อัปเดตสีแผนที่แบบเรียลไทม์ (ถ้าเปิดแผนที่อยู่)
         if (typeof adminMap !== 'undefined' && adminMap) {
             adminMap.setOptions({ styles: !isNowDark ? darkMapStyle : lightMapStyle });
         }
     }
-
     // ================= CUSTOM ALERTS =================
     let confirmCallback = null;
     function showCustomAlert(title, message, type='info', callback=null) {
@@ -1054,6 +1054,7 @@
 
     const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ' };
 
+    // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
 
     function switchTab(tabId, isBack = false) {
@@ -1105,6 +1106,7 @@
         }
     }
 
+    // 🌟 2. ระบบสไลด์ย้อนกลับ (Swipe to go back)
     let touchStartX = 0; let touchStartY = 0;
     document.addEventListener('touchstart', e => {
         touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
@@ -1117,6 +1119,7 @@
         if (diffX > 80 && diffX > diffY) { window.goBackAdmin(); }
     }, {passive: true});
 
+    // 🌟 3. ระบบจัดการป้องกันการซูมด้วยนิ้ว
     document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
     document.addEventListener('touchmove', function(event) {
         if (event.scale !== 1 && event.touches.length > 1) { event.preventDefault(); }
@@ -1163,20 +1166,24 @@
         let html = ''; 
         let jobsArr = Object.entries(allCompletedJobs).map(([k, v]) => ({id:k, ...v}));
         
+        // 1. รับค่าตัวกรองทั้งหมด
         let fStart = document.getElementById('hist-filter-start').value;
         let fEnd = document.getElementById('hist-filter-end').value;
         let fStatus = document.getElementById('hist-filter-status').value;
         let fPin = document.getElementById('hist-filter-pin').value.trim();
 
+        // แปลงวันที่เป็น Timestamp (ถ้าไม่เลือก ให้ครอบคลุมทั้งหมด)
         let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
         let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
 
         let statTotal = 0, statSuccess = 0, statCancel = 0, statEarn = 0;
 
+        // 2. กรองข้อมูลตามเงื่อนไข (Filter)
         let filteredJobs = jobsArr.filter(j => {
             let time = j.completedAt || j.timestamp || 0;
-            if(time < startTime || time > endTime) return false;
-            if(fPin && j.driverPin !== fPin) return false;
+            if(time < startTime || time > endTime) return false; // หลุดช่วงวันที่
+            
+            if(fPin && j.driverPin !== fPin) return false; // ไม่ตรงรหัสคนขับ
 
             let isSuccess = j.status.includes('ถึงที่หมาย') || j.status.includes('เสร็จสิ้น');
             let isCancelDriver = j.status.includes('คนขับยกเลิก');
@@ -1186,15 +1193,23 @@
             if(fStatus === 'cancel_driver' && !isCancelDriver) return false;
             if(fStatus === 'cancel_passenger' && !isCancelPass) return false;
 
+            // 3. คำนวณยอดรวม (คำนวณเฉพาะตัวที่ผ่านฟิลเตอร์มาแล้ว)
             statTotal++;
-            if(isSuccess) { statSuccess++; statEarn += parseInt(j.price || 0); }
-            else if (isCancelDriver || isCancelPass || j.status.includes('ยกเลิก')) { statCancel++; }
+            if(isSuccess) { 
+                statSuccess++; 
+                statEarn += parseInt(j.price || 0); 
+            }
+            else if (isCancelDriver || isCancelPass || j.status.includes('ยกเลิก')) { 
+                statCancel++; 
+            }
 
             return true;
         });
 
+        // เรียงจากใหม่ไปเก่า
         filteredJobs.sort((a,b) => (b.completedAt || b.timestamp || 0) - (a.completedAt || a.timestamp || 0));
 
+        // อัปเดตการ์ดสถิติด้านบน
         let elTot = document.getElementById('hist-stat-total'); if(elTot) elTot.innerText = statTotal;
         let elSuc = document.getElementById('hist-stat-success'); if(elSuc) elSuc.innerText = statSuccess;
         let elCan = document.getElementById('hist-stat-cancel'); if(elCan) elCan.innerText = statCancel;
@@ -1205,8 +1220,11 @@
              if(lst) lst.innerHTML = '<tr><td colspan="7" class="py-10 text-center text-gray-500 dark:text-slate-500">ไม่พบประวัติงานที่ตรงกับตัวกรองที่เลือก</td></tr>'; return;
         }
 
+        // 4. วาดตารางข้อมูล
         filteredJobs.forEach(j => {
             let timeStr = new Date(j.completedAt || j.timestamp || 0).toLocaleString('th-TH');
+            
+            // แยกป้ายสีสถานะให้ชัดเจน
             let statusBadge = '';
             if(j.status.includes('ถึงที่หมาย') || j.status.includes('เสร็จสิ้น')) {
                 statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-500/30">สำเร็จ</span>`;
@@ -1218,6 +1236,7 @@
                 statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">${j.status}</span>`;
             }
 
+            // จัดการคอลัมน์รีวิว / ร้องเรียน
             let reviewHtml = '<span class="text-gray-400">-</span>';
             if(j.rating) {
                 reviewHtml = `<div class="flex items-center justify-center gap-1 text-yellow-500"><i class="fas fa-star text-[10px]"></i> <span class="font-bold text-xs">${j.rating}</span></div>`;
@@ -1239,18 +1258,26 @@
         let lst = document.getElementById('history-jobs-list'); if(lst) lst.innerHTML = html;
     }
 
+    // ==========================================
+    // 🌟 ระบบวาร์ป (Warp Links) จากโปรไฟล์คนขับ
+    // ==========================================
     window.warpToHistory = function() {
         let pin = window.currentDriverFocus;
         if(pin) document.getElementById('hist-filter-pin').value = pin;
+        
+        // ล้างวันที่เพื่อให้ดูงานทั้งหมดของคนขับคนนี้แต่แรกเกิด
         document.getElementById('hist-filter-start').value = '';
         document.getElementById('hist-filter-end').value = '';
         document.getElementById('hist-filter-status').value = 'all';
-        switchTab('history');
-        renderHistoryTab();
+        
+        closeDriverProfilePage(); // ปิดหน้าโปรไฟล์
+        switchTab('history');     // ย้ายไปหน้าประวัติงาน
+        renderHistoryTab();       // สั่งประมวลผลทันที
     }
 
     window.warpToLogs = function() {
-        showCustomAlert('ระบบคลังประวัติ', 'ระบบตรวจสอบประวัติพิกัด GPS แบบเต็มตัวเลือกอยู่ในแท็บเมนู "ศูนย์ตรวจสอบประวัติพิกัด" เรียบร้อยครับ', 'info');
+        // แอบทิ้งไว้ก่อน เดี๋ยวรอทำหน้า Logs แบบเต็มจอในอัปเดตหน้าครับ
+        showCustomAlert('เร็วๆ นี้', 'เดี๋ยวเราจะพาไปยังหน้าประวัติ Logs เต็มจอแบบใหม่ในขั้นตอนต่อไปครับ', 'info');
     }
 
     // ================= ระบบเรดาร์แผนที่แอดมิน (Live Map) =================
@@ -1284,6 +1311,7 @@
 
     window.initAdminMap = function() {
         if(typeof google === 'undefined' || adminMap) return;
+        
         let isDark = document.documentElement.classList.contains('dark');
 
         adminMap = new google.maps.Map(document.getElementById('adminLiveMap'), {
@@ -1329,53 +1357,533 @@
 
     function updateAdminMarker(id, lat, lng, title, type, vehicleType, profilePic) {
         if(!adminMap) return;
+        
         let show = true;
         if(window.mapFilterUser !== 'all' && type !== window.mapFilterUser) show = false;
         if(type === 'driver' && window.mapFilterVehicle !== 'all' && vehicleType !== window.mapFilterVehicle) show = false;
 
-        let iconUrl = "https://img.icons8.com/color/48/marker--v1.png"; let sizeX = 35, sizeY = 35; 
-        if (type === 'driver') { iconUrl = "https://img.icons8.com/color/48/car-top-view.png"; } 
-        else if (type === 'passenger' && profilePic) { iconUrl = profilePic; sizeX = 32; sizeY = 32; }
+        let iconUrl = "https://img.icons8.com/color/48/marker--v1.png"; 
+        let sizeX = 35, sizeY = 35; 
+
+        if (type === 'driver') {
+            iconUrl = "https://img.icons8.com/color/48/car-top-view.png"; 
+        } else if (type === 'passenger' && profilePic) {
+            iconUrl = profilePic;
+            sizeX = 32; sizeY = 32; 
+        }
 
         let labelColor = '#1da1f2';
 
         if(!liveMarkers[id]) {
             let m = new google.maps.Marker({ 
-                position: {lat, lng}, map: show ? adminMap : null, title: title, 
-                icon: { url: iconUrl, scaledSize: new google.maps.Size(sizeX, sizeY), labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10) },
+                position: {lat, lng}, 
+                map: show ? adminMap : null, 
+                title: title, 
+                icon: { 
+                    url: iconUrl, 
+                    scaledSize: new google.maps.Size(sizeX, sizeY), 
+                    labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10)
+                },
                 label: { text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' }
             });
+            
             m.addListener('click', () => {
-                if(type === 'driver') { showDriverDetails(id.replace('drv_', '')); } 
-                else { showCustomAlert("ข้อมูลผู้โดยสาร (ออนไลน์)", `ชื่อบัญชี: ${title}\nกำลังเปิดแอปพลิเคชันอยู่ขณะนี้`, "info"); }
+                if(type === 'driver') {
+                    let pin = id.replace('drv_', '');
+                    showDriverDetails(pin);
+                } else {
+                    showCustomAlert("ข้อมูลผู้โดยสาร (ออนไลน์)", `ชื่อบัญชี: ${title}\nกำลังเปิดแอปพลิเคชันอยู่ขณะนี้`, "info");
+                }
             });
+
             liveMarkers[id] = { marker: m, type: type, vehicleType: vehicleType };
         } else { 
             liveMarkers[id].marker.setPosition({lat, lng}); 
             liveMarkers[id].marker.setMap(show ? adminMap : null);
             liveMarkers[id].marker.setLabel({ text: title, color: labelColor, fontSize: '11px', fontWeight: 'bold', className: 'map-label-text' });
-            liveMarkers[id].marker.setIcon({ url: iconUrl, scaledSize: new google.maps.Size(sizeX, sizeY), labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10) });
+            
+            liveMarkers[id].marker.setIcon({
+                url: iconUrl, 
+                scaledSize: new google.maps.Size(sizeX, sizeY), 
+                labelOrigin: new google.maps.Point(sizeX/2, sizeY + 10)
+            });
         }
     }
 
     function removeAdminMarker(id) { if(liveMarkers[id]) { liveMarkers[id].marker.setMap(null); delete liveMarkers[id]; } }
+ 
+    // ================= ระบบฐานข้อมูลลูกค้า CRM =================
+    function renderPassengers() {
+        let passMap = {};
+        
+        Object.values(allCompletedJobs).forEach(job => {
+            let uid = job.userId; 
+            if(!uid) uid = job.phone; 
+            if(!uid) return;
+            
+            if(!passMap[uid]) {
+                passMap[uid] = { 
+                    userId: uid,
+                    phone: job.phone || '-', 
+                    name: job.name || 'สมาชิกลูกค้า', 
+                    rides: 0, 
+                    spend: 0, 
+                    promos: [], 
+                    firstRide: job.completedAt || job.timestamp || Date.now() 
+                };
+            } else {
+                if(job.phone) passMap[uid].phone = job.phone;
+                if(job.name) passMap[uid].name = job.name;
+            }
+            
+            passMap[uid].rides++; 
+            passMap[uid].spend += parseInt(job.price || 0);
+            if(job.promoCode && !passMap[uid].promos.includes(job.promoCode)) passMap[uid].promos.push(job.promoCode);
+            if((job.completedAt || job.timestamp || Date.now()) < passMap[uid].firstRide) passMap[uid].firstRide = job.completedAt || job.timestamp;
+        });
+
+        if(allBookings) {
+            Object.values(allBookings).forEach(job => {
+                let uid = job.userId; 
+                if(!uid) uid = job.phone;
+                if(!uid) return;
+                
+                if(!passMap[uid]) { 
+                    passMap[uid] = { 
+                        userId: uid,
+                        phone: job.phone || '-', 
+                        name: job.name || 'สมาชิกลูกค้า', 
+                        rides: 0, 
+                        spend: 0, 
+                        promos: [], 
+                        firstRide: job.timestamp || Date.now() 
+                    }; 
+                } else {
+                    if(job.phone) passMap[uid].phone = job.phone;
+                    if(job.name) passMap[uid].name = job.name;
+                }
+            });
+        }
+
+        let passArray = Object.values(passMap);
+        let filterEl = document.getElementById('filter-passenger'); let filter = filterEl ? filterEl.value : 'all';
+        if(filter === 'new') passArray = passArray.filter(p => p.rides <= 1);
+        if(filter === 'regular') passArray = passArray.filter(p => p.rides > 1);
+        
+        passArray.sort((a,b) => b.spend - a.spend);
+
+        let html = '';
+        if(passArray.length === 0) { html = `<tr><td colspan="5" class="py-6 text-center text-gray-400">ไม่มีข้อมูลลิสต์รายชื่อในกลุ่มนี้</td></tr>`; } 
+        else {
+            passArray.forEach(p => {
+                let isNew = p.rides <= 1;
+                let badge = isNew ? `<span class="bg-blue-950 text-[#1da1f2] text-[10px] font-bold px-2 py-0.5 rounded border border-blue-500/20">ผู้ใช้ใหม่</span>` : `<span class="bg-yellow-950 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-500/20">ลูกค้าประจำ</span>`;
+                let pDataStr = encodeURIComponent(JSON.stringify(p));
+
+                html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition cursor-pointer text-left" onclick="viewPassengerDetails('${pDataStr}')">
+                    <td class="py-3 px-3 text-left">
+                        <p class="font-bold text-gray-800 dark:text-white hover:text-blue-500 transition flex items-center gap-2">${p.phone} <span class="bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-500 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></p>
+                        <p class="text-[10px] text-gray-400 dark:text-slate-500 font-medium truncate max-w-[180px]">${p.name} <span class="text-gray-300 dark:text-slate-600 font-normal">|</span> <span class="font-mono text-gray-400">ID: ${p.userId || '-'}</span></p>
+                    </td>
+                    <td class="py-3 px-2 text-left">${badge}</td>
+                    <td class="py-3 px-2 text-center font-bold text-blue-500 dark:text-[#1da1f2]">${p.rides} ครั้ง</td>
+                    <td class="py-3 px-2 text-right font-black text-gray-800 dark:text-white">฿${p.spend.toLocaleString()}</td>
+                    <td class="py-3 px-3 text-left text-[10px] text-gray-400 max-w-[120px] truncate">${p.promos.length > 0 ? p.promos.join(', ') : '-'}</td>
+                </tr>`;
+            });
+        }
+        
+        let tTotal = document.getElementById('stat-pass-total'); if(tTotal) tTotal.innerText = Object.values(passMap).length;
+        let tNew = document.getElementById('stat-pass-new'); if(tNew) tNew.innerText = Object.values(passMap).filter(p => p.rides <= 1).length;
+        let tVip = document.getElementById('stat-pass-vip'); if(tVip) tVip.innerText = Object.values(passMap).filter(p => p.rides > 1).length;
+        let listEl = document.getElementById('passengers-list'); if(listEl) listEl.innerHTML = html;
+        windowContext.currentPassengerData = passArray;
+    }
+
+    function viewPassengerDetails(encodedData) {
+        let p = JSON.parse(decodeURIComponent(encodedData));
+        document.getElementById('pdet-name').innerText = p.name; 
+        document.getElementById('pdet-phone').innerText = "เบอร์โทร: " + p.phone;
+        let uid = p.userId || p.phone;
+        let idEl = document.getElementById('pdet-id'); if(idEl) idEl.innerText = "ID: " + uid;  
+        document.getElementById('pdet-rides').innerHTML = `${p.rides} <span class="text-[10px] text-gray-400 font-normal">ครั้ง</span>`;
+        document.getElementById('pdet-spend').innerText = `฿${p.spend.toLocaleString()}`;
+        
+        windowContext.focusPassengerId = uid;
+        windowContext.focusPassengerPhone = p.phone;
+        windowContext.focusPassengerName = p.name;
+        
+        // 🌟 ดึงข้อมูลกระเป๋าเงินลูกค้าจาก Firebase สดๆ
+        db.ref('passengers_profile/' + uid).once('value', snap => {
+            let d = snap.val() || {};
+            let cash = parseFloat(d.creditCash || 0).toFixed(0);
+            let bonus = parseFloat(d.creditBonus || 0).toFixed(0);
+            document.getElementById('pdet-wallet-cash').innerText = `฿${cash}`;
+            document.getElementById('pdet-wallet-bonus').innerText = `฿${bonus}`;
+        });
+
+        openModal('modalPassengerDetails');
+    }
+
+    function blockPassengerFromModal() {
+        if(!windowContext.focusPassengerPhone) return;
+        let reason = prompt("กรุณาระบุสาเหตุที่ต้องการระงับการใช้งานเบอร์นี้:");
+        if(reason !== null) {
+            db.ref('blacklist/' + windowContext.focusPassengerPhone).set({ phone: windowContext.focusPassengerPhone, reason: reason || 'แอดมินระงับจากหน้าโปรไฟล์', timestamp: new Date().toLocaleString('th-TH') }).then(() => {
+                showCustomAlert("บล็อกสำเร็จ", "ขึ้นบัญชีดำเบอร์ลูกค้ารายนี้สำเร็จ!", "success"); closeModal('modalPassengerDetails');
+            });
+        }
+    }
+
+    function exportPassengersCSV() {
+        if(!windowContext.currentPassengerData || windowContext.currentPassengerData.length === 0) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีข้อมูลลูกค้าให้ Export', 'error');
+        let csv = "\uFEFFเบอร์โทร,ชื่อสมาชิก,จำนวนครั้งเดินทาง,ยอดเงินรวมสะสม(บาท),โค้ดส่วนลดที่เคยใช้\n";
+        windowContext.currentPassengerData.forEach(p => { csv += `"${p.phone}","${p.name}","${p.rides}","${p.spend}","${p.promos.join(';')}"\n`; });
+        triggerDownload(csv, `F1_Passengers_CRM_${Date.now()}.csv`);
+    }
+
+    // ================= PROMOTIONS =================
+    function switchPromoBuilder(type) {
+        let gen = document.getElementById('pbuild-general'); let rnd = document.getElementById('pbuild-random');
+        let bGen = document.getElementById('pbtn-general'); let bRnd = document.getElementById('pbtn-random');
+        if(!gen || !rnd || !bGen || !bRnd) return;
+        gen.classList.toggle('hidden', type !== 'general'); rnd.classList.toggle('hidden', type !== 'random');
+        bGen.className = type === 'general' ? "flex-1 py-2 text-xs font-bold bg-blue-600 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-gray-500 dark:text-slate-400 hover:text-white rounded-md transition";
+        bRnd.className = type === 'random' ? "flex-1 py-2 text-xs font-bold bg-blue-600 text-white rounded-md shadow transition" : "flex-1 py-2 text-xs font-bold text-gray-500 dark:text-slate-400 hover:text-white rounded-md transition";
+    }
+
+    function addPromoCode() {
+        let code = document.getElementById('promo-code').value.trim().toUpperCase(); let value = document.getElementById('promo-value').value.trim();
+        let target = document.querySelector('input[name="promo_target"]:checked').value; let limit = document.getElementById('promo-limit').value.trim(); let expire = document.getElementById('promo-expire').value;
+        if(!code || !value) return showCustomAlert("ข้อมูลไม่ครบ", "กรอกคำโค้ดและส่วนลดให้ครบถ้วนก่อนครับ", "error");
+
+        db.ref('promotions/' + code).set({ code: code, value: parseInt(value), target: target, usageCount: 0, maxLimit: limit ? parseInt(limit) : null, expireTime: expire || null, isActive: true, isSingleUse: false }).then(() => {
+            showCustomAlert("สำเร็จ", "บันทึกแคมเปญโปรโมชั่นใหม่สำเร็จ!", "success");
+            document.getElementById('promo-code').value = ''; document.getElementById('promo-value').value = ''; document.getElementById('promo-limit').value = ''; document.getElementById('promo-expire').value = ''; closeModal('modalAddPromo');
+        });
+    }
+
+    function generateRandomPromos() {
+        let prefix = document.getElementById('promo-rand-prefix').value.trim().toUpperCase() || "F1";
+        let amount = parseInt(document.getElementById('promo-rand-amount').value); let value = parseInt(document.getElementById('promo-rand-value').value);
+        if(!amount || !value || amount < 1) return showCustomAlert("ข้อมูลไม่ครบ", "ตรวจสอบฟิลด์ระบุจำนวนและมูลค่า", "error");
+
+        let batch = {};
+        for(let i=0; i<amount; i++) {
+            let rnd = Math.floor(1000 + Math.random() * 9000); let code = prefix + rnd;
+            batch['promotions/' + code] = { code: code, value: value, target: 'all', usageCount: 0, maxLimit: 1, isActive: true, isSingleUse: true };
+        }
+        db.ref().update(batch).then(() => { showCustomAlert("สำเร็จ", `เจนชุดคูปองสุ่มจำนวน ${amount} ใบ สำเร็จ!`, "success"); document.getElementById('promo-rand-amount').value = ''; closeModal('modalAddPromo'); });
+    }
+
+    function filterPromoList(type) { 
+        currentPromoFilter = type; 
+        let a = document.getElementById('flt-promo-all'); let r = document.getElementById('flt-promo-random');
+        if(a && r) {
+            a.className = type === 'all' ? "text-xs font-bold text-[#1da1f2] border-b-2 border-blue-500 pb-1 px-1 transition" : "text-xs font-bold text-gray-500 hover:text-gray-700 border-b-2 border-transparent pb-1 px-1 transition";
+            r.className = type === 'random' ? "text-xs font-bold text-[#1da1f2] border-b-2 border-blue-500 pb-1 px-1 transition" : "text-xs font-bold text-gray-500 hover:text-gray-700 border-b-2 border-transparent pb-1 px-1 transition";
+        }
+        renderPromoList(); 
+    }
+
+    db.ref('promotions').on('value', snap => { allPromoData = snap.val() || {}; renderPromoList(); });
+
+    function renderPromoList() {
+        let listContainer = document.getElementById('promo-codes-list'); if(!listContainer) return;
+        let html = ''; let now = Date.now();
+
+        for (let key in allPromoData) {
+            let p = allPromoData[key];
+            if(currentPromoFilter === 'random' && !p.isSingleUse) continue;
+            if(currentPromoFilter === 'all' && p.isSingleUse) continue;
+
+            let isExpired = p.expireTime ? (new Date(p.expireTime).getTime() < now) : false;
+            let isFull = p.maxLimit ? (p.usageCount >= p.maxLimit) : false;
+            let isActive = p.isActive !== false && !isExpired && !isFull;
+            
+            let toggleClass = isActive ? 'text-blue-500' : 'text-gray-400'; let toggleIcon = p.isActive !== false ? 'fa-toggle-on' : 'fa-toggle-off'; let opacityClass = isActive ? 'opacity-100' : 'opacity-60 grayscale-[30%]';
+            let badge = p.isSingleUse ? `<span class="bg-yellow-100 dark:bg-yellow-950 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-500/20 text-[8px] px-1 rounded">สุ่ม(ทิ้ง)</span>` : (p.target === 'new_user' ? `<span class="bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-[#1da1f2] border border-blue-200 dark:border-blue-500/20 text-[8px] px-1 rounded">ผู้ใช้ใหม่</span>` : `<span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 text-[8px] px-1 rounded border border-gray-200 dark:border-slate-700">ทั่วไป</span>`);
+            let limitTxt = p.maxLimit ? ` / ${p.maxLimit}` : ''; let expTxt = isExpired ? '<span class="text-red-500 ml-2">(หมดเวลา)</span>' : (isFull ? '<span class="text-red-500 ml-2">(เต็ม)</span>' : '');
+
+            html += `<li class="py-3 flex justify-between items-center text-gray-700 dark:text-slate-200 border-b border-gray-200 dark:border-slate-800 last:border-0 px-1 ${opacityClass}">
+                <div class="flex-1 min-w-0 pr-2 text-left">
+                    <div class="flex items-center gap-1.5 mb-1 flex-wrap"><span class="font-mono bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-white font-bold px-2 py-0.5 rounded border border-gray-200 dark:border-slate-700 tracking-wide text-xs">${p.code}</span>${badge}</div>
+                    <p class="text-[10px] text-gray-400 dark:text-slate-500">ใช้ไปแล้ว <span class="text-gray-800 dark:text-white font-bold">${p.usageCount || 0}</span>${limitTxt} สิทธิ์ ${expTxt}</p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-xs font-bold text-blue-500 dark:text-[#1da1f2] mr-2">฿${p.value}</span>
+                    <button onclick="db.ref('promotions/${p.code}').update({isActive: ${p.isActive === false}})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
+                    <button onclick="viewPromoHistory('${p.code}')" class="bg-gray-50 dark:bg-slate-800 w-7 h-7 flex items-center justify-center rounded border border-gray-200 dark:border-slate-700 text-xs hover:bg-gray-100"><i class="fas fa-list"></i></button>
+                    <button onclick="showCustomConfirm('ยืนยันลบโค้ด?', 'ลบโค้ดนี้ถาวรแล้วจะไม่สามารถกู้คืนได้', () => { db.ref('promotions/${p.code}').remove(); }, 'ลบเลย', 'red')" class="text-red-500 bg-red-100 dark:bg-red-950/20 w-7 h-7 flex items-center justify-center rounded border border-red-200 dark:border-red-500/20 text-xs hover:bg-red-600 hover:text-white"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </li>`;
+        }
+        listContainer.innerHTML = html || `<p class="text-center text-gray-400 text-xs py-6">ไม่มีข้อมูลคูปองในหมวดหมู่นี้</p>`;
+    }
+
+    function exportRandomCodes() {
+        let csv = "\uFEFFรหัสโค้ดแจก,มูลค่า(บาท),สถานะการใช้\n"; let found = false;
+        for(let key in allPromoData) { let p = allPromoData[key]; if(p.isSingleUse) { let stat = p.usageCount >= 1 ? 'ใช้แล้ว' : 'ยังไม่ถูกใช้'; csv += `"${p.code}","${p.value}","${stat}"\n`; found = true; } }
+        if(!found) return showCustomAlert("ข้อผิดพลาด", "ไม่มีโค้ดสุ่มในระบบ", "error"); triggerDownload(csv, `F1_Coupons_PrintSheet_${Date.now()}.csv`);
+    }
+
+    function triggerDownload(content, filename) {
+        let blob = new Blob([content], { type: 'text/csv;charset=utf-8;' }); let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob); link.setAttribute("download", filename);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    // ================= CMS BANNERS & NEWS =================
+    let cmsFile = document.getElementById('cms-banner-file');
+    if(cmsFile) {
+        cmsFile.addEventListener('change', function(e) {
+            let files = e.target.files;
+            if (files && files.length > 0) {
+                let file = files[0];
+                document.getElementById('imageToCrop').src = URL.createObjectURL(file);
+                document.getElementById('cropArea').classList.remove('hidden');
+                if (cropper) cropper.destroy();
+                let pos = document.getElementById('cms-banner-position').value;
+                let aspect = (16 / 9); if (pos === 'bottom') aspect = (600 / 120); if (pos === 'popup') aspect = (4 / 5);
+                cropper = new Cropper(document.getElementById('imageToCrop'), { aspectRatio: aspect, viewMode: 1, autoCropArea: 1 });
+                let popSet = document.getElementById('popup-only-settings'); if(popSet) popSet.classList.toggle('hidden', pos !== 'popup');
+            }
+        });
+    }
+
+    window.updateCropperRatio = function() {
+        if (!cropper) return;
+        let pos = document.getElementById('cms-banner-position').value; let aspect = (16 / 9);
+        if (pos === 'bottom') aspect = (600 / 120); if (pos === 'popup') aspect = (4 / 5); cropper.setAspectRatio(aspect);
+        let popSet = document.getElementById('popup-only-settings'); if(popSet) popSet.classList.toggle('hidden', pos !== 'popup');
+    }
+
+    function cancelCrop() {
+        let area = document.getElementById('cropArea'); if(area) area.classList.add('hidden');
+        let f = document.getElementById('cms-banner-file'); if(f) f.value = '';
+        let lnk = document.getElementById('cms-banner-link'); if(lnk) lnk.value = '';
+        let s = document.getElementById('cms-banner-start'); if(s) s.value = '';
+        let e = document.getElementById('cms-banner-end'); if(e) e.value = '';
+        if (cropper) { cropper.destroy(); cropper = null; }
+    }
+
+    function saveCroppedImage() {
+        if (!cropper) return; let pos = document.getElementById('cms-banner-position').value;
+        let cropOptions = { width: 600 }; if (pos === 'bottom') cropOptions = { width: 600, height: 120 }; if (pos === 'popup') cropOptions = { width: 480, height: 600 }; 
+        let canvas = cropper.getCroppedCanvas(cropOptions); let base64 = canvas.toDataURL('image/jpeg', 0.6);
+        let linkUrl = document.getElementById('cms-banner-link').value.trim(); let startTime = document.getElementById('cms-banner-start').value; let endTime = document.getElementById('cms-banner-end').value;
+        let path = 'config/banners'; if (pos === 'bottom') path = 'config/bottom_banners'; if (pos === 'popup') path = 'config/popup_ad';
+
+        let duration = document.getElementById('cms-banner-duration') ? parseInt(document.getElementById('cms-banner-duration').value) : null;
+        let snoozeDays = document.getElementById('cms-banner-snooze') ? parseInt(document.getElementById('cms-banner-snooze').value) : 14; if(isNaN(snoozeDays)) snoozeDays = 14; 
+        let targetPages = []; document.querySelectorAll('.cms-banner-pages:checked').forEach(cb => targetPages.push(cb.value));
+
+        let dataToSave = { imageUrl: base64, linkUrl: linkUrl, startTime: startTime || null, endTime: endTime || null, timestamp: firebase.database.ServerValue.TIMESTAMP };
+        if (pos === 'popup') { dataToSave.duration = duration || 0; dataToSave.snoozeDays = snoozeDays; dataToSave.targetPages = targetPages.length > 0 ? targetPages : ['home']; }
+
+        db.ref(path).push(dataToSave).then(() => {
+            showCustomAlert("สำเร็จ", 'อัปเดตสไลด์ภาพและตั้งเงื่อนไขโฆษณาเรียบร้อย!', 'success'); 
+            if(document.getElementById('cms-banner-duration')) document.getElementById('cms-banner-duration').value = '';
+            if(document.getElementById('cms-banner-snooze')) document.getElementById('cms-banner-snooze').value = '14';
+            cancelCrop();
+        });
+    }
+
+    let isFetchingBanners = false;
+    function fetchAllBanners() {
+        if(isFetchingBanners) return; isFetchingBanners = true;
+        Promise.all([ db.ref('config/banners').once('value'), db.ref('config/bottom_banners').once('value'), db.ref('config/popup_ad').once('value') ]).then(([snap1, snap2, snap3]) => {
+            isFetchingBanners = false; let listContainer = document.getElementById('admin-banners-list'); if(!listContainer) return; listContainer.innerHTML = '';
+            const drawItem = (snap, lbl, path) => {
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        let b = child.val();
+                        let timer = (b.startTime || b.endTime) ? `<p class="text-[9px] text-yellow-600 dark:text-yellow-500">⏱ ${b.startTime ? b.startTime.replace('T',' '):'เริ่ม'} ถึง ${b.endTime ? b.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-blue-500 dark:text-[#1da1f2]">✅ แสดงผล 24 ชม.</p>`;
+                        let extraRules = '';
+                        if (path === 'config/popup_ad') {
+                            let pagesMap = { 'home': 'หน้าแรก', 'tracking': 'หน้าติดตามงาน' };
+                            let displayPages = b.targetPages ? b.targetPages.map(p => pagesMap[p] || p).join(', ') : 'หน้าแรก';
+                            let displayDur = b.duration ? `${b.duration} วิ` : 'รอปิดเอง'; let displaySnooze = b.snoozeDays !== undefined ? b.snoozeDays : 14;
+                            extraRules = `<p class="text-[9px] text-blue-500 dark:text-blue-400 font-bold mt-0.5">📌 โชว์ที่: ${displayPages} (${displayDur}) | ซ่อน: ${displaySnooze} วัน</p>`;
+                        }
+                        listContainer.innerHTML += `<div class="flex gap-3 bg-gray-50 dark:bg-slate-800/40 p-2 rounded-xl border border-gray-200 dark:border-slate-700 items-center shrink-0 animate-fade-in text-left">
+                            <div class="w-20 h-12 bg-black rounded border border-gray-300 dark:border-slate-600 overflow-hidden shrink-0"><img src="${b.imageUrl}" class="w-full h-full object-contain"></div>
+                            <div class="flex-1 min-w-0 text-left"><p class="text-xs font-bold text-gray-800 dark:text-white truncate">ตำแหน่ง: ${lbl}</p>${timer}${extraRules}</div>
+                            <button onclick="showCustomConfirm('ลบแบนเนอร์?', 'ต้องการลบรูปภาพนี้ออกจากระบบใช่หรือไม่?', () => { db.ref('${path}/${child.key}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 dark:bg-red-950/20 w-8 h-8 rounded-lg border border-red-200 dark:border-red-500/20 text-sm flex items-center justify-center shrink-0 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
+                        </div>`;
+                    });
+                }
+            };
+            drawItem(snap1, 'บน (16:9)', 'config/banners'); drawItem(snap2, 'ล่าง (Slim)', 'config/bottom_banners'); drawItem(snap3, '💥 โฆษณาคั่นป๊อปอัป (เปิดแอป)', 'config/popup_ad');
+            if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">ไม่มีรูปแบนเนอร์ในระบบ</p>';
+        });
+    }
+
+    db.ref('config/banners').on('value', fetchAllBanners); db.ref('config/bottom_banners').on('value', fetchAllBanners); db.ref('config/popup_ad').on('value', fetchAllBanners);
+
+    function addNewsContent() {
+        let title = document.getElementById('cms-news-title').value.trim(); let content = document.getElementById('cms-news-content').value.trim();
+        let isPromo = document.getElementById('cms-news-ispromo').checked; let startTime = document.getElementById('cms-news-start').value; let endTime = document.getElementById('cms-news-end').value;
+        let fileInput = document.getElementById('cms-news-file');
+        if(!title || !content) return showCustomAlert('ข้อมูลไม่ครบ', 'ใส่หัวข้อและเนื้อความข่าวสารด้วยครับ', 'error');
+        let file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
+
+        if (file) { let reader = new FileReader(); reader.onload = function(e) { saveNewsToDb(title, content, isPromo, startTime, endTime, e.target.result); }; reader.readAsDataURL(file); } 
+        else { saveNewsToDb(title, content, isPromo, startTime, endTime, null); }
+    }
+
+    function saveNewsToDb(title, content, isPromo, startTime, endTime, imageUrl) {
+        db.ref('news_promotions').push({ title, content, isPromo, imageUrl: imageUrl || null, startTime: startTime || null, endTime: endTime || null, timestamp: firebase.database.ServerValue.TIMESTAMP, dateStr: new Date().toLocaleDateString('th-TH',{day:'numeric', month:'short', year:'numeric'}) }).then(() => {
+            showCustomAlert('สำเร็จ', 'กระจายข่าวสารขึ้นหน้าแอปเรียบร้อย!', 'success'); 
+            document.getElementById('cms-news-title').value=''; document.getElementById('cms-news-content').value=''; document.getElementById('cms-news-ispromo').checked=false; document.getElementById('cms-news-start').value=''; document.getElementById('cms-news-end').value='';
+            if(document.getElementById('cms-news-file')) document.getElementById('cms-news-file').value = ''; closeModal('modalAddNews');
+        });
+    }
+
+    db.ref('news_promotions').on('value', snap => {
+        let container = document.getElementById('admin-news-list'); if(!container) return; let html = '';
+        if(snap.exists()) {
+            let items = []; snap.forEach(child => { items.push({ id: child.key, ...child.val() }); }); items.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+            items.forEach(n => { 
+                let timer = (n.startTime || n.endTime) ? `<p class="text-[9px] text-yellow-600 dark:text-yellow-500 mt-1">⏱ ${n.startTime ? n.startTime.replace('T',' '):'เริ่ม'} - ${n.endTime ? n.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-gray-400 dark:text-slate-500 mt-1">แสดงผลถาวรจนกว่าจะลบ</p>`;
+                let imgHtml = n.imageUrl ? `<div class="w-12 h-12 bg-black rounded-lg overflow-hidden shrink-0 mt-2"><img src="${n.imageUrl}" class="w-full h-full object-cover"></div>` : '';
+                html += `<div class="flex justify-between items-start bg-gray-50 dark:bg-slate-800/40 p-3 border border-gray-200 dark:border-slate-700 rounded-xl mb-2 animate-fade-in text-left"><div class="min-w-0 flex-1 text-left"><div class="flex gap-2 text-left">${imgHtml}<div class="flex-1 min-w-0 text-left"><p class="text-sm font-bold text-gray-800 dark:text-white truncate text-left">${n.title} ${n.isPromo ? '<span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded ml-1">PROMO</span>':''}</p>${timer}</div></div></div><button onclick="showCustomConfirm('ลบข่าวนี้?', 'ยืนยันลบโพสต์ข่าวนี้ออกจากบอร์ด', () => { db.ref('news_promotions/${n.id}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 dark:bg-red-950/20 w-8 h-8 rounded-lg border border-red-200 dark:border-red-500/20 text-sm shrink-0 flex items-center justify-center ml-2 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button></div>`;
+            });
+        }
+        container.innerHTML = html || '<p class="text-gray-400 text-xs text-center py-4">บอร์ดประกาศว่างเปล่า</p>';
+    });
+
+    // ================= ระบบคุมคิวและคนขับ =================
+    windowContext.activeNodeDrivers = []; windowContext.singleNodeDriver = [];
+    
+    function mergeAdminDrivers() {
+        let count = 0; let modalHtml = ''; let merged = [...windowContext.activeNodeDrivers, ...windowContext.singleNodeDriver];
+        let unique = []; let pins = new Set(); for(let d of merged) { if(!pins.has(d.pin)) { pins.add(d.pin); unique.push(d); } }
+        windowContext.onlineDrivers = unique;
+        
+        unique.forEach(d => {
+            count++; let name = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงานประจำฟลีท";
+            let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="text-blue-500 bg-blue-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-xs hover:text-blue-600 transition"><i class="fas fa-phone-alt"></i></a>` : '';
+            modalHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 last:border-0 hover:bg-gray-100 dark:hover:bg-slate-800/30 transition text-left"><td class="py-3 px-2 font-bold text-gray-800 dark:text-white cursor-pointer hover:text-blue-500 transition" onclick="showDriverDetails('${d.pin}')"><u>${name} (PIN: ${d.pin})</u></td><td class="py-3 px-2 text-right flex items-center justify-end gap-2 text-gray-500 dark:text-slate-400">${d.driverPhone || '-'} ${callBtn}</td></tr>`;
+        });
+        
+        let cEl = document.getElementById('stat-online-count'); if(cEl) cEl.innerText = count + " คน";
+        let mList = document.getElementById('modal-online-list'); if(mList) mList.innerHTML = modalHtml || '<tr><td colspan="2" class="py-6 text-center text-gray-400">ไม่มีคนขับสแตนบายออนไลน์ในขณะนี้</td></tr>';
+    }
+
+    db.ref('active_drivers').on('value', snap => {
+        windowContext.activeNodeDrivers = [];
+        if(snap.exists()) { snap.forEach(child => { let d = child.val(); if(d.status === "ออนไลน์") windowContext.activeNodeDrivers.push(d); }); }
+        mergeAdminDrivers();
+    });
+
+    db.ref('driver').on('value', snap => {
+        windowContext.singleNodeDriver = [];
+        let d = snap.val(); if(d && d.status === "ออนไลน์" && d.lat) windowContext.singleNodeDriver.push(d);
+        mergeAdminDrivers();
+    });
+
+    function openAssignModal(jobId) {
+        window.activeJobToAssign = jobId; let listContainer = document.getElementById('assign-driver-list'); listContainer.innerHTML = '';
+        if(windowContext.onlineDrivers && windowContext.onlineDrivers.length > 0) {
+            windowContext.onlineDrivers.forEach(d => {
+                let dName = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงาน"; let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="w-10 h-10 bg-blue-50 dark:bg-slate-800 text-[#1da1f2] flex items-center justify-center rounded-xl border border-blue-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition"><i class="fas fa-phone-alt"></i></a>` : '';
+                listContainer.innerHTML += `<div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl mb-2 text-left"><div class="text-left"><p class="font-bold text-gray-800 dark:text-white text-sm">${dName}</p><p class="text-[10px] text-gray-400 dark:text-slate-500">PIN: ${d.pin}</p></div><div class="flex gap-2">${callBtn}<button onclick="confirmAssignDriver('${d.pin}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition">ส่งงาน</button></div></div>`;
+            });
+        } else { listContainer.innerHTML = '<p class="text-center text-gray-400 py-4 text-sm">ยังไม่มีคนขับออนไลน์ในระบบ</p>'; }
+        openModal('modalAssignDriver');
+    }
+
+    function confirmAssignDriver(driverPin) {
+        if(!window.activeJobToAssign || !driverPin) return;
+        showCustomConfirm(`ยิงงานให้รหัส ${driverPin}?`, `ยืนยันการจ่ายงานใบนี้เจาะจงให้คนขับรหัส [${driverPin}] ใช่หรือไม่?`, () => {
+            db.ref('bookings/' + window.activeJobToAssign).update({ assignedDriver: driverPin }).then(() => { showCustomAlert("ส่งงานสำเร็จ", `ยิงออเดอร์งานไปให้คนขับรหัส ${driverPin} เรียบร้อยแล้ว!`, "success"); closeModal('modalAssignDriver'); });
+        });
+    }
+
+    db.ref('bookings').on('value', snap => {
+        let countPending = 0; let modalPendingHtml = ''; 
+        let badgeMenu = document.getElementById('menu-badge-pending'); 
+        let headerAlert = document.getElementById('header-alert-badge');
+        
+        if(snap.exists()) {
+            let allBookings = snap.val();
+            for (let key in allBookings) {
+                let j = allBookings[key]; 
+                if (j.status !== "รอผู้ขับขี่ตอบรับ") continue; 
+                
+                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-500 dark:text-[#1da1f2] text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-blue-500 dark:text-[#1da1f2] text-base" title="รถยนต์"></i>';
+                let statusColor = "text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-500/10 border-yellow-200 dark:border-yellow-500/20"; 
+                let priceDisplay = `฿${j.price}`;
+                
+                if(j.promoCode) priceDisplay += `<br><span class="text-[10px] text-blue-600 dark:text-[#1da1f2] bg-blue-50 dark:bg-blue-900/30 px-1 rounded border border-blue-200 dark:border-blue-500/30 mt-1 inline-block">โค้ด ${j.promoCode}</span>`;
+                countPending++;
+                
+                let dispatchControl = dispatchMode === 'auto' ? `<span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-500/30 px-2 py-1 rounded-lg"><i class="fas fa-robot"></i> จัดการออโต้คิว</span>` : `<button onclick="openAssignModal('${key}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition">เลือกคนขับ</button>`;
+                
+                if(j.assignedDriver && dispatchMode === 'manual') { dispatchControl = `<div class="text-[10px] text-gray-500 dark:text-slate-400">ยิงงานให้ PIN <b class="text-blue-600 dark:text-[#1da1f2] text-xs ml-1">#${j.assignedDriver}</b><br><button onclick="db.ref('bookings/${key}/assignedDriver').remove()" class="text-red-500 underline mt-1 hover:text-red-600">ดึงงานกลับมาจ่ายใหม่</button></div>`; }
+                
+                let callCusBtn = j.phone ? `<a href="tel:${j.phone}" class="ml-2 text-blue-600 dark:text-[#1da1f2] bg-blue-50 dark:bg-slate-800 p-1.5 rounded-lg hover:text-blue-700 transition"><i class="fas fa-phone-alt"></i></a>` : '';
+
+                modalPendingHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/40 transition"><td class="py-3 px-2 font-bold text-gray-800 dark:text-white text-left flex flex-col items-start gap-1"><div class="flex items-center">${srvIcon} <span class="ml-2">${j.name || 'ลูกค้า'}</span> ${callCusBtn}</div><span class="text-[9px] ${statusColor} px-1.5 py-0.5 rounded border inline-block mt-0.5">${j.status}</span></td><td class="py-3 px-2 text-[11px] text-gray-500 dark:text-slate-400 max-w-[200px] truncate leading-relaxed text-left">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td><td class="py-3 px-2 font-black text-blue-600 dark:text-[#1da1f2] text-sm text-left"> ${priceDisplay}</td><td class="py-3 px-2 text-right">${dispatchControl}</td></tr>`;
+                
+                if(dispatchMode === 'auto' && j.status === "รอผู้ขับขี่ตอบรับ" && !j.assignedDriver) { 
+                    if(typeof executeAutoDispatchBalancing === 'function') executeAutoDispatchBalancing(key, j); 
+                }
+            }
+        }
+        
+        let pCountEl = document.getElementById('stat-pending-count'); 
+        if(pCountEl) pCountEl.innerText = countPending + " งาน";
+        
+        let mpList = document.getElementById('modal-pending-list'); 
+        if(mpList) {
+            if(countPending > 0) {
+                mpList.innerHTML = modalPendingHtml;
+            } else {
+                mpList.innerHTML = '<tr><td colspan="4" class="py-6 text-center text-gray-400">ไม่มีงานเรียกรถค้างคิวในขณะนี้</td></tr>';
+            }
+        }
+
+        if(badgeMenu && headerAlert) {
+            if(countPending > 0) { 
+                badgeMenu.innerText = countPending + " งานรอ"; badgeMenu.classList.remove('hidden'); headerAlert.classList.remove('hidden'); 
+            } else { 
+                badgeMenu.classList.add('hidden'); headerAlert.classList.add('hidden'); 
+            }
+        }
+    });
+
+    db.ref('blacklist').on('value', snap => {
+        let list = snap.val(); let count = 0; let mainHtml = ''; let modalHtml = '';
+        if(list) {
+            for(let k in list) { count++; let b = list[k];
+                mainHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 text-left"><td class="py-3 px-2 font-bold text-red-500 text-left">${b.phone}</td><td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400 text-left">${b.reason}</td><td class="py-3 px-2 text-xs text-left">${b.timestamp}</td><td class="py-3 px-2 text-right"><button onclick="removeFormBlacklist('${b.phone}')" class="bg-red-100 dark:bg-red-950/20 text-red-500 px-3 py-1.5 rounded-xl text-xs font-bold border border-red-200 dark:border-red-500/20 hover:bg-red-600 hover:text-white transition">ปลดแบน</button></td></tr>`;
+                modalHtml += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 text-left"><td class="py-3 px-2 font-bold text-red-500 text-left">${b.phone}</td><td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400 text-left">${b.reason}</td><td class="py-3 px-2 text-right text-xs text-gray-400">${b.timestamp.split(' ')[0]}</td></tr>`;
+            }
+        }
+        let tMain = document.getElementById('blacklist-table-body'); if(tMain) tMain.innerHTML = mainHtml || '<tr><td colspan="4" class="py-6 text-center text-gray-400">ทำเนียบบัญชีดำว่างเปล่า</td></tr>';
+    });
 
     // ================= 🌟 4. ระบบจัดการประเภทรถแบบไดนามิก =================
-    window.systemVehicleTypes = []; 
-
     db.ref('system_settings/vehicle_types').on('value', snap => {
         let container = document.getElementById('vehicle-types-container');
         let filterSelect = document.getElementById('map-filter-vehicle');
         let questVehContainer = document.getElementById('quest-target-vehicle-container'); 
         let filterQuestVeh = document.getElementById('filter-quest-vehicle'); 
         
-        let html = ''; let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; let questVehHtml = ''; let fQvHtml = '<option value="all">รถ: ทุกประเภท</option>';
+        let html = ''; 
+        let filterHtml = '<option value="all">🏷️ รถทุกประเภท</option>'; 
+        let questVehHtml = ''; 
+        let fQvHtml = '<option value="all">รถ: ทุกประเภท</option>';
+        
         window.systemVehicleTypes = []; 
 
         if(snap.exists()) {
             snap.forEach(child => {
                 let id = child.key; let v = child.val();
                 let vData = encodeURIComponent(JSON.stringify({id: id, ...v}));
+                
                 window.systemVehicleTypes.push({ id: id, name: v.name, icon: v.icon, forceOnline: v.forceOnline || false });
 
                 html += `
@@ -1394,6 +1902,7 @@
                 
                 filterHtml += `<option value="${id}">${v.name}</option>`;
                 fQvHtml += `<option value="${id}">🚗 ${v.name}</option>`;
+                
                 questVehHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${id}" class="quest-target-vehicle w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> ${v.name}</label>`;
             });
         }
@@ -1411,12 +1920,14 @@
     };
 
     window.renderDashboardVehicleToggles = function() {
-        let container = document.getElementById('dashboard-vehicle-toggles'); if(!container) return;
+        let container = document.getElementById('dashboard-vehicle-toggles');
+        if(!container) return;
         let html = '';
         (window.systemVehicleTypes || []).forEach(v => {
             let total = 0; let online = 0;
             for (let pin in allProfiles) {
-                let p = allProfiles[pin]; let hasThisVehicle = false;
+                let p = allProfiles[pin];
+                let hasThisVehicle = false;
                 if (p.vehicles && Object.values(p.vehicles).some(veh => veh.serviceType === v.id)) { hasThisVehicle = true; } 
                 else if (!p.vehicles && (p.serviceType || 'car') === v.id) { hasThisVehicle = true; }
                 if (hasThisVehicle) {
@@ -1425,7 +1936,8 @@
                     if (isOnline) online++;
                 }
             }
-            let isForced = v.forceOnline === true; let badgeColor = online > 0 ? 'text-[#1da1f2]' : 'text-gray-400 dark:text-slate-500';
+            let isForced = v.forceOnline === true;
+            let badgeColor = online > 0 ? 'text-[#1da1f2]' : 'text-gray-400 dark:text-slate-500';
             html += `
             <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
                 <div class="flex items-center gap-3">
@@ -1443,44 +1955,193 @@
         });
         container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-2">กำลังโหลดข้อมูลรถ...</p>';
     }
+    db.ref('active_drivers').on('value', () => { setTimeout(() => { if(typeof renderDashboardVehicleToggles === 'function') renderDashboardVehicleToggles(); }, 500); });
 
-    // ================= ระบบจัดการคนขับและตารางหลัก =================
+    window.openManageVehicleModal = function(encodedData = null) {
+        if(encodedData) {
+            let v = JSON.parse(decodeURIComponent(encodedData));
+            document.getElementById('vehicle-modal-title').innerHTML = `<i class="fas fa-edit"></i> แก้ไข: ${v.name}`;
+            document.getElementById('veh-id').value = v.id;
+            document.getElementById('veh-key').value = v.id; document.getElementById('veh-key').disabled = true; document.getElementById('veh-key').classList.add('opacity-50');
+            document.getElementById('veh-name').value = v.name; document.getElementById('veh-icon').value = v.icon || 'fa-car';
+            document.getElementById('veh-base').value = v.baseFare; document.getElementById('veh-km').value = v.kmRate; 
+            document.getElementById('veh-pick').value = v.pickupRate || 0;
+            document.getElementById('veh-mock-dist').value = v.mockDistance || 2;
+            document.getElementById('veh-algo-type').value = v.algoType || 'radius_cap';
+            document.getElementById('veh-algo-param').value = v.algoParam || 12;
+        } else {
+            document.getElementById('vehicle-modal-title').innerHTML = `<i class="fas fa-plus"></i> เพิ่มประเภทรถใหม่`;
+            document.getElementById('veh-id').value = '';
+            document.getElementById('veh-key').value = ''; document.getElementById('veh-key').disabled = false; document.getElementById('veh-key').classList.remove('opacity-50');
+            document.getElementById('veh-name').value = ''; document.getElementById('veh-icon').value = 'fa-car-side';
+            document.getElementById('veh-base').value = ''; document.getElementById('veh-km').value = ''; 
+            document.getElementById('veh-pick').value = ''; document.getElementById('veh-mock-dist').value = '2';
+            document.getElementById('veh-algo-type').value = 'radius_cap'; document.getElementById('veh-algo-param').value = '12';
+        }
+        let algoTypeEl = document.getElementById('veh-algo-type');
+        algoTypeEl.onchange = function() {
+            let lbl = document.getElementById('veh-algo-label');
+            if(this.value === 'radius_cap') lbl.innerText = 'รัศมีไม่เกิน (กม.)'; else if(this.value === 'percentage_cap') lbl.innerText = 'แพงสุดไม่เกิน (%)'; else lbl.innerText = 'ไม่ต้องระบุ';
+            window.updatePricePreview();
+        };
+        algoTypeEl.dispatchEvent(new Event('change')); openModal('modalManageVehicle');
+    }
+
+    window.updatePricePreview = function() {
+        let base = parseFloat(document.getElementById('veh-base').value) || 0; let km = parseFloat(document.getElementById('veh-km').value) || 0; let pick = parseFloat(document.getElementById('veh-pick').value) || 0; let aType = document.getElementById('veh-algo-type').value; let aParam = parseFloat(document.getElementById('veh-algo-param').value) || 0;
+        let baseRidePrice = base + (10 * km); let rawMinPrice = baseRidePrice + (2 * pick); let rawMaxPrice = baseRidePrice + (15 * pick);
+        if (aType === 'radius_cap') { if (15 > aParam) rawMaxPrice = baseRidePrice + (aParam * pick); } else if (aType === 'percentage_cap') { let maxLimit = rawMinPrice * (1 + (aParam / 100)); if (rawMaxPrice > maxLimit) rawMaxPrice = maxLimit; }
+        let minPrice = Math.floor(rawMinPrice / 10) * 10; let maxPrice = Math.ceil(rawMaxPrice / 10) * 10;
+        if(minPrice < base) minPrice = base; if(maxPrice <= minPrice) maxPrice = minPrice + 10;
+        document.getElementById('preview-price-result').innerText = `~฿${minPrice} - ${maxPrice}`;
+    }
+
+    window.saveVehicleData = function() {
+        let id = document.getElementById('veh-id').value; let key = document.getElementById('veh-key').value.trim().toLowerCase(); let name = document.getElementById('veh-name').value.trim();
+        let icon = document.getElementById('veh-icon').value.trim(); let base = parseInt(document.getElementById('veh-base').value); let km = parseInt(document.getElementById('veh-km').value); 
+        let pick = parseInt(document.getElementById('veh-pick').value) || 0; let mockDist = parseFloat(document.getElementById('veh-mock-dist').value) || 2; 
+        let aType = document.getElementById('veh-algo-type').value; let aParam = parseFloat(document.getElementById('veh-algo-param').value) || 0;
+        if(!key || !name || isNaN(base) || isNaN(km)) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกรหัสชื่อและราคาให้ครบถ้วน', 'error');
+        let targetId = id ? id : key; 
+        db.ref('system_settings/vehicle_types/' + targetId).set({ name: name, baseFare: base, kmRate: km, pickupRate: pick, mockDistance: mockDist, icon: icon, algoType: aType, algoParam: aParam }).then(() => { showCustomAlert('สำเร็จ', 'อัปเดตประเภท ราคารถ และอัลกอริทึมเรียบร้อย!', 'success'); closeModal('modalManageVehicle'); });
+    }
+
+    window.deleteVehicleType = function(id, name) { showCustomConfirm('ลบประเภทรถ?', `คุณแน่ใจหรือไม่ที่จะลบ "${name}" ออกจากระบบ? (ลูกค้าจะเรียกไม่ได้)`, () => { db.ref('system_settings/vehicle_types/' + id).remove().then(()=>{ showCustomAlert('ลบสำเร็จ', `ลบประเภทรถ ${name} ออกแล้ว`, 'success'); }); }, 'ลบทิ้ง', 'red'); }
+
+    // ================= ระบบคลังแชทลึกลับ =================
+    let allChatLogsGrouped = {};
+    db.ref('admin_chat_logs').on('value', snap => {
+        let logs = snap.val() || {}; let grouped = {};
+        for(let key in logs) {
+            let msg = logs[key]; let jid = msg.jobId; if(!jid) continue;
+            if(!grouped[jid]) { grouped[jid] = { jobId: jid, passengerName: msg.passengerName || 'ลูกค้า', driverPin: msg.driverPin || '-', driverName: msg.driverName || 'ไม่ระบุชื่อ', messages: [], lastTime: 0 }; }
+            grouped[jid].messages.push(msg); if(msg.timestamp > grouped[jid].lastTime) { grouped[jid].lastTime = msg.timestamp; }
+        }
+        allChatLogsGrouped = grouped; renderChatLogsTable();
+    });
+
+    function renderChatLogsTable() {
+        let tbody = document.getElementById('chatlogs-table-body'); if(!tbody) return;
+        let chatArr = Object.values(allChatLogsGrouped); chatArr.sort((a,b) => b.lastTime - a.lastTime); 
+        if(chatArr.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-400">ไม่มีประวัติการสนทนาในระบบ</td></tr>'; return; }
+        let html = '';
+        chatArr.forEach(chat => {
+            let dateStr = new Date(chat.lastTime).toLocaleString('th-TH'); let shortId = chat.jobId.substring(chat.jobId.length - 8).toUpperCase();
+            html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition"><td class="py-3 px-3 font-mono text-xs text-blue-500 dark:text-[#1da1f2]">#${shortId}</td><td class="py-3 px-2 font-bold text-gray-800 dark:text-white">${chat.passengerName}</td><td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400">PIN: <span class="text-blue-500 dark:text-[#1da1f2] font-bold">${chat.driverPin}</span><br>${chat.driverName}</td><td class="py-3 px-2 text-[11px] text-gray-400">${dateStr}</td><td class="py-3 px-3 text-right"><button onclick="openChatLogDetail('${chat.jobId}')" class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition shadow-sm"><i class="fas fa-eye"></i> ดูแชท</button></td></tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    window.openChatLogDetail = function(jobId) {
+        let chat = allChatLogsGrouped[jobId]; if(!chat) return;
+        let container = document.getElementById('chatlog-messages-container'); container.innerHTML = '';
+        chat.messages.sort((a,b) => a.timestamp - b.timestamp); let html = '';
+        chat.messages.forEach(msg => {
+            let isPassenger = (msg.sender === 'passenger'); let align = isPassenger ? 'justify-end' : 'justify-start'; let bg = isPassenger ? 'bg-[#1da1f2] text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-200 dark:border-slate-700'; let senderName = isPassenger ? `<span class="text-[10px] text-blue-600 dark:text-[#1da1f2] font-bold mb-1 mr-1 text-right w-full block">ผู้โดยสาร (${chat.passengerName})</span>` : `<span class="text-[10px] text-gray-500 dark:text-slate-400 font-bold mb-1 ml-1 text-left w-full block">คนขับ (${chat.driverPin})</span>`; let timeStr = new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            html += `<div class="flex w-full ${align} mb-2"><div class="flex flex-col max-w-[80%]">${senderName}<div class="${bg} px-4 py-2.5 rounded-2xl text-[13px] font-normal shadow-sm break-words w-full">${msg.text}</div><span class="text-[9px] text-gray-400 dark:text-slate-500 mt-1 ${isPassenger ? 'text-right mr-1' : 'text-left ml-1'}">${timeStr}</span></div></div>`;
+        });
+        container.innerHTML = html; openModal('modalViewChatLog'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+    }
+
+    // ================= 🌟 ระบบจัดการรูปโปรไฟล์ (เปิดหน้าต่างให้แอดมินเลื่อนปรับตำแหน่งได้เอง) =================
+    let profileCropper = null; let currentProfileInput = null; let currentPreviewId = null; let currentPlaceholderId = null;
+
+    window.processDriverImage = function(input, previewId, placeholderId) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                currentProfileInput = input; currentPreviewId = previewId; currentPlaceholderId = placeholderId;
+                document.getElementById('profileImageToCrop').src = e.target.result;
+                document.getElementById('modalCropProfile').classList.remove('hidden');
+                if (profileCropper) { profileCropper.destroy(); }
+                profileCropper = new Cropper(document.getElementById('profileImageToCrop'), { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9, dragMode: 'move', guides: true, center: true, cropBoxResizable: true });
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    window.closeProfileCropper = function() {
+        document.getElementById('modalCropProfile').classList.add('hidden');
+        if (profileCropper) { profileCropper.destroy(); profileCropper = null; }
+        if (currentProfileInput) currentProfileInput.value = ''; 
+    }
+    window.confirmProfileCrop = function() {
+        if (!profileCropper) return;
+        let canvas = profileCropper.getCroppedCanvas({ width: 256, height: 256 });
+        let base64 = canvas.toDataURL('image/jpeg', 0.8); 
+        let previewEl = document.getElementById(currentPreviewId); let placeholderEl = document.getElementById(currentPlaceholderId);
+        if (previewEl) { previewEl.src = base64; previewEl.classList.remove('hidden'); }
+        if (placeholderEl) { placeholderEl.classList.add('hidden'); }
+        if (currentProfileInput) { currentProfileInput.setAttribute('data-base64', base64); }
+        closeProfileCropper(); 
+    }
+
+    // ================= 🌟 ฟังก์ชันสำหรับกดดูรูปเต็มจอ (Image Viewer) =================
+    window.viewFullImage = function(src) {
+        if (!src || src.trim() === '') return; 
+        document.getElementById('fullImageViewerSrc').src = src;
+        document.getElementById('modalImageViewer').classList.remove('hidden');
+    }
+    window.closeImageViewer = function() {
+        document.getElementById('modalImageViewer').classList.add('hidden');
+        setTimeout(() => { document.getElementById('fullImageViewerSrc').src = ''; }, 200); 
+    }
+
+    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
+    window.getTierBadgeHtml = function(currentTier) {
+        if(currentTier === 'Silver') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40 whitespace-nowrap">Silver</span>`;
+        if(currentTier === 'Gold') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 whitespace-nowrap">Gold</span>`;
+        if(currentTier === 'Platinum') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-[#1da1f2] border border-blue-200 whitespace-nowrap">Platinum</span>`;
+        if(currentTier === 'F1 Legend') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-purple-500 to-indigo-500 text-white border border-purple-400 whitespace-nowrap">LEGEND</span>`;
+        if(currentTier === 'owner super legend') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-black text-yellow-300 border border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap">OWNER</span>`;
+        if(currentTier === 'New') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">🔰 New</span>`;
+        return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200 whitespace-nowrap">Standard</span>`;
+    }
+
     window.filterDrivers = function() {
         let keyword = document.getElementById('search-driver-input').value.toLowerCase();
         let rows = document.querySelectorAll('.driver-row-item');
-        rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(keyword) ? '' : 'none'; });
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(keyword) ? '' : 'none';
+        });
     };
 
     db.ref('drivers_profile').on('value', snap => {
-        let table = document.getElementById('all-drivers-table'); let html = ''; let count = 0; allProfiles = snap.val() || {}; 
+        let table = document.getElementById('all-drivers-table'); 
+        let html = ''; let count = 0; allProfiles = snap.val() || {}; 
         if(snap.exists() && table) {
             snap.forEach(child => { 
                 count++; let d = child.val(); let displayId = child.key; 
                 let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
-                let genderIcon = d.gender === 'female' ? `<i class="fas fa-venus text-pink-500 mx-1"></i>` : `<i class="fas fa-mars text-blue-500 mx-1"></i>`;
-                let cashVal = parseFloat(d.creditCash || d.credit || 0).toFixed(0); let bonusVal = parseFloat(d.creditBonus || 0).toFixed(0);
+                let genderIcon = d.gender === 'female' ? `<i class="fas fa-venus text-pink-500 mx-1" title="หญิง"></i>` : `<i class="fas fa-mars text-blue-500 mx-1" title="ชาย"></i>`;
+                let cashVal = parseFloat(d.creditCash || d.credit || 0).toFixed(0); 
+                let bonusVal = parseFloat(d.creditBonus || 0).toFixed(0);
                 
                 let creditDisplay = `
                     <span class="whitespace-nowrap bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-money-bill-wave"></i> ${cashVal}</span>
                     <span class="whitespace-nowrap bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-star"></i> ${bonusVal}</span>
                 `;
+
                 let profilePicHtml = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
                 
                 html += `
                 <tr class="driver-row-item cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors text-left" onclick="showDriverDetails('${displayId}')">
                     <td class="py-3 px-3 font-black text-[#1da1f2] w-28 align-middle text-left"><span class="bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 px-2 py-1 rounded-lg text-xs tracking-wider whitespace-nowrap">${displayId}</span></td>
-                    <td class="py-3 px-3 align-middle text-left"><div class="flex items-center gap-3">${profilePicHtml}<div class="flex flex-col min-w-0 text-left"><span class="font-bold text-gray-800 dark:text-white text-sm truncate max-w-[150px] sm:max-w-[250px]">${d.name} ${genderIcon}</span><div class="mt-1 flex flex-wrap items-center gap-1.5">${tierBadgeHtml.replace('class="', 'class="whitespace-nowrap ')} ${creditDisplay}</div></div></div></td>
+                    <td class="py-3 px-3 align-middle text-left"><div class="flex items-center gap-3">${profilePicHtml}<div class="flex flex-col min-w-0 text-left"><span class="font-bold text-gray-800 dark:text-white text-sm truncate max-w-[150px] sm:max-w-[250px]">${d.name} ${genderIcon}</span><div class="mt-1 flex flex-wrap items-center gap-1.5">${tierBadgeHtml} ${creditDisplay}</div></div></div></td>
                     <td class="py-3 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono align-middle whitespace-nowrap">${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-gray-400 ml-1"></i></td>
                 </tr>`;
             });
             table.innerHTML = html;
         } else if(table) { table.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-gray-400">ยังไม่มีคนขับ</td></tr>'; }
+        
         let statTotal = document.getElementById('stat-total-drivers'); if(statTotal) statTotal.innerText = count;
     });
 
     window.generateDriverId = function() {
-        let rnd = Math.floor(100000 + Math.random() * 900000); let newId = 'DRV-' + rnd;
-        return allProfiles[newId] ? window.generateDriverId() : newId;
+        let rnd = Math.floor(100000 + Math.random() * 900000); 
+        let newId = 'DRV-' + rnd;
+        if(allProfiles[newId]) return window.generateDriverId(); 
+        return newId;
     }
 
     window.openAddDriverModal = function() {
@@ -1492,6 +2153,7 @@
         if(dateDisp) dateDisp.innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
 
         document.getElementById('add-drv-vbrand').value = ''; document.getElementById('add-drv-vcolor').value = ''; document.getElementById('add-drv-vplate').value = '';
+        if(document.getElementById('add-drv-vprovince')) document.getElementById('add-drv-vprovince').value = '';
         
         let addPreview = document.getElementById('add-drv-pic-preview'); if(addPreview) { addPreview.src = ''; addPreview.classList.add('hidden'); }
         let addPlaceholder = document.getElementById('add-drv-pic-placeholder'); if(addPlaceholder) addPlaceholder.classList.remove('hidden');
@@ -1503,27 +2165,38 @@
         openModal('modalAddDriver');
     }
 
-    // ================= อัปเดตฟังก์ชันลงทะเบียน (โบนัสออโต้ + ยัดประวัติสมุดบัญชีอายุโบนัส FIFO) =================
+    // ================= อัปเดตฟังก์ชันลงทะเบียน (ดึงโบนัสออโต้ + จดบันทึกอายุโบนัส Ledger) =================
     window.saveNewDriver = function() {
-        let drvId = document.getElementById('add-drv-id').value.trim(); let pin = document.getElementById('add-drv-pin').value.trim();
-        let fname = document.getElementById('add-drv-fname').value.trim(); let lname = document.getElementById('add-drv-lname').value.trim();
-        let phone = document.getElementById('add-drv-phone').value.trim(); let gender = document.getElementById('add-drv-gender').value;
+        let drvId = document.getElementById('add-drv-id').value.trim(); 
+        let pin = document.getElementById('add-drv-pin').value.trim();
+        let fname = document.getElementById('add-drv-fname').value.trim(); 
+        let lname = document.getElementById('add-drv-lname').value.trim();
+        let phone = document.getElementById('add-drv-phone').value.trim(); 
+        let gender = document.getElementById('add-drv-gender').value;
         
         if(!drvId) return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุรหัสประจำตัว', 'error');
         if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'ตั้งรหัสผ่าน (PIN) 4 หลักด้วยครับ', 'error');
         if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อและเบอร์โทรศัพท์', 'error');
 
-        let fullName = fname + (lname ? ' ' + lname : ''); let vType = document.getElementById('add-drv-vtype').value; let vId = 'veh_' + Date.now();
+        let fullName = fname + (lname ? ' ' + lname : ''); 
+        let vType = document.getElementById('add-drv-vtype').value; 
+        let vId = 'veh_' + Date.now();
         let initialVehicles = {};
         initialVehicles[vId] = { id: vId, serviceType: vType, brand: document.getElementById('add-drv-vbrand').value.trim(), color: document.getElementById('add-drv-vcolor').value.trim(), plate: document.getElementById('add-drv-vplate').value.trim(), province: document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '', isOnline: false };
 
-        let picUpload = document.getElementById('add-drv-pic-upload'); let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
+        let picUpload = document.getElementById('add-drv-pic-upload'); 
+        let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
 
-        let startTier = "New"; let startBonus = 0; let now = Date.now(); let newLedgerEntries = [];
+        // 🌟 ลอจิกดึงโบนัสจาก Quest Center
+        let startTier = "New"; 
+        let startBonus = 0; 
+        let now = Date.now();
+        let newLedgerEntries = []; // ตัวแปรเก็บประวัติวันหมดอายุโบนัส
 
         if (typeof allQuests === 'object') {
             for (let qId in allQuests) {
-                let q = allQuests[qId]; if (!q.isActive) continue;
+                let q = allQuests[qId];
+                if (!q.isActive) continue;
                 if (q.startTime && new Date(q.startTime).getTime() > now) continue;
                 if (q.endTime && new Date(q.endTime).getTime() < now) continue;
                 
@@ -1533,12 +2206,17 @@
                         if (!q.targetVehicles || q.targetVehicles.includes('all') || q.targetVehicles.includes(vType)) {
                             let bAmt = parseInt(q.rewardBonus) || 0;
                             if (bAmt > 0) {
-                                startBonus += bAmt; let expDays = parseInt(q.rewardExpireDays) || 0;
+                                startBonus += bAmt;
+                                let expDays = parseInt(q.rewardExpireDays) || 0;
                                 let expAt = expDays > 0 ? now + (expDays * 24 * 60 * 60 * 1000) : 0;
                                 
+                                // เก็บรายละเอียดเตรียมยัดลงสมุดบัญชีโบนัส (Ledger)
                                 newLedgerEntries.push({
-                                    amount: bAmt, remaining: bAmt, expireAt: expAt,
-                                    note: `โบนัสคนขับใหม่ (แคมเปญ: ${q.name})`, timestamp: firebase.database.ServerValue.TIMESTAMP
+                                    amount: bAmt,
+                                    remaining: bAmt,
+                                    expireAt: expAt,
+                                    note: `โบนัสคนขับใหม่ (แคมเปญ: ${q.name})`,
+                                    timestamp: firebase.database.ServerValue.TIMESTAMP
                                 });
                             }
                             if (q.rewardTier && q.rewardTier !== 'none') { startTier = q.rewardTier; }
@@ -1556,68 +2234,133 @@
 
         db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
             if(startBonus > 0) {
+                // 1. บันทึกประวัติการทำรายการกระเป๋ารวม
                 db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
-                newLedgerEntries.forEach(entry => { db.ref(`bonus_ledger/${drvId}`).push(entry); });
+                
+                // 2. บันทึกรายละเอียดอายุโบนัสลงบัญชี Ledger (แก้ปัญหาที่พอกดเช็คโบนัสแล้วหน้าต่างว่างเปล่า)
+                newLedgerEntries.forEach(entry => {
+                    db.ref(`bonus_ledger/${drvId}`).push(entry);
+                });
             }
             showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เข้าระบบเรียบร้อย!`, 'success');
             closeModal('modalAddDriver');
         });
     }
-
-    window.currentDriverVehicles = {}; 
+    
+    // 🌟 ตัวแปรหน่วยความจำรถของคนขับคนปัจจุบัน (ห้ามลบเด็ดขาด)
+    window.currentDriverVehicles = {};
 
     window.showDriverDetails = function(driverId) {
-        let d = allProfiles[driverId]; if(!d) return; window.currentDriverFocus = driverId; 
-        let nameParts = (d.name || '').split(' '); let fname = nameParts[0] || ''; let lname = nameParts.slice(1).join(' ') || '';
+        let d = allProfiles[driverId]; 
+        if(!d) return; 
+        window.currentDriverFocus = driverId; 
 
-        document.getElementById('det-sys-id').value = driverId; document.getElementById('det-pin-input').value = d.pin || '';
-        document.getElementById('det-firstname').value = fname; document.getElementById('det-lastname').value = lname;
-        document.getElementById('det-phone').value = d.phone || ''; document.getElementById('det-gender').value = d.gender || 'male';
+        let nameParts = (d.name || '').split(' ');
+        let fname = nameParts[0] || '';
+        let lname = nameParts.slice(1).join(' ') || '';
+
+        document.getElementById('det-sys-id').value = driverId;
+        document.getElementById('det-pin-input').value = d.pin || '';
+        document.getElementById('det-firstname').value = fname;
+        document.getElementById('det-lastname').value = lname;
+        document.getElementById('det-phone').value = d.phone || '';
+        document.getElementById('det-gender').value = d.gender || 'male';
         
-        if (d.registeredAt) {
-            document.getElementById('det-reg-date').value = new Date(d.registeredAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-        } else { document.getElementById('det-reg-date').value = '-'; }
-
+        // 🌟 ดึงข้อมูลกระเป๋า 2 ใบมาโชว์ (อัปเดตข้อมูลเก่าให้ด้วย)
         let cash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0)).toFixed(2);
         let bonus = parseFloat(d.creditBonus || 0).toFixed(2);
         if(document.getElementById('det-cash')) document.getElementById('det-cash').value = cash;
         if(document.getElementById('det-bonus')) document.getElementById('det-bonus').value = bonus;
 
+        // ส่งข้อมูลระดับมาโชว์ที่ช่องแบบอ่านอย่างเดียว
         if(document.getElementById('det-tier-display')) {
             let t = d.tier || 'Standard';
-            if (t === 'owner super legend') t = '🚀 Owner Super Legend'; else if (t === 'F1 Legend') t = '👑 F1 Legend';
-            else if (t === 'Platinum') t = '💎 Platinum'; else if (t === 'Gold') t = '🥇 Gold';
-            else if (t === 'Silver') t = '🥈 Silver'; else t = '🥉 Standard';
+            if (t === 'owner super legend') t = '🚀 Owner Super Legend';
+            else if (t === 'F1 Legend') t = '👑 F1 Legend';
+            else if (t === 'Platinum') t = '💎 Platinum';
+            else if (t === 'Gold') t = '🥇 Gold';
+            else if (t === 'Silver') t = '🥈 Silver';
+            else t = '🥉 Standard';
             document.getElementById('det-tier-display').value = t;
         }
 
-        let editPreview = document.getElementById('edit-drv-pic-preview'); let editPlaceholder = document.getElementById('edit-drv-pic-placeholder'); let editUpload = document.getElementById('edit-drv-pic-upload');
+        let editPreview = document.getElementById('edit-drv-pic-preview');
+        let editPlaceholder = document.getElementById('edit-drv-pic-placeholder');
+        let editUpload = document.getElementById('edit-drv-pic-upload');
         if(editUpload) { editUpload.removeAttribute('data-base64'); editUpload.value = ''; }
 
         if(d.profilePic) {
             if(editPreview) { editPreview.src = d.profilePic; editPreview.classList.remove('hidden'); }
-            if(editPlaceholder) editPlaceholder.add('hidden');
+            if(editPlaceholder) editPlaceholder.classList.add('hidden');
         } else {
             if(editPreview) { editPreview.src = ''; editPreview.classList.add('hidden'); }
             if(editPlaceholder) editPlaceholder.classList.remove('hidden');
         }
 
         let vehicles = {};
-        if (d.vehicles) { vehicles = JSON.parse(JSON.stringify(d.vehicles)); } 
-        else if (d.plate) {
+        if (d.vehicles) {
+            vehicles = JSON.parse(JSON.stringify(d.vehicles)); 
+        } else if (d.plate) {
             let vId = 'veh_' + Date.now();
             vehicles[vId] = { id: vId, serviceType: d.serviceType || 'car', brand: d.brand || '', color: d.color || '', plate: d.plate || '', province: '', isOnline: false };
         }
-        window.currentDriverVehicles = vehicles; renderDriverVehicles();
+        window.currentDriverVehicles = vehicles;
+        renderDriverVehicles();
 
-        let rEl = document.getElementById('det-rating'); let cEl = document.getElementById('det-rating-count');
-        if (d.tier === 'owner super legend') { if(rEl) rEl.innerText = "100.0"; if(cEl) cEl.innerText = "(Max)"; } 
-        else if (d.tier === 'F1 Legend') { if(rEl) rEl.innerText = "10.0"; if(cEl) cEl.innerText = "(Max)"; } 
-        else {
-            if (d.ratings) { let total = 0; let count = 0; Object.values(d.ratings).forEach(r => { total += parseInt(r.score); count++; }); let avg = (total / count).toFixed(1); if(rEl) rEl.innerText = avg; if(cEl) cEl.innerText = `(${count})`; } 
-            else { if(rEl) rEl.innerText = "5.0"; if(cEl) cEl.innerText = "(0)"; }
+        let rEl = document.getElementById('det-rating'); 
+        let cEl = document.getElementById('det-rating-count');
+        
+        if (d.tier === 'owner super legend') {
+            if(rEl) rEl.innerText = "100.0"; if(cEl) cEl.innerText = "(Max)";
+        } else if (d.tier === 'F1 Legend') {
+            if(rEl) rEl.innerText = "10.0"; if(cEl) cEl.innerText = "(Max)";
+        } else {
+            if (d.ratings) {
+                let total = 0; let count = 0; Object.values(d.ratings).forEach(r => { total += parseInt(r.score); count++; });
+                let avg = (total / count).toFixed(1); if(rEl) rEl.innerText = avg; if(cEl) cEl.innerText = `(${count})`;
+            } else { 
+                if(rEl) rEl.innerText = "5.0"; if(cEl) cEl.innerText = "(0)"; 
+            }
         }
+
         openModal('pageDriverDetails');
+    }
+
+    window.closeDriverProfilePage = function() { closeModal('pageDriverDetails'); }
+
+    window.renderDriverVehicles = function() {
+        let container = document.getElementById('driver-vehicles-container');
+        let html = '';
+        for (let vId in window.currentDriverVehicles) {
+            let v = window.currentDriverVehicles[vId];
+            let selectHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-blue-500">`;
+            if (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) {
+                window.systemVehicleTypes.forEach(vt => {
+                    let sel = (v.serviceType === vt.id) ? 'selected' : ''; selectHtml += `<option value="${vt.id}" ${sel}>${vt.name}</option>`;
+                });
+            } else { selectHtml += `<option value="car">รถยนต์</option><option value="bike">มอเตอร์ไซค์</option>`; }
+            selectHtml += `</select>`;
+
+            let onlineBadge = v.isOnline ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-[#1da1f2] border border-blue-200 dark:border-blue-500/30">ออนไลน์รับงานอยู่</span>` : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200 dark:border-slate-700">ออฟไลน์</span>`;
+
+            html += `
+            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm relative transition-colors duration-300">
+                <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 w-7 h-7 rounded-lg flex items-center justify-center transition shadow-sm border border-red-100 dark:border-red-500/20"><i class="fas fa-trash-alt text-[11px]"></i></button>
+                <div class="flex justify-between items-center mb-3 pr-10">
+                    <div class="flex items-center gap-2"><i class="fas fa-car-side text-gray-400 dark:text-slate-500"></i>${onlineBadge}</div>
+                </div>
+                <div class="space-y-2">
+                    <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ประเภทรถ</label>${selectHtml}</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="Honda"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="สีขาว"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ป้ายทะเบียน</label><input type="text" id="v-plate-${vId}" value="${v.plate||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs font-bold outline-none placeholder-gray-400" placeholder="กท-1234"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จังหวัด</label><input type="text" id="v-province-${vId}" value="${v.province||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="กรุงเทพฯ"></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+        container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">ยังไม่มีรถที่ลงทะเบียน กดปุ่ม + ด้านบนเพื่อเพิ่มรถครับ</p>';
     }
 
     window.closeDriverProfilePage = function() { closeModal('pageDriverDetails'); }
@@ -1648,10 +2391,14 @@
                 </div>
             </div>`;
         }
-        container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border border-gray-300 dark:border-slate-700">ไม่มีรถที่ลงทะเบียน</p>';
+        container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">ไม่มีรถที่ลงทะเบียน</p>';
     }
 
-    window.addDriverVehicle = function() { let vId = 'veh_' + Date.now(); window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', province: '', isOnline: false }; renderDriverVehicles(); }
+    window.addDriverVehicle = function() {
+        let vId = 'veh_' + Date.now();
+        window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', province: '', isOnline: false };
+        renderDriverVehicles();
+    }
     window.removeTempVehicle = function(vId) { delete window.currentDriverVehicles[vId]; renderDriverVehicles(); }
     window.updateTempVehicle = function(vId) {
         if(!window.currentDriverVehicles[vId]) return;
@@ -1712,7 +2459,7 @@
         let elBonus = document.getElementById('wallet-stat-bonus'); if(elBonus) elBonus.innerText = '฿' + totalBonus.toLocaleString();
     }
 
-    let currentWalletTargetId = null; let currentWalletRole = 'driver'; 
+    let currentWalletRole = 'driver'; 
     window.openAdjustCreditModal = function(targetId, role = 'driver') {
         currentWalletTargetId = targetId; currentWalletRole = role;
         if(role === 'driver') {
@@ -1734,6 +2481,7 @@
     // ==========================================================
     // 🌟 ระบบจัดการกระเป๋าเงิน และบัญชีโบนัส (Bonus Ledger FIFO)
     // ==========================================================
+    
     window.toggleAdjustColors = function() {
         let wallet = document.getElementById('adj-wallet-type').value;
         let action = document.getElementById('adj-action-type').value; 
@@ -1744,6 +2492,7 @@
         if(action === 'add') el.className = "w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold focus:border-emerald-500";
         else el.className = "w-full p-2.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-xl outline-none text-sm font-bold focus:border-red-500";
 
+        // โชว์ช่องตั้งวันหมดอายุ เฉพาะตอนเติมโบนัสเท่านั้น
         if(wallet === 'bonus' && action === 'add') {
             amtCont.classList.remove('col-span-2'); amtCont.classList.add('col-span-1');
             expCont.classList.remove('hidden');
@@ -1753,30 +2502,47 @@
         }
     }
 
+    // ฟังก์ชันคำนวณและตัดโบนัสที่ใกล้หมดอายุก่อน (FIFO Logic)
     async function deductBonusFIFO(userId, amountToDeduct) {
         let snap = await db.ref(`bonus_ledger/${userId}`).once('value');
-        let ledgers = snap.val() || {}; let activeBonuses = []; let now = Date.now();
+        let ledgers = snap.val() || {};
+        let activeBonuses = [];
+        let now = Date.now();
 
+        // 1. คัดเฉพาะก้อนที่ยอดเหลือ > 0 และยังไม่หมดอายุ
         for(let key in ledgers) {
             let b = ledgers[key];
-            if(b.remaining > 0 && (b.expireAt === 0 || b.expireAt > now)) { activeBonuses.push({ key: key, ...b }); }
+            if(b.remaining > 0 && (b.expireAt === 0 || b.expireAt > now)) {
+                activeBonuses.push({ key: key, ...b });
+            }
         }
 
+        // 2. เรียงลำดับ: เอาตัวใกล้หมดอายุขึ้นก่อน (ส่วนพวก 0 คือถาวร เอาไว้ท้ายสุด)
         activeBonuses.sort((a, b) => {
-            if (a.expireAt === 0) return 1; if (b.expireAt === 0) return -1;
+            if (a.expireAt === 0) return 1;
+            if (b.expireAt === 0) return -1;
             return a.expireAt - b.expireAt;
         });
 
         let totalValid = activeBonuses.reduce((sum, b) => sum + b.remaining, 0);
-        if (totalValid < amountToDeduct) return false;
+        if (totalValid < amountToDeduct) return false; // เงินโบนัสที่ยังไม่หมดอายุ มีไม่พอให้หัก
 
-        let left = amountToDeduct; let updates = {};
+        // 3. ทยอยหักเงินจากก้อนที่เก่าสุดก่อน
+        let left = amountToDeduct;
+        let updates = {};
         for (let b of activeBonuses) {
             if (left <= 0) break;
-            if (b.remaining <= left) { left -= b.remaining; updates[`bonus_ledger/${userId}/${b.key}/remaining`] = 0; } 
-            else { updates[`bonus_ledger/${userId}/${b.key}/remaining`] = b.remaining - left; left = 0; }
+            if (b.remaining <= left) {
+                left -= b.remaining;
+                updates[`bonus_ledger/${userId}/${b.key}/remaining`] = 0;
+            } else {
+                updates[`bonus_ledger/${userId}/${b.key}/remaining`] = b.remaining - left;
+                left = 0;
+            }
         }
-        await db.ref().update(updates); return true;
+
+        await db.ref().update(updates);
+        return true;
     }
 
     window.submitCreditAdjustment = async function() {
@@ -1792,54 +2558,82 @@
 
         let path = currentWalletRole === 'driver' ? 'drivers_profile/' + currentWalletTargetId : 'passengers_profile/' + currentWalletTargetId;
         
-        let snap = await db.ref(path).once('value'); let d = snap.val() || {}; 
-        let currentCash = parseFloat(d.creditCash || d.credit || 0); let currentBonus = parseFloat(d.creditBonus || 0); 
-        let newCash = currentCash; let newBonus = currentBonus;
+        // อ่านค่ายอดเงินปัจจุบัน
+        let snap = await db.ref(path).once('value');
+        let d = snap.val() || {}; 
+        let currentCash = parseFloat(d.creditCash || d.credit || 0); 
+        let currentBonus = parseFloat(d.creditBonus || 0); 
+        let newCash = currentCash; 
+        let newBonus = currentBonus;
 
-        if (walletType === 'cash') { if (actionType === 'add') newCash += amount; else newCash -= amount; } 
-        else { 
+        if (walletType === 'cash') { 
+            if (actionType === 'add') newCash += amount; else newCash -= amount; 
+        } else { 
             if (actionType === 'add') {
                 newBonus += amount;
+                // บันทึกลงสมุดบัญชีโบนัส (Ledger)
                 let expireAt = expireDays > 0 ? Date.now() + (expireDays * 24 * 60 * 60 * 1000) : 0;
                 await db.ref(`bonus_ledger/${currentWalletTargetId}`).push({ amount: amount, remaining: amount, expireAt: expireAt, note: note, timestamp: firebase.database.ServerValue.TIMESTAMP });
             } else { 
+                // หักโบนัสแบบฉลาด (FIFO)
                 let success = await deductBonusFIFO(currentWalletTargetId, amount);
-                if (!success) { if(!confirm(`โบนัสที่ใช้งานได้มีไม่พอหัก ระบบจะหักยอดดิบให้ติดลบ ยืนยันดำเนินการต่อไหมครับ?`)) return; }
+                if (!success) {
+                    if(!confirm(`โบนัสที่ใช้งานได้มีไม่พอหัก (อาจจะหมดอายุไปแล้ว) ระบบจะหักยอดดิบให้ติดลบ ยืนยันดำเนินการต่อไหมครับ?`)) return;
+                }
                 newBonus -= amount; 
             } 
         }
             
         if (newCash < 0 || newBonus < 0) { if(!confirm(`กระเป๋าเงินจะติดลบ ยืนยันดำเนินการต่อไหมครับ?`)) return; }
             
-        let updatePayload = { creditCash: newCash, creditBonus: newBonus }; if(currentWalletRole === 'driver') updatePayload.credit = newCash;
+        let updatePayload = { creditCash: newCash, creditBonus: newBonus }; 
+        if(currentWalletRole === 'driver') updatePayload.credit = newCash;
         
         await db.ref(path).update(updatePayload);
         db.ref('wallet_transactions/' + currentWalletTargetId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: currentWalletRole, walletType, actionType, amount, note, balanceAfter: walletType === 'cash' ? newCash : newBonus, adminName: "แอดมินศูนย์" });
         
-        showCustomAlert('สำเร็จ', `ปรับปรุงยอดเงินเรียบร้อยแล้ว`, 'success'); closeAdjustCreditModal();
+        showCustomAlert('สำเร็จ', `ปรับปรุงยอดเงินเรียบร้อยแล้ว`, 'success'); 
+        closeAdjustCreditModal();
         if(currentWalletRole === 'driver') renderWalletTab(); 
     }
 
+    // ฟังก์ชันเปิดดูสมุดบัญชีโบนัส
     window.viewBonusLedger = async function(userId) {
-        let snap = await db.ref(`bonus_ledger/${userId}`).once('value'); let ledgers = snap.val() || {};
-        let listEl = document.getElementById('bonus-ledger-list'); let html = ''; let now = Date.now();
+        let snap = await db.ref(`bonus_ledger/${userId}`).once('value');
+        let ledgers = snap.val() || {};
+        let listEl = document.getElementById('bonus-ledger-list');
+        let html = '';
+        let now = Date.now();
 
         let bonuses = Object.keys(ledgers).map(k => ledgers[k]);
         bonuses.sort((a, b) => b.timestamp - a.timestamp);
 
         bonuses.forEach(b => {
-            if(b.remaining <= 0) return; let isExpired = b.expireAt > 0 && b.expireAt < now;
+            if(b.remaining <= 0) return; // ซ่อนก้อนที่ใช้หมดแล้ว
+            let isExpired = b.expireAt > 0 && b.expireAt < now;
             let dateStr = new Date(b.timestamp).toLocaleDateString('th-TH');
-            let expStr = b.expireAt > 0 ? (isExpired ? `<span class="text-red-500">หมดอายุแล้ว</span>` : `หมดอายุ: ${new Date(b.expireAt).toLocaleDateString('th-TH')}`) : "ไม่มีวันหมดอายุ";
+            
+            let expStr = "ไม่มีวันหมดอายุ";
+            if (b.expireAt > 0) {
+                if (isExpired) expStr = `<span class="text-red-500">หมดอายุแล้ว</span>`;
+                else expStr = `หมดอายุ: ${new Date(b.expireAt).toLocaleDateString('th-TH')}`;
+            }
 
+            let statusClass = isExpired ? "opacity-50 grayscale" : "";
             html += `
-            <li class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl flex justify-between items-center ${isExpired ? "opacity-50 grayscale" : ""}">
-                <div><p class="text-[11px] font-bold text-gray-800 dark:text-white">${b.note}</p><p class="text-[9px] text-gray-400 mt-1">ได้รับ: ${dateStr} | ${expStr}</p></div>
-                <div class="text-right"><p class="text-sm font-black text-yellow-500">฿${b.remaining}</p></div>
+            <li class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl flex justify-between items-center ${statusClass}">
+                <div>
+                    <p class="text-[11px] font-bold text-gray-800 dark:text-white">${b.note}</p>
+                    <p class="text-[9px] text-gray-400 mt-1">ได้รับ: ${dateStr} | ${expStr}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-black text-yellow-500">฿${b.remaining}</p>
+                </div>
             </li>`;
         });
 
-        listEl.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4">ไม่มีโบนัสคงเหลือให้ใช้งาน</p>';
+        if (!html) html = '<p class="text-center text-xs text-gray-400 py-4">ไม่มีโบนัสคงเหลือให้ใช้งาน</p>';
+        listEl.innerHTML = html;
         openModal('modalBonusLedger');
     }
     
@@ -1847,8 +2641,10 @@
     // 🌟 ระบบแจกโบนัสกลุ่มแบบไม่มีเงื่อนไข (Airdrop System)
     // ==========================================================
     window.openTierAirdropModal = function() {
-        document.getElementById('airdrop-amount').value = ''; document.getElementById('airdrop-expire-days').value = '0';
-        document.getElementById('airdrop-note').value = ''; document.getElementById('airdrop-tier-select').value = 'all';
+        document.getElementById('airdrop-amount').value = '';
+        document.getElementById('airdrop-expire-days').value = '0';
+        document.getElementById('airdrop-note').value = '';
+        document.getElementById('airdrop-tier-select').value = 'all';
         openModal('modalTierAirdrop');
     }
 
@@ -1861,43 +2657,71 @@
         if (isNaN(amount) || amount <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนเงินโบนัสด้วยครับ', 'error');
         if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกหมายเหตุหรือชื่อกิจกรรมเพื่อบันทึกประวัติด้วยครับ', 'error');
 
+        // คัดกรองรายชื่อคนขับที่ตรงกับกลุ่มระดับที่เราจะแจก
         let driversToReward = [];
         for (let drvId in allProfiles) {
-            let d = allProfiles[drvId]; let currentTier = d.tier || 'New';
-            if (targetTier === 'all' || currentTier === targetTier) { driversToReward.push({ id: drvId, currentBonus: parseFloat(d.creditBonus || 0) }); }
+            let d = allProfiles[drvId];
+            let currentTier = d.tier || 'New';
+            if (targetTier === 'all' || currentTier === targetTier) {
+                driversToReward.push({ id: drvId, currentBonus: parseFloat(d.creditBonus || 0) });
+            }
         }
 
         if (driversToReward.length === 0) return showCustomAlert('ไม่พบเป้าหมาย', 'ไม่มีคนขับในระบบที่อยู่ในกลุ่มระดับที่เลือกครับ', 'error');
+
         if (!confirm(`ยืนยันดำเนินการยิงโบนัสอัดฉีดคนละ ฿${amount} ให้คนขับกลุ่ม [${targetTier}] ทั้งหมดจำนวน ${driversToReward.length} คน พร้อมกันทันทีใช่หรือไม่?`)) return;
 
-        let now = Date.now(); let expireAt = expireDays > 0 ? now + (expireDays * 24 * 60 * 60 * 1000) : 0; let batchUpdates = {};
+        let now = Date.now();
+        let expireAt = expireDays > 0 ? now + (expireDays * 24 * 60 * 60 * 1000) : 0;
+        let batchUpdates = {};
 
+        // วนลูปสร้างคิวบันทึกข้อมูลแบบกลุ่มรอบเดียวจบ (Firebase Multi-Location Update)
         driversToReward.forEach(drv => {
             let newBonus = drv.currentBonus + amount;
+            
+            // 1. ปรับยอดเงินรวมในกระเป๋าโบนัสของโปรไฟล์คนขับ
             batchUpdates[`drivers_profile/${drv.id}/creditBonus`] = newBonus;
+            
+            // 2. หยอดประวัติธุรกรรม (Transaction Log)
             let txRef = db.ref('wallet_transactions/' + drv.id).push();
             batchUpdates[`wallet_transactions/${drv.id}/${txRef.key}`] = {
-                timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: amount,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                role: 'driver', walletType: 'bonus', actionType: 'add', amount: amount,
                 note: `อัดฉีดโบนัสกลุ่ม: ${note}`, balanceAfter: newBonus, adminName: "ผู้บริหารระบบ"
             };
+
+            // 3. ผูกเข้ากับสมุดบัญชีโบนัส (Bonus Ledger FIFO) เพื่อให้ตรวจเช็ควันหมดอายุรายก้อนได้
             let ledgerRef = db.ref(`bonus_ledger/${drv.id}`).push();
-            batchUpdates[`bonus_ledger/${drv.id}/${ledgerRef.key}`] = { amount: amount, remaining: amount, expireAt: expireAt, note: `รับโบนัสอัดฉีดกลุ่ม: ${note}`, timestamp: firebase.database.ServerValue.TIMESTAMP };
+            batchUpdates[`bonus_ledger/${drv.id}/${ledgerRef.key}`] = {
+                amount: amount, remaining: amount, expireAt: expireAt,
+                note: `รับโบนัสอัดฉีดกลุ่ม: ${note}`, timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
         });
 
+        // ยิงข้อมูลขึ้นฐานข้อมูลรอบเดียวรวด (ปลอดภัย ลื่นไหล ไม่หน่วงเว็บ)
         db.ref().update(batchUpdates).then(() => {
             showCustomAlert('แจกโบนัสกลุ่มสำเร็จ', `ระบบทำการกระจายโบนัสอัดฉีดเงิน ฿${amount} ให้คนขับจำนวน ${driversToReward.length} คน เรียบร้อยแล้วครับ! 🎉`, 'success');
-            closeModal('modalTierAirdrop'); renderWalletTab();
+            closeModal('modalTierAirdrop');
+            if (typeof renderWalletTab === 'function') renderWalletTab();
         });
     }
     
     window.openCommissionSettings = function() { showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังพัฒนา!', 'info'); }
 
-    // ================= ระบบการจัดการระดับและรายชื่อพนักงาน (Tiers Tab) =================
+    // 🌟 ระบบการจัดการระดับและรายชื่อพนักงาน (Tiers Tab)
     window.renderTiersTab = function() {
-        let lst = document.getElementById('tiers-drivers-list'); let html = '';
+        let lst = document.getElementById('tiers-drivers-list');
+        let html = '';
+
         for (let drvId in allProfiles) {
-            let d = allProfiles[drvId]; let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
-            let displayRating = d.tier === 'owner super legend' ? "100.0" : (d.tier === 'F1 Legend' ? "10.0" : parseFloat(d.rating || 5.0).toFixed(1));
+            let d = allProfiles[drvId];
+            let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
+
+            let displayRating = "5.0";
+            if (d.tier === 'owner super legend') displayRating = "100.0";
+            else if (d.tier === 'F1 Legend') displayRating = "10.0";
+            else if (d.rating) displayRating = parseFloat(d.rating).toFixed(1);
+
             let pic = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
 
             html += `
@@ -1914,13 +2738,20 @@
 
     let currentWalletDriverId = null;
     window.openAdjustTierRatingModal = function(drvId) {
-        currentWalletDriverId = drvId; let d = allProfiles[drvId]; if(!d) return;
+        currentWalletDriverId = drvId;
+        let d = allProfiles[drvId]; if(!d) return;
         document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
         document.getElementById('trm-drv-id').innerText = drvId;
         
         let cTier = d.tier || 'New';
-        document.getElementById('trm-tier-select').value = cTier; document.getElementById('trm-note').value = '';
-        document.getElementById('trm-rating-input').value = cTier === 'owner super legend' ? "100" : (cTier === 'F1 Legend' ? "10" : parseFloat(d.rating || 5.0).toFixed(1));
+        document.getElementById('trm-tier-select').value = cTier;
+        document.getElementById('trm-note').value = '';
+        
+        let currentRating = d.rating !== undefined ? d.rating : "5.0";
+        if(cTier === 'owner super legend') currentRating = "100";
+        else if(cTier === 'F1 Legend') currentRating = "10";
+        document.getElementById('trm-rating-input').value = currentRating;
+
         openModal('modalAdjustTierRating');
     }
 
@@ -1928,7 +2759,9 @@
 
     window.autoFillOverrideStars = function() {
         let tier = document.getElementById('trm-tier-select').value; let rInput = document.getElementById('trm-rating-input');
-        rInput.value = tier === 'owner super legend' ? "100" : (tier === 'F1 Legend' ? "10" : "5.0");
+        if(tier === 'owner super legend') rInput.value = "100";
+        else if(tier === 'F1 Legend') rInput.value = "10";
+        else rInput.value = "5.0";
     }
 
     window.submitTierRatingAdjustment = function() {
@@ -1942,7 +2775,7 @@
         db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: newTier, rating: newRating.toFixed(1) }).then(() => {
             db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: newTier, assignedRating: newRating.toFixed(1), reason: note, adminName: "ผู้บริหารระบบ" });
             showCustomAlert('สำเร็จ', 'ปรับเปลี่ยนระดับ Tier และคะแนนดาวเรียบร้อยแล้ว', 'success');
-            closeTierRatingModal(); renderTiersTab(); 
+            closeTierRatingModal(); if(typeof renderTiersTab === 'function') renderTiersTab(); 
         });
     }
 
@@ -1978,7 +2811,11 @@
         }
 
         filtered.sort((a, b) => b.timestamp - a.timestamp).forEach(q => {
-            let timeStr = (q.startTime || q.endTime) ? `${q.startTime ? q.startTime.replace('T',' ') : 'เริ่มแล้ว'} - ${q.endTime ? q.endTime.replace('T',' ') : 'ตลอดไป'}` : "ไม่มีวันหมดอายุ";
+            let timeStr = "ไม่มีวันหมดอายุ";
+            if (q.startTime || q.endTime) {
+                timeStr = `${q.startTime ? q.startTime.replace('T',' ') : 'เริ่มแล้ว'} - ${q.endTime ? q.endTime.replace('T',' ') : 'ตลอดไป'}`;
+            }
+
             let condArr = []; let c = q.conditions || {};
             if (c.manual) condArr.push("🏆 แอดมินพิจารณาแจก");
             else {
@@ -1990,7 +2827,8 @@
                     condArr.push(`อายุสมาชิก <b>${c.days}</b> ${unitStr}`);
                 }
             }
-            let conditionStr = condArr.length > 0 ? condArr.join(' <br><span class="text-blue-500 font-black">+</span> ') : "ไม่มีเงื่อนไขระบุ";
+            if(condArr.length === 0) condArr.push("ไม่มีเงื่อนไขระบุ");
+            let conditionStr = condArr.join(' <br><span class="text-blue-500 font-black">+</span> ');
 
             let tTiers = q.targetTiers && q.targetTiers.length > 0 ? (q.targetTiers.includes('all') ? 'ทุกระดับ' : q.targetTiers.join(', ')) : 'ทุกระดับ';
             let tVehs = q.targetVehicles && q.targetVehicles.length > 0 ? (q.targetVehicles.includes('all') ? 'ทุกประเภท' : q.targetVehicles.map(v => {
@@ -2001,18 +2839,23 @@
             if (q.rewardBonus > 0) rewardStr += `<span class="text-yellow-600 font-bold text-xs">+${q.rewardBonus} 🟡</span><br>`;
             if (q.rewardTier && q.rewardTier !== 'none') rewardStr += `<span class="text-blue-500 font-bold text-[10px]">เลื่อนเป็น ${q.rewardTier}</span>`;
 
+            let toggleClass = q.isActive ? 'text-emerald-500' : 'text-gray-300';
+            let toggleIcon = q.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
+
             html += `
             <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition border-b border-gray-100 dark:border-slate-800">
                 <td class="py-3 px-3">
                     <p class="font-bold text-gray-800 dark:text-white text-xs">${q.name}</p>
                     <p class="text-[9px] text-gray-400 mt-1">${timeStr}</p>
                 </td>
-                <td class="py-3 px-2 text-[10px] text-gray-500 dark:text-slate-400">ระดับ: <b class="text-blue-500">${tTiers}</b><br>รถ: <b>${tVehs}</b></td>
+                <td class="py-3 px-2 text-[10px] text-gray-500 dark:text-slate-400">
+                    ระดับ: <b class="text-blue-500">${tTiers}</b><br>รถ: <b>${tVehs}</b>
+                </td>
                 <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-300 leading-relaxed">${conditionStr}</td>
                 <td class="py-3 px-2 text-right">${rewardStr}</td>
                 <td class="py-3 px-3 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <button onclick="toggleQuestStatus('${q.id}', ${!q.isActive})" class="text-xl ${q.isActive ? 'text-emerald-500' : 'text-gray-300'} hover:scale-110 transition"><i class="fas ${q.isActive ? 'text-emerald-500 fa-toggle-on' : 'text-gray-300 fa-toggle-off'}"></i></button>
+                        <button onclick="toggleQuestStatus('${q.id}', ${!q.isActive})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
                         <button onclick="openQuestModal('${q.id}')" class="bg-blue-50 text-blue-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit text-[11px]"></i></button>
                         <button onclick="deleteQuest('${q.id}')" class="bg-red-50 text-red-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt text-[11px]"></i></button>
                     </div>
@@ -2022,14 +2865,26 @@
         if(lst) lst.innerHTML = html;
     }
 
-    window.toggleAllTiers = function(source) { document.querySelectorAll('.quest-target-tier').forEach(cb => cb.checked = source.checked); window.updateQuestDropdownText(); }
-    window.toggleAllVehs = function(source) { document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = source.checked); window.updateQuestDropdownText(); }
+    // 🌟 ระบบจัดการ UI สำหรับ Dropdown Checkbox แบบใหม่
+    window.toggleAllTiers = function(source) {
+        document.querySelectorAll('.quest-target-tier').forEach(cb => cb.checked = source.checked);
+        window.updateQuestDropdownText();
+    }
+    window.toggleAllVehs = function(source) {
+        document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = source.checked);
+        window.updateQuestDropdownText();
+    }
     window.updateQuestDropdownText = function() {
         let tiers = Array.from(document.querySelectorAll('.quest-target-tier:checked'));
-        document.getElementById('quest-tier-text').innerText = tiers.length > 0 ? (tiers.length === 5 ? 'ทุกระดับชั้น' : `เลือกเป้าหมายแล้ว (${tiers.length})`) : 'เลือกกลุ่มเป้าหมาย...';
+        let tText = tiers.length > 0 ? `เลือกเป้าหมายแล้ว (${tiers.length})` : 'เลือกกลุ่มเป้าหมาย...';
+        if(tiers.length === 5) tText = 'ทุกระดับชั้น';
+        document.getElementById('quest-tier-text').innerText = tText;
 
         let vehs = Array.from(document.querySelectorAll('.quest-target-vehicle:checked'));
-        document.getElementById('quest-veh-text').innerText = vehs.length > 0 ? (vehs.length === window.systemVehicleTypes.length ? 'รถทุกประเภท' : `เลือกรถแล้ว (${vehs.length})`) : 'เลือกรถ...';
+        let vText = vehs.length > 0 ? `เลือกรถแล้ว (${vehs.length})` : 'เลือกรถ...';
+        if(vehs.length === window.systemVehicleTypes.length && vehs.length > 0) vText = 'รถทุกประเภท';
+        document.getElementById('quest-veh-text').innerText = vText;
+
         window.checkQuestTierSelection();
     }
 
@@ -2037,8 +2892,9 @@
         let checkedTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
         let rewardTierSelect = document.getElementById('quest-reward-tier'); let options = rewardTierSelect.options;
 
-        if (checkedTiers.length > 1) { rewardTierSelect.value = 'none'; rewardTierSelect.disabled = true; rewardTierSelect.classList.add('opacity-50', 'cursor-not-allowed'); } 
-        else if (checkedTiers.length === 1) {
+        if (checkedTiers.length > 1) {
+            rewardTierSelect.value = 'none'; rewardTierSelect.disabled = true; rewardTierSelect.classList.add('opacity-50', 'cursor-not-allowed');
+        } else if (checkedTiers.length === 1) {
             rewardTierSelect.disabled = false; rewardTierSelect.classList.remove('opacity-50', 'cursor-not-allowed');
             let targetLvl = tierLevels[checkedTiers[0]];
             for(let i=0; i<options.length; i++) {
@@ -2053,27 +2909,46 @@
         }
     }
 
+// 🌟 ฟังก์ชันล็อก UI เมื่อเลือกเงื่อนไข "แจกคนใหม่"
     window.handleSignupConditionChange = function(checkbox) {
         let isSignup = checkbox.checked;
+
         if (isSignup) {
-            document.querySelectorAll('.quest-target-tier').forEach(cb => { if (cb.value === 'New') cb.checked = true; else { cb.checked = false; cb.disabled = true; } });
+            // 1. บังคับเลือกเป้าหมายเป็น New อย่างเดียว
+            document.querySelectorAll('.quest-target-tier').forEach(cb => {
+                if (cb.value === 'New') cb.checked = true;
+                else { cb.checked = false; cb.disabled = true; }
+            });
             window.updateQuestDropdownText();
+
+            // 2. ปิดการติ๊กเงื่อนไขอื่นๆ ทั้งหมด (เพราะเพิ่งสมัคร จะมีรอบวิ่งได้ยังไง)
             ['rides', 'star', 'days'].forEach(type => {
-                let chk = document.getElementById(`cond-${type}-check`); if(chk) { chk.checked = false; chk.disabled = true; }
-                let val = document.getElementById(`cond-${type}-val`); if(val) { val.value = ''; val.disabled = true; }
+                let chk = document.getElementById(`cond-${type}-check`);
+                if(chk) { chk.checked = false; chk.disabled = true; }
+                let val = document.getElementById(`cond-${type}-val`);
+                if(val) { val.value = ''; val.disabled = true; }
             });
             document.getElementById('cond-days-unit').disabled = true;
-            let manualChk = document.getElementById('cond-manual-check'); if(manualChk) { manualChk.checked = false; manualChk.disabled = true; }
+            
+            let manualChk = document.getElementById('cond-manual-check');
+            if(manualChk) { manualChk.checked = false; manualChk.disabled = true; }
+
         } else {
+            // ปลดล็อกทุกอย่างกลับมาเป็นปกติ
             document.querySelectorAll('.quest-target-tier').forEach(cb => cb.disabled = false);
-            ['rides', 'star', 'days', 'manual'].forEach(type => { let chk = document.getElementById(`cond-${type}-check`); if(chk) chk.disabled = false; });
+            ['rides', 'star', 'days', 'manual'].forEach(type => {
+                let chk = document.getElementById(`cond-${type}-check`);
+                if(chk) chk.disabled = false;
+            });
         }
     }
     
     window.openQuestModal = function(questId = null) {
         ['rides','star','days','signup','manual'].forEach(type => {
-            let chk = document.getElementById(`cond-${type}-check`); if(chk) { chk.checked = false; chk.disabled = false; }
-            let val = document.getElementById(`cond-${type}-val`); if(val) { val.value = ''; val.disabled = true; }
+            let chk = document.getElementById(`cond-${type}-check`); 
+            if(chk) { chk.checked = false; chk.disabled = false; }
+            let val = document.getElementById(`cond-${type}-val`); 
+            if(val) { val.value = ''; val.disabled = true; }
         });
         document.getElementById('cond-days-unit').disabled = true; document.getElementById('cond-days-unit').value = 'days';
         document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
@@ -2087,7 +2962,10 @@
             document.getElementById('quest-start').value = q.startTime || '';
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
+            
+            // 🌟 ดึงค่า "อายุโบนัส" กลับมาโชว์ตอนแก้ไขแคมเปญ
             document.getElementById('quest-reward-expire').value = q.rewardExpireDays || ''; 
+            
             document.getElementById('quest-reward-tier').value = q.rewardTier || 'none';
             document.getElementById('quest-is-active').checked = q.isActive;
 
@@ -2099,21 +2977,31 @@
             if(c.rides > 0) { document.getElementById('cond-rides-check').checked = true; document.getElementById('cond-rides-val').value = c.rides; document.getElementById('cond-rides-val').disabled = false; }
             if(c.stars > 0) { document.getElementById('cond-star-check').checked = true; document.getElementById('cond-star-val').value = c.stars; document.getElementById('cond-star-val').disabled = false; }
             if(c.days > 0) { document.getElementById('cond-days-check').checked = true; document.getElementById('cond-days-val').value = c.days; document.getElementById('cond-days-val').disabled = false; document.getElementById('cond-days-unit').disabled = false; document.getElementById('cond-days-unit').value = c.daysUnit || 'days'; }
+
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
             document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
             document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
-            document.getElementById('quest-reward-bonus').value = ''; document.getElementById('quest-reward-expire').value = ''; 
-            document.getElementById('quest-reward-tier').value = 'none'; document.getElementById('quest-is-active').checked = true;
+            document.getElementById('quest-reward-bonus').value = ''; 
+            
+            // 🌟 ล้างค่า "อายุโบนัส" เป็นช่องว่างตอนสร้างแคมเปญใหม่
+            document.getElementById('quest-reward-expire').value = ''; 
+            
+            document.getElementById('quest-reward-tier').value = 'none';
+            document.getElementById('quest-is-active').checked = true;
         }
-        window.updateQuestDropdownText(); openModal('modalAddQuest');
+        window.updateQuestDropdownText();
+        openModal('modalAddQuest');
     }
 
     window.saveQuestCampaign = function() {
         let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
+        
+        // 🌟 ดึงค่า "อายุโบนัส" จากหน้าจอ (ถ้าไม่ใส่ให้เป็น 0 คือถาวร)
         let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
+        
         let rewardTier = document.getElementById('quest-reward-tier').value;
 
         let targetTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
@@ -2136,18 +3024,21 @@
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
-            rewardBonus: rewardBonus, rewardExpireDays: rewardExpireDays,
+            rewardBonus: rewardBonus, 
+            rewardExpireDays: rewardExpireDays, // 🌟 บันทึกอายุโบนัสลงฐานข้อมูล
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
         db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
-            showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); closeModal('modalAddQuest'); 
+            showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); 
+            closeModal('modalAddQuest'); 
         });
     }
 
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
     window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
-  </script>
+
+</script>
 
   <!-- 🌟 หน้าต่างแก้ไขโปรไฟล์คนขับ (เปลี่ยนเป็น Modal ธรรมดา) -->
   <div id="pageDriverDetails" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
