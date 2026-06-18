@@ -1588,64 +1588,78 @@
 
         openModal('modalAddDriver');
     }
+// ================= ระบบดึงข้อมูลและบันทึกแคมเปญ =================
+    let currentGamification = { newActive: true, newBonus: 100 };
+    db.ref('system_settings/gamification').on('value', snap => {
+        if(snap.exists()) {
+            let g = snap.val(); currentGamification = g;
+            if(document.getElementById('camp-new-active')) {
+                document.getElementById('camp-new-active').checked = g.newActive;
+                document.getElementById('camp-new-bonus').value = g.newBonus || 0;
+                document.getElementById('camp-silver-rides').value = g.silverRides || '';
+                document.getElementById('camp-silver-bonus').value = g.silverBonus || '';
+                document.getElementById('camp-gold-rides').value = g.goldRides || '';
+                document.getElementById('camp-gold-bonus').value = g.goldBonus || '';
+                document.getElementById('camp-plat-rides').value = g.platRides || '';
+                document.getElementById('camp-plat-bonus').value = g.platBonus || '';
+                document.getElementById('camp-auto-demote').checked = g.autoDemote || false;
+            }
+        }
+    });
 
+    window.saveGamificationSettings = function() {
+        let payload = {
+            newActive: document.getElementById('camp-new-active').checked,
+            newBonus: parseInt(document.getElementById('camp-new-bonus').value) || 0,
+            silverRides: parseInt(document.getElementById('camp-silver-rides').value) || 0,
+            silverBonus: parseInt(document.getElementById('camp-silver-bonus').value) || 0,
+            goldRides: parseInt(document.getElementById('camp-gold-rides').value) || 0,
+            goldBonus: parseInt(document.getElementById('camp-gold-bonus').value) || 0,
+            platRides: parseInt(document.getElementById('camp-plat-rides').value) || 0,
+            platBonus: parseInt(document.getElementById('camp-plat-bonus').value) || 0,
+            autoDemote: document.getElementById('camp-auto-demote').checked
+        };
+        db.ref('system_settings/gamification').set(payload).then(() => {
+            showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญโบนัสและเงื่อนไขการเลื่อนระดับเรียบร้อยแล้ว', 'success');
+        });
+    }
+    // ================= อัปเดตฟังก์ชันลงทะเบียน (อิงตามแคมเปญ) =================
     window.saveNewDriver = function() {
-        let drvId = document.getElementById('add-drv-id').value;
+        let drvId = document.getElementById('add-drv-id').value.trim();
         let pin = document.getElementById('add-drv-pin').value.trim();
         let fname = document.getElementById('add-drv-fname').value.trim();
         let lname = document.getElementById('add-drv-lname').value.trim();
         let phone = document.getElementById('add-drv-phone').value.trim();
         let gender = document.getElementById('add-drv-gender').value;
-        let cashVal = parseFloat(document.getElementById('add-drv-cash').value) || 0;
-        let bonusVal = parseFloat(document.getElementById('add-drv-bonus').value) || 0;
         
-        let vType = document.getElementById('add-drv-vtype').value;
-        let vBrand = document.getElementById('add-drv-vbrand').value.trim();
-        let vColor = document.getElementById('add-drv-vcolor').value.trim();
-        let vPlate = document.getElementById('add-drv-vplate').value.trim();
-        let vProvince = document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '';
-
+        if(!drvId) return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุรหัสประจำตัว (เช่น DRV-123456)', 'error');
         if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'กรุณาตั้งรหัสผ่าน (PIN) 4 หลักสำหรับการเข้าแอปฯ ครั้งแรก', 'error');
         if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อพนักงานและเบอร์โทรศัพท์ให้ครบถ้วนก่อนครับ', 'error');
 
-        let isDuplicate = false; let dupReason = "";
-        for (let key in allProfiles) {
-            let existingUser = allProfiles[key];
-            let existingPhone = existingUser.phone || '';
-            let existingNameParts = (existingUser.name || '').split(' ');
-            let existingFname = existingNameParts[0] || '';
-            let existingLname = existingNameParts.slice(1).join(' ') || '';
-
-            if (phone && existingPhone === phone) { isDuplicate = true; dupReason = `เบอร์โทรศัพท์ ${phone} มีอยู่ในระบบแล้ว (รหัส: ${key})`; break; }
-            if (fname && lname && existingFname === fname && existingLname === lname) { isDuplicate = true; dupReason = `ชื่อ "${fname} ${lname}" มีพนักงานลงทะเบียนอยู่แล้วในระบบ (รหัส: ${key})`; break; }
-        }
-        if (isDuplicate) return showCustomAlert('ตรวจพบข้อมูลซ้ำ', dupReason, 'error');
+        // ดึงการตั้งค่าแคมเปญผู้ใช้ใหม่มาใช้งาน
+        let startTier = currentGamification.newActive ? "New" : "Standard";
+        let startBonus = currentGamification.newActive ? currentGamification.newBonus : 0;
 
         let fullName = fname + (lname ? ' ' + lname : '');
+        let vType = document.getElementById('add-drv-vtype').value;
         let vId = 'veh_' + Date.now();
         let initialVehicles = {};
-        initialVehicles[vId] = { id: vId, serviceType: vType, brand: vBrand, color: vColor, plate: vPlate, province: vProvince, isOnline: false };
+        initialVehicles[vId] = { id: vId, serviceType: vType, brand: document.getElementById('add-drv-vbrand').value.trim(), color: document.getElementById('add-drv-vcolor').value.trim(), plate: document.getElementById('add-drv-vplate').value.trim(), province: document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '', isOnline: false };
 
         let picUpload = document.getElementById('add-drv-pic-upload');
         let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
 
         let driverData = {
-            driverId: drvId,  
-            pin: pin,         
-            name: fullName,
-            phone: phone,
-            gender: gender,
-            creditCash: cashVal, // 🟢 ยอดเงินสด
-            creditBonus: bonusVal, // 🟡 ยอดโบนัส
-            tier: "Standard",
-            rating: "5.0", 
-            profilePic: profilePic,
-            vehicles: initialVehicles,
-            registeredAt: firebase.database.ServerValue.TIMESTAMP
+            driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
+            creditCash: 0, creditBonus: startBonus, tier: startTier, rating: "5.0", 
+            profilePic: profilePic, vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
 
         db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
-            showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มพนักงานรหัส ${drvId} เรียบร้อยแล้ว!\n(ให้คนขับใช้ PIN: ${pin} ในการเปิดแอปฯ)`, 'success');
+            if(startBonus > 0) {
+                db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
+            }
+            showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เรียบร้อย!\nได้รับระดับ ${startTier} และโบนัส ${startBonus} 🟡`, 'success');
             closeModal('modalAddDriver');
         });
     }
@@ -2715,16 +2729,15 @@
         if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูล</td></tr>';
     }
 
-    // ฟังก์ชันความปลอดภัย (Tier & Rating)
+    // ================= อัปเดต Modal จัดการระดับ =================
     window.openAdjustTierRatingModal = function(drvId) {
         currentWalletDriverId = drvId;
         let d = allProfiles[drvId]; if(!d) return;
         document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
         document.getElementById('trm-drv-id').innerText = drvId;
         
-        let cTier = d.tier || 'New';
-        if(cTier === 'owner super legend' || cTier === 'New') cTier = 'Standard'; // ซ่อน New และ Owner จาก Dropdown
-        document.getElementById('trm-tier-select').value = cTier;
+        // คืนอิสระการเลือกระดับ (เอาโค้ดซ่อนออก)
+        document.getElementById('trm-tier-select').value = d.tier || 'Standard';
         document.getElementById('trm-note').value = '';
         
         let currentRating = d.rating !== undefined ? d.rating : "5.0";
@@ -2733,6 +2746,14 @@
         document.getElementById('trm-rating-input').value = currentRating;
 
         openModal('modalAdjustTierRating');
+    }
+
+    window.autoFillOverrideStars = function() {
+        let tier = document.getElementById('trm-tier-select').value;
+        let rInput = document.getElementById('trm-rating-input');
+        if(tier === 'owner super legend') rInput.value = "100";
+        else if(tier === 'F1 Legend') rInput.value = "10";
+        else rInput.value = "5.0";
     }
     
     window.closeTierRatingModal = function() { closeModal('modalAdjustTierRating'); currentWalletDriverId = null; }
