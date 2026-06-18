@@ -3650,6 +3650,78 @@
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
     window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
 
+// ========================================================
+    // 🌟 ระบบสไลด์หน้าต่างเพื่อปิด (Smooth Swipe to Close)
+    // ========================================================
+    function enableSmoothSwipeToClose(modalId, closeCallback) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        
+        // จับสไลด์ที่กล่องสีขาว/ดำด้านใน (จะสมูทกว่าจับที่พื้นหลังสีดำ)
+        const contentBox = modal.querySelector('.bg-white, .dark\\:bg-slate-900') || modal;
+        let touchstartX = 0; let touchstartY = 0; let isSwiping = false;
+
+        contentBox.addEventListener('touchstart', function(event) {
+            // ไม่ดักจับถ้ากดโดน ตาราง, ช่องพิมพ์, หรือกล่องที่ตั้งให้เลื่อนได้ (slim-scroll)
+            if (event.target.closest('.overflow-x-auto') || event.target.closest('.slim-scroll') || event.target.closest('input') || event.target.closest('select') || event.target.closest('textarea') || event.target.closest('.pac-container') || event.target.closest('#historyMap') || event.target.closest('.cropper-container')) return;
+            
+            // event.stopPropagation(); // ปิดไว้ก่อน ป้องกันบั๊กกดปุ่มข้างในไม่ติด
+            touchstartX = event.touches[0].clientX; 
+            touchstartY = event.touches[0].clientY;
+            isSwiping = false; 
+            contentBox.style.transition = 'none'; 
+        }, { passive: true });
+
+        contentBox.addEventListener('touchmove', function(event) {
+            if (event.target.closest('.overflow-x-auto') || event.target.closest('.slim-scroll') || event.target.closest('input') || event.target.closest('select') || event.target.closest('textarea') || event.target.closest('.pac-container') || event.target.closest('#historyMap') || event.target.closest('.cropper-container')) return;
+            
+            let touchMoveX = event.touches[0].clientX; let touchMoveY = event.touches[0].clientY;
+            let diffX = touchMoveX - touchstartX; let diffY = Math.abs(touchMoveY - touchstartY);
+            
+            // ถ้านิ้วเลื่อนแนวนอนมากกว่าแนวตั้ง ค่อยดึงกล่องสไลด์ตาม
+            if (diffX > 10 && diffX > diffY) {
+                isSwiping = true; 
+                contentBox.style.transform = `translateX(${diffX}px)`;
+            } else if (diffY > diffX && diffY > 10) {
+                // ถ้านิ้วเลื่อนขึ้นลง ให้ยกเลิกการสไลด์
+                isSwiping = false;
+                contentBox.style.transform = 'translateX(0)';
+            }
+        }, { passive: true });
+
+        contentBox.addEventListener('touchend', function(event) {
+            if (!isSwiping) { contentBox.style.transition = ''; return; }
+            
+            let touchendX = event.changedTouches[0].clientX; 
+            let diffX = touchendX - touchstartX;
+            contentBox.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            // ถ้าลากเกิน 120px ให้ปิด Modal ทิ้ง
+            if (diffX > 120) { 
+                contentBox.style.transform = 'translateX(100%)'; 
+                setTimeout(() => { 
+                    if (typeof closeCallback === 'function') closeCallback(); 
+                    setTimeout(() => { contentBox.style.transform = ''; }, 50); 
+                }, 300);
+            } else {
+                // ถ้าลากไม่ถึง ให้เด้งกลับเข้าที่เดิม
+                contentBox.style.transform = 'translateX(0)'; 
+                setTimeout(() => { contentBox.style.transform = ''; }, 300);
+            }
+            isSwiping = false;
+        }, { passive: true });
+    }
+
+    // ========================================================
+    // 🌟 เปิดใช้งาน Swipe to Close ให้ทุก Modal แบบอัตโนมัติ
+    // ========================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        // ค้นหาทุก div ที่มี id ขึ้นต้นด้วยคำว่า modal แล้วผูกฟังก์ชันสไลด์ปิดให้เลย
+        document.querySelectorAll('div[id^="modal"]').forEach(modal => {
+            enableSmoothSwipeToClose(modal.id, () => closeModal(modal.id));
+        });
+    });
+    
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
