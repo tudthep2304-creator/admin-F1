@@ -907,19 +907,29 @@
               <div class="flex items-center gap-4">
                   <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 text-[#1da1f2] rounded-full flex items-center justify-center text-2xl border border-blue-200 dark:border-slate-700 shrink-0"><i class="fas fa-user-astronaut"></i></div>
                   <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2"><h2 class="text-lg font-black text-gray-800 dark:text-white truncate" id="pdet-name">ชื่อลูกค้า</h2><span class="bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-500 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></div>
+                      <div class="flex items-center gap-2"><h2 class="text-lg font-black text-gray-800 dark:text-white truncate" id="pdet-name">ชื่อลูกค้า</h2></div>
                       <p class="text-xs font-bold text-blue-500 dark:text-[#1da1f2] mt-0.5" id="pdet-phone">เบอร์โทร: -</p>
                       <p class="text-[10px] text-gray-500 dark:text-slate-400 font-mono mt-0.5" id="pdet-id">ID: -</p>
-                      <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-1" id="pdet-join">ใช้งานครั้งแรก: -</p>
                   </div>
               </div>
           </div>
           <div class="p-5 space-y-4">
               <div class="grid grid-cols-2 gap-3">
-                  <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">เรียกใช้บริการ</p><p class="text-xl font-black text-gray-800 dark:text-white" id="pdet-rides">0 <span class="text-[10px] text-gray-400 font-normal">ครั้ง</span></p></div>
-                  <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">ยอดชำระสะสม</p><p class="text-xl font-black text-green-500" id="pdet-spend">฿0</p></div>
+                  <div class="bg-green-50 dark:bg-green-900/10 p-3 rounded-xl border border-green-200 dark:border-green-900/30 text-center">
+                      <p class="text-[10px] text-green-600 dark:text-green-500 font-bold uppercase mb-1">เงินสด (Cash)</p>
+                      <p class="text-xl font-black text-green-600 dark:text-green-400" id="pdet-wallet-cash">฿0</p>
+                  </div>
+                  <div class="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-xl border border-yellow-200 dark:border-yellow-900/30 text-center">
+                      <p class="text-[10px] text-yellow-600 dark:text-yellow-500 font-bold uppercase mb-1">เครดิตโบนัส (Bonus)</p>
+                      <p class="text-xl font-black text-yellow-600 dark:text-yellow-400" id="pdet-wallet-bonus">฿0</p>
+                  </div>
               </div>
-              <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">ประวัติการเคลมส่วนลด</p><p class="text-xs text-gray-700 dark:text-slate-300 break-words" id="pdet-promos">-</p></div>
+              <button onclick="openAdjustCreditModal(windowContext.focusPassengerId, 'passenger')" class="w-full bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white font-bold py-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800 transition text-sm flex items-center justify-center gap-2"><i class="fas fa-wallet"></i> จัดการกระเป๋าเงินลูกค้า</button>
+              
+              <div class="grid grid-cols-2 gap-3 mt-4">
+                  <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">เรียกใช้บริการ</p><p class="text-xl font-black text-gray-800 dark:text-white" id="pdet-rides">0 <span class="text-[10px] text-gray-400 font-normal">ครั้ง</span></p></div>
+                  <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 text-center"><p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase mb-1">ยอดชำระสะสม</p><p class="text-xl font-black text-blue-500" id="pdet-spend">฿0</p></div>
+              </div>
               <button onclick="blockPassengerFromModal()" class="w-full bg-red-100 dark:bg-red-900/30 hover:bg-red-600 text-red-600 hover:text-white font-bold py-3 rounded-xl border border-red-200 dark:border-red-900/50 transition mt-2 text-sm flex items-center justify-center gap-2"><i class="fas fa-ban"></i> ระงับสิทธิ์การใช้งาน (Block)</button>
           </div>
       </div>
@@ -1872,14 +1882,27 @@
 
     function viewPassengerDetails(encodedData) {
         let p = JSON.parse(decodeURIComponent(encodedData));
-        document.getElementById('pdet-name').innerText = p.name; document.getElementById('pdet-phone').innerText = "เบอร์โทร: " + p.phone;
-        let idEl = document.getElementById('pdet-id'); if(idEl) idEl.innerText = "ID: " + (p.userId || '-');  
-        let dateStr = p.firstRide ? new Date(p.firstRide).toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric' }) : '-';
-        document.getElementById('pdet-join').innerText = "ใช้งานครั้งแรก: " + dateStr;
+        document.getElementById('pdet-name').innerText = p.name; 
+        document.getElementById('pdet-phone').innerText = "เบอร์โทร: " + p.phone;
+        let uid = p.userId || p.phone;
+        let idEl = document.getElementById('pdet-id'); if(idEl) idEl.innerText = "ID: " + uid;  
         document.getElementById('pdet-rides').innerHTML = `${p.rides} <span class="text-[10px] text-gray-400 font-normal">ครั้ง</span>`;
         document.getElementById('pdet-spend').innerText = `฿${p.spend.toLocaleString()}`;
-        document.getElementById('pdet-promos').innerText = p.promos.length > 0 ? p.promos.join(', ') : 'ไม่เคยใช้งานโค้ดส่วนลด';
-        windowContext.focusPassengerPhone = p.phone; openModal('modalPassengerDetails');
+        
+        windowContext.focusPassengerId = uid;
+        windowContext.focusPassengerPhone = p.phone;
+        windowContext.focusPassengerName = p.name;
+        
+        // 🌟 ดึงข้อมูลกระเป๋าเงินลูกค้าจาก Firebase สดๆ
+        db.ref('passengers_profile/' + uid).once('value', snap => {
+            let d = snap.val() || {};
+            let cash = parseFloat(d.creditCash || 0).toFixed(0);
+            let bonus = parseFloat(d.creditBonus || 0).toFixed(0);
+            document.getElementById('pdet-wallet-cash').innerText = `฿${cash}`;
+            document.getElementById('pdet-wallet-bonus').innerText = `฿${bonus}`;
+        });
+
+        openModal('modalPassengerDetails');
     }
 
     function blockPassengerFromModal() {
@@ -2662,45 +2685,92 @@
         });
     }
 
-    // 🌟 ระบบสคริปต์ปรับปรุงยอดเงิน (เงินสด/โบนัส)
-    let currentWalletDriverId = null;
-    window.openAdjustCreditModal = function(drvId) {
-        currentWalletDriverId = drvId;
-        let d = allProfiles[drvId]; if(!d) return;
-        document.getElementById('adj-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
-        document.getElementById('adj-drv-id').innerText = drvId;
+    // 🌟 ระบบสคริปต์ปรับปรุงยอดเงิน รองรับทั้ง "คนขับ" และ "ลูกค้า"
+    let currentWalletTargetId = null;
+    let currentWalletRole = 'driver'; 
+
+    window.openAdjustCreditModal = function(targetId, role = 'driver') {
+        currentWalletTargetId = targetId;
+        currentWalletRole = role;
+        
+        if(role === 'driver') {
+            let d = allProfiles[targetId]; if(!d) return;
+            document.getElementById('adj-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
+            document.getElementById('adj-drv-id').innerText = "คนขับ: " + targetId;
+        } else {
+            document.getElementById('adj-drv-name').innerText = windowContext.focusPassengerName || 'ลูกค้า';
+            document.getElementById('adj-drv-id').innerText = "ลูกค้า: " + targetId;
+        }
+
         document.getElementById('adj-amount').value = ''; document.getElementById('adj-note').value = '';
         document.getElementById('adj-wallet-type').value = 'cash'; document.getElementById('adj-action-type').value = 'add';
-        toggleAdjustColors(); openModal('modalAdjustCredit');
+        toggleAdjustColors(); 
+        
+        // สั่งปิดหน้าต่างข้อมูลลูกค้าชั่วคราวถ้าเปิดอยู่ เพื่อป้องกันหน้าต่างซ้อนกัน
+        if(role === 'passenger') closeModal('modalPassengerDetails');
+        openModal('modalAdjustCredit');
     }
-    window.closeAdjustCreditModal = function() { closeModal('modalAdjustCredit'); currentWalletDriverId = null; }
+
+    window.closeAdjustCreditModal = function() { 
+        closeModal('modalAdjustCredit'); 
+        if(currentWalletRole === 'passenger') openModal('modalPassengerDetails'); // เปิดหน้าต่างลูกค้ากลับมา
+        currentWalletTargetId = null; 
+    }
+
     window.toggleAdjustColors = function() {
         let action = document.getElementById('adj-action-type').value; let el = document.getElementById('adj-action-type');
         if(action === 'add') el.className = "w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold focus:border-emerald-500";
         else el.className = "w-full p-2.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-xl outline-none text-sm font-bold focus:border-red-500";
     }
+
     window.submitCreditAdjustment = function() {
-        if(!currentWalletDriverId) return;
+        if(!currentWalletTargetId) return;
         let walletType = document.getElementById('adj-wallet-type').value; 
         let actionType = document.getElementById('adj-action-type').value; 
         let amount = parseFloat(document.getElementById('adj-amount').value);
         let note = document.getElementById('adj-note').value.trim();
+        
         if (isNaN(amount) || amount <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนเงินให้ถูกต้องครับ', 'error');
         if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุหมายเหตุการทำรายการด้วยครับ', 'error');
 
-        let d = allProfiles[currentWalletDriverId];
-        let currentCash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
-        let currentBonus = parseFloat(d.creditBonus || 0);
-        let newCash = currentCash; let newBonus = currentBonus;
+        // ตรวจสอบว่ากำลังทำรายการให้ใคร
+        let path = currentWalletRole === 'driver' ? 'drivers_profile/' + currentWalletTargetId : 'passengers_profile/' + currentWalletTargetId;
 
-        if (walletType === 'cash') { if (actionType === 'add') newCash += amount; else newCash -= amount; } 
-        else { if (actionType === 'add') newBonus += amount; else newBonus -= amount; }
+        db.ref(path).once('value', snap => {
+            let d = snap.val() || {};
+            let currentCash = parseFloat(d.creditCash || d.credit || 0);
+            let currentBonus = parseFloat(d.creditBonus || 0);
+            let newCash = currentCash; let newBonus = currentBonus;
 
-        if (newCash < 0 || newBonus < 0) { if(!confirm(`กระเป๋าเงินจะติดลบ ยืนยันดำเนินการต่อหรือไม่?`)) return; }
+            if (walletType === 'cash') { if (actionType === 'add') newCash += amount; else newCash -= amount; } 
+            else { if (actionType === 'add') newBonus += amount; else newBonus -= amount; }
 
-        db.ref('drivers_profile/' + currentWalletDriverId).update({ creditCash: newCash, creditBonus: newBonus, credit: newCash }).then(() => {
-            db.ref('wallet_transactions/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, walletType, actionType, amount, note, balanceAfter: walletType === 'cash' ? newCash : newBonus, adminName: "แอดมินศูนย์" });
-            showCustomAlert('ทำรายการสำเร็จ', `ปรับปรุงยอดเงินเรียบร้อยแล้ว`, 'success'); closeAdjustCreditModal(); renderWalletTab(); 
+            if (newCash < 0 || newBonus < 0) { if(!confirm(`กระเป๋าเงินจะติดลบ ยืนยันดำเนินการต่อหรือไม่?`)) return; }
+
+            let updatePayload = { creditCash: newCash, creditBonus: newBonus };
+            if(currentWalletRole === 'driver') updatePayload.credit = newCash; // อัปเดตสำรองให้คนขับเผื่อระบบเก่า
+
+            db.ref(path).update(updatePayload).then(() => {
+                db.ref('wallet_transactions/' + currentWalletTargetId).push({ 
+                    timestamp: firebase.database.ServerValue.TIMESTAMP, 
+                    role: currentWalletRole,
+                    walletType, actionType, amount, note, 
+                    balanceAfter: walletType === 'cash' ? newCash : newBonus, 
+                    adminName: "แอดมินศูนย์" 
+                });
+                
+                showCustomAlert('ทำรายการสำเร็จ', `ปรับปรุงยอดเงินเรียบร้อยแล้ว`, 'success'); 
+                closeAdjustCreditModal(); 
+                
+                // รีเฟรชข้อมูลให้ถูกต้องตามระบบ
+                if(currentWalletRole === 'driver') renderWalletTab(); 
+                else {
+                    let ridesStr = document.getElementById('pdet-rides').innerText.replace(/[^0-9]/g, '');
+                    let spendStr = document.getElementById('pdet-spend').innerText.replace(/[^0-9]/g, '');
+                    let payloadStr = encodeURIComponent(JSON.stringify({userId: currentWalletTargetId, phone: windowContext.focusPassengerPhone, name: windowContext.focusPassengerName, rides: ridesStr, spend: spendStr}));
+                    viewPassengerDetails(payloadStr); 
+                }
+            });
         });
     }
 
