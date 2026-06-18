@@ -3259,5 +3259,138 @@
           </div>
       </div>
   </div>
+  <!-- 🌟 หน้าต่างปรับระดับ Tier & ดาว -->
+  <div id="modalAddQuest" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-amber-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 sticky top-0 z-10">
+              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500"><i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญ / ภารกิจ</h2>
+              <button onclick="closeModal('modalAddQuest')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <div>
+                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ (โชว์ให้คนขับเห็น)</label>
+                  <input type="text" id="quest-name" placeholder="เช่น โปรต้อนรับคนใหม่, Silver วิ่งครบ 10 รอบ..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div class="col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1 mb-2"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
+                      <select id="quest-target-tier" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                          <option value="all">🌐 ทุกระดับ</option>
+                          <option value="New">🔰 เฉพาะ New</option>
+                          <option value="Standard">🥉 เฉพาะ Standard</option>
+                          <option value="Silver">🥈 เฉพาะ Silver</option>
+                          <option value="Gold">🥇 เฉพาะ Gold</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
+                      <select id="quest-target-vehicle" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                          <option value="all">🚗+🏍️ รถทุกประเภท</option>
+                          <option value="car">🚗 เฉพาะรถยนต์</option>
+                          <option value="bike">🏍️ เฉพาะมอเตอร์ไซค์</option>
+                      </select>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
+                  <div class="col-span-2"><h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (Condition)</h3></div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">รูปแบบภารกิจ</label>
+                      <select id="quest-condition-type" class="w-full p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                          <option value="rides">🚕 สะสมรอบวิ่ง</option>
+                          <option value="tenure">⏱️ อายุการเป็นสมาชิก</option>
+                          <option value="signup">📝 สมัครใหม่ปุ๊บได้เลย (0 รอบ)</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เป้าหมายตัวเลข (รอบ / วัน)</label>
+                      <input type="number" id="quest-condition-value" placeholder="เช่น 10 (รอบ)" class="w-full p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-700 rounded-lg outline-none text-sm font-black text-center focus:border-amber-500">
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มแคมเปญ (ว่าง=เริ่มทันที)</label>
+                      <input type="datetime-local" id="quest-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=แจกตลอด)</label>
+                      <input type="datetime-local" id="quest-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none">
+                  </div>
+              </div>
+
+              <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
+                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกอย่างใดอย่างหนึ่ง หรือทั้งคู่)</h3>
+                  <div class="grid grid-cols-2 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">แจกโบนัส (เครดิต 🟡)</label>
+                          <input type="number" id="quest-reward-bonus" placeholder="เช่น 100" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-sm font-bold text-center">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เลื่อนเป็นระดับ</label>
+                          <select id="quest-reward-tier" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-xs font-bold">
+                              <option value="none">-- ไม่เลื่อนระดับ --</option>
+                              <option value="Standard">🥉 Standard</option>
+                              <option value="Silver">🥈 Silver</option>
+                              <option value="Gold">🥇 Gold</option>
+                              <option value="Platinum">💎 Platinum</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+
+              <button onclick="saveCampaignQuest()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-rocket"></i> ปล่อยแคมเปญ</button>
+          </div>
+      </div>
+  </div>
+  <div id="modalAdjustTierRating" class="hidden fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500 pl-2"><i class="fas fa-trophy mr-1"></i> ปรับระดับ & ดาวควบคุม</h2>
+              <button onclick="closeTierRatingModal()" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white relative z-50"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4 relative z-40">
+              <div class="flex items-center gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center text-lg shrink-0"><i class="fas fa-id-card"></i></div>
+                  <div class="min-w-0">
+                      <p id="trm-drv-name" class="font-bold text-sm text-gray-800 dark:text-white truncate">ชื่อคนขับ</p>
+                      <p id="trm-drv-id" class="text-[10px] text-gray-500 dark:text-slate-400">DRV-000000</p>
+                  </div>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 mb-1">ปรับเปลี่ยนระดับชั้น (Driver Tier)</label>
+                  <select id="trm-tier-select" onchange="autoFillOverrideStars()" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
+                      <option value="New">🔰 New (ผู้ใช้ใหม่)</option>
+                      <option value="Standard">🥉 Standard (ระดับทั่วไป)</option>
+                      <option value="Silver">🥈 Silver (ระดับเงิน)</option>
+                      <option value="Gold">🥇 Gold (ระดับทอง)</option>
+                      <option value="Platinum">💎 Platinum (ระดับแพลทินัม)</option>
+                      <option value="F1 Legend">👑 F1 Legend (ระดับตำนาน *10 ดาว)</option>
+                      <option value="owner super legend">🚀 Owner Super Legend (*100 ดาว)</option>
+                  </select>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 mb-1">คะแนนดาวประทับตรา (ล็อกค่า)</label>
+                  <div class="relative">
+                      <input type="number" id="trm-rating-input" step="0.1" min="1" max="100" placeholder="5.0" class="w-full p-2.5 bg-white dark:bg-slate-900 text-yellow-600 dark:text-yellow-400 border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-black focus:border-amber-500">
+                      <span class="absolute right-3 top-2.5 text-xs font-bold text-gray-400">★ ดวง</span>
+                  </div>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-gray-500 mb-1">หมายเหตุการเลื่อนขั้น</label>
+                  <input type="text" id="trm-note" placeholder="เหตุผลการเลื่อนระดับ..." class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-xs focus:border-amber-500">
+              </div>
+              
+              <button onclick="submitTierRatingAdjustment()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-check"></i> บันทึกระดับพนักงาน</button>
+          </div>
+      </div>
+  </div>
 </body>
 </html>
