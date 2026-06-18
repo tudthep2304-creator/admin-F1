@@ -2291,7 +2291,6 @@
                 filterHtml += `<option value="${id}">${v.name}</option>`;
                 fQvHtml += `<option value="${id}">🚗 ${v.name}</option>`;
                 
-                // 🌟 ดึงข้อมูลรถทำเป็น Checkbox หน้าภารกิจ
                 questVehHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${id}" class="quest-target-vehicle w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> ${v.name}</label>`;
             });
         }
@@ -2396,6 +2395,484 @@
     }
 
     window.deleteVehicleType = function(id, name) { showCustomConfirm('ลบประเภทรถ?', `คุณแน่ใจหรือไม่ที่จะลบ "${name}" ออกจากระบบ? (ลูกค้าจะเรียกไม่ได้)`, () => { db.ref('system_settings/vehicle_types/' + id).remove().then(()=>{ showCustomAlert('ลบสำเร็จ', `ลบประเภทรถ ${name} ออกแล้ว`, 'success'); }); }, 'ลบทิ้ง', 'red'); }
+
+    // ================= ระบบคลังแชทลึกลับ =================
+    let allChatLogsGrouped = {};
+    db.ref('admin_chat_logs').on('value', snap => {
+        let logs = snap.val() || {}; let grouped = {};
+        for(let key in logs) {
+            let msg = logs[key]; let jid = msg.jobId; if(!jid) continue;
+            if(!grouped[jid]) { grouped[jid] = { jobId: jid, passengerName: msg.passengerName || 'ลูกค้า', driverPin: msg.driverPin || '-', driverName: msg.driverName || 'ไม่ระบุชื่อ', messages: [], lastTime: 0 }; }
+            grouped[jid].messages.push(msg); if(msg.timestamp > grouped[jid].lastTime) { grouped[jid].lastTime = msg.timestamp; }
+        }
+        allChatLogsGrouped = grouped; renderChatLogsTable();
+    });
+
+    function renderChatLogsTable() {
+        let tbody = document.getElementById('chatlogs-table-body'); if(!tbody) return;
+        let chatArr = Object.values(allChatLogsGrouped); chatArr.sort((a,b) => b.lastTime - a.lastTime); 
+        if(chatArr.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-400">ไม่มีประวัติการสนทนาในระบบ</td></tr>'; return; }
+        let html = '';
+        chatArr.forEach(chat => {
+            let dateStr = new Date(chat.lastTime).toLocaleString('th-TH'); let shortId = chat.jobId.substring(chat.jobId.length - 8).toUpperCase();
+            html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition"><td class="py-3 px-3 font-mono text-xs text-blue-500 dark:text-[#1da1f2]">#${shortId}</td><td class="py-3 px-2 font-bold text-gray-800 dark:text-white">${chat.passengerName}</td><td class="py-3 px-2 text-xs text-gray-500 dark:text-slate-400">PIN: <span class="text-blue-500 dark:text-[#1da1f2] font-bold">${chat.driverPin}</span><br>${chat.driverName}</td><td class="py-3 px-2 text-[11px] text-gray-400">${dateStr}</td><td class="py-3 px-3 text-right"><button onclick="openChatLogDetail('${chat.jobId}')" class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition shadow-sm"><i class="fas fa-eye"></i> ดูแชท</button></td></tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    window.openChatLogDetail = function(jobId) {
+        let chat = allChatLogsGrouped[jobId]; if(!chat) return;
+        let container = document.getElementById('chatlog-messages-container'); container.innerHTML = '';
+        chat.messages.sort((a,b) => a.timestamp - b.timestamp); let html = '';
+        chat.messages.forEach(msg => {
+            let isPassenger = (msg.sender === 'passenger'); let align = isPassenger ? 'justify-end' : 'justify-start'; let bg = isPassenger ? 'bg-[#1da1f2] text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-200 dark:border-slate-700'; let senderName = isPassenger ? `<span class="text-[10px] text-blue-600 dark:text-[#1da1f2] font-bold mb-1 mr-1 text-right w-full block">ผู้โดยสาร (${chat.passengerName})</span>` : `<span class="text-[10px] text-gray-500 dark:text-slate-400 font-bold mb-1 ml-1 text-left w-full block">คนขับ (${chat.driverPin})</span>`; let timeStr = new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            html += `<div class="flex w-full ${align} mb-2"><div class="flex flex-col max-w-[80%]">${senderName}<div class="${bg} px-4 py-2.5 rounded-2xl text-[13px] font-normal shadow-sm break-words w-full">${msg.text}</div><span class="text-[9px] text-gray-400 dark:text-slate-500 mt-1 ${isPassenger ? 'text-right mr-1' : 'text-left ml-1'}">${timeStr}</span></div></div>`;
+        });
+        container.innerHTML = html; openModal('modalViewChatLog'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+    }
+
+    // ================= 🌟 ระบบจัดการรูปโปรไฟล์ (เปิดหน้าต่างให้แอดมินเลื่อนปรับตำแหน่งได้เอง) =================
+    let profileCropper = null; let currentProfileInput = null; let currentPreviewId = null; let currentPlaceholderId = null;
+
+    window.processDriverImage = function(input, previewId, placeholderId) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                currentProfileInput = input; currentPreviewId = previewId; currentPlaceholderId = placeholderId;
+                document.getElementById('profileImageToCrop').src = e.target.result;
+                document.getElementById('modalCropProfile').classList.remove('hidden');
+                if (profileCropper) { profileCropper.destroy(); }
+                profileCropper = new Cropper(document.getElementById('profileImageToCrop'), { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9, dragMode: 'move', guides: true, center: true, cropBoxResizable: true });
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    window.closeProfileCropper = function() {
+        document.getElementById('modalCropProfile').classList.add('hidden');
+        if (profileCropper) { profileCropper.destroy(); profileCropper = null; }
+        if (currentProfileInput) currentProfileInput.value = ''; 
+    }
+    window.confirmProfileCrop = function() {
+        if (!profileCropper) return;
+        let canvas = profileCropper.getCroppedCanvas({ width: 256, height: 256 });
+        let base64 = canvas.toDataURL('image/jpeg', 0.8); 
+        let previewEl = document.getElementById(currentPreviewId); let placeholderEl = document.getElementById(currentPlaceholderId);
+        if (previewEl) { previewEl.src = base64; previewEl.classList.remove('hidden'); }
+        if (placeholderEl) { placeholderEl.classList.add('hidden'); }
+        if (currentProfileInput) { currentProfileInput.setAttribute('data-base64', base64); }
+        closeProfileCropper(); 
+    }
+
+    // ================= 🌟 ฟังก์ชันสำหรับกดดูรูปเต็มจอ (Image Viewer) =================
+    window.viewFullImage = function(src) {
+        if (!src || src.trim() === '') return; 
+        document.getElementById('fullImageViewerSrc').src = src;
+        document.getElementById('modalImageViewer').classList.remove('hidden');
+    }
+    window.closeImageViewer = function() {
+        document.getElementById('modalImageViewer').classList.add('hidden');
+        setTimeout(() => { document.getElementById('fullImageViewerSrc').src = ''; }, 200); 
+    }
+
+    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
+    window.getTierBadgeHtml = function(currentTier) {
+        if(currentTier === 'Silver') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40 whitespace-nowrap">Silver</span>`;
+        if(currentTier === 'Gold') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 whitespace-nowrap">Gold</span>`;
+        if(currentTier === 'Platinum') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-[#1da1f2] border border-blue-200 whitespace-nowrap">Platinum</span>`;
+        if(currentTier === 'F1 Legend') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-purple-500 to-indigo-500 text-white border border-purple-400 whitespace-nowrap">LEGEND</span>`;
+        if(currentTier === 'owner super legend') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-black text-yellow-300 border border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap">OWNER</span>`;
+        if(currentTier === 'New') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">🔰 New</span>`;
+        return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200 whitespace-nowrap">Standard</span>`;
+    }
+
+    window.filterDrivers = function() {
+        let keyword = document.getElementById('search-driver-input').value.toLowerCase();
+        let rows = document.querySelectorAll('.driver-row-item');
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(keyword) ? '' : 'none';
+        });
+    };
+
+    db.ref('drivers_profile').on('value', snap => {
+        let table = document.getElementById('all-drivers-table'); 
+        let html = ''; let count = 0; allProfiles = snap.val() || {}; 
+        if(snap.exists() && table) {
+            snap.forEach(child => { 
+                count++; let d = child.val(); let displayId = child.key; 
+                let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
+                let genderIcon = d.gender === 'female' ? `<i class="fas fa-venus text-pink-500 mx-1" title="หญิง"></i>` : `<i class="fas fa-mars text-blue-500 mx-1" title="ชาย"></i>`;
+                let cashVal = parseFloat(d.creditCash || d.credit || 0).toFixed(0); 
+                let bonusVal = parseFloat(d.creditBonus || 0).toFixed(0);
+                
+                let creditDisplay = `
+                    <span class="whitespace-nowrap bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-money-bill-wave"></i> ${cashVal}</span>
+                    <span class="whitespace-nowrap bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-star"></i> ${bonusVal}</span>
+                `;
+
+                let profilePicHtml = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
+                
+                html += `
+                <tr class="driver-row-item cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors text-left" onclick="showDriverDetails('${displayId}')">
+                    <td class="py-3 px-3 font-black text-[#1da1f2] w-28 align-middle text-left"><span class="bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 px-2 py-1 rounded-lg text-xs tracking-wider whitespace-nowrap">${displayId}</span></td>
+                    <td class="py-3 px-3 align-middle text-left"><div class="flex items-center gap-3">${profilePicHtml}<div class="flex flex-col min-w-0 text-left"><span class="font-bold text-gray-800 dark:text-white text-sm truncate max-w-[150px] sm:max-w-[250px]">${d.name} ${genderIcon}</span><div class="mt-1 flex flex-wrap items-center gap-1.5">${tierBadgeHtml} ${creditDisplay}</div></div></div></td>
+                    <td class="py-3 px-3 text-right text-gray-600 dark:text-slate-300 text-xs font-mono align-middle whitespace-nowrap">${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-gray-400 ml-1"></i></td>
+                </tr>`;
+            });
+            table.innerHTML = html;
+        } else if(table) { table.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-gray-400">ยังไม่มีคนขับ</td></tr>'; }
+        
+        let statTotal = document.getElementById('stat-total-drivers'); if(statTotal) statTotal.innerText = count;
+    });
+
+    window.generateDriverId = function() {
+        let rnd = Math.floor(100000 + Math.random() * 900000); 
+        let newId = 'DRV-' + rnd;
+        if(allProfiles[newId]) return window.generateDriverId(); 
+        return newId;
+    }
+
+    window.openAddDriverModal = function() {
+        document.getElementById('add-drv-id').value = window.generateDriverId();
+        document.getElementById('add-drv-pin').value = ''; document.getElementById('add-drv-fname').value = ''; document.getElementById('add-drv-lname').value = '';
+        document.getElementById('add-drv-phone').value = ''; document.getElementById('add-drv-gender').value = 'male';
+        
+        let dateDisp = document.getElementById('add-drv-date-display');
+        if(dateDisp) dateDisp.innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        document.getElementById('add-drv-vbrand').value = ''; document.getElementById('add-drv-vcolor').value = ''; document.getElementById('add-drv-vplate').value = '';
+        if(document.getElementById('add-drv-vprovince')) document.getElementById('add-drv-vprovince').value = '';
+        
+        let addPreview = document.getElementById('add-drv-pic-preview'); if(addPreview) { addPreview.src = ''; addPreview.classList.add('hidden'); }
+        let addPlaceholder = document.getElementById('add-drv-pic-placeholder'); if(addPlaceholder) addPlaceholder.classList.remove('hidden');
+        let picUpload = document.getElementById('add-drv-pic-upload'); if(picUpload) { picUpload.removeAttribute('data-base64'); picUpload.value = ''; }
+
+        let vSelect = document.getElementById('add-drv-vtype'); let vHtml = '';
+        (window.systemVehicleTypes || []).forEach(vt => { vHtml += `<option value="${vt.id}">${vt.name}</option>`; });
+        if(vSelect) vSelect.innerHTML = vHtml || '<option value="car">รถยนต์</option>';
+        openModal('modalAddDriver');
+    }
+
+    // ================= อัปเดตฟังก์ชันลงทะเบียน (โบนัสออโต้จากเควส) =================
+    window.saveNewDriver = function() {
+        let drvId = document.getElementById('add-drv-id').value.trim(); let pin = document.getElementById('add-drv-pin').value.trim();
+        let fname = document.getElementById('add-drv-fname').value.trim(); let lname = document.getElementById('add-drv-lname').value.trim();
+        let phone = document.getElementById('add-drv-phone').value.trim(); let gender = document.getElementById('add-drv-gender').value;
+        
+        if(!drvId) return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุรหัสประจำตัว', 'error');
+        if(!pin || pin.length !== 4) return showCustomAlert('รหัสผ่านสั้นไป', 'ตั้งรหัสผ่าน (PIN) 4 หลักด้วยครับ', 'error');
+        if(!fname || !phone) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อและเบอร์โทรศัพท์', 'error');
+
+        let fullName = fname + (lname ? ' ' + lname : ''); let vType = document.getElementById('add-drv-vtype').value; let vId = 'veh_' + Date.now();
+        let initialVehicles = {};
+        initialVehicles[vId] = { id: vId, serviceType: vType, brand: document.getElementById('add-drv-vbrand').value.trim(), color: document.getElementById('add-drv-vcolor').value.trim(), plate: document.getElementById('add-drv-vplate').value.trim(), province: document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '', isOnline: false };
+
+        let picUpload = document.getElementById('add-drv-pic-upload'); let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
+
+        // 🌟 ลอจิกดึงโบนัสและระดับอัตโนมัติจาก Quest Center
+        let startTier = "New"; let startBonus = 0; let now = Date.now();
+
+        if (typeof allQuests === 'object') {
+            for (let qId in allQuests) {
+                let q = allQuests[qId];
+                if (!q.isActive) continue;
+                if (q.startTime && new Date(q.startTime).getTime() > now) continue;
+                if (q.endTime && new Date(q.endTime).getTime() < now) continue;
+                
+                let c = q.conditions || {};
+                if (c.signup) {
+                    if (!q.targetTiers || q.targetTiers.includes('all') || q.targetTiers.includes('New')) {
+                        startBonus += (parseInt(q.rewardBonus) || 0);
+                        if (q.rewardTier && q.rewardTier !== 'none') { startTier = q.rewardTier; }
+                    }
+                }
+            }
+        }
+
+        let driverData = {
+            driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
+            creditCash: 0, creditBonus: startBonus, tier: startTier, rating: "5.0", 
+            profilePic: profilePic, vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
+            if(startBonus > 0) {
+                db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
+            }
+            showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เข้าระบบเรียบร้อย!`, 'success');
+            closeModal('modalAddDriver');
+        });
+    }
+
+    window.currentDriverVehicles = {}; 
+    window.showDriverDetails = function(driverId) {
+        let d = allProfiles[driverId]; if(!d) return; 
+        window.currentDriverFocus = driverId; 
+
+        let nameParts = (d.name || '').split(' '); let fname = nameParts[0] || ''; let lname = nameParts.slice(1).join(' ') || '';
+
+        document.getElementById('det-sys-id').value = driverId; document.getElementById('det-pin-input').value = d.pin || '';
+        document.getElementById('det-firstname').value = fname; document.getElementById('det-lastname').value = lname;
+        document.getElementById('det-phone').value = d.phone || ''; document.getElementById('det-gender').value = d.gender || 'male';
+        
+        let cash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0)).toFixed(2);
+        let bonus = parseFloat(d.creditBonus || 0).toFixed(2);
+        if(document.getElementById('det-cash')) document.getElementById('det-cash').value = cash;
+        if(document.getElementById('det-bonus')) document.getElementById('det-bonus').value = bonus;
+
+        if(document.getElementById('det-tier-display')) {
+            let t = d.tier || 'Standard';
+            if (t === 'owner super legend') t = '🚀 Owner Super Legend'; else if (t === 'F1 Legend') t = '👑 F1 Legend';
+            else if (t === 'Platinum') t = '💎 Platinum'; else if (t === 'Gold') t = '🥇 Gold';
+            else if (t === 'Silver') t = '🥈 Silver'; else t = '🥉 Standard';
+            document.getElementById('det-tier-display').value = t;
+        }
+
+        let editPreview = document.getElementById('edit-drv-pic-preview'); let editPlaceholder = document.getElementById('edit-drv-pic-placeholder'); let editUpload = document.getElementById('edit-drv-pic-upload');
+        if(editUpload) { editUpload.removeAttribute('data-base64'); editUpload.value = ''; }
+
+        if(d.profilePic) {
+            if(editPreview) { editPreview.src = d.profilePic; editPreview.classList.remove('hidden'); }
+            if(editPlaceholder) editPlaceholder.classList.add('hidden');
+        } else {
+            if(editPreview) { editPreview.src = ''; editPreview.classList.add('hidden'); }
+            if(editPlaceholder) editPlaceholder.classList.remove('hidden');
+        }
+
+        let vehicles = {};
+        if (d.vehicles) { vehicles = JSON.parse(JSON.stringify(d.vehicles)); } 
+        else if (d.plate) {
+            let vId = 'veh_' + Date.now();
+            vehicles[vId] = { id: vId, serviceType: d.serviceType || 'car', brand: d.brand || '', color: d.color || '', plate: d.plate || '', province: '', isOnline: false };
+        }
+        window.currentDriverVehicles = vehicles; renderDriverVehicles();
+
+        let rEl = document.getElementById('det-rating'); let cEl = document.getElementById('det-rating-count');
+        if (d.tier === 'owner super legend') { if(rEl) rEl.innerText = "100.0"; if(cEl) cEl.innerText = "(Max)"; } 
+        else if (d.tier === 'F1 Legend') { if(rEl) rEl.innerText = "10.0"; if(cEl) cEl.innerText = "(Max)"; } 
+        else {
+            if (d.ratings) { let total = 0; let count = 0; Object.values(d.ratings).forEach(r => { total += parseInt(r.score); count++; }); let avg = (total / count).toFixed(1); if(rEl) rEl.innerText = avg; if(cEl) cEl.innerText = `(${count})`; } 
+            else { if(rEl) rEl.innerText = "5.0"; if(cEl) cEl.innerText = "(0)"; }
+        }
+        openModal('pageDriverDetails');
+    }
+
+    window.closeDriverProfilePage = function() { closeModal('pageDriverDetails'); }
+    window.renderDriverVehicles = function() {
+        let container = document.getElementById('driver-vehicles-container'); let html = '';
+        for (let vId in window.currentDriverVehicles) {
+            let v = window.currentDriverVehicles[vId];
+            let selectHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-blue-500">`;
+            if (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) {
+                window.systemVehicleTypes.forEach(vt => { let sel = (v.serviceType === vt.id) ? 'selected' : ''; selectHtml += `<option value="${vt.id}" ${sel}>${vt.name}</option>`; });
+            } else { selectHtml += `<option value="car">รถยนต์</option><option value="bike">มอเตอร์ไซค์</option>`; }
+            selectHtml += `</select>`;
+
+            let onlineBadge = v.isOnline ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-[#1da1f2] border border-blue-200 dark:border-blue-500/30">ออนไลน์</span>` : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200 dark:border-slate-700">ออฟไลน์</span>`;
+
+            html += `
+            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm relative transition-colors duration-300">
+                <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 w-7 h-7 rounded-lg flex items-center justify-center transition shadow-sm border border-red-100 dark:border-red-500/20"><i class="fas fa-trash-alt text-[11px]"></i></button>
+                <div class="flex justify-between items-center mb-3 pr-10"><div class="flex items-center gap-2"><i class="fas fa-car-side text-gray-400 dark:text-slate-500"></i>${onlineBadge}</div></div>
+                <div class="space-y-2">
+                    <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ประเภทรถ</label>${selectHtml}</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="Honda"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="สีขาว"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ป้ายทะเบียน</label><input type="text" id="v-plate-${vId}" value="${v.plate||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs font-bold outline-none placeholder-gray-400" placeholder="กท-1234"></div>
+                        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จังหวัด</label><input type="text" id="v-province-${vId}" value="${v.province||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-2 bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none placeholder-gray-400" placeholder="กรุงเทพฯ"></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+        container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">ไม่มีรถที่ลงทะเบียน</p>';
+    }
+
+    window.addDriverVehicle = function() { let vId = 'veh_' + Date.now(); window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', province: '', isOnline: false }; renderDriverVehicles(); }
+    window.removeTempVehicle = function(vId) { delete window.currentDriverVehicles[vId]; renderDriverVehicles(); }
+    window.updateTempVehicle = function(vId) {
+        if(!window.currentDriverVehicles[vId]) return;
+        window.currentDriverVehicles[vId].serviceType = document.getElementById('v-type-' + vId).value; window.currentDriverVehicles[vId].brand = document.getElementById('v-brand-' + vId).value.trim(); window.currentDriverVehicles[vId].color = document.getElementById('v-color-' + vId).value.trim(); window.currentDriverVehicles[vId].plate = document.getElementById('v-plate-' + vId).value.trim(); let pEl = document.getElementById('v-province-' + vId); window.currentDriverVehicles[vId].province = pEl ? pEl.value.trim() : '';
+    }
+
+    window.saveDriverUpdates = function() {
+        let driverId = window.currentDriverFocus; let newPin = document.getElementById('det-pin-input').value.trim(); let phone = document.getElementById('det-phone').value.trim(); let fname = document.getElementById('det-firstname').value.trim(); let lname = document.getElementById('det-lastname').value.trim(); let gender = document.getElementById('det-gender').value;
+        let tierEl = document.getElementById('det-tier'); let tier = tierEl ? tierEl.value : 'Standard'; let fullName = fname + (lname ? ' ' + lname : '');
+        if (!newPin || newPin.length !== 4) return showCustomAlert('ข้อผิดพลาด', 'รหัสผ่าน (PIN) ต้องเป็นตัวเลข 4 หลักเท่านั้น', 'error');
+        for (let vId in window.currentDriverVehicles) { window.updateTempVehicle(vId); }
+        let picUpload = document.getElementById('edit-drv-pic-upload'); let newPic = picUpload ? picUpload.getAttribute('data-base64') : null;
+
+        let updateData = { pin: newPin, name: fullName, phone: phone, gender: gender, tier: tier, vehicles: window.currentDriverVehicles };
+        if (tier === 'owner super legend') { updateData.rating = "100.0"; } else if (tier === 'F1 Legend') { updateData.rating = "10.0"; }
+        if(newPic) updateData.profilePic = newPic; 
+
+        db.ref('drivers_profile/' + driverId).update(updateData).then(() => {
+            showCustomAlert('สำเร็จ', 'บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว', 'success');
+            db.ref('driver_logs/' + driverId).push({ action: 'admin_updated', timestamp: firebase.database.ServerValue.TIMESTAMP, note: `แอดมินอัปเดตข้อมูลโปรไฟล์ทั่วไป` });
+            closeDriverProfilePage();
+        });
+    }
+    
+    window.deleteDriverFromModal = function() {
+        let driverId = window.currentDriverFocus;
+        showCustomConfirm('ถอดพนักงาน?', `ต้องการลบประวัติคนขับรหัส ${driverId} ถาวรใช่หรือไม่?`, () => { db.ref('drivers_profile/' + driverId).remove(); db.ref('driver_sessions/' + driverId).remove(); closeDriverProfilePage(); showCustomAlert('สำเร็จ', 'ลบคนขับออกจากระบบเรียบร้อย', 'success'); }, 'ลบทิ้ง', 'red'); 
+    }
+
+    // 🌟 ระบบจัดการกระเป๋าเงิน (Wallet)
+    window.renderWalletTab = function() {
+        let keyword = (document.getElementById('wallet-search-input')?.value || '').toLowerCase();
+        let lst = document.getElementById('wallet-drivers-list');
+        let html = ''; let totalCash = 0; let totalBonus = 0;
+
+        for (let drvId in allProfiles) {
+            let d = allProfiles[drvId];
+            if (keyword && !`${drvId} ${d.name || ''} ${d.phone || ''}`.toLowerCase().includes(keyword)) continue;
+
+            let cashVal = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
+            let bonusVal = parseFloat(d.creditBonus || 0);
+            totalCash += cashVal; totalBonus += bonusVal;
+
+            let pic = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/50 hover:bg-gray-50 dark:hover:bg-slate-800/60 transition">
+                <td class="py-3 px-3 font-bold text-emerald-600 dark:text-emerald-400 text-xs text-left">${drvId}</td>
+                <td class="py-3 px-3 flex items-center gap-2 text-left">${pic} <div class="flex flex-col text-left"><span class="font-bold text-[13px] text-gray-800 dark:text-white">${d.name}</span><span class="text-[10px] text-gray-400">${d.phone}</span></div></td>
+                <td class="py-3 px-2 text-right font-bold text-green-600 text-[13px]">฿${cashVal.toFixed(2)}</td>
+                <td class="py-3 px-2 text-right font-bold text-yellow-600 text-[13px]">฿${bonusVal.toFixed(2)}</td>
+                <td class="py-3 px-3 text-center"><button onclick="openAdjustCreditModal('${drvId}', 'driver')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition border border-emerald-200">จัดการเงิน</button></td>
+            </tr>`;
+        }
+        if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูล</td></tr>';
+        
+        let elCash = document.getElementById('wallet-stat-cash'); if(elCash) elCash.innerText = '฿' + totalCash.toLocaleString();
+        let elBonus = document.getElementById('wallet-stat-bonus'); if(elBonus) elBonus.innerText = '฿' + totalBonus.toLocaleString();
+    }
+
+    let currentWalletRole = 'driver'; 
+    window.openAdjustCreditModal = function(targetId, role = 'driver') {
+        currentWalletTargetId = targetId; currentWalletRole = role;
+        if(role === 'driver') {
+            let d = allProfiles[targetId]; if(!d) return;
+            document.getElementById('adj-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
+            document.getElementById('adj-drv-id').innerText = "คนขับ: " + targetId;
+        } else {
+            document.getElementById('adj-drv-name').innerText = windowContext.focusPassengerName || 'ลูกค้า';
+            document.getElementById('adj-drv-id').innerText = "ลูกค้า: " + targetId;
+            closeModal('modalPassengerDetails');
+        }
+        document.getElementById('adj-amount').value = ''; document.getElementById('adj-note').value = '';
+        document.getElementById('adj-wallet-type').value = 'cash'; document.getElementById('adj-action-type').value = 'add';
+        toggleAdjustColors(); openModal('modalAdjustCredit');
+    }
+
+    window.closeAdjustCreditModal = function() { closeModal('modalAdjustCredit'); if(currentWalletRole === 'passenger') openModal('modalPassengerDetails'); currentWalletTargetId = null; }
+    window.toggleAdjustColors = function() {
+        let action = document.getElementById('adj-action-type').value; let el = document.getElementById('adj-action-type');
+        if(action === 'add') el.className = "w-full p-2.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800 rounded-xl outline-none text-sm font-bold focus:border-emerald-500";
+        else el.className = "w-full p-2.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800 rounded-xl outline-none text-sm font-bold focus:border-red-500";
+    }
+
+    window.submitCreditAdjustment = function() {
+        if(!currentWalletTargetId) return;
+        let walletType = document.getElementById('adj-wallet-type').value; let actionType = document.getElementById('adj-action-type').value; let amount = parseFloat(document.getElementById('adj-amount').value); let note = document.getElementById('adj-note').value.trim();
+        if (isNaN(amount) || amount <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'ระบุจำนวนเงินด้วยครับ', 'error');
+        if (!note) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกระบุหมายเหตุทำรายการ', 'error');
+
+        let path = currentWalletRole === 'driver' ? 'drivers_profile/' + currentWalletTargetId : 'passengers_profile/' + currentWalletTargetId;
+        db.ref(path).once('value', snap => {
+            let d = snap.val() || {}; let currentCash = parseFloat(d.creditCash || d.credit || 0); let currentBonus = parseFloat(d.creditBonus || 0); let newCash = currentCash; let newBonus = currentBonus;
+            if (walletType === 'cash') { if (actionType === 'add') newCash += amount; else newCash -= amount; }
+            else { if (actionType === 'add') newBonus += amount; else newBonus -= amount; }
+            
+            if (newCash < 0 || newBonus < 0) { if(!confirm(`กระเป๋าเงินจะติดลบ ยืนยันดำเนินการต่อไหมครับ?`)) return; }
+            
+            let updatePayload = { creditCash: newCash, creditBonus: newBonus }; if(currentWalletRole === 'driver') updatePayload.credit = newCash;
+            db.ref(path).update(updatePayload).then(() => {
+                db.ref('wallet_transactions/' + currentWalletTargetId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: currentWalletRole, walletType, actionType, amount, note, balanceAfter: walletType === 'cash' ? newCash : newBonus, adminName: "แอดมินศูนย์" });
+                showCustomAlert('สำเร็จ', `ปรับปรุงยอดเงินเรียบร้อยแล้ว`, 'success'); closeAdjustCreditModal();
+                if(currentWalletRole === 'driver') renderWalletTab(); else {
+                    let rStr = document.getElementById('pdet-rides').innerText.replace(/[^0-9]/g, ''); let sStr = document.getElementById('pdet-spend').innerText.replace(/[^0-9]/g, '');
+                    let payloadStr = encodeURIComponent(JSON.stringify({userId: currentWalletTargetId, phone: windowContext.focusPassengerPhone, name: windowContext.focusPassengerName, rides: rStr, spend: sStr}));
+                    viewPassengerDetails(payloadStr);
+                }
+            });
+        });
+    }
+
+    window.openTierAirdropModal = function() { showCustomAlert('เร็วๆ นี้', 'ระบบแจกโบนัสกลุ่ม (Airdrop) กำลังพัฒนา!', 'info'); }
+    window.openCommissionSettings = function() { showCustomAlert('เร็วๆ นี้', 'ระบบตั้งค่าหักค่าคอมมิชชัน กำลังพัฒนา!', 'info'); }
+
+    // 🌟 ระบบการจัดการระดับและรายชื่อพนักงาน (Tiers Tab)
+    window.renderTiersTab = function() {
+        let lst = document.getElementById('tiers-drivers-list');
+        let html = '';
+
+        for (let drvId in allProfiles) {
+            let d = allProfiles[drvId];
+            let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
+
+            let displayRating = "5.0";
+            if (d.tier === 'owner super legend') displayRating = "100.0";
+            else if (d.tier === 'F1 Legend') displayRating = "10.0";
+            else if (d.rating) displayRating = parseFloat(d.rating).toFixed(1);
+
+            let pic = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/50 hover:bg-gray-50 transition text-left">
+                <td class="py-3 px-3 font-bold text-amber-600 text-xs">${drvId}</td>
+                <td class="py-3 px-3 flex items-center gap-2"><div class="shrink-0">${pic}</div> <span class="font-bold text-[13px] text-gray-800 dark:text-white truncate">${d.name}</span></td>
+                <td class="py-3 px-2 text-center">${tierBadgeHtml}</td>
+                <td class="py-3 px-2 text-center font-bold text-yellow-500 text-xs"><i class="fas fa-star text-[10px]"></i> ${displayRating}</td>
+                <td class="py-3 px-3 text-center"><button onclick="openAdjustTierRatingModal('${drvId}')" class="bg-amber-50 text-amber-600 px-3 py-1 rounded text-xs font-bold border border-amber-200 hover:bg-amber-500 hover:text-white transition">ปรับแมนนวล</button></td>
+            </tr>`;
+        }
+        if(lst) lst.innerHTML = html || '<tr><td colspan="5" class="py-8 text-center text-gray-400">ไม่พบข้อมูลพนักงาน</td></tr>';
+    }
+
+    let currentWalletDriverId = null;
+    window.openAdjustTierRatingModal = function(drvId) {
+        currentWalletDriverId = drvId;
+        let d = allProfiles[drvId]; if(!d) return;
+        document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
+        document.getElementById('trm-drv-id').innerText = drvId;
+        
+        let cTier = d.tier || 'New';
+        document.getElementById('trm-tier-select').value = cTier;
+        document.getElementById('trm-note').value = '';
+        
+        let currentRating = d.rating !== undefined ? d.rating : "5.0";
+        if(cTier === 'owner super legend') currentRating = "100";
+        else if(cTier === 'F1 Legend') currentRating = "10";
+        document.getElementById('trm-rating-input').value = currentRating;
+
+        openModal('modalAdjustTierRating');
+    }
+
+    window.closeTierRatingModal = function() { closeModal('modalAdjustTierRating'); currentWalletDriverId = null; }
+
+    window.autoFillOverrideStars = function() {
+        let tier = document.getElementById('trm-tier-select').value; let rInput = document.getElementById('trm-rating-input');
+        if(tier === 'owner super legend') rInput.value = "100";
+        else if(tier === 'F1 Legend') rInput.value = "10";
+        else rInput.value = "5.0";
+    }
+
+    window.submitTierRatingAdjustment = function() {
+        if(!currentWalletDriverId) return;
+        let newTier = document.getElementById('trm-tier-select').value;
+        let newRating = parseFloat(document.getElementById('trm-rating-input').value) || 5.0;
+        let note = document.getElementById('trm-note').value.trim();
+
+        if(!note) return showCustomAlert('ระบุหมายเหตุ', 'กรุณากรอกเหตุผลเพื่อบันทึกประวัติการปรับสิทธิ์', 'error');
+
+        db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: newTier, rating: newRating.toFixed(1) }).then(() => {
+            db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: newTier, assignedRating: newRating.toFixed(1), reason: note, adminName: "ผู้บริหารระบบ" });
+            showCustomAlert('สำเร็จ', 'ปรับเปลี่ยนระดับ Tier และคะแนนดาวเรียบร้อยแล้ว', 'success');
+            closeTierRatingModal(); if(typeof renderTiersTab === 'function') renderTiersTab(); 
+        });
+    }
 
     // ========================================================
     // 🌟 ระบบสร้างแคมเปญและภารกิจแบบผสมเงื่อนไข (Composite Quest Center)
@@ -2601,7 +3078,7 @@
 
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
     window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
-
+    
     // ================= อัปเดตฟังก์ชันลงทะเบียน (โบนัสออโต้จากเควส) =================
     window.saveNewDriver = function() {
         let drvId = document.getElementById('add-drv-id').value.trim();
