@@ -169,83 +169,103 @@
           </div>
       </section>
 
-      <section id="content-allmenu" class="tab-content hidden space-y-6 pb-6">
+      <!-- ================= หน้าเมนูรวม (แบบพับเก็บได้) ================= -->
+      <section id="content-allmenu" class="tab-content hidden space-y-4 pb-6 mt-2">
           
-          <div>
-              <h2 class="text-sm font-bold text-gray-500 dark:text-slate-400 mb-3 flex items-center gap-2 border-b border-gray-200 dark:border-slate-800 pb-2">
-                  <i class="fas fa-id-card text-blue-500"></i> หมวดหมู่จัดการคนขับ
-              </h2>
-              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
-                  <button onclick="switchTab('drivers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+          <!-- 👤 ฝั่งคนขับ -->
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm transition-colors duration-300">
+              <div onclick="toggleMenuCategory('menu-group-driver', this)" class="flex items-center justify-between cursor-pointer select-none">
+                  <h2 class="text-sm font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                      <i class="fas fa-id-card text-blue-500"></i> หมวดหมู่จัดการคนขับ
+                  </h2>
+                  <div class="w-8 h-8 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-gray-500 dark:text-slate-400 transition">
+                      <i class="fas fa-chevron-up transition-transform duration-300"></i>
+                  </div>
+              </div>
+              <div id="menu-group-driver" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 transition-all duration-300">
+                  <button onclick="switchTab('drivers')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการคนขับ</span>
                   </button>
-                  <button onclick="switchTab('wallet'); renderWalletTab();" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('wallet'); renderWalletTab();" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-wallet"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">กระเป๋าเงิน</span>
                   </button>
-                  <button onclick="switchTab('quests'); renderQuestsTable();" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('quests'); renderQuestsTable();" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullseye"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ภารกิจแคมเปญ</span>
                   </button>
-                  <button onclick="switchTab('tiers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-balance-scale"></i></div>
+                  <button onclick="switchTab('tiers'); renderTiersTab();" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-balance-scale"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">กฎระเบียบคนขับ</span>
                   </button>
-                  <button onclick="switchTab('blockdrivers')" class="bg-white dark:bg-slate-900 border border-red-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('blockdrivers')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ban"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-red-500 dark:text-red-400 leading-tight">บล็อกคนขับ</span>
                   </button>
               </div>
           </div>
 
-          <div>
-              <h2 class="text-sm font-bold text-gray-500 dark:text-slate-400 mb-3 flex items-center gap-2 border-b border-gray-200 dark:border-slate-800 pb-2">
-                  <i class="fas fa-user-friends text-[#1da1f2]"></i> หมวดหมู่ข้อมูลลูกค้า
-              </h2>
-              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
-                  <button onclick="switchTab('passengers')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+          <!-- 🧍‍♂️ ฝั่งลูกค้า -->
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm transition-colors duration-300">
+              <div onclick="toggleMenuCategory('menu-group-passenger', this)" class="flex items-center justify-between cursor-pointer select-none">
+                  <h2 class="text-sm font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                      <i class="fas fa-user-friends text-[#1da1f2]"></i> หมวดหมู่ผู้โดยสาร
+                  </h2>
+                  <div class="w-8 h-8 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-gray-500 dark:text-slate-400 transition">
+                      <i class="fas fa-chevron-up transition-transform duration-300"></i>
+                  </div>
+              </div>
+              <div id="menu-group-passenger" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 transition-all duration-300">
+                  <button onclick="switchTab('passengers')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-users"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข้อมูลลูกค้า</span>
                   </button>
-                  <button onclick="switchTab('promos')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('promos')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ticket-alt"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">คูปองส่วนลด</span>
                   </button>
-                  <button onclick="switchTab('blacklist')" class="bg-white dark:bg-slate-900 border border-red-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('banners')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">โฆษณาลูกค้า</span>
+                  </button>
+                  <button onclick="switchTab('news')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข่าวสารลูกค้า</span>
+                  </button>
+                  <button onclick="switchTab('blacklist')" class="bg-gray-50 dark:bg-slate-800 border border-red-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-slash"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-red-500 dark:text-red-400 leading-tight">บล็อกลูกค้า</span>
                   </button>
               </div>
           </div>
 
-          <div>
-              <h2 class="text-sm font-bold text-gray-500 dark:text-slate-400 mb-3 flex items-center gap-2 border-b border-gray-200 dark:border-slate-800 pb-2">
-                  <i class="fas fa-cogs text-gray-500"></i> หมวดหมู่ระบบส่วนกลาง
-              </h2>
-              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
-                  <button onclick="switchTab('history')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+          <!-- ⚙️ ระบบส่วนกลาง -->
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm transition-colors duration-300">
+              <div onclick="toggleMenuCategory('menu-group-central', this)" class="flex items-center justify-between cursor-pointer select-none">
+                  <h2 class="text-sm font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                      <i class="fas fa-cogs text-gray-500"></i> หมวดหมู่ระบบส่วนกลาง
+                  </h2>
+                  <div class="w-8 h-8 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-gray-500 dark:text-slate-400 transition">
+                      <i class="fas fa-chevron-up transition-transform duration-300"></i>
+                  </div>
+              </div>
+              <div id="menu-group-central" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 transition-all duration-300">
+                  <button onclick="switchTab('history')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-history"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ประวัติงาน</span>
                   </button>
-                  <button onclick="switchTab('vehicles')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('vehicles')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">เรท & ประเภท</span>
                   </button>
-                  <button onclick="switchTab('banners')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการโฆษณา</span>
-                  </button>
-                  <button onclick="switchTab('news')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">โพสต์ข่าวสาร</span>
-                  </button>
-                  <button onclick="switchTab('chatlogs')" class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('chatlogs')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">บันทึกแชท</span>
                   </button>
               </div>
           </div>
+
       </section>
 
       <section id="content-map" class="tab-content hidden flex-1 flex-col pb-2">
@@ -1050,6 +1070,23 @@
             adminMap.setOptions({ styles: !isNowDark ? darkMapStyle : lightMapStyle });
         }
     }
+
+// ==========================================
+    // 🌟 ระบบสไลด์พับเก็บเมนู (Accordion)
+    // ==========================================
+    window.toggleMenuCategory = function(groupId, headerEl) {
+        let group = document.getElementById(groupId);
+        let icon = headerEl.querySelector('.fa-chevron-up');
+        
+        if (group.classList.contains('hidden')) {
+            group.classList.remove('hidden');
+            if(icon) icon.classList.remove('rotate-180');
+        } else {
+            group.classList.add('hidden');
+            if(icon) icon.classList.add('rotate-180'); // ใช้ class Tailwind หมุนลูกศรลง
+        }
+    }
+    
     // ================= CUSTOM ALERTS =================
     let confirmCallback = null;
     function showCustomAlert(title, message, type='info', callback=null) {
