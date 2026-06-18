@@ -573,21 +573,26 @@
           </div>
       </section>
 
-      <section id="content-blockdrivers" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md h-fit">
-              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-ban text-red-500 mr-1"></i> ระงับการใช้งานคนขับ</h2>
-              <div class="space-y-4">
-                  <input type="text" id="block-driver-pin" placeholder="กรอกรหัส PIN (4 หลัก)" class="w-full p-3 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none font-bold text-center focus:border-red-500 tracking-widest">
-                  <input type="text" id="block-driver-reason" placeholder="สาเหตุการระงับ..." class="w-full p-3 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm focus:border-red-500">
-                  <button onclick="addDriverToBlacklist()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-md transition">ระงับพนักงานคนนี้</button>
-              </div>
+      <section id="content-blockdrivers" class="tab-content hidden grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-2 pb-8">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm h-fit">
+              <h2 class="text-sm font-black text-gray-800 dark:text-white mb-2"><i class="fas fa-ban text-red-500 mr-1"></i> ระงับการใช้งานคนขับ</h2>
+              <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-4 leading-relaxed">บล็อกพนักงานผ่านรหัสอ้างอิงระบบ (Driver ID) เพื่อป้องกันการเปิดออนไลน์รับงาน</p>
+              
+              <button onclick="openModal('modalSearchToBlock')" class="w-full bg-red-50 dark:bg-red-900/20 hover:bg-red-100 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 font-medium py-3 rounded-xl shadow-sm transition flex items-center justify-center gap-2 text-[11px]"><i class="fas fa-search"></i> ระบุ ID คนขับเพื่อบล็อก</button>
           </div>
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md md:col-span-2">
-              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อคนขับที่ถูกระงับ</h2>
-              <div class="overflow-x-auto">
+          
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm md:col-span-2">
+              <h2 class="text-sm font-black text-gray-800 dark:text-white mb-4"><i class="fas fa-list text-red-500 mr-1"></i> รายชื่อคนขับที่ถูกระงับสิทธิ์</h2>
+              <div class="overflow-x-auto hide-scrollbar">
                   <table class="w-full text-left border-collapse min-w-[400px]">
-                      <thead><tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-xs font-bold bg-gray-100 dark:bg-slate-800/20"><th class="py-3 px-2 text-left">รหัส PIN</th><th class="py-3 px-2 text-left">เหตุผลการบล็อก</th><th class="py-3 px-2 text-right">จัดการ</th></tr></thead>
-                      <tbody id="blockdrivers-table-body" class="text-sm divide-y divide-gray-200 dark:divide-slate-800"></tbody>
+                      <thead>
+                          <tr class="border-b border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 text-[11px] font-medium bg-gray-50 dark:bg-slate-800/30">
+                              <th class="py-2.5 px-3 text-left rounded-tl-lg">รหัสอ้างอิง (ID)</th>
+                              <th class="py-2.5 px-2 text-left">เหตุผลการบล็อก</th>
+                              <th class="py-2.5 px-3 text-right rounded-tr-lg">จัดการ</th>
+                          </tr>
+                      </thead>
+                      <tbody id="blockdrivers-table-body" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50"></tbody>
                   </table>
               </div>
           </div>
@@ -2664,8 +2669,8 @@
         let statusEl = document.getElementById('det-online-status');
         let btnAction = document.getElementById('btn-profile-block-action');
         
-        // 🌟 ดึงข้อมูลจากฐานข้อมูลดูว่าโดนบล็อกอยู่ไหม เพื่อเปลี่ยนสีป้ายและชื่อปุ่ม
-        db.ref('blocked_drivers/' + d.pin).once('value', snap => {
+        // 🌟 แก้บั๊กตรงนี้: เปลี่ยนมาใช้ driverId ค้นหาแทน d.pin เพื่อให้แมตช์กับตอนที่บันทึก
+        db.ref('blocked_drivers/' + driverId).once('value', snap => {
             let b = snap.val();
             let now = Date.now();
             let isBlocked = b && (b.expireAt === 0 || b.expireAt > now);
@@ -2707,15 +2712,15 @@
     }
 
     // ==========================================
-    // 🌟 ระบบจัดการบล็อกคนขับผ่านป๊อปอัป (ปรับปรุงให้ยืดหยุ่น)
+    // 🌟 ระบบจัดการบล็อกคนขับผ่านป๊อปอัป
     // ==========================================
-    window.openBlockDriverModal = function(pin) {
-        if(!pin) return;
-        let d = allProfiles[pin];
+    window.openBlockDriverModal = function(driverId) {
+        if(!driverId) return;
+        let d = allProfiles[driverId];
         document.getElementById('block-drv-name').innerText = d ? d.name : 'พนักงาน';
-        document.getElementById('block-drv-id').innerText = 'PIN: ' + pin;
+        document.getElementById('block-drv-id').innerText = 'ID: ' + driverId;
         
-        db.ref('blocked_drivers/' + pin).once('value', snap => {
+        db.ref('blocked_drivers/' + driverId).once('value', snap => {
             let b = snap.val();
             let now = Date.now();
             let isBlocked = b && (b.expireAt === 0 || b.expireAt > now);
@@ -2736,25 +2741,25 @@
                 }
                 
                 submitBtn.className = "w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5";
-                submitBtn.innerText = 'ปลดบล็อกคนขับ';
-                submitBtn.onclick = function() { unblockDriver(pin); };
+                submitBtn.innerHTML = '<i class="fas fa-unlock"></i> ปลดบล็อกคนขับ';
+                submitBtn.onclick = function() { unblockDriver(driverId); };
             } else {
                 inputZone.classList.remove('hidden');
                 statusZone.classList.add('hidden');
-                document.getElementById('block-duration-num').value = "";
+                document.getElementById('block-duration-num').value = "10";
                 document.getElementById('block-duration-num').disabled = false;
                 document.getElementById('block-duration-unit').value = "minutes";
                 document.getElementById('block-reason-input').value = "";
                 
                 submitBtn.className = "w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5";
-                submitBtn.innerText = 'ยืนยันการบล็อก';
-                submitBtn.onclick = function() { submitBlockDriver(pin); };
+                submitBtn.innerHTML = '<i class="fas fa-ban"></i> ยืนยันการบล็อก';
+                submitBtn.onclick = function() { submitBlockDriver(driverId); };
             }
             openModal('modalBlockDriver');
         });
     }
 
-    window.submitBlockDriver = function(pin) {
+    window.submitBlockDriver = function(driverId) {
         let numStr = document.getElementById('block-duration-num').value;
         let unit = document.getElementById('block-duration-unit').value;
         let reason = document.getElementById('block-reason-input').value.trim();
@@ -2776,28 +2781,126 @@
             expireAt = Date.now() + (num * multiplier);
         }
 
-        let payload = { pin: pin, reason: reason, expireAt: expireAt, timestamp: firebase.database.ServerValue.TIMESTAMP };
+        let payload = { pin: driverId, reason: reason, expireAt: expireAt, timestamp: firebase.database.ServerValue.TIMESTAMP };
 
-        db.ref('blocked_drivers/' + pin).set(payload).then(() => {
-            db.ref('blocked_history/' + pin).push(payload); // เก็บประวัติ
-            db.ref('active_drivers/' + pin).remove(); // เตะคนขับออกจากระบบออนไลน์ทันที
+        db.ref('blocked_drivers/' + driverId).set(payload).then(() => {
+            db.ref('blocked_history/' + driverId).push(payload);
+            
+            // เตะออกจากระบบออนไลน์ (ลบจาก active_drivers โดยใช้ PIN)
+            let d = allProfiles[driverId];
+            if(d && d.pin) db.ref('active_drivers/' + d.pin).remove(); 
             
             showCustomAlert('ระงับสิทธิ์สำเร็จ', 'คนขับถูกระงับสิทธิ์และถูกตัดออกจากระบบออนไลน์แล้ว', 'success');
             closeModal('modalBlockDriver');
-            showDriverDetails(pin); // รีเฟรชหน้าโปรไฟล์
+            showDriverDetails(driverId); 
         });
     }
 
-    window.unblockDriver = function(pin) {
+    window.unblockDriver = function(driverId) {
         showCustomConfirm('ปลดบล็อกคนขับ?', 'ยืนยันการคืนสิทธิ์ให้พนักงานคนนี้สามารถเปิดออนไลน์รับงานได้ตามปกติ?', () => {
-            db.ref('blocked_drivers/' + pin).remove().then(() => {
-                db.ref('blocked_history/' + pin).push({ pin: pin, reason: 'แอดมินพิจารณาปลดบล็อกให้แล้ว', action: 'unblock', timestamp: firebase.database.ServerValue.TIMESTAMP });
-                showCustomAlert('สำเร็จ', 'ปลดบล็อกคนขับเรียบร้อยแล้ว พนักงานสามารถออนไลน์ได้ทันที', 'success');
+            db.ref('blocked_drivers/' + driverId).remove().then(() => {
+                db.ref('blocked_history/' + driverId).push({ pin: driverId, reason: 'แอดมินพิจารณาปลดบล็อกให้แล้ว', action: 'unblock', timestamp: firebase.database.ServerValue.TIMESTAMP });
+                showCustomAlert('สำเร็จ', 'ปลดบล็อกคนขับเรียบร้อยแล้ว', 'success');
                 closeModal('modalBlockDriver');
-                showDriverDetails(pin); // รีเฟรชหน้า
+                showDriverDetails(driverId); 
             });
         });
     }
+
+    // ==========================================
+    // 🌟 ระบบหน้าจัดการ Blocked Drivers (ตารางรายชื่อ)
+    // ==========================================
+    db.ref('blocked_drivers').on('value', snap => {
+        let tbody = document.getElementById('blockdrivers-table-body');
+        if(!tbody) return;
+        let html = '';
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let driverId = child.key;
+                let b = child.val();
+                let now = Date.now();
+                
+                // ถ้าหมดเวลาแบนแล้ว ให้ลบประวัติแบนปัจจุบันทิ้ง
+                if(b.expireAt !== 0 && b.expireAt < now) {
+                    db.ref('blocked_drivers/' + driverId).remove();
+                    return; 
+                }
+                
+                let d = allProfiles[driverId] || {};
+                let name = d.name || 'ไม่ทราบชื่อ';
+                let dateStr = b.expireAt === 0 ? 'แบนถาวร' : new Date(b.expireAt).toLocaleString('th-TH');
+                
+                html += `
+                <tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                    <td class="py-3 px-3">
+                        <p class="font-bold text-red-500 text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${driverId}')">${driverId}</p>
+                        <p class="text-[10px] text-gray-500">${name}</p>
+                    </td>
+                    <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">
+                        <p class="font-bold mb-0.5"><i class="fas fa-exclamation-circle text-red-400"></i> ${b.reason}</p>
+                        <p class="text-[9px] text-gray-400">ปลดบล็อก: ${dateStr}</p>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <button onclick="unblockDriver('${driverId}')" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition shadow-sm">ปลดบล็อก</button>
+                    </td>
+                </tr>`;
+            });
+        }
+        tbody.innerHTML = html || '<tr><td colspan="3" class="py-10 text-center text-gray-400 text-xs">ปัจจุบันไม่มีพนักงานที่ถูกระงับสิทธิ์ 🎉</td></tr>';
+    });
+
+    // ฟังก์ชันรับ ID จากหน้าต่างค้นหา แล้วส่งไปหน้าตั้งเวลาบล็อก
+    window.submitSearchToBlock = function() {
+        let driverId = document.getElementById('search-block-id').value.trim().toUpperCase();
+        if(!driverId) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณากรอกรหัส Driver ID ด้วยครับ', 'error');
+
+        if(!allProfiles[driverId]) {
+            return showCustomAlert('ไม่พบข้อมูล', `ไม่พบพนักงานรหัส ${driverId} ในระบบ กรุณาตรวจสอบให้แน่ใจว่าพิมพ์ถูกต้อง`, 'error');
+        }
+
+        closeModal('modalSearchToBlock');
+        document.getElementById('search-block-id').value = ''; // เคลียร์ช่องพิมพ์
+        openBlockDriverModal(driverId); // ส่งไม้ต่อให้ป๊อปอัปบล็อกตัวหลักทำงานต่อ
+    }
+
+    // อัปเดตตารางรายชื่อคนขับที่ถูกระงับให้โชว์ DRV-ID ถูกต้อง
+    db.ref('blocked_drivers').on('value', snap => {
+        let tbody = document.getElementById('blockdrivers-table-body');
+        if(!tbody) return;
+        let html = '';
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let driverId = child.key;
+                let b = child.val();
+                let now = Date.now();
+                
+                if(b.expireAt !== 0 && b.expireAt < now) {
+                    db.ref('blocked_drivers/' + driverId).remove();
+                    return; 
+                }
+                
+                let d = allProfiles[driverId] || {};
+                let name = d.name || 'ไม่ทราบชื่อ';
+                let dateStr = b.expireAt === 0 ? 'แบนถาวร' : new Date(b.expireAt).toLocaleString('th-TH');
+                
+                html += `
+                <tr class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                    <td class="py-3 px-3 min-w-[120px]">
+                        <p class="font-bold text-red-500 text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${driverId}')">${driverId}</p>
+                        <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">${name}</p>
+                    </td>
+                    <td class="py-3 px-2 text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed max-w-[150px] sm:max-w-xs">
+                        <p class="font-medium text-gray-800 dark:text-slate-200 mb-0.5 truncate" title="${b.reason}"><i class="fas fa-exclamation-circle text-red-400 mr-0.5"></i> ${b.reason}</p>
+                        <p class="text-[9px] text-gray-400">ปลดบล็อก: ${dateStr}</p>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <button onclick="unblockDriver('${driverId}')" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-[10px] font-medium border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-600 hover:text-white transition shadow-sm whitespace-nowrap">ปลดบล็อก</button>
+                    </td>
+                </tr>`;
+            });
+        }
+        tbody.innerHTML = html || '<tr><td colspan="3" class="py-10 text-center text-gray-400 text-[11px]">ปัจจุบันไม่มีพนักงานที่ถูกระงับสิทธิ์ 🎉</td></tr>';
+    });
     
     window.viewBlockHistory = function() {
         showCustomAlert('ระบบประวัติ (เร็วๆนี้)', 'หน้านี้จะเก็บประวัติการถูกบล็อกและการโดนระบบ Auto-Block หักคะแนนทั้งหมดของพนักงานคนนี้ครับ', 'info');
@@ -3806,6 +3909,22 @@
                   <input type="text" id="airdrop-note" placeholder="เช่น โบนัสเยียวยาระบบปรับปรุง, แจกปีใหม่..." class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-xs focus:border-yellow-500">
               </div>
               <button onclick="submitTierAirdrop()" class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-paper-plane"></i> อัดฉีดเงินให้กลุ่มเป้าหมาย 🚀</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalSearchToBlock" class="hidden fixed inset-0 z-[350] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+              <h2 class="text-sm font-bold text-gray-800 dark:text-white pl-2"><i class="fas fa-search mr-1 text-blue-500"></i> ระบุคนขับที่ต้องการบล็อก</h2>
+              <button onclick="closeModal('modalSearchToBlock')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white relative z-50"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-5 space-y-4 relative z-40">
+              <div>
+                  <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-1">รหัสอ้างอิงระบบ (Driver ID)</label>
+                  <input type="text" id="search-block-id" placeholder="เช่น DRV-123456" class="w-full p-2.5 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-[12px] font-bold focus:border-red-500 transition tracking-wide text-center uppercase">
+              </div>
+              <button onclick="submitSearchToBlock()" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-arrow-right"></i> ดำเนินการต่อ</button>
           </div>
       </div>
   </div>
