@@ -299,15 +299,21 @@
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">เรท & ประเภท</span>
                   </button>
+                  
+                  <button onclick="switchTab('tier-settings')" class="bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-medal"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-amber-700 dark:text-amber-500 leading-tight">ตั้งค่าระดับชั้น</span>
+                  </button>
+
                   <button onclick="switchTab('chatlogs')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">บันทึกแชท</span>
                   </button>
-                <button onclick="switchTab('all-wallet-history')" class="bg-gray-50 dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                  <button onclick="switchTab('all-wallet-history')" class="bg-gray-50 dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-file-invoice-dollar"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-emerald-600 dark:text-emerald-400 leading-tight">ประวัติการเงิน</span>
                   </button>
-                <button onclick="switchTab('topup-approvals')" class="bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95 relative">
+                  <button onclick="switchTab('topup-approvals')" class="bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95 relative">
                       <div id="badge-topup-pending" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">0</div>
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-file-invoice"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-amber-600 dark:text-amber-500 leading-tight">อนุมัติสลิปเติมเงิน</span>
@@ -1215,6 +1221,49 @@
                   </div>
 
                   <button onclick="saveSpecialCommissionRule()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5"><i class="fas fa-check-circle"></i> บันทึกและเปิดใช้งานเงื่อนไข</button>
+              </div>
+          </div>
+      </div>
+    <section id="content-tier-settings" class="tab-content hidden space-y-4 pb-8 mt-2 h-full animate-fade-in">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col min-h-[calc(100vh-140px)]">
+              
+              <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100 dark:border-slate-800">
+                  <div>
+                      <h2 class="text-base sm:text-lg font-black text-amber-600 dark:text-amber-500 flex items-center gap-2"><i class="fas fa-medal"></i> ฐานข้อมูลระดับชั้น (Central Tiers)</h2>
+                      <p class="text-xs text-gray-500 mt-1">ทุกระบบในแอปจะอ้างอิงรายชื่อและข้อมูลระดับชั้นจากหน้านี้เท่านั้น</p>
+                  </div>
+                  <button onclick="openTierModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 shrink-0">
+                      <i class="fas fa-plus"></i> <span class="hidden sm:inline">เพิ่มระดับชั้นใหม่</span>
+                  </button>
+              </div>
+
+              <div id="tier-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  </div>
+          </div>
+      </section>
+
+      <div id="modalTierForm" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
+          <div class="bg-white dark:bg-slate-900 border border-amber-500/30 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+              <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-amber-50 dark:bg-amber-950/20">
+                  <h2 id="tier-modal-title" class="text-sm font-black text-amber-600 dark:text-amber-400"><i class="fas fa-edit mr-1"></i> เพิ่มระดับชั้นใหม่</h2>
+                  <button onclick="closeModal('modalTierForm')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400"><i class="fas fa-times"></i></button>
+              </div>
+              
+              <div class="p-5 space-y-4">
+                  <input type="hidden" id="tier-old-id" value="">
+                  
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ชื่อระดับชั้น (Tier Name) <span class="text-red-500">*</span></label>
+                      <input type="text" id="tier-input-name" placeholder="เช่น Standard, Gold, Diamond" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-bold outline-none focus:border-amber-500">
+                      <p class="text-[9px] text-gray-400 mt-1">⚠️ พิมพ์ให้ถูกต้องชัดเจน เพราะระบบออโต้จะใช้ชื่อนี้ในการอ้างอิง</p>
+                  </div>
+
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">คำอธิบายเพิ่มเติม (ใส่หรือไม่ใส่ก็ได้)</label>
+                      <input type="text" id="tier-input-desc" placeholder="เช่น สำหรับคนขับทั่วไป" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-amber-500">
+                  </div>
+
+                  <button onclick="saveTierData()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm shadow-md transition mt-2"><i class="fas fa-save mr-1"></i> บันทึกข้อมูล</button>
               </div>
           </div>
       </div>
@@ -4962,6 +5011,99 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
     // สั่งโหลดข้อมูลใส่ Dropdown ทันที
     window.loadCentralOptionsForCommission();
+
+    // ========================================================
+    // 🌟 ระบบจัดการระดับชั้นส่วนกลาง (Centralized Tier Management)
+    // ========================================================
+
+    // ลงทะเบียนหน้าเข้าสู่ระบบ Navigation
+    if(typeof tabTitles !== 'undefined') {
+        tabTitles['tier-settings'] = 'ศูนย์กลางจัดการระดับชั้น (Tiers)';
+    }
+
+    // ดึงข้อมูลและวาดหน้าจอแบบ Real-time
+    db.ref('config/tiers').on('value', snap => {
+        let container = document.getElementById('tier-list-container');
+        if(!container) return;
+        
+        let html = '';
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let tierName = child.key;
+                let data = child.val();
+                let desc = data.description || 'ไม่มีคำอธิบาย';
+                
+                html += `
+                <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400 text-amber-900 rounded-full flex items-center justify-center text-lg shadow-sm"><i class="fas fa-star"></i></div>
+                        <div>
+                            <h3 class="font-black text-gray-800 dark:text-white text-sm">${tierName}</h3>
+                            <p class="text-[10px] text-gray-500">${desc}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="openTierModal('${tierName}', '${desc}')" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteTierData('${tierName}')" class="w-8 h-8 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+        }
+        container.innerHTML = html || '<div class="col-span-full py-10 text-center text-gray-400 font-bold"><i class="fas fa-box-open text-3xl block mb-2 opacity-30"></i> ยังไม่มีข้อมูลระดับชั้นในระบบ</div>';
+        
+        // 🌟 อัปเดต Dropdown ในหน้าตั้งค่าคอมมิชชันให้ทันที!
+        if(typeof window.loadCentralOptionsForCommission === 'function') {
+            window.loadCentralOptionsForCommission();
+        }
+    });
+
+    // เปิดหน้าต่างเพิ่ม/แก้ไข
+    window.openTierModal = function(id = '', desc = '') {
+        document.getElementById('tier-old-id').value = id;
+        document.getElementById('tier-input-name').value = id; // ใช้ Key เป็นชื่อเลย
+        document.getElementById('tier-input-desc').value = desc;
+        
+        document.getElementById('tier-modal-title').innerHTML = id ? '<i class="fas fa-edit mr-1"></i> แก้ไขระดับชั้น' : '<i class="fas fa-plus-circle mr-1"></i> เพิ่มระดับชั้นใหม่';
+        openModal('modalTierForm');
+    }
+
+    // บันทึกข้อมูลลงฐานข้อมูล
+    window.saveTierData = function() {
+        let oldId = document.getElementById('tier-old-id').value;
+        let newName = document.getElementById('tier-input-name').value.trim();
+        let desc = document.getElementById('tier-input-desc').value.trim();
+
+        if(!newName) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ชื่อระดับชั้นด้วยครับ', 'error');
+        
+        // กฎเหล็ก: ห้ามมีอักขระพิเศษในชื่อ Key ของ Firebase (จุด, #, $, [, ])
+        if(/[.#$\[\]]/.test(newName)) {
+            return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้นเด็ดขาดครับ', 'error');
+        }
+
+        // ถ้าเป็นการแก้ไขชื่อใหม่ ต้องลบของเก่าทิ้งก่อน (เพราะเราใช้ชื่อเป็น Key)
+        if(oldId && oldId !== newName) {
+            db.ref('config/tiers/' + oldId).remove();
+        }
+
+        // เซฟของใหม่ลงไป
+        db.ref('config/tiers/' + newName).set({
+            description: desc,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เข้าสู่ระบบส่วนกลางแล้ว`, 'success');
+            closeModal('modalTierForm');
+        });
+    }
+
+    // ลบระดับชั้น
+    window.deleteTierData = function(tierName) {
+        showCustomConfirm('ยืนยันลบระดับชั้น?', `หากลบระดับ ${tierName} กฎคอมมิชชันที่ผูกกับระดับนี้อาจทำงานผิดพลาดได้!`, () => {
+            db.ref('config/tiers/' + tierName).remove().then(() => {
+                showCustomAlert('ลบสำเร็จ', 'นำระดับชั้นออกจากระบบส่วนกลางแล้ว', 'success');
+            });
+        }, 'ลบข้อมูล', 'red');
+    }
+    
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
