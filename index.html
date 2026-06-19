@@ -1898,8 +1898,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า'};    // 🌟 1. ระบบ History & Back Button
-    window.adminHistoryStack = ['dashboard'];
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า' };    window.adminHistoryStack = ['dashboard'];
 
     function switchTab(tabId, isBack = false) {
         document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
@@ -4321,7 +4320,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     // ========================================================
     window.openQuestModal = function(questId = null) {
         // ล้างค่าเก่าทิ้งให้หมดเวลาเปิดหน้าต่าง
-        ['rides','star','days','signup','manual', 'limit'].forEach(type => {
+        ['rides','star','days','signup','manual'].forEach(type => {
             let chk = document.getElementById(`cond-${type}-check`); 
             if(chk) { chk.checked = false; chk.disabled = false; }
             let val = document.getElementById(`cond-${type}-val`); 
@@ -4334,7 +4333,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
 
         if (questId && allQuests[questId]) {
-            // โหลดข้อมูลเก่ามาแสดงกรณีแก้ไข
             let q = allQuests[questId]; let c = q.conditions || {};
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญ';
             document.getElementById('quest-id').value = questId;
@@ -4352,13 +4350,11 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
             if(c.manual) { let chk = document.getElementById('cond-manual-check'); if(chk) chk.checked = true; }
             if(c.signup) { let chk = document.getElementById('cond-signup-check'); if(chk) chk.checked = true; }
-            if(c.dailyLimit > 0) { let chk = document.getElementById('cond-limit-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-limit-val'); if(val) { val.value = c.dailyLimit; val.disabled = false; } }
             if(c.rides > 0) { let chk = document.getElementById('cond-rides-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-rides-val'); if(val) { val.value = c.rides; val.disabled = false; } }
             if(c.stars > 0) { let chk = document.getElementById('cond-star-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-star-val'); if(val) { val.value = c.stars; val.disabled = false; } }
             if(c.days > 0) { let chk = document.getElementById('cond-days-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-days-val'); if(val) { val.value = c.days; val.disabled = false; } if(dUnit) { dUnit.disabled = false; dUnit.value = c.daysUnit || 'days'; } }
 
         } else {
-            // ตั้งค่าพื้นฐานสำหรับกดสร้างใหม่
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
             document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
             document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
@@ -4391,7 +4387,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let conditions = {
             manual: document.getElementById('cond-manual-check')?.checked || false,
             signup: document.getElementById('cond-signup-check')?.checked || false,
-            dailyLimit: document.getElementById('cond-limit-check')?.checked ? (parseInt(document.getElementById('cond-limit-val').value) || 0) : 0,
             rides: document.getElementById('cond-rides-check')?.checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
             stars: document.getElementById('cond-star-check')?.checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
             days: document.getElementById('cond-days-check')?.checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
@@ -4406,14 +4401,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         };
 
         db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
-            // 🌟 จด Log ลง Sheet เมื่อสร้าง/แก้ไขแคมเปญคนขับ
-            window.syncLogToSheet('Admin_Activities', [
-                new Date().toLocaleString('th-TH'), 
-                'ตั้งค่าแคมเปญ (Quest)', 
-                name, 
-                qId, 
-                '-', '-'
-            ]);
+            if(typeof window.syncLogToSheet === 'function') {
+                window.syncLogToSheet('Admin_Activities', [new Date().toLocaleString('th-TH'), 'ตั้งค่าแคมเปญ (Quest)', name, qId, '-', '-']);
+            }
             showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); 
             closeModal('modalAddQuest'); 
         });
@@ -4781,12 +4771,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                               <option value="days">วัน</option><option value="months">เดือน</option><option value="years">ปี</option>
                           </select>
                       </div>
-                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
-                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="cond-limit-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24 text-red-600 dark:text-red-400">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
-                          <input type="number" id="cond-limit-val" disabled placeholder="เช่น 1" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <span class="text-[10px] font-bold text-gray-500">ครั้ง / วัน</span>
-                      </div>
+                      
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
                           <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (แจกคนใหม่)</label>
