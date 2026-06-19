@@ -1131,6 +1131,126 @@
           </div>
       </div>
   </div>
+    <section id="content-commission-settings" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-140px)]">
+              
+              <div class="w-full lg:w-1/3 space-y-4 shrink-0">
+                  <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-800 p-4 rounded-xl space-y-4">
+                      <h3 class="text-xs font-black text-gray-800 dark:text-white uppercase tracking-wider flex items-center gap-2"><i class="fas fa-shield-alt text-blue-500"></i> กฎการเงินพื้นฐาน (Default)</h3>
+                      <p class="text-[10px] text-gray-500 leading-relaxed">กฎนี้จะทำงานเป็น "ตาข่ายรองรับขั้นต่ำ" บังคับใช้กับคนขับทุกคนในระบบทันที หากไม่มีกฎพิเศษใดๆ มาครอบคลุม</p>
+                      
+                      <hr class="border-gray-200 dark:border-slate-700">
+
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1">💸 ยอดเครดิตขั้นต่ำ (บังคับเติมเงิน)</label>
+                          <div class="flex items-center gap-2">
+                              <input type="number" id="comm-def-min-balance" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold text-center focus:border-blue-500 shadow-sm shadow-inner">
+                              <span class="text-xs font-bold text-gray-500">บาท</span>
+                          </div>
+                      </div>
+
+                      <div class="grid grid-cols-2 gap-2">
+                          <div>
+                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1">รูปแบบหักเงิน</label>
+                              <select id="comm-def-type" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-xs font-bold focus:border-blue-500">
+                                  <option value="percent">เปอร์เซ็นต์ (%)</option>
+                                  <option value="flat">คงที่ (บาท)</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1">จำนวนที่หัก</label>
+                              <input type="number" id="comm-def-value" class="w-full p-2.5 bg-white dark:bg-slate-900 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-black text-center focus:border-blue-500 shadow-inner">
+                          </div>
+                      </div>
+
+                      <button onclick="saveDefaultCommissionSettings()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5"><i class="fas fa-save"></i> บันทึกกฎพื้นฐาน</button>
+                  </div>
+              </div>
+
+              <div class="flex-1 flex flex-col border border-gray-100 dark:border-slate-800/60 p-4 rounded-xl bg-white dark:bg-slate-900">
+                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                      <div>
+                          <h3 class="text-sm font-black text-blue-600 dark:text-[#1da1f2] flex items-center gap-2"><i class="fas fa-sliders-h"></i> กฎการหักเงินพิเศษ (Campaign & Tiers)</h3>
+                          <p class="text-[10px] text-gray-400 mt-0.5">ระบบจะเลือกใช้กฎย่อยที่มอบผลประโยชน์ (หักเงินน้อยที่สุด) ให้คนขับโดยอัตโนมัติ</p>
+                      </div>
+                      <button onclick="openAddCommRuleModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1.5 shrink-0"><i class="fas fa-plus"></i> เพิ่มกฎพิเศษ</button>
+                  </div>
+
+                  <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/20">
+                      <table class="w-full text-left border-collapse min-w-[550px]">
+                          <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 border-b border-gray-300 dark:border-slate-600">
+                              <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-black select-none">
+                                  <th class="py-2 px-3">ชื่อเงื่อนไข / แคมเปญ</th>
+                                  <th class="py-2 px-3">ระดับคนขับ</th>
+                                  <th class="py-2 px-3">ประเภทรถ</th>
+                                  <th class="py-2 px-3 text-right">ยอดที่หัก</th>
+                                  <th class="py-2 px-3 text-center">สถานะ</th>
+                                  <th class="py-2 px-3 text-center">จัดการ</th>
+                              </tr>
+                          </thead>
+                          <tbody id="comm-rules-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800 bg-white dark:bg-slate-900下">
+                              </tbody>
+                      </table>
+                  </div>
+              </div>
+
+          </div>
+      </section>
+
+      <div id="modalAddCommRule" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
+          <div class="bg-white dark:bg-slate-900 border border-emerald-500/30 rounded-2xl w-full max-w-md shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
+              <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-emerald-50 dark:bg-emerald-950/20">
+                  <h2 class="text-sm font-black text-emerald-600 dark:text-emerald-400"><i class="fas fa-plus-circle mr-1"></i> ตั้งค่าเงื่อนไขกฎการเงินพิเศษ</h2>
+                  <button onclick="closeModal('modalAddCommRule')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400"><i class="fas fa-times"></i></button>
+              </div>
+              
+              <div class="p-5 space-y-4">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ชื่อเรียกกฎ / ชื่อแคมเปญกระตุ้นยอด</label>
+                      <input type="text" id="rule-name" placeholder="เช่น ลดค่าคอมให้ระดับทองช่วงปีใหม่" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-emerald-500">
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">กลุ่มระดับชั้นคนขับ (Tier)</label>
+                          <select id="rule-target-tier" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:border-emerald-500">
+                              <option value="all">🌟 ทุกระดับชั้น</option>
+                              <option value="New">คนขับหน้าใหม่ (New)</option>
+                              <option value="Standard">Standard</option>
+                              <option value="Gold">Gold</option>
+                              <option value="Diamond">Diamond</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทรถที่บังคับใช้</label>
+                          <select id="rule-target-vehicle" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:border-emerald-500">
+                              <option value="all">🚗 รถทุกประเภท</option>
+                              <option value="รถจักรยานยนต์">รถจักรยานยนต์</option>
+                              <option value="รถสามล้อ">รถสามล้อ</option>
+                              <option value="รถยนต์ 4 ประตู">รถยนต์ 4 ประตู</option>
+                              <option value="รถกระบะ">รถกระบะ</option>
+                          </select>
+                      </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3 bg-emerald-50/40 dark:bg-emerald-950/10 p-3 rounded-xl border border-emerald-200/40">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">รูปแบบการคำนวณ</label>
+                          <select id="rule-type" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs font-bold outline-none focus:border-emerald-500">
+                              <option value="percent">เปอร์เซ็นต์ (%)</option>
+                              <option value="flat">คงที่ (บาท)</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">จำนวนเงิน/เปอร์เซ็นต์</label>
+                          <input type="number" id="rule-value" placeholder="เช่น 5" class="w-full p-2 bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-gray-300 dark:border-slate-700 rounded-lg text-xs font-black text-center outline-none focus:border-emerald-500">
+                      </div>
+                  </div>
+
+                  <button onclick="saveSpecialCommissionRule()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5"><i class="fas fa-check-circle"></i> บันทึกและเปิดใช้งานเงื่อนไข</button>
+              </div>
+          </div>
+      </div>
   </main>
 
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
@@ -1668,7 +1788,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน' };
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน' };
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
 
@@ -1715,6 +1835,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if(tabId === 'all-block-history') { if(typeof renderAllBlockHistory === 'function') renderAllBlockHistory(); }
       if(tabId === 'all-wallet-history') { if(typeof renderAllWalletHistory === 'function') renderAllWalletHistory(); }
       if(tabId === 'topup-approvals') { if(typeof renderTopupApprovals === 'function') renderTopupApprovals(); }
+      if(tabId === 'commission-settings') { if(typeof renderCommissionSettings === 'function') renderCommissionSettings(); }
     }
 
     window.goBackAdmin = function() {
@@ -4652,7 +4773,191 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         link.setAttribute("download", `F1_WalletHistory_${Date.now()}.csv`);
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
-    
+
+    // ========================================================
+    // 🌟 ระบบบริหารกฎคอมมิชชันและความยืดหยุ่นทางธุรกิจ (Commission Rules Engine)
+    // ========================================================
+    let globalCommissionData = {
+        defaultMinBalance: 50,
+        defaultType: 'percent',
+        defaultValue: 15,
+        specialRules: {}
+    };
+
+    // เชื่อมต่อดึงข้อมูลสดจาก Firebase Realtime Database
+    db.ref('system_settings/commission_v2').on('value', snap => {
+        if(snap.exists()) {
+            let data = snap.val();
+            globalCommissionData.defaultMinBalance = data.defaultMinBalance !== undefined ? data.defaultMinBalance : 50;
+            globalCommissionData.defaultType = data.defaultType || 'percent';
+            globalCommissionData.defaultValue = data.defaultValue !== undefined ? data.defaultValue : 15;
+            globalCommissionData.specialRules = data.specialRules || {};
+        }
+        
+        // ถ้ากำลังเปิดหน้าจอนี้อยู่ ให้รีเรนเดอร์ตารางทันทีแบบเรียลไทม์
+        let targetEl = document.getElementById('content-commission-settings');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderCommissionSettings();
+        }
+    });
+
+    // ฟังก์ชันวาดหน้าจอหลักและดึงค่าไปหยอดลงช่องอินพุต
+    window.renderCommissionSettings = function() {
+        let d = globalCommissionData;
+        
+        // หยอดค่าฝั่งกฎพื้นฐาน
+        document.getElementById('comm-def-min-balance').value = d.defaultMinBalance;
+        document.getElementById('comm-def-type').value = d.defaultType;
+        document.getElementById('comm-def-value').value = d.defaultValue;
+
+        // วาดตารางกฎพิเศษฝั่งขวา
+        let tbody = document.getElementById('comm-rules-tbody');
+        if(!tbody) return;
+
+        let html = '';
+        let rulesObj = d.specialRules;
+
+        for(let key in rulesObj) {
+            let r = rulesObj[key];
+            
+            let tierBadge = r.targetTier === 'all' 
+                ? '<span class="bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded font-bold">✨ ทุกระดับ</span>'
+                : `<span class="bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-900/30 font-bold">${r.targetTier}</span>`;
+            
+            let vehicleBadge = r.targetVehicle === 'all'
+                ? '<span class="bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded font-bold">🚗 ทุกประเภท</span>'
+                : `<span class="bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 px-2 py-0.5 rounded border border-purple-100 dark:border-purple-900/30 font-bold">${r.targetVehicle}</span>`;
+
+            let valueStr = r.type === 'percent' ? `${r.value}%` : `฿${parseFloat(r.value).toFixed(2)}`;
+
+            let toggleBtn = r.isActive 
+                ? `<button onclick="toggleRuleStatus('${key}', false)" class="text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 px-2.5 py-1 rounded-lg font-black transition-all hover:scale-105 shadow-sm"><i class="fas fa-toggle-on text-sm"></i> เปิดใช้งาน</button>`
+                : `<button onclick="toggleRuleStatus('${key}', true)" class="text-gray-400 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-2.5 py-1 rounded-lg font-bold transition-all hover:scale-105 shadow-sm"><i class="fas fa-toggle-off text-sm"></i> ปิดระบบ</button>`;
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/80 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition">
+                <td class="py-3 px-3 font-bold text-gray-800 dark:text-white">${r.name}</td>
+                <td class="py-3 px-3">${tierBadge}</td>
+                <td class="py-3 px-3">${vehicleBadge}</td>
+                <td class="py-3 px-3 text-right font-black text-blue-600 dark:text-[#1da1f2] text-xs">${valueStr}</td>
+                <td class="py-3 px-3 text-center">${toggleBtn}</td>
+                <td class="py-3 px-3 text-center">
+                    <button onclick="deleteSpecialRule('${key}')" class="text-red-500 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-950/40 w-7 h-7 rounded-lg text-xs transition flex items-center justify-center mx-auto shadow-sm" title="ลบเงื่อนไขนี้"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>`;
+        }
+
+        tbody.innerHTML = html || '<tr><td colspan="6" class="py-12 text-center text-gray-400 font-bold"><i class="fas fa-folder-open text-xl block mb-2 opacity-50"></i> ยังไม่มีการตั้งกฎพิเศษแยกย่อย</td></tr>';
+    }
+
+    // กดเซฟฝั่งกฎพื้นฐาน
+    window.saveDefaultCommissionSettings = function() {
+        let minBal = parseFloat(document.getElementById('comm-def-min-balance').value);
+        let type = document.getElementById('comm-def-type').value;
+        let val = parseFloat(document.getElementById('comm-def-value').value);
+
+        if(isNaN(minBal) || isNaN(val) || minBal < 0 || val < 0) {
+            return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุข้อมูลตัวเลขให้ถูกต้องและห้ามติดลบครับ', 'error');
+        }
+
+        db.ref('system_settings/commission_v2').update({
+            defaultMinBalance: minBal,
+            defaultType: type,
+            defaultValue: val
+        }).then(() => {
+            showCustomAlert('บันทึกกฎพื้นฐานสำเร็จ', 'อัปเดตระบบโครงสร้างการเงินเรียบร้อย', 'success');
+        });
+    }
+
+    // เปิดหน้าต่างเพิ่มกฎพิเศษ
+    window.openAddCommRuleModal = function() {
+        document.getElementById('rule-name').value = '';
+        document.getElementById('rule-target-tier').value = 'all';
+        document.getElementById('rule-target-vehicle').value = 'all';
+        document.getElementById('rule-type').value = 'percent';
+        document.getElementById('rule-value').value = '';
+        openModal('modalAddCommRule');
+    }
+
+    // กดเซฟกฎพิเศษชุดใหม่ลงฐานข้อมูล
+    window.saveSpecialCommissionRule = function() {
+        let name = document.getElementById('rule-name').value.trim();
+        let tier = document.getElementById('rule-target-tier').value;
+        let vehicle = document.getElementById('rule-target-vehicle').value;
+        let type = document.getElementById('rule-type').value;
+        let value = parseFloat(document.getElementById('rule-value').value);
+
+        if(!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อเงื่อนไขหรือแคมเปญนี้ด้วยครับ', 'error');
+        if(isNaN(value) || value < 0) return showCustomAlert('ยอดเงินผิดพลาด', 'กรุณาระบุยอดหักให้ถูกต้อง', 'error');
+
+        let newRuleRef = db.ref('system_settings/commission_v2/specialRules').push();
+        newRuleRef.set({
+            name: name,
+            targetTier: tier,
+            targetVehicle: vehicle,
+            type: type,
+            value: value,
+            isActive: true,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            showCustomAlert('เพิ่มกฎพิเศษสำเร็จ', 'เปิดใช้งานระบบเงื่อนไขใหม่เรียบร้อยแล้ว', 'success');
+            closeModal('modalAddCommRule');
+        });
+    }
+
+    // สลับเปิด/ปิดสถานะการใช้งานของกฎย่อย
+    window.toggleRuleStatus = function(ruleId, newStatus) {
+        db.ref(`system_settings/commission_v2/specialRules/${ruleId}`).update({
+            isActive: newStatus
+        });
+    }
+
+    // ฟังก์ชันลบกฎพิเศษทิ้ง
+    window.deleteSpecialRule = function(ruleId) {
+        showCustomConfirm('ยืนยันลบกฎนี้?', 'เมื่อลบแล้ว ระบบคำนวณเงินจะกลับไปใช้ค่ามาตรฐานพื้นฐานทันที', () => {
+            db.ref(`system_settings/commission_v2/specialRules/${ruleId}`).remove().then(() => {
+                showCustomAlert('ลบสำเร็จ', 'ลบเงื่อนไขการหักเงินพิเศษออกจากระบบแล้ว', 'success');
+            });
+        }, 'ลบทิ้ง', 'red');
+    }
+
+    // 🌟 โบนัสชิ้นสิริมงคล: ฟังก์ชันจำลองคำนวณหาค่าคอมมิชชันที่ดีที่สุดให้คนขับ (สำหรับใช้ในอนาคต)
+    window.calculateBestCommission = function(driverTier, vehicleType, fareAmount) {
+        let d = globalCommissionData;
+        let finalCommFee = 0;
+        
+        // 1. ตั้งค่าฐานคิดจากตัวกฎพื้นฐานไว้ก่อน
+        if(d.defaultType === 'percent') {
+            finalCommFee = fareAmount * (d.defaultValue / 100);
+        } else {
+            finalCommFee = d.defaultValue;
+        }
+
+        // 2. วิ่งตรวจหากฎพิเศษที่เปิดใช้งานอยู่
+        let rules = d.specialRules || {};
+        for(let id in rules) {
+            let r = rules[id];
+            if(!r.isActive) continue;
+
+            // ตรวจสอบความเข้ากันได้ของ Tier และ ประเภทรถ
+            let tierMatch = (r.targetTier === 'all' || r.targetTier === driverTier);
+            let vehicleMatch = (r.targetVehicle === 'all' || r.targetVehicle === vehicleType);
+
+            if(tierMatch && vehicleMatch) {
+                let tempFee = 0;
+                if(r.type === 'percent') {
+                    tempFee = fareAmount * (r.value / 100);
+                } else {
+                    tempFee = r.value;
+                }
+                // สถาปัตยกรรมเอาใจคนขับ: ถ้ากฎพิเศษข้อนี้คิดเงิน "ถูกกว่า" กฎฐาน ให้สิทธิ์เลือกอันนี้ทันที
+                if(tempFee < finalCommFee) {
+                    finalCommFee = tempFee;
+                }
+            }
+        }
+        return finalCommFee;
+    }
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
