@@ -303,6 +303,11 @@
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-file-invoice-dollar"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-emerald-600 dark:text-emerald-400 leading-tight">ประวัติการเงิน</span>
                   </button>
+                <button onclick="switchTab('topup-approvals')" class="bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95 relative">
+                      <div id="badge-topup-pending" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">0</div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-file-invoice"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-amber-600 dark:text-amber-500 leading-tight">อนุมัติสลิปเติมเงิน</span>
+                  </button>
               </div>
           </div>
 
@@ -1049,6 +1054,38 @@
               </div>
           </div>
       </section>
+    <section id="content-topup-approvals" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
+              
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
+                  <h2 class="text-sm font-black text-amber-600 dark:text-amber-500 flex items-center gap-2"><i class="fas fa-file-invoice"></i> คำขอเติมเครดิต (รอตรวจสอบสลิป)</h2>
+                  
+                  <div class="flex gap-2 w-full sm:w-auto">
+                      <select id="topup-filter-status" onchange="renderTopupApprovals()" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-amber-500 font-bold">
+                          <option value="pending">⏳ รอตรวจสอบ</option>
+                          <option value="approved">✅ อนุมัติแล้ว</option>
+                          <option value="rejected">❌ ปฏิเสธ</option>
+                      </select>
+                  </div>
+              </div>
+
+              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
+                  <table class="w-full text-left border-collapse min-w-[750px]">
+                      <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
+                          <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
+                              <th class="py-2.5 px-3">วันเวลาที่แจ้งโอน</th>
+                              <th class="py-2.5 px-3">ผู้แจ้งโอน</th>
+                              <th class="py-2.5 px-3 text-right">ยอดเงิน (บาท)</th>
+                              <th class="py-2.5 px-3 text-center">หลักฐานสลิป</th>
+                              <th class="py-2.5 px-3 text-center">การจัดการ</th>
+                          </tr>
+                      </thead>
+                      <tbody id="topup-approvals-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                          </tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
   </main>
 
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
@@ -1536,8 +1573,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด' };
-
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน' };
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
 
@@ -1581,9 +1617,9 @@
         if(tabId === 'history') renderHistoryTab();
         if(tabId === 'quests') renderQuestsTable();
         if(tabId === 'map') { if(adminMap) google.maps.event.trigger(adminMap, 'resize'); }
-        // 🌟 แก้ปัญหาหน้าตารางประวัติรวมขาวโพลน โดยสั่งให้โหลดเมื่อสลับมาหน้านี้
         if(tabId === 'all-block-history') { if(typeof renderAllBlockHistory === 'function') renderAllBlockHistory(); }
       if(tabId === 'all-wallet-history') { if(typeof renderAllWalletHistory === 'function') renderAllWalletHistory(); }
+      if(tabId === 'topup-approvals') { if(typeof renderTopupApprovals === 'function') renderTopupApprovals(); }
     }
 
     window.goBackAdmin = function() {
@@ -3996,6 +4032,137 @@
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
         
+    // ========================================================
+    // 🌟 ระบบศูนย์อนุมัติสลิปเติมเงิน (Manual Top-up Approvals)
+    // ========================================================
+    let globalTopupRequests = [];
+
+    db.ref('topup_requests').on('value', snap => {
+        globalTopupRequests = [];
+        let pendingCount = 0;
+        
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let req = child.val();
+                req.id = child.key;
+                globalTopupRequests.push(req);
+                if(req.status === 'pending') pendingCount++;
+            });
+        }
+        
+        // แจ้งเตือนป้ายวงแดงๆ บนเมนูถ้ามีรายการค้าง
+        let badge = document.getElementById('badge-topup-pending');
+        if(badge) {
+            if(pendingCount > 0) { badge.innerText = pendingCount; badge.classList.remove('hidden'); }
+            else { badge.classList.add('hidden'); }
+        }
+
+        let targetEl = document.getElementById('content-topup-approvals');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderTopupApprovals();
+        }
+    });
+
+    window.renderTopupApprovals = function() {
+        let tbody = document.getElementById('topup-approvals-tbody');
+        if(!tbody) return;
+
+        let fStatus = document.getElementById('topup-filter-status').value;
+        let filtered = globalTopupRequests.filter(req => req.status === fStatus);
+        
+        // เรียงจากใหม่สุดไปเก่าสุด
+        filtered.sort((a,b) => b.timestamp - a.timestamp);
+
+        let html = '';
+        filtered.forEach(req => {
+            let d = allProfiles[req.userId] || {};
+            let uName = d.name || 'ไม่ทราบชื่อ';
+            let roleBadge = req.role === 'driver' 
+                ? '<span class="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-[9px] border border-blue-200">คนขับ</span>' 
+                : '<span class="bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded text-[9px] border border-purple-200">ลูกค้า</span>';
+            
+            let dateStr = new Date(req.timestamp).toLocaleString('th-TH');
+            
+            let slipBtn = req.slipUrl 
+                ? `<button onclick="viewFullImage('${req.slipUrl}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 px-3 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 mx-auto"><i class="fas fa-image"></i> ดูสลิป</button>`
+                : '<span class="text-gray-400">ไม่มีรูป</span>';
+
+            let actionHtml = '';
+            if (req.status === 'pending') {
+                actionHtml = `
+                <div class="flex items-center justify-center gap-2">
+                    <button onclick="rejectTopup('${req.id}')" class="bg-red-50 text-red-500 hover:bg-red-600 hover:text-white border border-red-200 w-8 h-8 rounded-lg font-bold transition flex items-center justify-center shadow-sm" title="ปฏิเสธ"><i class="fas fa-times"></i></button>
+                    <button onclick="approveTopup('${req.id}', '${req.userId}', ${req.amount}, '${req.role}')" class="bg-emerald-500 text-white hover:bg-emerald-600 border border-emerald-600 px-3 h-8 rounded-lg font-bold transition flex items-center justify-center gap-1.5 shadow-sm" title="อนุมัติยอดเงิน"><i class="fas fa-check"></i> อนุมัติ</button>
+                </div>`;
+            } else if (req.status === 'approved') {
+                actionHtml = '<span class="text-emerald-500 font-bold"><i class="fas fa-check-circle"></i> อนุมัติแล้ว</span>';
+            } else {
+                actionHtml = `<span class="text-red-500 font-bold"><i class="fas fa-times-circle"></i> ปฏิเสธ (${req.rejectReason || '-'})</span>`;
+            }
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <td class="py-3 px-3 text-[10px] text-gray-500">${dateStr}</td>
+                <td class="py-3 px-3">
+                    <p class="font-bold text-gray-800 dark:text-white text-[11px]">${req.userId} ${roleBadge}</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">${uName}</p>
+                </td>
+                <td class="py-3 px-3 text-right font-black text-emerald-600 text-sm">฿${parseFloat(req.amount).toFixed(2)}</td>
+                <td class="py-3 px-3 text-center">${slipBtn}</td>
+                <td class="py-3 px-3 text-center">${actionHtml}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html || '<tr><td colspan="5" class="py-10 text-center text-gray-400">ไม่มีรายการในหมวดหมู่นี้</td></tr>';
+    }
+
+    // ฟังก์ชันอนุมัติเงิน
+    window.approveTopup = function(reqId, userId, amount, role) {
+        showCustomConfirm('ยืนยันอนุมัติ?', `ต้องการเติมเงิน ฿${amount} ให้รหัส ${userId} ใช่หรือไม่?<br><span class="text-red-500 text-[10px]">โปรดตรวจสอบสลิปกับแอปธนาคารให้แน่ใจก่อนกดยืนยัน</span>`, async () => {
+            
+            let path = role === 'driver' ? 'drivers_profile/' + userId : 'passengers_profile/' + userId;
+            let snap = await db.ref(path).once('value');
+            let d = snap.val() || {}; 
+            let currentCash = parseFloat(d.creditCash || d.credit || 0); 
+            let newCash = currentCash + parseFloat(amount);
+            
+            let updatePayload = { creditCash: newCash }; 
+            if(role === 'driver') updatePayload.credit = newCash;
+            
+            // 1. อัปเดตเงินผู้ใช้
+            await db.ref(path).update(updatePayload);
+            
+            // 2. บันทึกลงประวัติธุรกรรม (Ledger)
+            await db.ref('wallet_transactions/' + userId).push({ 
+                timestamp: firebase.database.ServerValue.TIMESTAMP, 
+                role: role, walletType: 'cash', actionType: 'add', 
+                amount: amount, note: "เติมเงินผ่านสลิป (แอดมินอนุมัติ)", 
+                balanceAfter: newCash, adminName: "แอดมินตรวจสลิป" 
+            });
+
+            // 3. เปลี่ยนสถานะคำขอเป็น approved
+            await db.ref('topup_requests/' + reqId).update({ 
+                status: 'approved', 
+                approvedAt: firebase.database.ServerValue.TIMESTAMP 
+            });
+
+            showCustomAlert('สำเร็จ', 'เติมเงินและอัปเดตสถานะบิลเรียบร้อยแล้ว', 'success');
+        });
+    }
+
+    // ฟังก์ชันปฏิเสธสลิป
+    window.rejectTopup = function(reqId) {
+        let reason = prompt("กรุณาระบุเหตุผลที่ปฏิเสธ (เช่น สลิปซ้ำ, ยอดไม่ตรง, ภาพไม่ชัด):");
+        if(reason === null) return;
+        
+        db.ref('topup_requests/' + reqId).update({ 
+            status: 'rejected', 
+            rejectReason: reason || 'แอดมินปฏิเสธ',
+            rejectedAt: firebase.database.ServerValue.TIMESTAMP 
+        }).then(() => {
+            showCustomAlert('ปฏิเสธสำเร็จ', 'บันทึกการปฏิเสธคำขอเรียบร้อยแล้ว', 'success');
+        });
+    }
     // ========================================================
     // 🌟 ระบบสไลด์หน้าต่างเพื่อปิด (Smooth Swipe to Close)
     // ========================================================
