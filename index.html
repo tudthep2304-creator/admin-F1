@@ -4241,6 +4241,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-start').value = q.startTime || '';
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
+          document.getElementById('quest-reward-rating').value = q.rewardRating || '';
             
             // 🌟 ดึงค่า "อายุโบนัส" กลับมาโชว์ตอนแก้ไขแคมเปญ
             document.getElementById('quest-reward-expire').value = q.rewardExpireDays || ''; 
@@ -4261,7 +4262,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
             document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
             document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
-            document.getElementById('quest-reward-bonus').value = ''; 
+            document.getElementById('quest-reward-bonus').value = '';
+          document.getElementById('quest-reward-rating').value = '';
             
             // 🌟 ล้างค่า "อายุโบนัส" เป็นช่องว่างตอนสร้างแคมเปญใหม่
             document.getElementById('quest-reward-expire').value = ''; 
@@ -4277,9 +4279,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
-        
-        // 🌟 1. ย้ายมาดึงค่าอายุโบนัสไว้ตรงนี้ (ดึงจากหน้าจอ)
         let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
+        
+        // 🌟 ดึงค่า "ดาว" ที่แอดมินตั้งแจก
+        let rewardRating = parseFloat(document.getElementById('quest-reward-rating').value) || 0; 
         
         let rewardTier = document.getElementById('quest-reward-tier').value;
 
@@ -4289,7 +4292,11 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญให้คนขับด้วยครับ', 'error');
         if (targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกเป้าหมายระดับชั้นอย่างน้อย 1 กลุ่ม', 'error');
         if (targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะอย่างน้อย 1 ประเภท', 'error');
-        if (rewardBonus === 0 && rewardTier === 'none') return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ', 'error');
+        
+        // 🌟 ดักจับถ้าไม่แจกอะไรเลย (เช็กทั้ง โบนัส, เลื่อนขั้น และ ดาว)
+        if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) {
+            return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ (เงิน, ดาว หรือเลื่อนขั้น)', 'error');
+        }
 
         let conditions = {
             manual: document.getElementById('cond-manual-check').checked,
@@ -4304,20 +4311,16 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
             rewardBonus: rewardBonus, 
-            
-            // 🌟 2. เอามาใส่ใน payload ตรงนี้! เพื่อให้ระบบมันบันทึกลง Firebase ได้ครับ
             rewardExpireDays: rewardExpireDays, 
-            
+            rewardRating: rewardRating, // 🌟 ส่ง "ดาว" ไปเซฟใน Firebase
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
-        // 🌟 3. สั่งอัปเดตลงฐานข้อมูล แล้วปิดหน้าต่าง จบแบบคลีนๆ
         db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
             showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); 
             closeModal('modalAddQuest'); 
         });
     }
-
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
     window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
 
@@ -5452,21 +5455,25 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
               <!-- 🎁 ของรางวัล (เหลือกล่องเดียว ไม่ซ้ำแล้ว!) -->
               <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกอย่างใดอย่างหนึ่ง หรือทั้งคู่)</h3>
-                  <div class="grid grid-cols-3 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
+                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกแจกอย่างใดอย่างหนึ่ง หรือทั้งหมด)</h3>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
-                          <input type="number" id="quest-reward-bonus" placeholder="เช่น 100" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-sm font-bold text-center focus:border-amber-500">
+                          <input type="number" id="quest-reward-bonus" placeholder="เช่น 100" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-amber-500">
                       </div>
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">อายุโบนัส (วัน)</label>
-                          <input type="number" id="quest-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-sm font-bold text-center focus:border-amber-500">
+                          <input type="number" id="quest-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-amber-500">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เพิ่มดาว (⭐)</label>
+                          <input type="number" step="0.1" id="quest-reward-rating" placeholder="เช่น 0.5" class="w-full p-2 bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-500 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-amber-500">
                       </div>
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เลื่อนระดับ</label>
                           <select id="quest-reward-tier" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold focus:border-amber-500">
-    <option value="none">-- ไม่เลื่อน --</option>
-</select>
+                              <option value="none">-- ไม่เลื่อน --</option>
+                          </select>
                       </div>
                   </div>
               </div>
