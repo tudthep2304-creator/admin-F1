@@ -5021,18 +5021,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         tabTitles['tier-settings'] = 'ศูนย์กลางจัดการระดับชั้น (Tiers)';
     }
 
-    // ดึงข้อมูลและวาดหน้าจอแบบ Real-time
+    // 🌟 ดึงข้อมูลและวาดหน้าจอแบบ Real-time (อัปเกรดกระจายข้อมูลไปยังหน้าแคมเปญและปรับระดับ)
     db.ref('config/tiers').on('value', snap => {
         let container = document.getElementById('tier-list-container');
         if(!container) return;
-        
+
         let html = '';
+        let questTierHtml = ''; // สำหรับหน้าสร้างแคมเปญ
+        let adjustModalHtml = ''; // สำหรับหน้าแอดมินปรับระดับแมนนวล
+
         if(snap.exists()) {
             snap.forEach(child => {
                 let tierName = child.key;
                 let data = child.val();
                 let desc = data.description || 'ไม่มีคำอธิบาย';
-                
+
+                // 1. วาดการ์ดในหน้าตั้งค่าหลัก
                 html += `
                 <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
                     <div class="flex items-center gap-3">
@@ -5047,11 +5051,30 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                         <button onclick="deleteTierData('${tierName}')" class="w-8 h-8 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
+
+                // 2. สร้างโครงสร้าง Checkbox สำหรับป๊อปอัปแคมเปญ/ภารกิจ (Quest Modal)
+                questTierHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${tierName}" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> ${tierName}</label>`;
+
+                // 3. สร้าง Option สำหรับป๊อปอัปแอดมินปรับระดับแมนนวล (Adjust Tier Modal)
+                adjustModalHtml += `<option value="${tierName}">${tierName}</option>`;
             });
+
+            // แถมตัวเลือกพิเศษระดับสูงสุดของเจ้าของระบบไว้ท้ายสุดในหน้าปรับระดับแมนนวล
+            adjustModalHtml += `<option value="owner super legend">🚀 Owner Super Legend</option>`;
         }
+        
+        // สั่งอัปเดต UI หน้าหลัก
         container.innerHTML = html || '<div class="col-span-full py-10 text-center text-gray-400 font-bold"><i class="fas fa-box-open text-3xl block mb-2 opacity-30"></i> ยังไม่มีข้อมูลระดับชั้นในระบบ</div>';
         
-        // 🌟 อัปเดต Dropdown ในหน้าตั้งค่าคอมมิชชันให้ทันที!
+        // 🌟 ยิงข้อมูลเชื่อมเข้าสู่ศูนย์แคมเปญภารกิจโดยตรง
+        let qContainer = document.getElementById('quest-target-tier-container');
+        if(qContainer) qContainer.innerHTML = questTierHtml;
+
+        // 🌟 ยิงข้อมูลเชื่อมเข้าสู่ศูนย์ปรับระดับแมนนวลโดยตรง
+        let trmSelect = document.getElementById('trm-tier-select');
+        if(trmSelect) trmSelect.innerHTML = adjustModalHtml;
+
+        // อัปเดตหน้าตั้งค่าคอมมิชชันพ่วงไปด้วยเลย
         if(typeof window.loadCentralOptionsForCommission === 'function') {
             window.loadCentralOptionsForCommission();
         }
@@ -5231,13 +5254,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <i class="fas fa-chevron-down text-gray-400"></i>
                       </div>
                       <div id="quest-tier-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="New" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> 🔰 New</label>
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="Standard" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> 🥉 Standard</label>
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="Silver" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> 🥈 Silver</label>
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="Gold" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> 🥇 Gold</label>
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="Platinum" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> 💎 Platinum</label>
-                      </div>
+    <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
+    
+    <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
+</div>
                   </div>
                   
                   <div class="relative">
@@ -5354,14 +5374,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               <div>
                   <label class="block text-[10px] font-bold text-gray-500 mb-1">ปรับเปลี่ยนระดับชั้น (Driver Tier)</label>
                   <select id="trm-tier-select" onchange="autoFillOverrideStars()" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
-                      <option value="New">🔰 New (ผู้ใช้ใหม่)</option>
-                      <option value="Standard">🥉 Standard (ระดับทั่วไป)</option>
-                      <option value="Silver">🥈 Silver (ระดับเงิน)</option>
-                      <option value="Gold">🥇 Gold (ระดับทอง)</option>
-                      <option value="Platinum">💎 Platinum (ระดับแพลทินัม)</option>
-                      <option value="F1 Legend">👑 F1 Legend (ระดับตำนาน *10 ดาว)</option>
-                      <option value="owner super legend">🚀 Owner Super Legend (*100 ดาว)</option>
-                  </select>
+    </select>
               </div>
 
               <div>
