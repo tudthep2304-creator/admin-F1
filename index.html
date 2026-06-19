@@ -1878,7 +1878,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน' 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า'};
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า'};
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
 
@@ -4296,10 +4296,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let val = document.getElementById(`cond-${type}-val`); 
             if(val) { val.value = ''; val.disabled = true; }
         });
-        document.getElementById('cond-days-unit').disabled = true; document.getElementById('cond-days-unit').value = 'days';
-        document.getElementById('cond-proof-selfie').checked = false;
-        document.getElementById('cond-proof-receipt').checked = false;
-        document.getElementById('cond-proof-code').checked = false;
+        let dUnit = document.getElementById('cond-days-unit');
+        if(dUnit) { dUnit.disabled = true; dUnit.value = 'days'; }
 
         document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
@@ -4320,18 +4318,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if(q.targetTiers) q.targetTiers.forEach(v => { let cb = document.querySelector(`.quest-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
             if(q.targetVehicles) q.targetVehicles.forEach(v => { let cb = document.querySelector(`.quest-target-vehicle[value="${v}"]`); if(cb) cb.checked = true; });
 
-            if(c.manual) document.getElementById('cond-manual-check').checked = true;
-            if(c.signup) document.getElementById('cond-signup-check').checked = true;
-            
-            // 🌟 โหลดค่ากฏหมายร้านค้า
-            if(c.requireSelfie) document.getElementById('cond-proof-selfie').checked = true;
-            if(c.requireReceipt) document.getElementById('cond-proof-receipt').checked = true;
-            if(c.requireCode) document.getElementById('cond-proof-code').checked = true;
-            
-            if(c.dailyLimit > 0) { document.getElementById('cond-limit-check').checked = true; document.getElementById('cond-limit-val').value = c.dailyLimit; document.getElementById('cond-limit-val').disabled = false; }
-            if(c.rides > 0) { document.getElementById('cond-rides-check').checked = true; document.getElementById('cond-rides-val').value = c.rides; document.getElementById('cond-rides-val').disabled = false; }
-            if(c.stars > 0) { document.getElementById('cond-star-check').checked = true; document.getElementById('cond-star-val').value = c.stars; document.getElementById('cond-star-val').disabled = false; }
-            if(c.days > 0) { document.getElementById('cond-days-check').checked = true; document.getElementById('cond-days-val').value = c.days; document.getElementById('cond-days-val').disabled = false; document.getElementById('cond-days-unit').disabled = false; document.getElementById('cond-days-unit').value = c.daysUnit || 'days'; }
+            if(c.manual) { let chk = document.getElementById('cond-manual-check'); if(chk) chk.checked = true; }
+            if(c.signup) { let chk = document.getElementById('cond-signup-check'); if(chk) chk.checked = true; }
+            if(c.dailyLimit > 0) { let chk = document.getElementById('cond-limit-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-limit-val'); if(val) { val.value = c.dailyLimit; val.disabled = false; } }
+            if(c.rides > 0) { let chk = document.getElementById('cond-rides-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-rides-val'); if(val) { val.value = c.rides; val.disabled = false; } }
+            if(c.stars > 0) { let chk = document.getElementById('cond-star-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-star-val'); if(val) { val.value = c.stars; val.disabled = false; } }
+            if(c.days > 0) { let chk = document.getElementById('cond-days-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-days-val'); if(val) { val.value = c.days; val.disabled = false; } if(dUnit) { dUnit.disabled = false; dUnit.value = c.daysUnit || 'days'; } }
 
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
@@ -4364,19 +4356,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ', 'error');
 
         let conditions = {
-            manual: document.getElementById('cond-manual-check').checked,
-            signup: document.getElementById('cond-signup-check').checked,
-            
-            // 🌟 เซฟค่ากฎร้านค้าพาร์ทเนอร์
-            requireSelfie: document.getElementById('cond-proof-selfie').checked,
-            requireReceipt: document.getElementById('cond-proof-receipt').checked,
-            requireCode: document.getElementById('cond-proof-code').checked,
-            
-            dailyLimit: document.getElementById('cond-limit-check').checked ? (parseInt(document.getElementById('cond-limit-val').value) || 0) : 0,
-            rides: document.getElementById('cond-rides-check').checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
-            stars: document.getElementById('cond-star-check').checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
-            days: document.getElementById('cond-days-check').checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
-            daysUnit: document.getElementById('cond-days-unit').value
+            manual: document.getElementById('cond-manual-check')?.checked || false,
+            signup: document.getElementById('cond-signup-check')?.checked || false,
+            dailyLimit: document.getElementById('cond-limit-check')?.checked ? (parseInt(document.getElementById('cond-limit-val').value) || 0) : 0,
+            rides: document.getElementById('cond-rides-check')?.checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
+            stars: document.getElementById('cond-star-check')?.checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
+            days: document.getElementById('cond-days-check')?.checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
+            daysUnit: document.getElementById('cond-days-unit')?.value || 'days'
         };
 
         let payload = {
@@ -5328,6 +5314,194 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         showCustomConfirm('ยืนยันลบระดับชั้น?', `หากลบระดับ ${tierName} กฎคอมมิชชันที่ผูกกับระดับนี้อาจทำงานผิดพลาดได้!`, () => {
             db.ref('config/tiers/' + tierName).remove().then(() => { showCustomAlert('ลบสำเร็จ', 'นำระดับชั้นออกจากระบบส่วนกลางแล้ว', 'success'); });
         }, 'ลบข้อมูล', 'red');
+    }
+
+// ========================================================
+    // 🌟 ระบบแคมเปญร้านค้าพาร์ทเนอร์ (Partner Campaigns)
+    // ========================================================
+    let allPartnerCampaigns = {};
+
+    db.ref('system_settings/partner_campaigns').on('value', snap => {
+        allPartnerCampaigns = snap.val() || {};
+        if(typeof renderPartnerCampaignsTable === 'function') renderPartnerCampaignsTable();
+    });
+
+    window.renderPartnerCampaignsTable = function() {
+        let lst = document.getElementById('partner-campaigns-list'); 
+        if(!lst) return;
+        let html = '';
+        let campsArr = Object.entries(allPartnerCampaigns).map(([k,v]) => ({id:k, ...v}));
+        
+        if (campsArr.length === 0) {
+            lst.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-gray-400 text-xs">ยังไม่มีแคมเปญร้านค้าพาร์ทเนอร์</td></tr>`; 
+            return;
+        }
+
+        campsArr.sort((a, b) => b.timestamp - a.timestamp).forEach(c => {
+            let timeStr = "ตลอดไป";
+            if (c.startTime || c.endTime) {
+                timeStr = `${c.startTime ? new Date(c.startTime).toLocaleDateString('th-TH') : 'เริ่มแล้ว'} ถึง ${c.endTime ? new Date(c.endTime).toLocaleDateString('th-TH') : 'ตลอดไป'}`;
+            }
+
+            let rewardStr = "";
+            if (c.rewardBonus > 0) rewardStr += `<span class="text-yellow-600 font-bold text-xs">+฿${c.rewardBonus} 🟡</span><br>`;
+            if (c.rewardRating > 0) rewardStr += `<span class="text-amber-500 font-bold text-[10px]">+${c.rewardRating} ⭐</span>`;
+            
+            let limitStr = c.dailyLimit > 0 ? ` (ได้ ${c.dailyLimit} ครั้ง/วัน)` : '';
+
+            let toggleClass = c.isActive ? 'text-emerald-500' : 'text-gray-300';
+            let toggleIcon = c.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
+
+            // เช็คสต็อกโค้ด
+            let codeHtml = '-';
+            if(c.requireCode) {
+                let totalCodes = c.codes ? Object.keys(c.codes).length : 0;
+                let usedCodes = c.codes ? Object.values(c.codes).filter(x => x.used).length : 0;
+                codeHtml = `<span class="font-bold text-purple-600">${usedCodes}/${totalCodes}</span><br><button onclick="downloadPartnerCodes('${c.id}')" class="text-[9px] bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded border border-gray-300 mt-1 shadow-sm"><i class="fas fa-download"></i> โหลดโค้ด</button>`;
+            }
+
+            html += `
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition border-b border-gray-100 dark:border-slate-800">
+                <td class="py-3 px-3">
+                    <p class="font-bold text-purple-600 dark:text-purple-400 text-xs">${c.name}</p>
+                    <p class="text-[9px] text-gray-400 mt-1"><i class="far fa-clock"></i> ${timeStr}</p>
+                </td>
+                <td class="py-3 px-2 text-left">${rewardStr}<br><span class="text-[9px] text-gray-500">${limitStr}</span></td>
+                <td class="py-3 px-2 text-center text-[10px]">${codeHtml}</td>
+                <td class="py-3 px-2 text-center text-[10px]">
+                    <button onclick="togglePartnerCampStatus('${c.id}', ${!c.isActive})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
+                </td>
+                <td class="py-3 px-3 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <button onclick="openPartnerCampaignModal('${c.id}')" class="bg-blue-50 text-blue-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit text-[11px]"></i></button>
+                        <button onclick="deletePartnerCampaign('${c.id}')" class="bg-red-50 text-red-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt text-[11px]"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+        lst.innerHTML = html;
+    }
+
+    window.openPartnerCampaignModal = function(campId = null) {
+        if (campId && allPartnerCampaigns[campId]) {
+            let c = allPartnerCampaigns[campId];
+            document.getElementById('partner-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญร้านค้า';
+            document.getElementById('partner-camp-id').value = campId;
+            document.getElementById('partner-camp-name').value = c.name || '';
+            
+            document.getElementById('pc-proof-selfie').checked = c.requireSelfie || false;
+            document.getElementById('pc-proof-receipt').checked = c.requireReceipt || false;
+            document.getElementById('pc-proof-code').checked = c.requireCode || false;
+            document.getElementById('pc-code-amount').disabled = !c.requireCode;
+            document.getElementById('pc-code-amount').value = ''; // โชว์ว่างไว้เวลาแก้ ให้พิมพ์เพิ่มเอา
+            document.getElementById('pc-code-amount').placeholder = "พิมพ์จำนวนเพื่อเพิ่มโค้ด...";
+
+            document.getElementById('partner-camp-start').value = c.startTime || '';
+            document.getElementById('partner-camp-end').value = c.endTime || '';
+            
+            document.getElementById('partner-reward-bonus').value = c.rewardBonus || '';
+            document.getElementById('partner-reward-expire').value = c.rewardExpireDays || '';
+            document.getElementById('partner-reward-rating').value = c.rewardRating || '';
+            document.getElementById('partner-reward-limit').value = c.dailyLimit || '';
+            document.getElementById('partner-camp-is-active').checked = c.isActive !== false;
+        } else {
+            document.getElementById('partner-modal-title').innerHTML = '<i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์';
+            document.getElementById('partner-camp-id').value = '';
+            document.getElementById('partner-camp-name').value = '';
+            
+            document.getElementById('pc-proof-selfie').checked = false;
+            document.getElementById('pc-proof-receipt').checked = false;
+            document.getElementById('pc-proof-code').checked = false;
+            document.getElementById('pc-code-amount').disabled = true;
+            document.getElementById('pc-code-amount').value = '';
+            document.getElementById('pc-code-amount').placeholder = "เช่น 100";
+
+            document.getElementById('partner-camp-start').value = '';
+            document.getElementById('partner-camp-end').value = '';
+            
+            document.getElementById('partner-reward-bonus').value = '';
+            document.getElementById('partner-reward-expire').value = '';
+            document.getElementById('partner-reward-rating').value = '';
+            document.getElementById('partner-reward-limit').value = '';
+            document.getElementById('partner-camp-is-active').checked = true;
+        }
+        openModal('modalPartnerCampaign');
+    }
+
+    window.savePartnerCampaign = function() {
+        let id = document.getElementById('partner-camp-id').value || 'PTN_' + Date.now();
+        let name = document.getElementById('partner-camp-name').value.trim();
+        let requireSelfie = document.getElementById('pc-proof-selfie').checked;
+        let requireReceipt = document.getElementById('pc-proof-receipt').checked;
+        let requireCode = document.getElementById('pc-proof-code').checked;
+        let codeAmount = parseInt(document.getElementById('pc-code-amount').value) || 0;
+        
+        let rewardBonus = parseInt(document.getElementById('partner-reward-bonus').value) || 0;
+        let rewardRating = parseFloat(document.getElementById('partner-reward-rating').value) || 0;
+        
+        if(!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญร้านค้า', 'error');
+        if(!requireSelfie && !requireReceipt && !requireCode) return showCustomAlert('ข้อผิดพลาด', 'กรุณาเลือกเงื่อนไขหลักฐานอย่างน้อย 1 อย่างครับ', 'error');
+        if(rewardBonus === 0 && rewardRating === 0) return showCustomAlert('ข้อผิดพลาด', 'กรุณาตั้งรางวัล (เงิน หรือ ดาว)', 'error');
+
+        let payload = {
+            name: name,
+            requireSelfie: requireSelfie,
+            requireReceipt: requireReceipt,
+            requireCode: requireCode,
+            startTime: document.getElementById('partner-camp-start').value || null,
+            endTime: document.getElementById('partner-camp-end').value || null,
+            rewardBonus: rewardBonus,
+            rewardExpireDays: parseInt(document.getElementById('partner-reward-expire').value) || 0,
+            rewardRating: rewardRating,
+            dailyLimit: parseInt(document.getElementById('partner-reward-limit').value) || 0,
+            isActive: document.getElementById('partner-camp-is-active').checked,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        // ถ้ามีการขอเจนโค้ดเพิ่ม
+        let newCodes = {};
+        if(requireCode && codeAmount > 0) {
+            let prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PTN');
+            for(let i=0; i<codeAmount; i++) {
+                let rnd = Math.floor(1000 + Math.random() * 9000); 
+                let cStr = prefix + rnd;
+                newCodes[cStr] = { code: cStr, used: false };
+            }
+        }
+
+        let updates = {};
+        updates[`system_settings/partner_campaigns/${id}`] = payload;
+        
+        db.ref().update(updates).then(() => {
+            if (Object.keys(newCodes).length > 0) {
+                db.ref(`system_settings/partner_campaigns/${id}/codes`).update(newCodes);
+            }
+            showCustomAlert('สำเร็จ', 'บันทึกแคมเปญร้านค้าเรียบร้อย', 'success');
+            closeModal('modalPartnerCampaign');
+        });
+    }
+
+    window.togglePartnerCampStatus = function(id, status) {
+        db.ref(`system_settings/partner_campaigns/${id}`).update({ isActive: status });
+    }
+
+    window.deletePartnerCampaign = function(id) {
+        showCustomConfirm('ลบแคมเปญร้านค้า?', 'ลบถาวรจะไม่สามารถกู้คืนได้ โค้ดที่แจกไปแล้วจะใช้งานไม่ได้', () => {
+            db.ref(`system_settings/partner_campaigns/${id}`).remove();
+            showCustomAlert('ลบสำเร็จ', 'แคมเปญถูกลบออกจากระบบแล้ว', 'success');
+        }, 'ลบทิ้ง', 'red');
+    }
+
+    window.downloadPartnerCodes = function(campId) {
+        let c = allPartnerCampaigns[campId];
+        if(!c || !c.codes) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีโค้ดให้ดาวน์โหลด', 'error');
+        
+        let csv = "\uFEFFแคมเปญ,รหัสโค้ด,สถานะการใช้งาน\n";
+        for(let k in c.codes) {
+            let stat = c.codes[k].used ? 'ใช้แล้ว' : 'ยังไม่ใช้';
+            csv += `"${c.name}","${k}","${stat}"\n`;
+        }
+        triggerDownload(csv, `PartnerCodes_${c.name}_${Date.now()}.csv`);
     }
     
 </script>
