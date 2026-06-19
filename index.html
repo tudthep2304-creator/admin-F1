@@ -243,6 +243,18 @@
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ban"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-red-500 dark:text-red-400 leading-tight">บล็อกคนขับ</span>
                   </button>
+                <!-- 🌟 เมนูใหม่ 1: แคมเปญร้านค้าพาร์ทเนอร์ -->
+                  <button onclick="switchTab('partner-campaigns')" class="bg-purple-50 dark:bg-slate-800 border border-purple-200 dark:border-slate-700 hover:bg-purple-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-store"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-purple-700 dark:text-purple-400 leading-tight">แคมเปญร้านค้า</span>
+                  </button>
+                  
+                  <!-- 🌟 เมนูใหม่ 2: อนุมัติแคมเปญร้านค้า -->
+                  <button onclick="switchTab('partner-approvals')" class="bg-purple-50 dark:bg-slate-800 border border-purple-200 dark:border-slate-700 hover:bg-purple-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95 relative">
+                      <div id="badge-partner-pending" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">0</div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-tasks"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-purple-700 dark:text-purple-400 leading-tight">ตรวจงานร้านค้า</span>
+                  </button>
               </div>
           </div>
 
@@ -380,6 +392,61 @@
                           </tr>
                       </thead>
                       <tbody id="all-drivers-table" class="text-sm divide-y divide-gray-200 dark:divide-slate-800 bg-white dark:bg-slate-900 transition-colors">
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
+    <!-- ================= หน้าจัดการแคมเปญร้านค้าพาร์ทเนอร์ ================= -->
+      <section id="content-partner-campaigns" class="tab-content hidden space-y-4">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                  <h2 class="text-lg font-bold text-purple-600 dark:text-purple-500"><i class="fas fa-store mr-1.5"></i> ระบบแคมเปญร้านค้า (B2B Partner)</h2>
+                  <button onclick="openPartnerCampaignModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> สร้างแคมเปญร้านค้า</button>
+              </div>
+              <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
+                  <table class="w-full text-left border-collapse min-w-[800px]">
+                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[10px] uppercase font-bold bg-purple-50/50 dark:bg-slate-800/50">
+                          <th class="py-3 px-3 w-[25%]">ชื่อแคมเปญ / ร้านค้า</th>
+                          <th class="py-3 px-2 w-[20%]">รางวัลที่จะแจก</th>
+                          <th class="py-3 px-2 text-center w-[20%]">สต็อกโค้ดลับ (ใบ)</th>
+                          <th class="py-3 px-2 text-center w-[15%]">สถานะ</th>
+                          <th class="py-3 px-3 text-center w-[20%]">จัดการ</th>
+                      </tr></thead>
+                      <tbody id="partner-campaigns-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50">
+                          <tr><td colspan="5" class="py-10 text-center text-gray-400 text-xs">กำลังออกแบบระบบประมวลผล... (รอใส่ JS)</td></tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
+
+      <!-- ================= หน้าอนุมัติหลักฐานแคมเปญร้านค้า ================= -->
+      <section id="content-partner-approvals" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
+                  <h2 class="text-sm font-black text-purple-600 dark:text-purple-400 flex items-center gap-2"><i class="fas fa-tasks"></i> ศูนย์ตรวจหลักฐานร้านค้าพาร์ทเนอร์</h2>
+                  <div class="flex gap-2 w-full sm:w-auto">
+                      <select id="partner-approval-status" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-purple-500 font-bold">
+                          <option value="pending">⏳ รอตรวจสอบ</option>
+                          <option value="approved">✅ อนุมัติแล้ว</option>
+                          <option value="rejected">❌ ปฏิเสธ</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
+                  <table class="w-full text-left border-collapse min-w-[750px]">
+                      <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
+                          <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
+                              <th class="py-2.5 px-3">วันเวลาที่ส่ง</th>
+                              <th class="py-2.5 px-3">คนขับ</th>
+                              <th class="py-2.5 px-3 text-center">โค้ดที่อ้างสิทธิ์</th>
+                              <th class="py-2.5 px-3 text-center">รูปหลักฐาน</th>
+                              <th class="py-2.5 px-3 text-center">การจัดการ</th>
+                          </tr>
+                      </thead>
+                      <tbody id="partner-approvals-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                          <tr><td colspan="5" class="py-10 text-center text-gray-400 text-xs">กำลังออกแบบระบบประมวลผล... (รอใส่ JS)</td></tr>
                       </tbody>
                   </table>
               </div>
@@ -1811,7 +1878,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน' };
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน' 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า'};
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
 
