@@ -1214,7 +1214,14 @@
           </div>
       </section>
 
-      <div class="p-5 space-y-4">
+      <div id="modalTierForm" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
+          <div class="bg-white dark:bg-slate-900 border border-amber-500/30 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+              <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-amber-50 dark:bg-amber-950/20">
+                  <h2 id="tier-modal-title" class="text-sm font-black text-amber-600 dark:text-amber-400"><i class="fas fa-edit mr-1"></i> เพิ่มระดับชั้นใหม่</h2>
+                  <button onclick="closeModal('modalTierForm')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400"><i class="fas fa-times"></i></button>
+              </div>
+              
+              <div class="p-5 space-y-4">
                   <input type="hidden" id="tier-old-id" value="">
                   
                   <div>
@@ -1231,6 +1238,19 @@
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">คะแนนดาวเริ่มต้น</label>
                           <input type="number" id="tier-input-rating" step="0.1" placeholder="เช่น 5.0" value="5.0" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-amber-600 dark:text-amber-500 border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-black text-center outline-none focus:border-amber-500">
                       </div>
+                  </div>
+
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ธีมสีของป้ายระดับ (Badge Theme)</label>
+                      <select id="tier-input-theme" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:border-amber-500 shadow-sm cursor-pointer">
+                          <option value="default">⬜ สีเทา (Standard / ทั่วไป)</option>
+                          <option value="emerald">🟩 สีเขียว (New / ผู้ใช้ใหม่)</option>
+                          <option value="slate">⬜ สีเงิน (Silver)</option>
+                          <option value="amber">🟨 สีทอง (Gold)</option>
+                          <option value="blue">💎 สีฟ้าประกายเพชร (Platinum / Diamond)</option>
+                          <option value="legend">🔥 สีกาแล็กซี่เรืองแสง (Legend / ระดับตำนาน)</option>
+                          <option value="owner">👑 สีดำ-ทอง มีออร่า (Owner / ผู้บริหาร)</option>
+                      </select>
                   </div>
 
                   <div>
@@ -1252,6 +1272,8 @@
 
                   <button onclick="saveTierData()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm shadow-md transition mt-2"><i class="fas fa-save mr-1"></i> บันทึกข้อมูล</button>
               </div>
+          </div>
+      </div>
   </main>
 
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
@@ -2880,19 +2902,33 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
 
     // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
+    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
+    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
     window.getTierBadgeHtml = function(currentTier) {
-        let t = (currentTier || 'New').toLowerCase();
+        let tierName = currentTier || 'New';
         
-        // 🌟 สีพิเศษสำหรับ Keyword ที่เจอบ่อย (ยืดหยุ่นสูง มีชื่อใหม่ก็ยังโชว์สีสวยๆ ได้)
-        if(t.includes('silver') || t.includes('เงิน')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40 whitespace-nowrap">${currentTier}</span>`;
-        if(t.includes('gold') || t.includes('ทอง')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 whitespace-nowrap">${currentTier}</span>`;
-        if(t.includes('platinum') || t.includes('แพลทินัม')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-[#1da1f2] border border-blue-200 whitespace-nowrap">${currentTier}</span>`;
-        if(t.includes('legend') || t.includes('ตำนาน')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-purple-500 to-indigo-500 text-white border border-purple-400 whitespace-nowrap">${currentTier}</span>`;
-        if(t.includes('owner') || t.includes('เจ้าของ')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-black text-yellow-300 border border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap">${currentTier}</span>`;
-        if(t.includes('new') || t.includes('ใหม่')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">${currentTier}</span>`;
-        
-        // 🌟 สีมาตรฐาน หากแอดมินตั้งชื่อประหลาดๆ นอกเหนือจากข้างบน แอปก็จะไม่พัง!
-        return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 border border-gray-300 dark:border-slate-600 whitespace-nowrap">${currentTier}</span>`;
+        // 🌟 ดึงข้อมูลธีมสีจาก RAM ส่วนกลาง (ถ้าหาไม่เจอให้ใช้ default)
+        let tierData = window.systemTiersMap[tierName] || {};
+        let theme = tierData.theme || 'default';
+
+        // 🌟 คลังแสงดีไซน์ป้ายกำกับ (เปลี่ยนชื่อระดับอะไรมา ดีไซน์ก็จะเกาะติดไปตลอด)
+        const themes = {
+            'default': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 border border-gray-300 dark:border-slate-600 whitespace-nowrap">${tierName}</span>`,
+            
+            'emerald': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">🔰 ${tierName}</span>`,
+            
+            'slate': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40 whitespace-nowrap">${tierName}</span>`,
+            
+            'amber': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 whitespace-nowrap">${tierName}</span>`,
+            
+            'blue': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-white border border-cyan-300 shadow-sm whitespace-nowrap"><i class="far fa-gem mr-0.5"></i>${tierName}</span>`,
+            
+            'legend': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border border-pink-400 shadow-[0_0_10px_rgba(219,39,119,0.7)] whitespace-nowrap uppercase tracking-wider"><i class="fas fa-fire text-pink-200 mr-1"></i>${tierName}</span>`,
+            
+            'owner': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-gray-900 text-white border border-yellow-400 shadow-[0_0_12px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap uppercase tracking-wider"><i class="fas fa-crown text-yellow-200 mr-1"></i>${tierName}</span>`
+        };
+
+        return themes[theme] || themes['default'];
     }
 
     window.filterDrivers = function() {
@@ -5114,20 +5150,20 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                     name: child.key, 
                     rating: data.defaultRating !== undefined ? data.defaultRating : 5.0, 
                     level: data.rankLevel || 1,
+                    theme: data.badgeTheme || 'default', // 🌟 ดึงค่าธีมสี
                     desc: data.description || 'ไม่มีคำอธิบาย',
-                    resetOnPromote: data.resetOnPromote || false, // 🌟 ดึงสถานะกฎรีเซ็ต
-                    isInvincible: data.isInvincible || false // 🌟 ดึงสถานะกฎอมตะ
+                    resetOnPromote: data.resetOnPromote || false,
+                    isInvincible: data.isInvincible || false
                 });
             });
 
             tiersList.sort((a, b) => a.level - b.level);
 
             tiersList.forEach((t) => {
-                // 🌟 เก็บทุกกฎลง RAM เพื่อให้หน้าอื่นเรียกใช้
-                window.systemTiersMap[t.name] = { desc: t.desc, rating: t.rating, resetOnPromote: t.resetOnPromote, isInvincible: t.isInvincible };
+                // 🌟 เก็บธีมสีลง RAM ด้วย
+                window.systemTiersMap[t.name] = { desc: t.desc, rating: t.rating, theme: t.theme, resetOnPromote: t.resetOnPromote, isInvincible: t.isInvincible };
                 window.tierLevels[t.name] = t.level; 
 
-                // สร้างป้ายกำกับบอกสถานะในหน้าการ์ด
                 let specialBadges = '';
                 if(t.resetOnPromote) specialBadges += `<span class="bg-blue-100 text-blue-600 px-1 py-0.5 rounded text-[8px] mr-1">รีเซ็ตดาว</span>`;
                 if(t.isInvincible) specialBadges += `<span class="bg-amber-100 text-amber-600 px-1 py-0.5 rounded text-[8px]">⭐ อมตะ</span>`;
@@ -5139,11 +5175,11 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                         <div>
                             <h3 class="font-black text-gray-800 dark:text-white text-sm">LV.${t.level} : ${t.name}</h3>
                             <p class="text-[10px] text-gray-500 mb-1">ดาวเริ่ม: <b>${t.rating}</b> | ${t.desc}</p>
-                            <div>${specialBadges}</div>
+                            <div>${window.getTierBadgeHtml(t.name)} ${specialBadges}</div>
                         </div>
                     </div>
                     <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.rating}, ${t.level}, ${t.resetOnPromote}, ${t.isInvincible})" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.rating}, ${t.level}, '${t.theme}', ${t.resetOnPromote}, ${t.isInvincible})" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
                         <button onclick="deleteTierData('${t.name}')" class="w-8 h-8 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
@@ -5170,27 +5206,31 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if(typeof window.loadCentralOptionsForCommission === 'function') window.loadCentralOptionsForCommission();
     });
 
-    window.openTierModal = function(id = '', desc = '', rating = 5.0, level = 1, isReset = false, isInv = false) {
+    // 🌟 รับค่าธีมสี (theme) มาโชว์ในป๊อปอัป
+    window.openTierModal = function(id = '', desc = '', rating = 5.0, level = 1, theme = 'default', isReset = false, isInv = false) {
         document.getElementById('tier-old-id').value = id;
         document.getElementById('tier-input-name').value = id; 
         document.getElementById('tier-input-desc').value = desc;
         document.getElementById('tier-input-rating').value = rating; 
         document.getElementById('tier-input-level').value = level; 
-        document.getElementById('tier-rule-reset').checked = isReset; // 🌟 ติ๊กค่าเดิมมาโชว์
-        document.getElementById('tier-rule-invincible').checked = isInv; // 🌟 ติ๊กค่าเดิมมาโชว์
+        document.getElementById('tier-input-theme').value = theme; // 🌟 หยอดค่าธีม
+        document.getElementById('tier-rule-reset').checked = isReset; 
+        document.getElementById('tier-rule-invincible').checked = isInv; 
 
         document.getElementById('tier-modal-title').innerHTML = id ? '<i class="fas fa-edit mr-1"></i> แก้ไขระดับชั้น' : '<i class="fas fa-plus-circle mr-1"></i> เพิ่มระดับชั้นใหม่';
         openModal('modalTierForm');
     }
 
+    // 🌟 เซฟธีมสีลงฐานข้อมูล
     window.saveTierData = function() {
         let oldId = document.getElementById('tier-old-id').value;
         let newName = document.getElementById('tier-input-name').value.trim();
         let desc = document.getElementById('tier-input-desc').value.trim();
         let rating = parseFloat(document.getElementById('tier-input-rating').value) || 5.0; 
         let level = parseInt(document.getElementById('tier-input-level').value) || 1; 
-        let isReset = document.getElementById('tier-rule-reset').checked; // 🌟 อ่านค่าสวิตช์
-        let isInv = document.getElementById('tier-rule-invincible').checked; // 🌟 อ่านค่าสวิตช์
+        let theme = document.getElementById('tier-input-theme').value; // 🌟 อ่านค่าธีม
+        let isReset = document.getElementById('tier-rule-reset').checked; 
+        let isInv = document.getElementById('tier-rule-invincible').checked; 
 
         if(!newName) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ชื่อระดับชั้นด้วยครับ', 'error');
         if(/[.#$\[\]]/.test(newName)) return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้น', 'error');
@@ -5201,8 +5241,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             description: desc, 
             defaultRating: rating, 
             rankLevel: level, 
-            resetOnPromote: isReset, // 🌟 เซฟกฎลงฐานข้อมูล!
-            isInvincible: isInv,     // 🌟 เซฟกฎลงฐานข้อมูล!
+            badgeTheme: theme, // 🌟 เซฟธีมสีลง Firebase!
+            resetOnPromote: isReset, 
+            isInvincible: isInv,     
             updatedAt: firebase.database.ServerValue.TIMESTAMP 
         }).then(() => {
             showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เรียบร้อยแล้ว`, 'success'); 
