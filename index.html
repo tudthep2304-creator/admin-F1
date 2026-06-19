@@ -1093,16 +1093,18 @@
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-140px)]">
               
               <div class="w-full lg:w-1/3 space-y-4 shrink-0">
-                  <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-800 p-4 rounded-xl space-y-4">
-                      <h3 class="text-xs font-black text-gray-800 dark:text-white uppercase tracking-wider flex items-center gap-2"><i class="fas fa-shield-alt text-blue-500"></i> กฎการเงินพื้นฐาน (Default)</h3>
-                      <p class="text-[10px] text-gray-500 leading-relaxed">กฎนี้จะทำงานเป็น "ตาข่ายรองรับขั้นต่ำ" บังคับใช้กับคนขับทุกคนในระบบทันที หากไม่มีกฎพิเศษใดๆ มาครอบคลุม</p>
+                  <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-800 p-4 rounded-xl space-y-4 relative overflow-hidden">
+                      <div id="comm-def-lock-badge" class="absolute top-4 right-4 text-[10px] font-black bg-gray-200 text-gray-500 px-2 py-1 rounded flex items-center gap-1"><i class="fas fa-lock"></i> ล็อกการแก้ไข</div>
+
+                      <h3 class="text-xs font-black text-gray-800 dark:text-white uppercase tracking-wider flex items-center gap-2"><i class="fas fa-shield-alt text-blue-500"></i> กฎการเงินพื้นฐาน</h3>
+                      <p class="text-[10px] text-gray-500 leading-relaxed pr-16">กฎนี้ทำงานเป็น "ตาข่ายรองรับขั้นต่ำ" บังคับใช้กับคนขับทุกคน หากไม่มีกฎพิเศษใดๆ มาครอบคลุม</p>
                       
                       <hr class="border-gray-200 dark:border-slate-700">
 
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1">💸 ยอดเครดิตขั้นต่ำ (บังคับเติมเงิน)</label>
                           <div class="flex items-center gap-2">
-                              <input type="number" id="comm-def-min-balance" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold text-center focus:border-blue-500 shadow-sm shadow-inner">
+                              <input type="number" id="comm-def-min-balance" disabled class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold text-center focus:border-blue-500 shadow-sm disabled:bg-gray-100 disabled:opacity-60 transition-all">
                               <span class="text-xs font-bold text-gray-500">บาท</span>
                           </div>
                       </div>
@@ -1110,18 +1112,25 @@
                       <div class="grid grid-cols-2 gap-2">
                           <div>
                               <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1">รูปแบบหักเงิน</label>
-                              <select id="comm-def-type" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-xs font-bold focus:border-blue-500">
+                              <select id="comm-def-type" disabled class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-xs font-bold focus:border-blue-500 disabled:bg-gray-100 disabled:opacity-60 transition-all">
                                   <option value="percent">เปอร์เซ็นต์ (%)</option>
                                   <option value="flat">คงที่ (บาท)</option>
                               </select>
                           </div>
                           <div>
                               <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1">จำนวนที่หัก</label>
-                              <input type="number" id="comm-def-value" class="w-full p-2.5 bg-white dark:bg-slate-900 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-black text-center focus:border-blue-500 shadow-inner">
+                              <input type="number" id="comm-def-value" disabled class="w-full p-2.5 bg-white dark:bg-slate-900 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-black text-center focus:border-blue-500 shadow-inner disabled:bg-gray-100 disabled:opacity-60 transition-all">
                           </div>
                       </div>
 
-                      <button onclick="saveDefaultCommissionSettings()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5"><i class="fas fa-save"></i> บันทึกกฎพื้นฐาน</button>
+                      <div class="pt-2">
+                          <button id="btn-edit-comm-def" onclick="enableEditCommDef()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5"><i class="fas fa-unlock"></i> ปลดล็อกเพื่อแก้ไข</button>
+                          
+                          <div id="group-save-comm-def" class="hidden flex gap-2">
+                              <button onclick="cancelEditCommDef()" class="w-1/3 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-xl text-xs transition"><i class="fas fa-times"></i> ยกเลิก</button>
+                              <button onclick="saveDefaultCommissionSettings()" class="w-2/3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5"><i class="fas fa-save"></i> ยืนยันบันทึกข้อมูล</button>
+                          </div>
+                      </div>
                   </div>
               </div>
 
@@ -4788,25 +4797,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         tbody.innerHTML = html || '<tr><td colspan="6" class="py-12 text-center text-gray-400 font-bold"><i class="fas fa-folder-open text-xl block mb-2 opacity-50"></i> ยังไม่มีการตั้งกฎพิเศษแยกย่อย</td></tr>';
     }
 
-    // กดเซฟฝั่งกฎพื้นฐาน
-    window.saveDefaultCommissionSettings = function() {
-        let minBal = parseFloat(document.getElementById('comm-def-min-balance').value);
-        let type = document.getElementById('comm-def-type').value;
-        let val = parseFloat(document.getElementById('comm-def-value').value);
-
-        if(isNaN(minBal) || isNaN(val) || minBal < 0 || val < 0) {
-            return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุข้อมูลตัวเลขให้ถูกต้องและห้ามติดลบครับ', 'error');
-        }
-
-        db.ref('system_settings/commission_v2').update({
-            defaultMinBalance: minBal,
-            defaultType: type,
-            defaultValue: val
-        }).then(() => {
-            showCustomAlert('บันทึกกฎพื้นฐานสำเร็จ', 'อัปเดตระบบโครงสร้างการเงินเรียบร้อย', 'success');
-        });
-    }
-
     // เปิดหน้าต่างเพิ่มกฎพิเศษ
     window.openAddCommRuleModal = function() {
         document.getElementById('rule-name').value = '';
@@ -4859,25 +4849,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         }, 'ลบทิ้ง', 'red');
     }
 
-    // 🌟 โบนัสชิ้นสิริมงคล: ฟังก์ชันจำลองคำนวณหาค่าคอมมิชชันที่ดีที่สุดให้คนขับ (สำหรับใช้ในอนาคต)
+    // 🌟 โบนัสชิ้นสิริมงคล: ฟังก์ชันจำลองคำนวณหาค่าคอมมิชชันที่ดีที่สุดให้คนขับ
     window.calculateBestCommission = function(driverTier, vehicleType, fareAmount) {
         let d = globalCommissionData;
         let finalCommFee = 0;
         
-        // 1. ตั้งค่าฐานคิดจากตัวกฎพื้นฐานไว้ก่อน
         if(d.defaultType === 'percent') {
             finalCommFee = fareAmount * (d.defaultValue / 100);
         } else {
             finalCommFee = d.defaultValue;
         }
 
-        // 2. วิ่งตรวจหากฎพิเศษที่เปิดใช้งานอยู่
         let rules = d.specialRules || {};
         for(let id in rules) {
             let r = rules[id];
             if(!r.isActive) continue;
 
-            // ตรวจสอบความเข้ากันได้ของ Tier และ ประเภทรถ
             let tierMatch = (r.targetTier === 'all' || r.targetTier === driverTier);
             let vehicleMatch = (r.targetVehicle === 'all' || r.targetVehicle === vehicleType);
 
@@ -4888,7 +4875,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 } else {
                     tempFee = r.value;
                 }
-                // สถาปัตยกรรมเอาใจคนขับ: ถ้ากฎพิเศษข้อนี้คิดเงิน "ถูกกว่า" กฎฐาน ให้สิทธิ์เลือกอันนี้ทันที
                 if(tempFee < finalCommFee) {
                     finalCommFee = tempFee;
                 }
@@ -4896,6 +4882,86 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         }
         return finalCommFee;
     }
+
+    // ========================================================
+    // 🌟 ฟังก์ชันจัดการ UI ล็อกหน้าต่าง & ดึงข้อมูลส่วนกลาง
+    // ========================================================
+
+    // ปลดล็อกกล่องข้อความกฎพื้นฐาน
+    window.enableEditCommDef = function() {
+        document.getElementById('comm-def-min-balance').disabled = false;
+        document.getElementById('comm-def-type').disabled = false;
+        document.getElementById('comm-def-value').disabled = false;
+        
+        document.getElementById('comm-def-lock-badge').innerHTML = '<i class="fas fa-lock-open text-amber-500"></i> <span class="text-amber-500">กำลังแก้ไข</span>';
+        document.getElementById('btn-edit-comm-def').classList.add('hidden');
+        document.getElementById('group-save-comm-def').classList.remove('hidden');
+    }
+
+    // ยกเลิกการแก้ไขและล็อกกลับเหมือนเดิม
+    window.cancelEditCommDef = function() {
+        window.renderCommissionSettings(); 
+        document.getElementById('comm-def-min-balance').disabled = true;
+        document.getElementById('comm-def-type').disabled = true;
+        document.getElementById('comm-def-value').disabled = true;
+        
+        document.getElementById('comm-def-lock-badge').innerHTML = '<i class="fas fa-lock"></i> ล็อกการแก้ไข';
+        document.getElementById('group-save-comm-def').classList.add('hidden');
+        document.getElementById('btn-edit-comm-def').classList.remove('hidden');
+    }
+
+    // 🌟 อัปเกรดแล้ว: กดเซฟฝั่งกฎพื้นฐาน แล้วล็อกหน้าจอทันที
+    window.saveDefaultCommissionSettings = function() {
+        let minBal = parseFloat(document.getElementById('comm-def-min-balance').value);
+        let type = document.getElementById('comm-def-type').value;
+        let val = parseFloat(document.getElementById('comm-def-value').value);
+
+        if(isNaN(minBal) || isNaN(val) || minBal < 0 || val < 0) {
+            return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุข้อมูลตัวเลขให้ถูกต้องและห้ามติดลบครับ', 'error');
+        }
+
+        db.ref('system_settings/commission_v2').update({
+            defaultMinBalance: minBal, defaultType: type, defaultValue: val
+        }).then(() => {
+            showCustomAlert('บันทึกกฎพื้นฐานสำเร็จ', 'อัปเดตระบบโครงสร้างการเงินเรียบร้อย', 'success');
+            window.cancelEditCommDef(); // ล็อกหน้าจอกลับทันที
+        });
+    }
+
+    // ดึงข้อมูลตัวเลือกประเภทรถและระดับชั้นจากส่วนกลาง
+    window.loadCentralOptionsForCommission = function() {
+        // ดึงรายชื่อ Tier
+        db.ref('config/tiers').once('value', snap => {
+            let select = document.getElementById('rule-target-tier');
+            let html = '<option value="all">🌟 ทุกระดับชั้น</option>';
+            if(snap.exists()) {
+                snap.forEach(child => { html += `<option value="${child.key}">${child.key}</option>`; });
+            } else {
+                html += '<option value="New">คนขับหน้าใหม่ (New)</option><option value="Standard">Standard</option><option value="Gold">Gold</option><option value="Diamond">Diamond</option>';
+            }
+            select.innerHTML = html;
+        });
+
+        // ดึงรายชื่อประเภทยานพาหนะ (ตรง path 'vehicles' แก้ตามที่คุณใช้จริงได้เลยครับ)
+        db.ref('vehicles').once('value', snap => {
+            let select = document.getElementById('rule-target-vehicle');
+            let html = '<option value="all">🚗 รถทุกประเภท</option>';
+            
+            if(snap.exists()) {
+                snap.forEach(child => { 
+                    let vData = child.val();
+                    let vName = vData.name || vData.title || child.key; 
+                    html += `<option value="${vName}">${vName}</option>`; 
+                });
+            } else {
+                html += '<option value="รถจักรยานยนต์">รถจักรยานยนต์</option><option value="รถสามล้อ">รถสามล้อ</option><option value="รถยนต์">รถยนต์</option>';
+            }
+            select.innerHTML = html;
+        });
+    }
+
+    // สั่งโหลดข้อมูลใส่ Dropdown ทันที
+    window.loadCentralOptionsForCommission();
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
