@@ -243,18 +243,6 @@
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ban"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-red-500 dark:text-red-400 leading-tight">บล็อกคนขับ</span>
                   </button>
-                <!-- 🌟 เมนูใหม่ 1: แคมเปญร้านค้าพาร์ทเนอร์ -->
-                  <button onclick="switchTab('partner-campaigns')" class="bg-purple-50 dark:bg-slate-800 border border-purple-200 dark:border-slate-700 hover:bg-purple-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-store"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-purple-700 dark:text-purple-400 leading-tight">แคมเปญร้านค้า</span>
-                  </button>
-                  
-                  <!-- 🌟 เมนูใหม่ 2: อนุมัติแคมเปญร้านค้า -->
-                  <button onclick="switchTab('partner-approvals')" class="bg-purple-50 dark:bg-slate-800 border border-purple-200 dark:border-slate-700 hover:bg-purple-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95 relative">
-                      <div id="badge-partner-pending" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">0</div>
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-tasks"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-purple-700 dark:text-purple-400 leading-tight">ตรวจงานร้านค้า</span>
-                  </button>
               </div>
           </div>
 
@@ -392,61 +380,6 @@
                           </tr>
                       </thead>
                       <tbody id="all-drivers-table" class="text-sm divide-y divide-gray-200 dark:divide-slate-800 bg-white dark:bg-slate-900 transition-colors">
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </section>
-    <!-- ================= หน้าจัดการแคมเปญร้านค้าพาร์ทเนอร์ ================= -->
-      <section id="content-partner-campaigns" class="tab-content hidden space-y-4">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h2 class="text-lg font-bold text-purple-600 dark:text-purple-500"><i class="fas fa-store mr-1.5"></i> ระบบแคมเปญร้านค้า (B2B Partner)</h2>
-                  <button onclick="openPartnerCampaignModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> สร้างแคมเปญร้านค้า</button>
-              </div>
-              <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
-                  <table class="w-full text-left border-collapse min-w-[800px]">
-                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[10px] uppercase font-bold bg-purple-50/50 dark:bg-slate-800/50">
-                          <th class="py-3 px-3 w-[25%]">ชื่อแคมเปญ / ร้านค้า</th>
-                          <th class="py-3 px-2 w-[20%]">รางวัลที่จะแจก</th>
-                          <th class="py-3 px-2 text-center w-[20%]">สต็อกโค้ดลับ (ใบ)</th>
-                          <th class="py-3 px-2 text-center w-[15%]">สถานะ</th>
-                          <th class="py-3 px-3 text-center w-[20%]">จัดการ</th>
-                      </tr></thead>
-                      <tbody id="partner-campaigns-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50">
-                          <tr><td colspan="5" class="py-10 text-center text-gray-400 text-xs">กำลังออกแบบระบบประมวลผล... (รอใส่ JS)</td></tr>
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </section>
-
-      <!-- ================= หน้าอนุมัติหลักฐานแคมเปญร้านค้า ================= -->
-      <section id="content-partner-approvals" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
-                  <h2 class="text-sm font-black text-purple-600 dark:text-purple-400 flex items-center gap-2"><i class="fas fa-tasks"></i> ศูนย์ตรวจหลักฐานร้านค้าพาร์ทเนอร์</h2>
-                  <div class="flex gap-2 w-full sm:w-auto">
-                      <select id="partner-approval-status" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-purple-500 font-bold">
-                          <option value="pending">⏳ รอตรวจสอบ</option>
-                          <option value="approved">✅ อนุมัติแล้ว</option>
-                          <option value="rejected">❌ ปฏิเสธ</option>
-                      </select>
-                  </div>
-              </div>
-              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
-                  <table class="w-full text-left border-collapse min-w-[750px]">
-                      <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
-                          <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
-                              <th class="py-2.5 px-3">วันเวลาที่ส่ง</th>
-                              <th class="py-2.5 px-3">คนขับ</th>
-                              <th class="py-2.5 px-3 text-center">โค้ดที่อ้างสิทธิ์</th>
-                              <th class="py-2.5 px-3 text-center">รูปหลักฐาน</th>
-                              <th class="py-2.5 px-3 text-center">การจัดการ</th>
-                          </tr>
-                      </thead>
-                      <tbody id="partner-approvals-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
-                          <tr><td colspan="5" class="py-10 text-center text-gray-400 text-xs">กำลังออกแบบระบบประมวลผล... (รอใส่ JS)</td></tr>
                       </tbody>
                   </table>
               </div>
@@ -1748,27 +1681,7 @@
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
     const db = firebase.database();
-// ========================================================
-    // 🌟 ฟังก์ชันส่งข้อมูลประวัติไปบันทึกลง Google Sheet (Central Logger)
-    // ========================================================
-    window.syncLogToSheet = async function(logType, logDataArray) {
-        try {
-            let payload = {
-                logType: logType, // ชื่อหมวดหมู่
-                logData: logDataArray // Array ข้อมูลที่จะให้เรียงในคอลัมน์ A, B, C...
-            };
-            let res = await fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            let result = await res.json();
-            if(result.status !== 'success') {
-                console.error("Sheet Log Error:", result.message);
-            }
-        } catch (e) {
-            console.error("Fetch Sheet Error:", e);
-        }
-    }
+
     // ==========================================
     // 🌟 ระบบ Sidebar เมนู (เลื่อนจากซ้าย)
     // ==========================================
@@ -1898,7 +1811,9 @@
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า' };
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน' };
+    // 🌟 1. ระบบ History & Back Button
+    window.adminHistoryStack = ['dashboard'];
 
     function switchTab(tabId, isBack = false) {
         document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
@@ -2989,25 +2904,32 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
     // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
     // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
-        window.getTierBadgeHtml = function(currentTier) {
+    window.getTierBadgeHtml = function(currentTier) {
         let tierName = currentTier || 'New';
-        let mapData = window.systemTiersMap || {}; // เพิ่มการกันเหนียว
-        let tierData = mapData[tierName] || {};
+        
+        // 🌟 ดึงข้อมูลธีมสีจาก RAM ส่วนกลาง (ถ้าหาไม่เจอให้ใช้ default)
+        let tierData = window.systemTiersMap[tierName] || {};
         let theme = tierData.theme || 'default';
 
+        // 🌟 คลังแสงดีไซน์ป้ายกำกับ (เปลี่ยนชื่อระดับอะไรมา ดีไซน์ก็จะเกาะติดไปตลอด)
         const themes = {
             'default': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 border border-gray-300 dark:border-slate-600 whitespace-nowrap">${tierName}</span>`,
+            
             'emerald': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">🔰 ${tierName}</span>`,
+            
             'slate': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40 whitespace-nowrap">${tierName}</span>`,
+            
             'amber': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 whitespace-nowrap">${tierName}</span>`,
+            
             'blue': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-white border border-cyan-300 shadow-sm whitespace-nowrap"><i class="far fa-gem mr-0.5"></i>${tierName}</span>`,
+            
             'legend': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border border-pink-400 shadow-[0_0_10px_rgba(219,39,119,0.7)] whitespace-nowrap uppercase tracking-wider"><i class="fas fa-fire text-pink-200 mr-1"></i>${tierName}</span>`,
+            
             'owner': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-gray-900 text-white border border-yellow-400 shadow-[0_0_12px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap uppercase tracking-wider"><i class="fas fa-crown text-yellow-200 mr-1"></i>${tierName}</span>`
         };
 
         return themes[theme] || themes['default'];
     }
-
 
     window.filterDrivers = function() {
         let keyword = document.getElementById('search-driver-input').value.toLowerCase();
@@ -3151,14 +3073,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
                 newLedgerEntries.forEach(entry => db.ref(`bonus_ledger/${drvId}`).push(entry));
             }
-          window.syncLogToSheet('Driver_Profiles', [
-    new Date().toLocaleString('th-TH'), 
-    drvId, 
-    fullName, 
-    phone, 
-    '-', 
-    finalPicUrl || 'ไม่มีรูป'
-]);
             window.showGlobalLoading(false); // ปิดหน้าโหลด
             showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เข้าระบบเรียบร้อย!`, 'success');
             if(picUpload) { picUpload.removeAttribute('data-base64'); picUpload.value = ''; }
@@ -4308,20 +4222,14 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         }
     }
     
-    // ========================================================
-    // 🌟 ระบบสร้างแคมเปญและภารกิจแบบผสมเงื่อนไข (Quest Center - ฝั่งคนขับ)
-    // ========================================================
     window.openQuestModal = function(questId = null) {
-        // ล้างค่าเก่าทิ้งให้หมดเวลาเปิดหน้าต่าง
         ['rides','star','days','signup','manual'].forEach(type => {
             let chk = document.getElementById(`cond-${type}-check`); 
             if(chk) { chk.checked = false; chk.disabled = false; }
             let val = document.getElementById(`cond-${type}-val`); 
             if(val) { val.value = ''; val.disabled = true; }
         });
-        let dUnit = document.getElementById('cond-days-unit');
-        if(dUnit) { dUnit.disabled = true; dUnit.value = 'days'; }
-
+        document.getElementById('cond-days-unit').disabled = true; document.getElementById('cond-days-unit').value = 'days';
         document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
 
@@ -4333,27 +4241,33 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-start').value = q.startTime || '';
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
+          document.getElementById('quest-reward-rating').value = q.rewardRating || '';
+            
+            // 🌟 ดึงค่า "อายุโบนัส" กลับมาโชว์ตอนแก้ไขแคมเปญ
             document.getElementById('quest-reward-expire').value = q.rewardExpireDays || ''; 
-            document.getElementById('quest-reward-rating').value = q.rewardRating || ''; 
+            
             document.getElementById('quest-reward-tier').value = q.rewardTier || 'none';
             document.getElementById('quest-is-active').checked = q.isActive;
 
             if(q.targetTiers) q.targetTiers.forEach(v => { let cb = document.querySelector(`.quest-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
             if(q.targetVehicles) q.targetVehicles.forEach(v => { let cb = document.querySelector(`.quest-target-vehicle[value="${v}"]`); if(cb) cb.checked = true; });
 
-            if(c.manual) { let chk = document.getElementById('cond-manual-check'); if(chk) chk.checked = true; }
-            if(c.signup) { let chk = document.getElementById('cond-signup-check'); if(chk) chk.checked = true; }
-            if(c.rides > 0) { let chk = document.getElementById('cond-rides-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-rides-val'); if(val) { val.value = c.rides; val.disabled = false; } }
-            if(c.stars > 0) { let chk = document.getElementById('cond-star-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-star-val'); if(val) { val.value = c.stars; val.disabled = false; } }
-            if(c.days > 0) { let chk = document.getElementById('cond-days-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-days-val'); if(val) { val.value = c.days; val.disabled = false; } if(dUnit) { dUnit.disabled = false; dUnit.value = c.daysUnit || 'days'; } }
+            if(c.manual) document.getElementById('cond-manual-check').checked = true;
+            if(c.signup) document.getElementById('cond-signup-check').checked = true;
+            if(c.rides > 0) { document.getElementById('cond-rides-check').checked = true; document.getElementById('cond-rides-val').value = c.rides; document.getElementById('cond-rides-val').disabled = false; }
+            if(c.stars > 0) { document.getElementById('cond-star-check').checked = true; document.getElementById('cond-star-val').value = c.stars; document.getElementById('cond-star-val').disabled = false; }
+            if(c.days > 0) { document.getElementById('cond-days-check').checked = true; document.getElementById('cond-days-val').value = c.days; document.getElementById('cond-days-val').disabled = false; document.getElementById('cond-days-unit').disabled = false; document.getElementById('cond-days-unit').value = c.daysUnit || 'days'; }
 
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
             document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
             document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
-            document.getElementById('quest-reward-bonus').value = ''; 
+            document.getElementById('quest-reward-bonus').value = '';
+          document.getElementById('quest-reward-rating').value = '';
+            
+            // 🌟 ล้างค่า "อายุโบนัส" เป็นช่องว่างตอนสร้างแคมเปญใหม่
             document.getElementById('quest-reward-expire').value = ''; 
-            document.getElementById('quest-reward-rating').value = '';
+            
             document.getElementById('quest-reward-tier').value = 'none';
             document.getElementById('quest-is-active').checked = true;
         }
@@ -4366,7 +4280,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
         let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
+        
+        // 🌟 ดึงค่า "ดาว" ที่แอดมินตั้งแจก
         let rewardRating = parseFloat(document.getElementById('quest-reward-rating').value) || 0; 
+        
         let rewardTier = document.getElementById('quest-reward-tier').value;
 
         let targetTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
@@ -4375,229 +4292,972 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญให้คนขับด้วยครับ', 'error');
         if (targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกเป้าหมายระดับชั้นอย่างน้อย 1 กลุ่ม', 'error');
         if (targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะอย่างน้อย 1 ประเภท', 'error');
-        if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ', 'error');
+        
+        // 🌟 ดักจับถ้าไม่แจกอะไรเลย (เช็กทั้ง โบนัส, เลื่อนขั้น และ ดาว)
+        if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) {
+            return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ (เงิน, ดาว หรือเลื่อนขั้น)', 'error');
+        }
 
         let conditions = {
-            manual: document.getElementById('cond-manual-check')?.checked || false,
-            signup: document.getElementById('cond-signup-check')?.checked || false,
-            rides: document.getElementById('cond-rides-check')?.checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
-            stars: document.getElementById('cond-star-check')?.checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
-            days: document.getElementById('cond-days-check')?.checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
-            daysUnit: document.getElementById('cond-days-unit')?.value || 'days'
+            manual: document.getElementById('cond-manual-check').checked,
+            signup: document.getElementById('cond-signup-check').checked,
+            rides: document.getElementById('cond-rides-check').checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
+            stars: document.getElementById('cond-star-check').checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
+            days: document.getElementById('cond-days-check').checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
+            daysUnit: document.getElementById('cond-days-unit').value
         };
 
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
-            rewardBonus: rewardBonus, rewardExpireDays: rewardExpireDays, rewardRating: rewardRating, 
+            rewardBonus: rewardBonus, 
+            rewardExpireDays: rewardExpireDays, 
+            rewardRating: rewardRating, // 🌟 ส่ง "ดาว" ไปเซฟใน Firebase
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
         db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
-            if(typeof window.syncLogToSheet === 'function') {
-                window.syncLogToSheet('Admin_Activities', [new Date().toLocaleString('th-TH'), 'ตั้งค่าแคมเปญ (Quest)', name, qId, '-', '-']);
-            }
             showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญขึ้นระบบเรียบร้อยแล้ว', 'success'); 
             closeModal('modalAddQuest'); 
         });
     }
+    window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
+    window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
 
+// ========================================================
+    // 🌟 ระบบประวัติการบล็อกทั้งหมด (All Block History) + จัดเรียง (Sort)
     // ========================================================
-    // 🌟 ระบบแคมเปญร้านค้าพาร์ทเนอร์ (Partner Campaigns - B2B)
-    // ========================================================
-    let allPartnerCampaigns = {};
+    let globalBlockHistoryData = [];
+    let abhSortCol = 'timestamp';
+    let abhSortAsc = false; // false = มากไปน้อย (ใหม่สุดขึ้นก่อน), true = น้อยไปมาก
 
-    db.ref('system_settings/partner_campaigns').on('value', snap => {
-        allPartnerCampaigns = snap.val() || {};
-        if(typeof renderPartnerCampaignsTable === 'function') renderPartnerCampaignsTable();
+    db.ref('blocked_history').on('value', snap => {
+        globalBlockHistoryData = [];
+        if(snap.exists()) {
+            snap.forEach(driverNode => {
+                let dId = driverNode.key;
+                driverNode.forEach(logNode => {
+                    let log = logNode.val();
+                    // 🌟 เพิ่มเงื่อนไข if นี้ครอบไว้ ป้องกันพังถ้าเจอข้อมูลเก่าทับซ้อน
+                    if(typeof log === 'object' && log !== null && log.timestamp) {
+                        log.driverId = log.pin || dId; 
+                        globalBlockHistoryData.push(log);
+                    }
+                });
+            });
+        }
+        
+        let targetEl = document.getElementById('content-all-block-history');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderAllBlockHistory();
+        }
     });
 
-    window.renderPartnerCampaignsTable = function() {
-        let lst = document.getElementById('partner-campaigns-list'); 
-        if(!lst) return;
+    window.sortAllBlockHistory = function(col) {
+        // ถ้ากดซ้ำคอลัมน์เดิม ให้สลับการเรียง (มากไปน้อย <-> น้อยไปมาก)
+        if(abhSortCol === col) {
+            abhSortAsc = !abhSortAsc;
+        } else {
+            // ถ้าเปลี่ยนคอลัมน์ ค่าตั้งต้นให้เป็น มากไปน้อย (desc) เสมอ
+            abhSortCol = col;
+            abhSortAsc = false; 
+        }
+        window.renderAllBlockHistory();
+    }
+
+    window.renderAllBlockHistory = function() {
+        let tbody = document.getElementById('all-block-history-tbody');
+        if(!tbody) return;
+
+        // 1. ดึงค่าตัวกรองทั้งหมด
+        let fStart = document.getElementById('abh-filter-start').value;
+        let fEnd = document.getElementById('abh-filter-end').value;
+        let fTier = document.getElementById('abh-filter-tier').value;
+        let fReason = document.getElementById('abh-filter-reason').value;
+        let search = document.getElementById('abh-search-input').value.toLowerCase();
+
+        let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
+        let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
+
+        // 2. กรองข้อมูล (Filter)
+        let filtered = globalBlockHistoryData.filter(log => {
+            let d = allProfiles[log.driverId] || {};
+            let dTier = d.tier || 'New';
+            let dName = d.name || '';
+
+            if (log.timestamp < startTime || log.timestamp > endTime) return false;
+            if (fTier !== 'all' && dTier !== fTier) return false;
+            if (fReason !== 'all' && log.reason !== fReason) return false;
+
+            let searchStr = `${log.driverId} ${dName}`.toLowerCase();
+            if (search && !searchStr.includes(search)) return false;
+
+            return true;
+        });
+
+        // 3. จัดเรียงข้อมูล (Sort)
+        filtered.sort((a, b) => {
+            let valA, valB;
+            if(abhSortCol === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
+            else if(abhSortCol === 'driverId') { valA = a.driverId; valB = b.driverId; }
+            else if(abhSortCol === 'tier') { 
+                valA = (allProfiles[a.driverId] || {}).tier || 'New'; 
+                valB = (allProfiles[b.driverId] || {}).tier || 'New'; 
+            }
+            else if(abhSortCol === 'reason') { valA = a.reason; valB = b.reason; }
+            else if(abhSortCol === 'action') { valA = a.action || 'block'; valB = b.action || 'block'; }
+
+            if (valA < valB) return abhSortAsc ? -1 : 1;
+            if (valA > valB) return abhSortAsc ? 1 : -1;
+            return 0;
+        });
+
+        // 4. อัปเดตไอคอนลูกศรบนหัวตาราง
+        let cols = ['timestamp', 'driverId', 'tier', 'reason', 'action'];
+        cols.forEach(c => {
+            let icon = document.getElementById('sort-icon-' + c);
+            if(icon) {
+                if(abhSortCol === c) {
+                    icon.className = abhSortAsc ? 'fas fa-sort-up text-indigo-500 ml-1' : 'fas fa-sort-down text-indigo-500 ml-1';
+                } else {
+                    icon.className = 'fas fa-sort text-gray-400 ml-1';
+                }
+            }
+        });
+
+        // 5. วาดตาราง
         let html = '';
-        let campsArr = Object.entries(allPartnerCampaigns).map(([k,v]) => ({id:k, ...v}));
+        filtered.forEach(log => {
+            let d = allProfiles[log.driverId] || {};
+            let name = d.name || 'ไม่ทราบชื่อ';
+            let tierBadge = window.getTierBadgeHtml ? window.getTierBadgeHtml(d.tier || 'New') : d.tier || 'New';
+            let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+            
+            let isUnblock = log.action === 'unblock';
+            let actionBadge = isUnblock 
+                ? '<span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-bold border border-emerald-200 dark:border-emerald-800">ปลดบล็อก</span>'
+                : '<span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded text-[9px] font-bold border border-red-200 dark:border-red-800">ระงับสิทธิ์</span>';
+            let noteHtml = log.note ? `<br><span class="text-[9px] text-gray-400">หมายเหตุ: ${log.note}</span>` : '';
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-left">
+                <td class="py-2.5 px-3 text-[10px] text-gray-500 dark:text-slate-400 align-top whitespace-nowrap">${dateStr}</td>
+                <td class="py-2.5 px-3 align-top">
+                    <p class="font-bold text-[#1da1f2] text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${log.driverId}')">${log.driverId}</p>
+                    <p class="text-[10px] text-gray-800 dark:text-white mt-0.5">${name}</p>
+                </td>
+                <td class="py-2.5 px-3 align-top">${tierBadge}</td>
+                <td class="py-2.5 px-3 text-[10px] leading-relaxed align-top">
+                    <p class="font-bold text-gray-800 dark:text-slate-200">${log.reason}</p>
+                    ${noteHtml}
+                </td>
+                <td class="py-2.5 px-3 text-center align-top">${actionBadge}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html || '<tr><td colspan="5" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบข้อมูลประวัติที่ตรงกับเงื่อนไข</td></tr>';
+    }
+
+    // ฟังก์ชัน Export ข้อมูลเป็น Excel (CSV)
+    window.exportAllBlockHistory = function() {
+        if(globalBlockHistoryData.length === 0) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีข้อมูลประวัติให้ Export', 'error');
+        let csv = "\uFEFFวัน/เวลา,ID พนักงาน,ชื่อพนักงาน,ระดับชั้น,การกระทำ,เหตุผลหลัก,หมายเหตุ\n";
         
-        if (campsArr.length === 0) {
-            lst.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-gray-400 text-xs">ยังไม่มีแคมเปญร้านค้าพาร์ทเนอร์</td></tr>`; 
-            return;
+        globalBlockHistoryData.forEach(log => {
+            let d = allProfiles[log.driverId] || {};
+            let dName = d.name || 'ไม่ทราบชื่อ';
+            let dTier = d.tier || 'New';
+            let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+            let actionStr = log.action === 'unblock' ? 'ปลดบล็อก' : 'ถูกระงับสิทธิ์';
+            let noteStr = log.note || '-';
+            csv += `"${dateStr}","${log.driverId}","${dName}","${dTier}","${actionStr}","${log.reason}","${noteStr}"\n`;
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", `F1_BlockHistory_${Date.now()}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+        
+    // ========================================================
+    // 🌟 ระบบศูนย์อนุมัติสลิปเติมเงิน (Manual Top-up Approvals)
+    // ========================================================
+    let globalTopupRequests = [];
+
+    db.ref('topup_requests').on('value', snap => {
+        globalTopupRequests = [];
+        let pendingCount = 0;
+        
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let req = child.val();
+                req.id = child.key;
+                globalTopupRequests.push(req);
+                if(req.status === 'pending') pendingCount++;
+            });
+        }
+        
+        // แจ้งเตือนป้ายวงแดงๆ บนเมนูถ้ามีรายการค้าง
+        let badge = document.getElementById('badge-topup-pending');
+        if(badge) {
+            if(pendingCount > 0) { badge.innerText = pendingCount; badge.classList.remove('hidden'); }
+            else { badge.classList.add('hidden'); }
         }
 
-        campsArr.sort((a, b) => b.timestamp - a.timestamp).forEach(c => {
-            let timeStr = "ตลอดไป";
-            if (c.startTime || c.endTime) {
-                timeStr = `${c.startTime ? new Date(c.startTime).toLocaleDateString('th-TH') : 'เริ่มแล้ว'} ถึง ${c.endTime ? new Date(c.endTime).toLocaleDateString('th-TH') : 'ตลอดไป'}`;
-            }
+        let targetEl = document.getElementById('content-topup-approvals');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderTopupApprovals();
+        }
+    });
 
-            let rewardStr = "";
-            if (c.rewardBonus > 0) rewardStr += `<span class="text-yellow-600 font-bold text-xs">+฿${c.rewardBonus} 🟡</span><br>`;
-            if (c.rewardRating > 0) rewardStr += `<span class="text-amber-500 font-bold text-[10px]">+${c.rewardRating} ⭐</span>`;
+    window.renderTopupApprovals = function() {
+        let tbody = document.getElementById('topup-approvals-tbody');
+        if(!tbody) return;
+
+        let fStatus = document.getElementById('topup-filter-status').value;
+        let filtered = globalTopupRequests.filter(req => req.status === fStatus);
+        
+        // เรียงจากใหม่สุดไปเก่าสุด
+        filtered.sort((a,b) => b.timestamp - a.timestamp);
+
+        let html = '';
+        filtered.forEach(req => {
+            let d = allProfiles[req.userId] || {};
+            let uName = d.name || 'ไม่ทราบชื่อ';
+            let roleBadge = req.role === 'driver' 
+                ? '<span class="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-[9px] border border-blue-200">คนขับ</span>' 
+                : '<span class="bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded text-[9px] border border-purple-200">ลูกค้า</span>';
             
-            let limitStr = c.dailyLimit > 0 ? ` (ได้ ${c.dailyLimit} ครั้ง/วัน)` : '';
+            let dateStr = new Date(req.timestamp).toLocaleString('th-TH');
+            
+            let slipBtn = req.slipUrl 
+                ? `<button onclick="viewFullImage('${req.slipUrl}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 px-3 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 mx-auto"><i class="fas fa-image"></i> ดูสลิป</button>`
+                : '<span class="text-gray-400">ไม่มีรูป</span>';
 
-            let toggleClass = c.isActive ? 'text-emerald-500' : 'text-gray-300';
-            let toggleIcon = c.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
-
-            // เช็คสต็อกโค้ด
-            let codeHtml = '-';
-            if(c.requireCode) {
-                let totalCodes = c.codes ? Object.keys(c.codes).length : 0;
-                let usedCodes = c.codes ? Object.values(c.codes).filter(x => x.used).length : 0;
-                codeHtml = `<span class="font-bold text-purple-600">${usedCodes}/${totalCodes}</span><br><button onclick="downloadPartnerCodes('${c.id}')" class="text-[9px] bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded border border-gray-300 mt-1 shadow-sm"><i class="fas fa-download"></i> โหลดโค้ด</button>`;
+            let actionHtml = '';
+            if (req.status === 'pending') {
+                actionHtml = `
+                <div class="flex items-center justify-center gap-2">
+                    <button onclick="rejectTopup('${req.id}')" class="bg-red-50 text-red-500 hover:bg-red-600 hover:text-white border border-red-200 w-8 h-8 rounded-lg font-bold transition flex items-center justify-center shadow-sm" title="ปฏิเสธ"><i class="fas fa-times"></i></button>
+                    <button onclick="approveTopup('${req.id}', '${req.userId}', ${req.amount}, '${req.role}')" class="bg-emerald-500 text-white hover:bg-emerald-600 border border-emerald-600 px-3 h-8 rounded-lg font-bold transition flex items-center justify-center gap-1.5 shadow-sm" title="อนุมัติยอดเงิน"><i class="fas fa-check"></i> อนุมัติ</button>
+                </div>`;
+            } else if (req.status === 'approved') {
+                actionHtml = '<span class="text-emerald-500 font-bold"><i class="fas fa-check-circle"></i> อนุมัติแล้ว</span>';
+            } else {
+                actionHtml = `<span class="text-red-500 font-bold"><i class="fas fa-times-circle"></i> ปฏิเสธ (${req.rejectReason || '-'})</span>`;
             }
 
             html += `
-            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition border-b border-gray-100 dark:border-slate-800">
+            <tr class="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <td class="py-3 px-3 text-[10px] text-gray-500">${dateStr}</td>
                 <td class="py-3 px-3">
-                    <p class="font-bold text-purple-600 dark:text-purple-400 text-xs">${c.name}</p>
-                    <p class="text-[9px] text-gray-400 mt-1"><i class="far fa-clock"></i> ${timeStr}</p>
+                    <p class="font-bold text-gray-800 dark:text-white text-[11px]">${req.userId} ${roleBadge}</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">${uName}</p>
                 </td>
-                <td class="py-3 px-2 text-left">${rewardStr}<br><span class="text-[9px] text-gray-500">${limitStr}</span></td>
-                <td class="py-3 px-2 text-center text-[10px]">${codeHtml}</td>
-                <td class="py-3 px-2 text-center text-[10px]">
-                    <button onclick="togglePartnerCampStatus('${c.id}', ${!c.isActive})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
+                <td class="py-3 px-3 text-right font-black text-emerald-600 text-sm">฿${parseFloat(req.amount).toFixed(2)}</td>
+                <td class="py-3 px-3 text-center">${slipBtn}</td>
+                <td class="py-3 px-3 text-center">${actionHtml}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html || '<tr><td colspan="5" class="py-10 text-center text-gray-400">ไม่มีรายการในหมวดหมู่นี้</td></tr>';
+    }
+
+    // ฟังก์ชันอนุมัติเงิน
+    window.approveTopup = function(reqId, userId, amount, role) {
+        showCustomConfirm('ยืนยันอนุมัติ?', `ต้องการเติมเงิน ฿${amount} ให้รหัส ${userId} ใช่หรือไม่?<br><span class="text-red-500 text-[10px]">โปรดตรวจสอบสลิปกับแอปธนาคารให้แน่ใจก่อนกดยืนยัน</span>`, async () => {
+            
+            let path = role === 'driver' ? 'drivers_profile/' + userId : 'passengers_profile/' + userId;
+            let snap = await db.ref(path).once('value');
+            let d = snap.val() || {}; 
+            let currentCash = parseFloat(d.creditCash || d.credit || 0); 
+            let newCash = currentCash + parseFloat(amount);
+            
+            let updatePayload = { creditCash: newCash }; 
+            if(role === 'driver') updatePayload.credit = newCash;
+            
+            // 1. อัปเดตเงินผู้ใช้
+            await db.ref(path).update(updatePayload);
+            
+            // 2. บันทึกลงประวัติธุรกรรม (Ledger)
+            await db.ref('wallet_transactions/' + userId).push({ 
+                timestamp: firebase.database.ServerValue.TIMESTAMP, 
+                role: role, walletType: 'cash', actionType: 'add', 
+                amount: amount, note: "เติมเงินผ่านสลิป (แอดมินอนุมัติ)", 
+                balanceAfter: newCash, adminName: "แอดมินตรวจสลิป" 
+            });
+
+            // 3. เปลี่ยนสถานะคำขอเป็น approved
+            await db.ref('topup_requests/' + reqId).update({ 
+                status: 'approved', 
+                approvedAt: firebase.database.ServerValue.TIMESTAMP 
+            });
+
+            showCustomAlert('สำเร็จ', 'เติมเงินและอัปเดตสถานะบิลเรียบร้อยแล้ว', 'success');
+        });
+    }
+
+    // ฟังก์ชันปฏิเสธสลิป
+    window.rejectTopup = function(reqId) {
+        let reason = prompt("กรุณาระบุเหตุผลที่ปฏิเสธ (เช่น สลิปซ้ำ, ยอดไม่ตรง, ภาพไม่ชัด):");
+        if(reason === null) return;
+        
+        db.ref('topup_requests/' + reqId).update({ 
+            status: 'rejected', 
+            rejectReason: reason || 'แอดมินปฏิเสธ',
+            rejectedAt: firebase.database.ServerValue.TIMESTAMP 
+        }).then(() => {
+            showCustomAlert('ปฏิเสธสำเร็จ', 'บันทึกการปฏิเสธคำขอเรียบร้อยแล้ว', 'success');
+        });
+    }
+    // ========================================================
+    // 🌟 ระบบสไลด์หน้าต่างเพื่อปิด (Smooth Swipe to Close)
+    // ========================================================
+    function enableSmoothSwipeToClose(modalId, closeCallback) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        
+        // จับสไลด์ที่กล่องสีขาว/ดำด้านใน (จะสมูทกว่าจับที่พื้นหลังสีดำ)
+        const contentBox = modal.querySelector('.bg-white, .dark\\:bg-slate-900') || modal;
+        let touchstartX = 0; let touchstartY = 0; let isSwiping = false;
+
+        contentBox.addEventListener('touchstart', function(event) {
+            // ไม่ดักจับถ้ากดโดน ตาราง, ช่องพิมพ์, หรือกล่องที่ตั้งให้เลื่อนได้ (slim-scroll)
+            if (event.target.closest('.overflow-x-auto') || event.target.closest('.slim-scroll') || event.target.closest('input') || event.target.closest('select') || event.target.closest('textarea') || event.target.closest('.pac-container') || event.target.closest('#historyMap') || event.target.closest('.cropper-container')) return;
+            
+            // event.stopPropagation(); // ปิดไว้ก่อน ป้องกันบั๊กกดปุ่มข้างในไม่ติด
+            touchstartX = event.touches[0].clientX; 
+            touchstartY = event.touches[0].clientY;
+            isSwiping = false; 
+            contentBox.style.transition = 'none'; 
+        }, { passive: true });
+
+        contentBox.addEventListener('touchmove', function(event) {
+            if (event.target.closest('.overflow-x-auto') || event.target.closest('.slim-scroll') || event.target.closest('input') || event.target.closest('select') || event.target.closest('textarea') || event.target.closest('.pac-container') || event.target.closest('#historyMap') || event.target.closest('.cropper-container')) return;
+            
+            let touchMoveX = event.touches[0].clientX; let touchMoveY = event.touches[0].clientY;
+            let diffX = touchMoveX - touchstartX; let diffY = Math.abs(touchMoveY - touchstartY);
+            
+            // ถ้านิ้วเลื่อนแนวนอนมากกว่าแนวตั้ง ค่อยดึงกล่องสไลด์ตาม
+            if (diffX > 10 && diffX > diffY) {
+                isSwiping = true; 
+                contentBox.style.transform = `translateX(${diffX}px)`;
+            } else if (diffY > diffX && diffY > 10) {
+                // ถ้านิ้วเลื่อนขึ้นลง ให้ยกเลิกการสไลด์
+                isSwiping = false;
+                contentBox.style.transform = 'translateX(0)';
+            }
+        }, { passive: true });
+
+        contentBox.addEventListener('touchend', function(event) {
+            if (!isSwiping) { contentBox.style.transition = ''; return; }
+            
+            let touchendX = event.changedTouches[0].clientX; 
+            let diffX = touchendX - touchstartX;
+            contentBox.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            // ถ้าลากเกิน 120px ให้ปิด Modal ทิ้ง
+            if (diffX > 120) { 
+                contentBox.style.transform = 'translateX(100%)'; 
+                setTimeout(() => { 
+                    if (typeof closeCallback === 'function') closeCallback(); 
+                    setTimeout(() => { contentBox.style.transform = ''; }, 50); 
+                }, 300);
+            } else {
+                // ถ้าลากไม่ถึง ให้เด้งกลับเข้าที่เดิม
+                contentBox.style.transform = 'translateX(0)'; 
+                setTimeout(() => { contentBox.style.transform = ''; }, 300);
+            }
+            isSwiping = false;
+        }, { passive: true });
+    }
+
+    // ========================================================
+    // 🌟 เปิดใช้งาน Swipe to Close ให้ทุก Modal แบบอัตโนมัติ
+    // ========================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        // ค้นหาทุก div ที่มี id ขึ้นต้นด้วยคำว่า modal แล้วผูกฟังก์ชันสไลด์ปิดให้เลย
+        document.querySelectorAll('div[id^="modal"]').forEach(modal => {
+            enableSmoothSwipeToClose(modal.id, () => closeModal(modal.id));
+        });
+    });
+    // ========================================================
+    // 🌟 ระบบปัดหน้าจอเพื่อย้อนกลับ และ เปิด/ปิด Sidebar
+    // ========================================================
+    let navTouchStartX = 0; 
+    let navTouchStartY = 0;
+    
+    document.addEventListener('touchstart', e => {
+        // ไม่ดักจับถ้ากดโดนแผนที่, ที่ครอบตัดรูป, ตารางเลื่อนขวาง หรือ หน้าต่างป๊อปอัป (Modal)
+        if(e.target.closest('#adminLiveMap, .cropper-container, .overflow-x-auto, div[id^="modal"]')) return;
+        navTouchStartX = e.touches[0].clientX;
+        navTouchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+        if(navTouchStartX === 0) return;
+        
+        // เช็คว่ามีหน้าต่าง Modal เปิดซ้อนอยู่ไหม ถ้ามีให้ยกเลิกการสไลด์ย้อนกลับทันที!
+        let openModals = Array.from(document.querySelectorAll('div[id^="modal"]')).filter(m => !m.classList.contains('hidden'));
+        if (openModals.length > 0) { navTouchStartX = 0; return; }
+
+        let navTouchEndX = e.changedTouches[0].clientX;
+        let navTouchEndY = e.changedTouches[0].clientY;
+        let diffX = navTouchEndX - navTouchStartX;
+        let diffY = Math.abs(navTouchEndY - navTouchStartY);
+
+        let sidebar = document.getElementById('sidebar-menu');
+        let isSidebarOpen = sidebar && !sidebar.classList.contains('-translate-x-full');
+
+        // ปัดไปทางซ้าย: เพื่อปิดเมนู Sidebar
+        if (isSidebarOpen && diffX < -50 && Math.abs(diffX) > diffY) {
+            if(typeof window.toggleSidebar === 'function') window.toggleSidebar();
+            navTouchStartX = 0; return;
+        }
+
+        // ปัดไปทางขวา: เปิด Sidebar หรือ กดย้อนกลับ
+        if (diffX > 60 && diffX > diffY) {
+            if (navTouchStartX <= 40 && !isSidebarOpen) { 
+                // ลากจากขอบจอซ้ายสุด -> เปิดเมนู Sidebar
+                if(typeof window.toggleSidebar === 'function') window.toggleSidebar();
+            } else if (!isSidebarOpen && navTouchStartX > 40) { 
+                // ลากจากกลางจอ -> สั่งกดปุ่มย้อนกลับ
+                if(typeof window.goBackAdmin === 'function') window.goBackAdmin();
+            }
+        }
+        navTouchStartX = 0;
+    }, { passive: true });
+
+// ========================================================
+    // 🌟 ระบบประวัติธุรกรรมการเงิน (All Wallet History)
+    // ========================================================
+    let globalWalletHistoryData = [];
+    let awhSortCol = 'timestamp';
+    let awhSortAsc = false; // false = ล่าสุดขึ้นก่อน
+
+    db.ref('wallet_transactions').on('value', snap => {
+        globalWalletHistoryData = [];
+        if(snap.exists()) {
+            snap.forEach(userNode => {
+                let uId = userNode.key;
+                userNode.forEach(logNode => {
+                    let log = logNode.val();
+                    // ตรวจสอบความถูกต้องของ Object ป้องกันบั๊ก
+                    if(typeof log === 'object' && log !== null && log.timestamp) {
+                        log.userId = uId; 
+                        globalWalletHistoryData.push(log);
+                    }
+                });
+            });
+        }
+        
+        let targetEl = document.getElementById('content-all-wallet-history');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderAllWalletHistory();
+        }
+    });
+
+    window.sortAllWalletHistory = function(col) {
+        if(awhSortCol === col) { awhSortAsc = !awhSortAsc; } 
+        else { awhSortCol = col; awhSortAsc = false; }
+        window.renderAllWalletHistory();
+    }
+
+    window.renderAllWalletHistory = function() {
+        let tbody = document.getElementById('all-wallet-history-tbody');
+        if(!tbody) return;
+
+        // ดึงค่าตัวกรอง
+        let fStart = document.getElementById('awh-filter-start').value;
+        let fEnd = document.getElementById('awh-filter-end').value;
+        let fRole = document.getElementById('awh-filter-role').value;
+        let fType = document.getElementById('awh-filter-type').value;
+        let fAction = document.getElementById('awh-filter-action').value;
+        let search = document.getElementById('awh-search-input').value.toLowerCase();
+
+        let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
+        let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
+
+        // ดึงข้อมูลลูกค้าเพื่อเทียบชื่อ (เพราะตารางนี้รวมทั้งคนขับและลูกค้า)
+        let passMap = {};
+        if(windowContext.currentPassengerData) {
+            windowContext.currentPassengerData.forEach(p => passMap[p.userId || p.phone] = p);
+        }
+
+        // กรองข้อมูล (Filter)
+        let filtered = globalWalletHistoryData.filter(log => {
+            if (log.timestamp < startTime || log.timestamp > endTime) return false;
+            if (fRole !== 'all' && log.role !== fRole) return false;
+            if (fType !== 'all' && log.walletType !== fType) return false;
+            if (fAction !== 'all' && log.actionType !== fAction) return false;
+
+            let uName = log.role === 'driver' ? ((allProfiles[log.userId] || {}).name || '') : ((passMap[log.userId] || {}).name || '');
+            let searchStr = `${log.userId} ${uName} ${log.note || ''}`.toLowerCase();
+            if (search && !searchStr.includes(search)) return false;
+
+            return true;
+        });
+
+        // จัดเรียงข้อมูล (Sort)
+        filtered.sort((a, b) => {
+            let valA, valB;
+            if(awhSortCol === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
+            else if(awhSortCol === 'userId') { valA = a.userId; valB = b.userId; }
+            else if(awhSortCol === 'type') { valA = a.walletType; valB = b.walletType; }
+            else if(awhSortCol === 'amount') { valA = parseFloat(a.amount || 0); valB = parseFloat(b.amount || 0); }
+
+            if (valA < valB) return awhSortAsc ? -1 : 1;
+            if (valA > valB) return awhSortAsc ? 1 : -1;
+            return 0;
+        });
+
+        // เปลี่ยนไอคอนลูกศรที่หัวตาราง
+        let cols = ['timestamp', 'userId', 'type', 'amount'];
+        cols.forEach(c => {
+            let icon = document.getElementById('wsort-icon-' + c);
+            if(icon) icon.className = (awhSortCol === c) ? (awhSortAsc ? 'fas fa-sort-up text-emerald-500 ml-1' : 'fas fa-sort-down text-emerald-500 ml-1') : 'fas fa-sort text-gray-400 ml-1';
+        });
+
+        // สร้าง HTML
+        let html = '';
+        filtered.forEach(log => {
+            let uName = log.role === 'driver' ? ((allProfiles[log.userId] || {}).name || 'คนขับ') : ((passMap[log.userId] || {}).name || 'ลูกค้า');
+            let roleBadge = log.role === 'driver' ? '<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded text-[9px] border border-blue-200 dark:border-blue-800">คนขับ</span>' : '<span class="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-1.5 py-0.5 rounded text-[9px] border border-purple-200 dark:border-purple-800">ลูกค้า</span>';
+            
+            let typeBadge = log.walletType === 'cash' ? '<span class="text-green-600 dark:text-green-400 font-bold text-[10px]"><i class="fas fa-money-bill-wave mr-1"></i> Cash</span>' : '<span class="text-yellow-600 dark:text-yellow-500 font-bold text-[10px]"><i class="fas fa-star mr-1"></i> Bonus</span>';
+            
+            let isAdd = log.actionType === 'add';
+            let actionColor = isAdd ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400';
+            let actionPrefix = isAdd ? '+' : '-';
+            
+            let bal = log.balanceAfter !== undefined ? `฿${parseFloat(log.balanceAfter).toFixed(2)}` : '-';
+            let adminLabel = log.adminName ? `<br><span class="text-[9px] text-gray-400 mt-1 inline-block">ทำรายการโดย: ${log.adminName}</span>` : '';
+            
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-left">
+                <td class="py-3 px-3 text-[10px] text-gray-500 dark:text-slate-400 align-top whitespace-nowrap">${new Date(log.timestamp).toLocaleString('th-TH')}</td>
+                <td class="py-3 px-3 align-top">
+                    <div class="flex items-center gap-1.5 mb-0.5"><span class="font-bold text-gray-800 dark:text-white text-[11px]">${log.userId}</span> ${roleBadge}</div>
+                    <p class="text-[10px] text-gray-500 dark:text-slate-400">${uName}</p>
                 </td>
-                <td class="py-3 px-3 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                        <button onclick="openPartnerCampaignModal('${c.id}')" class="bg-blue-50 text-blue-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit text-[11px]"></i></button>
-                        <button onclick="deletePartnerCampaign('${c.id}')" class="bg-red-50 text-red-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt text-[11px]"></i></button>
-                    </div>
+                <td class="py-3 px-3 align-top text-center">${typeBadge}</td>
+                <td class="py-3 px-3 align-top text-right font-black ${actionColor} text-[11px] whitespace-nowrap">${actionPrefix}฿${parseFloat(log.amount).toFixed(2)}</td>
+                <td class="py-3 px-3 align-top text-right font-bold text-gray-600 dark:text-slate-300 text-[10px] whitespace-nowrap">${bal}</td>
+                <td class="py-3 px-3 align-top text-[10px] leading-relaxed">
+                    <p class="font-bold text-gray-800 dark:text-slate-200">${log.note || '-'}</p>
+                    ${adminLabel}
                 </td>
             </tr>`;
         });
-        lst.innerHTML = html;
+        tbody.innerHTML = html || '<tr><td colspan="6" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบประวัติที่ตรงกับเงื่อนไข</td></tr>';
     }
 
-    window.openPartnerCampaignModal = function(campId = null) {
-        if (campId && allPartnerCampaigns[campId]) {
-            let c = allPartnerCampaigns[campId];
-            document.getElementById('partner-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญร้านค้า';
-            document.getElementById('partner-camp-id').value = campId;
-            document.getElementById('partner-camp-name').value = c.name || '';
-            
-            document.getElementById('pc-proof-selfie').checked = c.requireSelfie || false;
-            document.getElementById('pc-proof-receipt').checked = c.requireReceipt || false;
-            document.getElementById('pc-proof-code').checked = c.requireCode || false;
-            document.getElementById('pc-code-amount').disabled = !c.requireCode;
-            document.getElementById('pc-code-amount').value = ''; 
-            document.getElementById('pc-code-amount').placeholder = "พิมพ์จำนวนเพื่อเพิ่มโค้ด...";
+    // 🌟 ระบบ Export Data ประวัติการเงินเป็น Excel
+    window.exportAllWalletHistory = function() {
+        if(globalWalletHistoryData.length === 0) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีข้อมูลประวัติให้ Export', 'error');
+        let csv = "\uFEFFวัน/เวลา,กลุ่มผู้ใช้,ID ผู้ใช้,กระเป๋า,ประเภท,จำนวนเงิน(บาท),ยอดคงเหลือ(บาท),หมายเหตุ,ผู้ทำรายการ\n";
+        
+        let passMap = {};
+        if(windowContext.currentPassengerData) { windowContext.currentPassengerData.forEach(p => passMap[p.userId || p.phone] = p); }
 
-            document.getElementById('partner-camp-start').value = c.startTime || '';
-            document.getElementById('partner-camp-end').value = c.endTime || '';
-            
-            document.getElementById('partner-reward-bonus').value = c.rewardBonus || '';
-            document.getElementById('partner-reward-expire').value = c.rewardExpireDays || '';
-            document.getElementById('partner-reward-rating').value = c.rewardRating || '';
-            document.getElementById('partner-reward-limit').value = c.dailyLimit || '';
-            document.getElementById('partner-camp-is-active').checked = c.isActive !== false;
-        } else {
-            document.getElementById('partner-modal-title').innerHTML = '<i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์';
-            document.getElementById('partner-camp-id').value = '';
-            document.getElementById('partner-camp-name').value = '';
-            
-            document.getElementById('pc-proof-selfie').checked = false;
-            document.getElementById('pc-proof-receipt').checked = false;
-            document.getElementById('pc-proof-code').checked = false;
-            document.getElementById('pc-code-amount').disabled = true;
-            document.getElementById('pc-code-amount').value = '';
-            document.getElementById('pc-code-amount').placeholder = "เช่น 100";
+        globalWalletHistoryData.forEach(log => {
+            let roleStr = log.role === 'driver' ? 'คนขับ' : 'ลูกค้า';
+            let uName = log.role === 'driver' ? ((allProfiles[log.userId] || {}).name || 'คนขับ') : ((passMap[log.userId] || {}).name || 'ลูกค้า');
+            let typeStr = log.walletType === 'cash' ? 'เงินสด (Cash)' : 'โบนัส (Bonus)';
+            let actionStr = log.actionType === 'add' ? 'รายรับ (+)' : 'รายจ่าย (-)';
+            let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+            let noteStr = log.note || '-';
+            let balStr = log.balanceAfter !== undefined ? log.balanceAfter : '-';
+            let admStr = log.adminName || '-';
 
-            document.getElementById('partner-camp-start').value = '';
-            document.getElementById('partner-camp-end').value = '';
-            
-            document.getElementById('partner-reward-bonus').value = '';
-            document.getElementById('partner-reward-expire').value = '';
-            document.getElementById('partner-reward-rating').value = '';
-            document.getElementById('partner-reward-limit').value = '';
-            document.getElementById('partner-camp-is-active').checked = true;
+            csv += `"${dateStr}","${roleStr}","${log.userId} (${uName})","${typeStr}","${actionStr}","${log.amount}","${balStr}","${noteStr}","${admStr}"\n`;
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", `F1_WalletHistory_${Date.now()}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    // ========================================================
+    // 🌟 ระบบบริหารกฎคอมมิชชันและความยืดหยุ่นทางธุรกิจ (Commission Rules Engine)
+    // ========================================================
+    let globalCommissionData = {
+        defaultMinBalance: 50,
+        defaultType: 'percent',
+        defaultValue: 15,
+        specialRules: {}
+    };
+
+    // เชื่อมต่อดึงข้อมูลสดจาก Firebase Realtime Database
+    db.ref('system_settings/commission_v2').on('value', snap => {
+        if(snap.exists()) {
+            let data = snap.val();
+            globalCommissionData.defaultMinBalance = data.defaultMinBalance !== undefined ? data.defaultMinBalance : 50;
+            globalCommissionData.defaultType = data.defaultType || 'percent';
+            globalCommissionData.defaultValue = data.defaultValue !== undefined ? data.defaultValue : 15;
+            globalCommissionData.specialRules = data.specialRules || {};
         }
-        openModal('modalPartnerCampaign');
+        
+        // ถ้ากำลังเปิดหน้าจอนี้อยู่ ให้รีเรนเดอร์ตารางทันทีแบบเรียลไทม์
+        let targetEl = document.getElementById('content-commission-settings');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderCommissionSettings();
+        }
+    });
+
+    // ฟังก์ชันวาดหน้าจอหลักและดึงค่าไปหยอดลงช่องอินพุต
+    window.renderCommissionSettings = function() {
+        let d = globalCommissionData;
+        
+        // หยอดค่าฝั่งกฎพื้นฐาน
+        document.getElementById('comm-def-min-balance').value = d.defaultMinBalance;
+        document.getElementById('comm-def-type').value = d.defaultType;
+        document.getElementById('comm-def-value').value = d.defaultValue;
+
+        // วาดตารางกฎพิเศษฝั่งขวา
+        let tbody = document.getElementById('comm-rules-tbody');
+        if(!tbody) return;
+
+        let html = '';
+        let rulesObj = d.specialRules;
+
+        for(let key in rulesObj) {
+            let r = rulesObj[key];
+            
+            let tierBadge = r.targetTier === 'all' 
+                ? '<span class="bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded font-bold">✨ ทุกระดับ</span>'
+                : `<span class="bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-900/30 font-bold">${r.targetTier}</span>`;
+            
+            let vehicleBadge = r.targetVehicle === 'all'
+                ? '<span class="bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded font-bold">🚗 ทุกประเภท</span>'
+                : `<span class="bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 px-2 py-0.5 rounded border border-purple-100 dark:border-purple-900/30 font-bold">${r.targetVehicle}</span>`;
+
+            let valueStr = r.type === 'percent' ? `${r.value}%` : `฿${parseFloat(r.value).toFixed(2)}`;
+
+            let toggleBtn = r.isActive 
+                ? `<button onclick="toggleRuleStatus('${key}', false)" class="text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 px-2.5 py-1 rounded-lg font-black transition-all hover:scale-105 shadow-sm"><i class="fas fa-toggle-on text-sm"></i> เปิดใช้งาน</button>`
+                : `<button onclick="toggleRuleStatus('${key}', true)" class="text-gray-400 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-2.5 py-1 rounded-lg font-bold transition-all hover:scale-105 shadow-sm"><i class="fas fa-toggle-off text-sm"></i> ปิดระบบ</button>`;
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/80 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition">
+                <td class="py-3 px-3 font-bold text-gray-800 dark:text-white">${r.name}</td>
+                <td class="py-3 px-3">${tierBadge}</td>
+                <td class="py-3 px-3">${vehicleBadge}</td>
+                <td class="py-3 px-3 text-right font-black text-blue-600 dark:text-[#1da1f2] text-xs">${valueStr}</td>
+                <td class="py-3 px-3 text-center">${toggleBtn}</td>
+                <td class="py-3 px-3 text-center">
+                    <button onclick="deleteSpecialRule('${key}')" class="text-red-500 bg-red-50 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-950/40 w-7 h-7 rounded-lg text-xs transition flex items-center justify-center mx-auto shadow-sm" title="ลบเงื่อนไขนี้"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>`;
+        }
+
+        tbody.innerHTML = html || '<tr><td colspan="6" class="py-12 text-center text-gray-400 font-bold"><i class="fas fa-folder-open text-xl block mb-2 opacity-50"></i> ยังไม่มีการตั้งกฎพิเศษแยกย่อย</td></tr>';
     }
 
-    window.savePartnerCampaign = function() {
-        let id = document.getElementById('partner-camp-id').value || 'PTN_' + Date.now();
-        let name = document.getElementById('partner-camp-name').value.trim();
-        let requireSelfie = document.getElementById('pc-proof-selfie').checked;
-        let requireReceipt = document.getElementById('pc-proof-receipt').checked;
-        let requireCode = document.getElementById('pc-proof-code').checked;
-        let codeAmount = parseInt(document.getElementById('pc-code-amount').value) || 0;
-        
-        let rewardBonus = parseInt(document.getElementById('partner-reward-bonus').value) || 0;
-        let rewardRating = parseFloat(document.getElementById('partner-reward-rating').value) || 0;
-        
-        if(!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญร้านค้า', 'error');
-        if(!requireSelfie && !requireReceipt && !requireCode) return showCustomAlert('ข้อผิดพลาด', 'กรุณาเลือกเงื่อนไขหลักฐานอย่างน้อย 1 อย่างครับ', 'error');
-        if(rewardBonus === 0 && rewardRating === 0) return showCustomAlert('ข้อผิดพลาด', 'กรุณาตั้งรางวัล (เงิน หรือ ดาว)', 'error');
+    // เปิดหน้าต่างเพิ่มกฎพิเศษ
+    window.openAddCommRuleModal = function() {
+        document.getElementById('rule-name').value = '';
+        document.getElementById('rule-target-tier').value = 'all';
+        document.getElementById('rule-target-vehicle').value = 'all';
+        document.getElementById('rule-type').value = 'percent';
+        document.getElementById('rule-value').value = '';
+        openModal('modalAddCommRule');
+    }
 
-        let payload = {
+    // กดเซฟกฎพิเศษชุดใหม่ลงฐานข้อมูล
+    window.saveSpecialCommissionRule = function() {
+        let name = document.getElementById('rule-name').value.trim();
+        let tier = document.getElementById('rule-target-tier').value;
+        let vehicle = document.getElementById('rule-target-vehicle').value;
+        let type = document.getElementById('rule-type').value;
+        let value = parseFloat(document.getElementById('rule-value').value);
+
+        if(!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อเงื่อนไขหรือแคมเปญนี้ด้วยครับ', 'error');
+        if(isNaN(value) || value < 0) return showCustomAlert('ยอดเงินผิดพลาด', 'กรุณาระบุยอดหักให้ถูกต้อง', 'error');
+
+        let newRuleRef = db.ref('system_settings/commission_v2/specialRules').push();
+        newRuleRef.set({
             name: name,
-            requireSelfie: requireSelfie,
-            requireReceipt: requireReceipt,
-            requireCode: requireCode,
-            startTime: document.getElementById('partner-camp-start').value || null,
-            endTime: document.getElementById('partner-camp-end').value || null,
-            rewardBonus: rewardBonus,
-            rewardExpireDays: parseInt(document.getElementById('partner-reward-expire').value) || 0,
-            rewardRating: rewardRating,
-            dailyLimit: parseInt(document.getElementById('partner-reward-limit').value) || 0,
-            isActive: document.getElementById('partner-camp-is-active').checked,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        // ถ้ามีการขอเจนโค้ดเพิ่ม
-        let newCodes = {};
-        if(requireCode && codeAmount > 0) {
-            let prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PTN');
-            for(let i=0; i<codeAmount; i++) {
-                let rnd = Math.floor(1000 + Math.random() * 9000); 
-                let cStr = prefix + rnd;
-                newCodes[cStr] = { code: cStr, used: false };
-            }
-        }
-
-        let updates = {};
-        updates[`system_settings/partner_campaigns/${id}`] = payload;
-        
-        db.ref().update(updates).then(() => {
-            if (Object.keys(newCodes).length > 0) {
-                db.ref(`system_settings/partner_campaigns/${id}/codes`).update(newCodes);
-            }
-            
-            // 🌟 จด Log ลง Sheet เมื่อสร้างแคมเปญร้านค้าสำเร็จ
-            window.syncLogToSheet('Admin_Activities', [
-                new Date().toLocaleString('th-TH'), 
-                'ตั้งค่าแคมเปญ (ร้านค้าพาร์ทเนอร์)', 
-                name, 
-                `รหัส: ${id} | สร้างโค้ด: ${codeAmount} ใบ`, 
-                '-', '-'
-            ]);
-
-            showCustomAlert('สำเร็จ', 'บันทึกแคมเปญร้านค้าเรียบร้อย', 'success');
-            closeModal('modalPartnerCampaign');
+            targetTier: tier,
+            targetVehicle: vehicle,
+            type: type,
+            value: value,
+            isActive: true,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            showCustomAlert('เพิ่มกฎพิเศษสำเร็จ', 'เปิดใช้งานระบบเงื่อนไขใหม่เรียบร้อยแล้ว', 'success');
+            closeModal('modalAddCommRule');
         });
     }
 
-    window.togglePartnerCampStatus = function(id, status) {
-        db.ref(`system_settings/partner_campaigns/${id}`).update({ isActive: status });
+    // สลับเปิด/ปิดสถานะการใช้งานของกฎย่อย
+    window.toggleRuleStatus = function(ruleId, newStatus) {
+        db.ref(`system_settings/commission_v2/specialRules/${ruleId}`).update({
+            isActive: newStatus
+        });
     }
 
-    window.deletePartnerCampaign = function(id) {
-        showCustomConfirm('ลบแคมเปญร้านค้า?', 'ลบถาวรจะไม่สามารถกู้คืนได้ โค้ดที่แจกไปแล้วจะใช้งานไม่ได้', () => {
-            db.ref(`system_settings/partner_campaigns/${id}`).remove();
-            showCustomAlert('ลบสำเร็จ', 'แคมเปญถูกลบออกจากระบบแล้ว', 'success');
+    // ฟังก์ชันลบกฎพิเศษทิ้ง
+    window.deleteSpecialRule = function(ruleId) {
+        showCustomConfirm('ยืนยันลบกฎนี้?', 'เมื่อลบแล้ว ระบบคำนวณเงินจะกลับไปใช้ค่ามาตรฐานพื้นฐานทันที', () => {
+            db.ref(`system_settings/commission_v2/specialRules/${ruleId}`).remove().then(() => {
+                showCustomAlert('ลบสำเร็จ', 'ลบเงื่อนไขการหักเงินพิเศษออกจากระบบแล้ว', 'success');
+            });
         }, 'ลบทิ้ง', 'red');
     }
 
-    window.downloadPartnerCodes = function(campId) {
-        let c = allPartnerCampaigns[campId];
-        if(!c || !c.codes) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีโค้ดให้ดาวน์โหลด', 'error');
+    // 🌟 โบนัสชิ้นสิริมงคล: ฟังก์ชันจำลองคำนวณหาค่าคอมมิชชันที่ดีที่สุดให้คนขับ
+    window.calculateBestCommission = function(driverTier, vehicleType, fareAmount) {
+        let d = globalCommissionData;
+        let finalCommFee = 0;
         
-        let csv = "\uFEFFแคมเปญ,รหัสโค้ด,สถานะการใช้งาน\n";
-        for(let k in c.codes) {
-            let stat = c.codes[k].used ? 'ใช้แล้ว' : 'ยังไม่ใช้';
-            csv += `"${c.name}","${k}","${stat}"\n`;
+        if(d.defaultType === 'percent') {
+            finalCommFee = fareAmount * (d.defaultValue / 100);
+        } else {
+            finalCommFee = d.defaultValue;
         }
-        triggerDownload(csv, `PartnerCodes_${c.name}_${Date.now()}.csv`);
+
+        let rules = d.specialRules || {};
+        for(let id in rules) {
+            let r = rules[id];
+            if(!r.isActive) continue;
+
+            let tierMatch = (r.targetTier === 'all' || r.targetTier === driverTier);
+            let vehicleMatch = (r.targetVehicle === 'all' || r.targetVehicle === vehicleType);
+
+            if(tierMatch && vehicleMatch) {
+                let tempFee = 0;
+                if(r.type === 'percent') {
+                    tempFee = fareAmount * (r.value / 100);
+                } else {
+                    tempFee = r.value;
+                }
+                if(tempFee < finalCommFee) {
+                    finalCommFee = tempFee;
+                }
+            }
+        }
+        return finalCommFee;
+    }
+
+    // ========================================================
+    // 🌟 ฟังก์ชันจัดการ UI ล็อกหน้าต่าง & ดึงข้อมูลส่วนกลาง
+    // ========================================================
+
+    // ปลดล็อกกล่องข้อความกฎพื้นฐาน
+    window.enableEditCommDef = function() {
+        document.getElementById('comm-def-min-balance').disabled = false;
+        document.getElementById('comm-def-type').disabled = false;
+        document.getElementById('comm-def-value').disabled = false;
+        
+        document.getElementById('comm-def-lock-badge').innerHTML = '<i class="fas fa-lock-open text-amber-500"></i> <span class="text-amber-500">กำลังแก้ไข</span>';
+        document.getElementById('btn-edit-comm-def').classList.add('hidden');
+        document.getElementById('group-save-comm-def').classList.remove('hidden');
+    }
+
+    // ยกเลิกการแก้ไขและล็อกกลับเหมือนเดิม
+    window.cancelEditCommDef = function() {
+        window.renderCommissionSettings(); 
+        document.getElementById('comm-def-min-balance').disabled = true;
+        document.getElementById('comm-def-type').disabled = true;
+        document.getElementById('comm-def-value').disabled = true;
+        
+        document.getElementById('comm-def-lock-badge').innerHTML = '<i class="fas fa-lock"></i> ล็อกการแก้ไข';
+        document.getElementById('group-save-comm-def').classList.add('hidden');
+        document.getElementById('btn-edit-comm-def').classList.remove('hidden');
+    }
+
+    // 🌟 อัปเกรดแล้ว: กดเซฟฝั่งกฎพื้นฐาน แล้วล็อกหน้าจอทันที
+    window.saveDefaultCommissionSettings = function() {
+        let minBal = parseFloat(document.getElementById('comm-def-min-balance').value);
+        let type = document.getElementById('comm-def-type').value;
+        let val = parseFloat(document.getElementById('comm-def-value').value);
+
+        if(isNaN(minBal) || isNaN(val) || minBal < 0 || val < 0) {
+            return showCustomAlert('ข้อผิดพลาด', 'กรุณาระบุข้อมูลตัวเลขให้ถูกต้องและห้ามติดลบครับ', 'error');
+        }
+
+        db.ref('system_settings/commission_v2').update({
+            defaultMinBalance: minBal, defaultType: type, defaultValue: val
+        }).then(() => {
+            showCustomAlert('บันทึกกฎพื้นฐานสำเร็จ', 'อัปเดตระบบโครงสร้างการเงินเรียบร้อย', 'success');
+            window.cancelEditCommDef(); // ล็อกหน้าจอกลับทันที
+        });
+    }
+
+    // ดึงข้อมูลตัวเลือกประเภทรถและระดับชั้นจากส่วนกลาง
+    window.loadCentralOptionsForCommission = function() {
+        // ดึงรายชื่อ Tier จากส่วนกลาง
+        db.ref('config/tiers').once('value', snap => {
+            let select = document.getElementById('rule-target-tier');
+            let html = '<option value="all">🌟 ทุกระดับชั้น</option>';
+            if(snap.exists()) {
+                snap.forEach(child => { html += `<option value="${child.key}">${child.key}</option>`; });
+            } else {
+                html += '<option value="New">คนขับหน้าใหม่ (New)</option><option value="Standard">Standard</option><option value="Gold">Gold</option><option value="Diamond">Diamond</option>';
+            }
+            if(select) select.innerHTML = html;
+        });
+
+        // 🌟 แก้ไขจุดนี้: เปลี่ยนจาก 'vehicles' เป็น 'system_settings/vehicle_types' ให้ดึงค่าจากส่วนกลางตัวจริง
+        db.ref('system_settings/vehicle_types').once('value', snap => {
+            let select = document.getElementById('rule-target-vehicle');
+            let html = '<option value="all">🚗 รถทุกประเภท</option>';
+            
+            if(snap.exists()) {
+                snap.forEach(child => { 
+                    let vData = child.val();
+                    let vName = vData.name || child.key; 
+                    // 🌟 ใช้ child.key เป็น value เพื่อความแม่นยำในการนำรหัสรถไปคำนวณหักเงินในระบบหลังบ้าน
+                    html += `<option value="${child.key}">${vName}</option>`; 
+                });
+            } else {
+                // ค่าสำรองกรณีระบบขัดข้อง
+                html += '<option value="" disabled>ไม่พบประเภทรถ (กรุณาตรวจสอบหน้าตั้งค่า)</option>';
+            }
+            if(select) select.innerHTML = html;
+        });
+    }
+
+    // สั่งโหลดข้อมูลใส่ Dropdown ทันที
+    window.loadCentralOptionsForCommission();
+
+    // ========================================================
+    // 🌟 ระบบจัดการระดับชั้นส่วนกลาง (Centralized Tier Management)
+    // ========================================================
+    if(typeof tabTitles !== 'undefined') { tabTitles['tier-settings'] = 'ศูนย์กลางจัดการระดับชั้น (Tiers)'; }
+
+    window.systemTiersMap = {}; 
+    window.tierLevels = {}; 
+
+    db.ref('config/tiers').on('value', snap => {
+        let container = document.getElementById('tier-list-container');
+        if(!container) return;
+        
+        let html = ''; let questTierHtml = ''; let adjustModalHtml = '';
+        let airdropHtml = '<option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>';
+        let filterBlockedHtml = '<option value="all">ทุกระดับชั้น</option>';
+        let filterQuestHtml = '<option value="all">เป้าหมาย: ทุกระดับชั้น</option>';
+        let rewardTierHtml = '<option value="none">-- ไม่เลื่อน --</option>';
+
+        window.systemTiersMap = {}; window.tierLevels = {};
+        let tiersList = [];
+
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let data = child.val();
+                tiersList.push({ 
+                    name: child.key, 
+                    rating: data.defaultRating !== undefined ? data.defaultRating : 5.0, 
+                    level: data.rankLevel || 1,
+                    theme: data.badgeTheme || 'default', // 🌟 ดึงค่าธีมสี
+                    desc: data.description || 'ไม่มีคำอธิบาย',
+                    resetOnPromote: data.resetOnPromote || false,
+                    isInvincible: data.isInvincible || false
+                });
+            });
+
+            tiersList.sort((a, b) => a.level - b.level);
+
+            tiersList.forEach((t) => {
+                // 🌟 เก็บธีมสีลง RAM ด้วย
+                window.systemTiersMap[t.name] = { desc: t.desc, rating: t.rating, theme: t.theme, resetOnPromote: t.resetOnPromote, isInvincible: t.isInvincible };
+                window.tierLevels[t.name] = t.level; 
+
+                let specialBadges = '';
+                if(t.resetOnPromote) specialBadges += `<span class="bg-blue-100 text-blue-600 px-1 py-0.5 rounded text-[8px] mr-1">รีเซ็ตดาว</span>`;
+                if(t.isInvincible) specialBadges += `<span class="bg-amber-100 text-amber-600 px-1 py-0.5 rounded text-[8px]">⭐ อมตะ</span>`;
+
+                html += `
+                <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400 text-amber-900 rounded-full flex items-center justify-center text-lg shadow-sm"><i class="fas fa-medal"></i></div>
+                        <div>
+                            <h3 class="font-black text-gray-800 dark:text-white text-sm">LV.${t.level} : ${t.name}</h3>
+                            <p class="text-[10px] text-gray-500 mb-1">ดาวเริ่ม: <b>${t.rating}</b> | ${t.desc}</p>
+                            <div>${window.getTierBadgeHtml(t.name)} ${specialBadges}</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.rating}, ${t.level}, '${t.theme}', ${t.resetOnPromote}, ${t.isInvincible})" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteTierData('${t.name}')" class="w-8 h-8 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+
+                questTierHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${t.name}" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> ${t.name}</label>`;
+                adjustModalHtml += `<option value="${t.name}">${t.name}</option>`;
+                airdropHtml += `<option value="${t.name}">🎁 แจกเฉพาะกลุ่ม ${t.name}</option>`;
+                filterBlockedHtml += `<option value="${t.name}">เฉพาะ ${t.name}</option>`;
+                filterQuestHtml += `<option value="${t.name}">เฉพาะ ${t.name}</option>`;
+                rewardTierHtml += `<option value="${t.name}">เลื่อนเป็น ${t.name}</option>`;
+            });
+        }
+        
+        container.innerHTML = html || '<div class="col-span-full py-10 text-center text-gray-400 font-bold">ยังไม่มีข้อมูลระดับชั้นในระบบ</div>';
+        
+        if(document.getElementById('quest-target-tier-container')) document.getElementById('quest-target-tier-container').innerHTML = questTierHtml;
+        if(document.getElementById('trm-tier-select')) document.getElementById('trm-tier-select').innerHTML = adjustModalHtml;
+        if(document.getElementById('airdrop-tier-select')) document.getElementById('airdrop-tier-select').innerHTML = airdropHtml;
+        if(document.getElementById('filter-blocked-tier')) document.getElementById('filter-blocked-tier').innerHTML = filterBlockedHtml;
+        if(document.getElementById('abh-filter-tier')) document.getElementById('abh-filter-tier').innerHTML = filterBlockedHtml;
+        if(document.getElementById('filter-quest-tier')) document.getElementById('filter-quest-tier').innerHTML = filterQuestHtml;
+        if(document.getElementById('quest-reward-tier')) document.getElementById('quest-reward-tier').innerHTML = rewardTierHtml;
+
+        if(typeof window.loadCentralOptionsForCommission === 'function') window.loadCentralOptionsForCommission();
+    });
+
+    // 🌟 รับค่าธีมสี (theme) มาโชว์ในป๊อปอัป
+    window.openTierModal = function(id = '', desc = '', rating = 5.0, level = 1, theme = 'default', isReset = false, isInv = false) {
+        document.getElementById('tier-old-id').value = id;
+        document.getElementById('tier-input-name').value = id; 
+        document.getElementById('tier-input-desc').value = desc;
+        document.getElementById('tier-input-rating').value = rating; 
+        document.getElementById('tier-input-level').value = level; 
+        document.getElementById('tier-input-theme').value = theme; // 🌟 หยอดค่าธีม
+        document.getElementById('tier-rule-reset').checked = isReset; 
+        document.getElementById('tier-rule-invincible').checked = isInv; 
+
+        document.getElementById('tier-modal-title').innerHTML = id ? '<i class="fas fa-edit mr-1"></i> แก้ไขระดับชั้น' : '<i class="fas fa-plus-circle mr-1"></i> เพิ่มระดับชั้นใหม่';
+        openModal('modalTierForm');
+    }
+
+    // 🌟 เซฟธีมสีลงฐานข้อมูล
+    window.saveTierData = function() {
+        let oldId = document.getElementById('tier-old-id').value;
+        let newName = document.getElementById('tier-input-name').value.trim();
+        let desc = document.getElementById('tier-input-desc').value.trim();
+        let rating = parseFloat(document.getElementById('tier-input-rating').value) || 5.0; 
+        let level = parseInt(document.getElementById('tier-input-level').value) || 1; 
+        let theme = document.getElementById('tier-input-theme').value; // 🌟 อ่านค่าธีม
+        let isReset = document.getElementById('tier-rule-reset').checked; 
+        let isInv = document.getElementById('tier-rule-invincible').checked; 
+
+        if(!newName) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ชื่อระดับชั้นด้วยครับ', 'error');
+        if(/[.#$\[\]]/.test(newName)) return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้น', 'error');
+
+        if(oldId && oldId !== newName) db.ref('config/tiers/' + oldId).remove();
+
+        db.ref('config/tiers/' + newName).set({ 
+            description: desc, 
+            defaultRating: rating, 
+            rankLevel: level, 
+            badgeTheme: theme, // 🌟 เซฟธีมสีลง Firebase!
+            resetOnPromote: isReset, 
+            isInvincible: isInv,     
+            updatedAt: firebase.database.ServerValue.TIMESTAMP 
+        }).then(() => {
+            showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เรียบร้อยแล้ว`, 'success'); 
+            closeModal('modalTierForm');
+        });
+    }
+
+    window.deleteTierData = function(tierName) {
+        showCustomConfirm('ยืนยันลบระดับชั้น?', `หากลบระดับ ${tierName} กฎคอมมิชชันที่ผูกกับระดับนี้อาจทำงานผิดพลาดได้!`, () => {
+            db.ref('config/tiers/' + tierName).remove().then(() => { showCustomAlert('ลบสำเร็จ', 'นำระดับชั้นออกจากระบบส่วนกลางแล้ว', 'success'); });
+        }, 'ลบข้อมูล', 'red');
     }
     
 </script>
@@ -4701,7 +5361,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
       </div>
   </div>
   <!-- 🌟 หน้าต่างสร้างแคมเปญ/ภารกิจ (แก้บั๊กกล่องรางวัลเบิ้ล) -->
-    <!-- 🌟 1. หน้าต่างสร้างแคมเปญ/ภารกิจคนขับ (ฉบับคลีน - ไม่มีของร้านค้าปนแล้ว) -->
   <div id="modalAddQuest" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 border border-amber-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
           <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 sticky top-0 z-10">
@@ -4711,13 +5370,16 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
           
           <div class="p-5 space-y-4">
               <input type="hidden" id="quest-id">
+              
               <div>
                   <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ (โชว์ให้คนขับเห็น)</label>
                   <input type="text" id="quest-name" placeholder="เช่น โปรวิ่งวันหยุด, สู้ฝนแจกโบนัส..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
               </div>
 
+              <!-- 🎯 เป้าหมายผู้เข้าร่วม -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
                   <div class="col-span-1 sm:col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
+                  
                   <div class="relative">
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
                       <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-tier-dd').classList.toggle('hidden')">
@@ -4725,10 +5387,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <i class="fas fa-chevron-down text-gray-400"></i>
                       </div>
                       <div id="quest-tier-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
-                          <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
-                      </div>
+    <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
+    
+    <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
+</div>
                   </div>
+                  
                   <div class="relative">
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
                       <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-veh-dd').classList.toggle('hidden')">
@@ -4742,6 +5406,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
+              <!-- 🏁 เงื่อนไขความสำเร็จ -->
               <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
                   <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (ติ๊กเลือกผสมกันได้)</h3>
                   <div class="space-y-3 mt-3">
@@ -4766,14 +5431,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           </select>
                       </div>
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
-                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="cond-limit-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24 text-red-600 dark:text-red-400">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
-                          <input type="number" id="cond-limit-val" disabled placeholder="เช่น 1" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <span class="text-[10px] font-bold text-gray-500">ครั้ง / วัน</span>
-                      </div>
-                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                          <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (แจกคนใหม่)</label>
+                          <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (สำหรับแจกคนใหม่)</label>
                       </div>
                       <div class="flex items-center gap-2 pt-1">
                           <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
@@ -4782,6 +5441,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
+              <!-- 📅 ช่วงเวลา -->
               <div class="grid grid-cols-2 gap-3">
                   <div>
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มภารกิจ (ว่าง=เริ่มทันที)</label>
@@ -4793,8 +5453,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
+              <!-- 🎁 ของรางวัล (เหลือกล่องเดียว ไม่ซ้ำแล้ว!) -->
               <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ</h3>
+                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกแจกอย่างใดอย่างหนึ่ง หรือทั้งหมด)</h3>
                   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
@@ -4826,87 +5487,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
           </div>
       </div>
   </div>
-
-  <!-- 🌟 2. หน้าต่างสร้างแคมเปญร้านค้าพาร์ทเนอร์ (สำหรับแจกโค้ด / รับเซลฟี่) -->
-  <div id="modalPartnerCampaign" class="hidden fixed inset-0 z-[310] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-slate-900 border border-purple-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-purple-50 dark:bg-purple-900/20 sticky top-0 z-10">
-              <h2 class="text-base font-bold text-purple-600 dark:text-purple-500" id="partner-modal-title"><i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์</h2>
-              <button onclick="closeModal('modalPartnerCampaign')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="p-5 space-y-4">
-              <input type="hidden" id="partner-camp-id">
-              <div>
-                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ / ชื่อร้านค้า (โชว์ให้คนขับเห็น)</label>
-                  <input type="text" id="partner-camp-name" placeholder="เช่น แจกโบนัสกินกาแฟร้าน A..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-purple-500">
-              </div>
-
-              <div class="p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/40 rounded-xl">
-                  <h4 class="text-[10px] font-black text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> เงื่อนไขรับรางวัล (ระบบยืนยันตัวตนร้านค้า)</h4>
-                  <div class="space-y-2">
-                      <label class="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" id="pc-proof-selfie" class="w-4 h-4 accent-red-500">
-                          <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">📸 บังคับเซลฟี่หน้าร้าน หรือเซลฟี่คู่กับสินค้า</span>
-                      </label>
-                      <label class="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" id="pc-proof-receipt" class="w-4 h-4 accent-red-500">
-                          <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">🧾 บังคับแนบใบเสร็จ (ให้ตรวจวันที่ + ตราปั๊มร้าน)</span>
-                      </label>
-                      <div class="flex items-center gap-2">
-                          <input type="checkbox" id="pc-proof-code" onchange="document.getElementById('pc-code-amount').disabled = !this.checked; if(this.checked) document.getElementById('pc-code-amount').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="pc-proof-code" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0">🎟️ สร้างโค้ดสุ่มให้ร้านค้าแจก (ใบ)</label>
-                          <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                      </div>
-                  </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่ม (ว่าง=เริ่มทันที)</label>
-                      <input type="datetime-local" id="partner-camp-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=ตลอดไป)</label>
-                      <input type="datetime-local" id="partner-camp-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
-                  </div>
-              </div>
-
-              <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                  <h3 class="text-xs font-bold text-purple-600 mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับ</h3>
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-purple-50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-200 dark:border-purple-800/50">
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
-                          <input type="number" id="partner-reward-bonus" placeholder="เช่น 50" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">อายุโบนัส (วัน)</label>
-                          <input type="number" id="partner-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เพิ่มดาว (⭐)</label>
-                          <input type="number" step="0.1" id="partner-reward-rating" placeholder="เช่น 0.2" class="w-full p-2 bg-white dark:bg-slate-900 text-amber-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">จำกัดสิทธิ์</label>
-                          <div class="relative">
-                              <input type="number" id="partner-reward-limit" placeholder="เช่น 1" class="w-full p-2 bg-white dark:bg-slate-900 text-red-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500 pr-12">
-                              <span class="absolute right-2 top-2 text-[9px] text-gray-500">ครั้ง/วัน</span>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="flex items-center gap-2 mt-2">
-                  <input type="checkbox" id="partner-camp-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                  <label for="partner-camp-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญร้านค้านี้ทันที 🟢</label>
-              </div>
-
-              <button onclick="savePartnerCampaign()" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกแคมเปญร้านค้า</button>
-          </div>
-      </div>
-  </div>
-
   
   <div id="modalAdjustTierRating" class="hidden fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
