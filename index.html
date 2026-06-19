@@ -1748,7 +1748,27 @@
       appId: "1:1048189690454:web:7c2c4c9bbf12b9c77ed1f7"
     });
     const db = firebase.database();
-
+// ========================================================
+    // 🌟 ฟังก์ชันส่งข้อมูลประวัติไปบันทึกลง Google Sheet (Central Logger)
+    // ========================================================
+    window.syncLogToSheet = async function(logType, logDataArray) {
+        try {
+            let payload = {
+                logType: logType, // ชื่อหมวดหมู่
+                logData: logDataArray // Array ข้อมูลที่จะให้เรียงในคอลัมน์ A, B, C...
+            };
+            let res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            let result = await res.json();
+            if(result.status !== 'success') {
+                console.error("Sheet Log Error:", result.message);
+            }
+        } catch (e) {
+            console.error("Fetch Sheet Error:", e);
+        }
+    }
     // ==========================================
     // 🌟 ระบบ Sidebar เมนู (เลื่อนจากซ้าย)
     // ==========================================
@@ -1878,8 +1898,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า'};
-    // 🌟 1. ระบบ History & Back Button
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า'};    // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
 
     function switchTab(tabId, isBack = false) {
@@ -3140,6 +3159,14 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
                 newLedgerEntries.forEach(entry => db.ref(`bonus_ledger/${drvId}`).push(entry));
             }
+          window.syncLogToSheet('Driver_Profiles', [
+    new Date().toLocaleString('th-TH'), 
+    drvId, 
+    fullName, 
+    phone, 
+    '-', 
+    finalPicUrl || 'ไม่มีรูป'
+]);
             window.showGlobalLoading(false); // ปิดหน้าโหลด
             showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เข้าระบบเรียบร้อย!`, 'success');
             if(picUpload) { picUpload.removeAttribute('data-base64'); picUpload.value = ''; }
@@ -5614,16 +5641,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
           
           <div class="p-5 space-y-4">
               <input type="hidden" id="quest-id">
-              
               <div>
                   <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ (โชว์ให้คนขับเห็น)</label>
                   <input type="text" id="quest-name" placeholder="เช่น โปรวิ่งวันหยุด, สู้ฝนแจกโบนัส..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
               </div>
 
-              <!-- 🎯 เป้าหมายผู้เข้าร่วม -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
                   <div class="col-span-1 sm:col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
-                  
                   <div class="relative">
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
                       <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-tier-dd').classList.toggle('hidden')">
@@ -5631,12 +5655,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <i class="fas fa-chevron-down text-gray-400"></i>
                       </div>
                       <div id="quest-tier-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-    <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
-    
-    <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
-</div>
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
+                          <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
+                      </div>
                   </div>
-                  
                   <div class="relative">
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
                       <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-veh-dd').classList.toggle('hidden')">
@@ -5650,10 +5672,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
-              <!-- 🏁 เงื่อนไขความสำเร็จ -->
               <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
                   <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (ติ๊กเลือกผสมกันได้)</h3>
-                  
                   <div class="space-y-3 mt-3">
                       <div class="flex items-center gap-2">
                           <input type="checkbox" id="cond-rides-check" onchange="document.getElementById('cond-rides-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-rides-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
@@ -5675,46 +5695,23 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                               <option value="days">วัน</option><option value="months">เดือน</option><option value="years">ปี</option>
                           </select>
                       </div>
-
-                      <!-- 🌟 โหมดร้านค้าพาร์ทเนอร์ (Anti-Fraud) -->
-                      <div class="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/40 rounded-xl">
-                          <h4 class="text-[10px] font-black text-purple-600 dark:text-purple-400 mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> ระบบยืนยันตัวตน (ร้านค้าพาร์ทเนอร์)</h4>
-                          <div class="space-y-2">
-                              <label class="flex items-center gap-2 cursor-pointer">
-                                  <input type="checkbox" id="cond-proof-selfie" class="w-4 h-4 accent-purple-500">
-                                  <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">📸 บังคับเซลฟี่หน้าร้าน หรือเซลฟี่คู่กับสินค้า</span>
-                              </label>
-                              <label class="flex items-center gap-2 cursor-pointer">
-                                  <input type="checkbox" id="cond-proof-receipt" class="w-4 h-4 accent-purple-500">
-                                  <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">🧾 บังคับแนบใบเสร็จ (ตรวจวันที่ + ตราปั๊มแอป)</span>
-                              </label>
-                              <label class="flex items-center gap-2 cursor-pointer">
-                                  <input type="checkbox" id="cond-proof-code" class="w-4 h-4 accent-purple-500">
-                                  <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">🎟️ บังคับกรอก "โค้ดลับใช้แล้วทิ้ง" (รับจากร้านค้า)</span>
-                              </label>
-                          </div>
-                      </div>
-
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
                           <label for="cond-limit-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24 text-red-600 dark:text-red-400">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
                           <input type="number" id="cond-limit-val" disabled placeholder="เช่น 1" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
                           <span class="text-[10px] font-bold text-gray-500">ครั้ง / วัน</span>
                       </div>
-
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
                           <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (แจกคนใหม่)</label>
                       </div>
-                      
                       <div class="flex items-center gap-2 pt-1">
                           <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
-                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (แจกแมนนวล / ตรวจหลักฐาน)</label>
+                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (แจกแมนนวล)</label>
                       </div>
                   </div>
               </div>
 
-              <!-- 📅 ช่วงเวลา -->
               <div class="grid grid-cols-2 gap-3">
                   <div>
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มภารกิจ (ว่าง=เริ่มทันที)</label>
@@ -5726,9 +5723,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
-              <!-- 🎁 ของรางวัล (เหลือกล่องเดียว ไม่ซ้ำแล้ว!) -->
               <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกแจกอย่างใดอย่างหนึ่ง หรือทั้งหมด)</h3>
+                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ</h3>
                   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
@@ -5757,6 +5753,85 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               </div>
 
               <button onclick="saveQuestCampaign()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกแคมเปญ</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalPartnerCampaign" class="hidden fixed inset-0 z-[310] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-purple-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-purple-50 dark:bg-purple-900/20 sticky top-0 z-10">
+              <h2 class="text-base font-bold text-purple-600 dark:text-purple-500" id="partner-modal-title"><i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์</h2>
+              <button onclick="closeModal('modalPartnerCampaign')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <input type="hidden" id="partner-camp-id">
+              <div>
+                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ / ชื่อร้านค้า (โชว์ให้คนขับเห็น)</label>
+                  <input type="text" id="partner-camp-name" placeholder="เช่น แจกโบนัสกินกาแฟร้าน A..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-purple-500">
+              </div>
+
+              <div class="p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/40 rounded-xl">
+                  <h4 class="text-[10px] font-black text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> เงื่อนไขรับรางวัล (ระบบยืนยันตัวตนร้านค้า)</h4>
+                  <div class="space-y-2">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" id="pc-proof-selfie" class="w-4 h-4 accent-red-500">
+                          <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">📸 บังคับเซลฟี่หน้าร้าน หรือเซลฟี่คู่กับสินค้า</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" id="pc-proof-receipt" class="w-4 h-4 accent-red-500">
+                          <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">🧾 บังคับแนบใบเสร็จ (ให้ตรวจวันที่ + ตราปั๊มร้าน)</span>
+                      </label>
+                      <div class="flex items-center gap-2">
+                          <input type="checkbox" id="pc-proof-code" onchange="document.getElementById('pc-code-amount').disabled = !this.checked; if(this.checked) document.getElementById('pc-code-amount').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="pc-proof-code" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0">🎟️ สร้างโค้ดสุ่มให้ร้านค้าแจก (ใบ)</label>
+                          <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                      </div>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่ม (ว่าง=เริ่มทันที)</label>
+                      <input type="datetime-local" id="partner-camp-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=ตลอดไป)</label>
+                      <input type="datetime-local" id="partner-camp-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
+                  </div>
+              </div>
+
+              <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
+                  <h3 class="text-xs font-bold text-purple-600 mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับเมื่อแอดมินกดอนุมัติ</h3>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-purple-50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-200 dark:border-purple-800/50">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
+                          <input type="number" id="partner-reward-bonus" placeholder="เช่น 50" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">อายุโบนัส (วัน)</label>
+                          <input type="number" id="partner-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เพิ่มดาว (⭐)</label>
+                          <input type="number" step="0.1" id="partner-reward-rating" placeholder="เช่น 0.2" class="w-full p-2 bg-white dark:bg-slate-900 text-amber-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">จำกัดสิทธิ์</label>
+                          <div class="relative">
+                              <input type="number" id="partner-reward-limit" placeholder="เช่น 1" class="w-full p-2 bg-white dark:bg-slate-900 text-red-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500 pr-12">
+                              <span class="absolute right-2 top-2 text-[9px] text-gray-500">ครั้ง/วัน</span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="flex items-center gap-2 mt-2">
+                  <input type="checkbox" id="partner-camp-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                  <label for="partner-camp-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญร้านค้านี้ทันที 🟢</label>
+              </div>
+
+              <button onclick="savePartnerCampaign()" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกแคมเปญร้านค้า</button>
           </div>
       </div>
   </div>
