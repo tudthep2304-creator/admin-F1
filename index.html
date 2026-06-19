@@ -1507,6 +1507,8 @@
         if(tabId === 'history') renderHistoryTab();
         if(tabId === 'quests') renderQuestsTable();
         if(tabId === 'map') { if(adminMap) google.maps.event.trigger(adminMap, 'resize'); }
+        // 🌟 แก้ปัญหาหน้าตารางประวัติรวมขาวโพลน โดยสั่งให้โหลดเมื่อสลับมาหน้านี้
+        if(tabId === 'all-block-history') { if(typeof renderAllBlockHistory === 'function') renderAllBlockHistory(); } 
     }
 
     window.goBackAdmin = function() {
@@ -2939,72 +2941,45 @@
         let name = d ? d.name : 'พนักงาน';
         
         let reason = document.getElementById('block-reason-dropdown').value;
-        let num = parseInt(document.getElementById('block-duration-num').value);
+        let numStr = document.getElementById('block-duration-num').value;
         let unit = document.getElementById('block-duration-unit').value;
-        let note = document.getElementById('block-note-input').value;
+        let note = document.getElementById('block-note-input').value.trim();
 
-        if(!reason) return showCustomAlert('แจ้งเตือน', 'กรุณาระบุเหตุผลการระงับสิทธิ์', 'warning');
-        
+        if(!reason) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกสาเหตุหลักการระงับสิทธิ์', 'error');
+
         let expireAt = 0;
-        let durationStr = "ถาวร";
-        
-        if(unit === "permanent") {
-            expireAt = 0;
-        } else {
-            if(!num || num < 1) return showCustomAlert('แจ้งเตือน', 'กรุณาระบุจำนวนเวลาที่ถูกต้อง', 'warning');
-            let ms = 0;
-            if(unit === "minutes") { ms = num * 60 * 1000; durationStr = `${num} นาที`; }
-            else if(unit === "hours") { ms = num * 60 * 60 * 1000; durationStr = `${num} ชั่วโมง`; }
-            else if(unit === "days") { ms = num * 24 * 60 * 60 * 1000; durationStr = `${num} วัน`; }
-            expireAt = Date.now() + ms;
+        if (unit !== 'permanent') {
+            let num = parseFloat(numStr);
+            if (isNaN(num) || num <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุตัวเลขระยะเวลาให้ถูกต้อง', 'error');
+            
+            let multiplier = 1;
+            if (unit === 'minutes') multiplier = 60 * 1000;
+            else if (unit === 'hours') multiplier = 60 * 60 * 1000;
+            else if (unit === 'days') multiplier = 24 * 60 * 60 * 1000;
+            else if (unit === 'months') multiplier = 30 * 24 * 60 * 60 * 1000;
+            else if (unit === 'years') multiplier = 365 * 24 * 60 * 60 * 1000;
+            
+            expireAt = Date.now() + (num * multiplier);
         }
 
-        // --- เตรียมข้อมูลสำหรับบันทึก ---
-        let now = Date.now();
-        let blockData = {
-            expireAt: expireAt,
-            reason: reason,
-            note: note || '',
-            timestamp: now,
-            action: 'block', // กำหนดการกระทำ
-            driverId: driverId // เพื่อเอาไว้ดึงข้อมูลในหน้าประวัติรวม
-        };
+        let now = Date.now(); // 🌟 ใช้ Date.now() ป้องกัน Array Sort เอ๋อ
+        let payload = { pin: driverId, reason: reason, note: note, expireAt: expireAt, timestamp: now, action: 'block' };
 
-        showCustomAlert('ยืนยัน', `คุณต้องการระงับสิทธิ์ (${name})<br>เป็นเวลา ${durationStr} ใช่หรือไม่?`, 'question', () => {
+        // 🌟 ใช้ Batch Update ยิงขึ้นฐานข้อมูลพร้อมกัน 2 ที่รวดเดียว (ปลอดภัยกว่า .set แล้วค่อย .push)
+        let updates = {};
+        updates[`blocked_drivers/${driverId}`] = payload; // ลงตารางแบนปัจจุบัน
+        
+        let logId = db.ref().child(`blocked_history/${driverId}`).push().key; // สร้าง ID ไม่ซ้ำ
+        updates[`blocked_history/${driverId}/${logId}`] = payload; // ลงสมุดประวัติ
+
+        db.ref().update(updates).then(() => {
+            let d = allProfiles[driverId];
+            if(d && d.pin) db.ref('active_drivers/' + d.pin).remove(); 
+            
+            showCustomAlert('ระงับสิทธิ์สำเร็จ', 'คนขับถูกระงับสิทธิ์และถูกตัดออกจากระบบออนไลน์แล้ว', 'success');
             closeModal('modalBlockDriver');
-            showLoading(true, `กำลังดำเนินการระงับสิทธิ์ (${driverId})...`);
-            
-            // --- เริ่มเขียนข้อมูลลง Firebase ---
-            let updates = {};
-            
-            // (A) บันทึกสถานะปัจจุบัน (blocked_drivers/${driverId})
-            updates[`blocked_drivers/${driverId}`] = blockData;
-            
-            // (B) บันทึกประวัติ (blocked_history/${driverId}/${logId}) -> ใช้ .push().key เพื่อสร้าง ID อัตโนมัติ
-            let logId = db.ref().child(`blocked_history/${driverId}`).push().key;
-            updates[`blocked_history/${driverId}/${logId}`] = blockData;
-            
-            // (C) บันทึกประวัติแบบรวมทั้งหมด (blocked_history_all/${logId}) -> เพื่อให้หน้าประวัติรวมดึงง่าย
-            // โดยเราจะใช้ข้อมูลก้อนเดียวกัน แต่ใส่ข้อมูลคนขับเพิ่มไปให้ครบ (ถ้าต้องการ)
-            let masterLogData = {...blockData}; 
-            // ลบ node `blocked_history_all` ทิ้งไปเลยครับ เพราะลอจิกหน้าใหม่เราดึงจาก blocked_history แบบ nested ได้
-            // updates[`blocked_history_all/${logId}`] = masterLogData;
-
-            db.ref().update(updates, error => {
-                showLoading(false);
-                if(error) {
-                    showCustomAlert('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้: ' + error.message, 'error');
-                } else {
-                    // อัปเดตตารางหน้าระงับสิทธิ์ทันที
-                    if(window.filterBlockedDrivers) window.filterBlockedDrivers();
-                    
-                    // ปรับปรุงลอจิกหน้าประวัติรวม เพื่อให้มันโหลดข้อมูลใหม่
-                    // ในลอจิกหน้า All Block History เราดึงจาก blocked_history node
-                    // ดังนั้นเราแค่สั่ง .on('value') ที่นั่นให้ทำงาน (ซึ่งมันทำงานอัตโนมัติอยู่แล้วถ้า firebase อัปเดต)
-                    
-                    showCustomAlert('สำเร็จ', `ระงับสิทธิ์ (${name}) เรียบร้อยแล้ว`, 'success');
-                }
-            });
+            showDriverDetails(driverId); 
+            if(typeof window.renderAllBlockHistory === 'function') window.renderAllBlockHistory(); // อัปเดตตารางหน้ารวม
         });
     }
 
@@ -3014,51 +2989,38 @@
         let d = allProfiles[driverId];
         let name = d ? d.name : 'พนักงาน';
         
-        showCustomAlert('ยืนยันปลดบล็อก', `คุณต้องการปลดล็อกการระงับสิทธิ์ของ (${name}) ใช่หรือไม่?`, 'question', () => {
-            closeModal('modalBlockDriver');
-            showLoading(true, `กำลังดำเนินการปลดล็อก (${driverId})...`);
-            
+        showCustomConfirm('ยืนยันปลดบล็อก', `คุณต้องการปลดล็อกการระงับสิทธิ์ของ (${name}) ใช่หรือไม่?`, () => {
             let now = Date.now();
-            let unblockData = {
-                timestamp: now,
-                action: 'unblock', // กำหนดการกระทำ
-                reason: 'ปลดล็อกโดยแอดมิน',
-                driverId: driverId
-            };
+            let logPayload = { pin: driverId, reason: 'แอดมินพิจารณาปลดบล็อกให้', note: '', action: 'unblock', timestamp: now };
             
-            // --- เริ่มเขียนข้อมูลลง Firebase ---
+            // 🌟 ใช้ Batch Update เหมือนกัน
             let updates = {};
+            updates[`blocked_drivers/${driverId}`] = null; // ถอดออกจากคุก (ลบข้อมูล)
             
-            // (A) ลบสถานะบล็อกปัจจุบัน (blocked_drivers/${driverId})
-            updates[`blocked_drivers/${driverId}`] = null; // null คือการลบ
-            
-            // (B) บันทึกประวัติ (blocked_history/${driverId}/${logId}) -> ใช้ .push().key เพื่อสร้าง ID อัตโนมัติ
             let logId = db.ref().child(`blocked_history/${driverId}`).push().key;
-            updates[`blocked_history/${driverId}/${logId}`] = unblockData;
-            
-            db.ref().update(updates, error => {
-                showLoading(false);
-                if(error) {
-                    showCustomAlert('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้: ' + error.message, 'error');
-                } else {
-                    if(window.filterBlockedDrivers) window.filterBlockedDrivers();
-                    showCustomAlert('สำเร็จ', `ปลดล็อก (${name}) เรียบร้อยแล้ว`, 'success');
-                }
+            updates[`blocked_history/${driverId}/${logId}`] = logPayload; // จดลงประวัติ
+
+            db.ref().update(updates).then(() => {
+                showCustomAlert('สำเร็จ', 'ปลดบล็อกคนขับเรียบร้อยแล้ว', 'success');
+                closeModal('modalBlockDriver'); 
+                
+                let currentTab = window.adminHistoryStack[window.adminHistoryStack.length - 1];
+                if (currentTab === 'driver-details') showDriverDetails(driverId); 
+                if(typeof window.renderAllBlockHistory === 'function') window.renderAllBlockHistory();
             });
         });
     }
+
     // ==========================================
-    // 🌟 ระบบแสดงประวัติการบล็อก (Block History Timeline)
+    // 🌟 ระบบแสดงประวัติการบล็อก (Block History Timeline แบบมีตัวกรองกันบั๊ก)
     // ==========================================
     window.viewBlockHistory = function(driverId = null) {
-        // หากไม่ได้ส่ง ID มา (เช่น กดจากหน้าต่าง Modal Block) ให้ดึง ID จาก UI
         if(!driverId) {
             let el = document.getElementById('block-drv-id');
             if(el) driverId = el.innerText.replace('PIN: ', '').replace('ID: ', '').trim();
         }
         if(!driverId) return;
         
-        // 🌟 เพิ่มบรรทัดนี้: กัน Error ถ้าหน้าต่าง Modal ประวัติไม่มีอยู่ (เพื่อความปลอดภัย)
         let historyModal = document.getElementById('modalBlockHistory');
         if(!historyModal) return showCustomAlert('Error', 'ไม่พบหน้าต่างประวัติการบล็อก กรุณารีเฟรชหน้าเว็บ', 'error');
 
@@ -3073,31 +3035,42 @@
             
             if(snap.exists()) {
                 let logs = [];
-                snap.forEach(child => logs.push(child.val()));
-                logs.sort((a,b) => b.timestamp - a.timestamp);
-                
-                logs.forEach(log => {
-                    let isUnblock = log.action === 'unblock';
-                    let icon = isUnblock ? '<i class="fas fa-unlock text-emerald-500 text-[10px]"></i>' : '<i class="fas fa-ban text-red-500 text-[10px]"></i>';
-                    let bg = isUnblock ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30' : 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800/30';
-                    let title = isUnblock ? 'ปลดบล็อกคืนสิทธิ์' : 'ถูกระงับสิทธิ์';
-                    let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
-                    let noteStr = log.note ? ` <br><span class="text-[9px] text-gray-400">หมายเหตุ: ${log.note}</span>` : '';
-
-                    html += `
-                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active text-left">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-gray-50 dark:border-slate-900 bg-white dark:bg-slate-800 text-center z-10 shadow-sm shrink-0">
-                            ${icon}
-                        </div>
-                        <div class="w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] p-3 rounded-xl border shadow-sm ${bg} flex flex-col text-left">
-                            <div class="flex justify-between items-center mb-1">
-                                <h4 class="font-bold text-[11px] text-gray-800 dark:text-white">${title}</h4>
-                                <span class="text-[9px] text-gray-500">${dateStr}</span>
-                            </div>
-                            <p class="text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed font-bold">${log.reason}${noteStr}</p>
-                        </div>
-                    </div>`;
+                snap.forEach(child => {
+                    let val = child.val();
+                    // 🌟 ดักจับข้อมูลขยะ (ถ้าก่อนหน้านี้เคยเกิดบั๊กเซฟทับ มันจะข้ามข้อมูลที่เสียให้เลย)
+                    if(typeof val === 'object' && val !== null && val.timestamp) {
+                        logs.push(val);
+                    }
                 });
+                
+                if(logs.length > 0) {
+                    logs.sort((a,b) => b.timestamp - a.timestamp);
+                    
+                    logs.forEach(log => {
+                        let isUnblock = log.action === 'unblock';
+                        let icon = isUnblock ? '<i class="fas fa-unlock text-emerald-500 text-[10px]"></i>' : '<i class="fas fa-ban text-red-500 text-[10px]"></i>';
+                        let bg = isUnblock ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30' : 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800/30';
+                        let title = isUnblock ? 'ปลดบล็อกคืนสิทธิ์' : 'ถูกระงับสิทธิ์';
+                        let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+                        let noteStr = log.note ? ` <br><span class="text-[9px] text-gray-400">หมายเหตุ: ${log.note}</span>` : '';
+
+                        html += `
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active text-left">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-gray-50 dark:border-slate-900 bg-white dark:bg-slate-800 text-center z-10 shadow-sm shrink-0">
+                                ${icon}
+                            </div>
+                            <div class="w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] p-3 rounded-xl border shadow-sm ${bg} flex flex-col text-left">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h4 class="font-bold text-[11px] text-gray-800 dark:text-white">${title}</h4>
+                                    <span class="text-[9px] text-gray-500">${dateStr}</span>
+                                </div>
+                                <p class="text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed font-bold">${log.reason}${noteStr}</p>
+                            </div>
+                        </div>`;
+                    });
+                } else {
+                    html = '<p class="text-center text-[11px] text-gray-400 py-10">ประวัติขาวสะอาด ไม่เคยถูกระงับสิทธิ์ ✨</p>';
+                }
             } else {
                 html = '<p class="text-center text-[11px] text-gray-400 py-10">ประวัติขาวสะอาด ไม่เคยถูกระงับสิทธิ์ ✨</p>';
             }
@@ -3806,8 +3779,11 @@
                 let dId = driverNode.key;
                 driverNode.forEach(logNode => {
                     let log = logNode.val();
-                    log.driverId = log.pin || dId; 
-                    globalBlockHistoryData.push(log);
+                    // 🌟 เพิ่มเงื่อนไข if นี้ครอบไว้ ป้องกันพังถ้าเจอข้อมูลเก่าทับซ้อน
+                    if(typeof log === 'object' && log !== null && log.timestamp) {
+                        log.driverId = log.pin || dId; 
+                        globalBlockHistoryData.push(log);
+                    }
                 });
             });
         }
