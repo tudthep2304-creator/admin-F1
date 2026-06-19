@@ -4223,13 +4223,17 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
     
     window.openQuestModal = function(questId = null) {
-        ['rides','star','days','signup','manual'].forEach(type => {
+        ['rides','star','days','signup','manual', 'limit'].forEach(type => {
             let chk = document.getElementById(`cond-${type}-check`); 
             if(chk) { chk.checked = false; chk.disabled = false; }
             let val = document.getElementById(`cond-${type}-val`); 
             if(val) { val.value = ''; val.disabled = true; }
         });
         document.getElementById('cond-days-unit').disabled = true; document.getElementById('cond-days-unit').value = 'days';
+        document.getElementById('cond-proof-selfie').checked = false;
+        document.getElementById('cond-proof-receipt').checked = false;
+        document.getElementById('cond-proof-code').checked = false;
+
         document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
 
@@ -4241,11 +4245,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-start').value = q.startTime || '';
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
-          document.getElementById('quest-reward-rating').value = q.rewardRating || '';
-            
-            // 🌟 ดึงค่า "อายุโบนัส" กลับมาโชว์ตอนแก้ไขแคมเปญ
             document.getElementById('quest-reward-expire').value = q.rewardExpireDays || ''; 
-            
+            document.getElementById('quest-reward-rating').value = q.rewardRating || ''; 
             document.getElementById('quest-reward-tier').value = q.rewardTier || 'none';
             document.getElementById('quest-is-active').checked = q.isActive;
 
@@ -4254,6 +4255,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
             if(c.manual) document.getElementById('cond-manual-check').checked = true;
             if(c.signup) document.getElementById('cond-signup-check').checked = true;
+            
+            // 🌟 โหลดค่ากฏหมายร้านค้า
+            if(c.requireSelfie) document.getElementById('cond-proof-selfie').checked = true;
+            if(c.requireReceipt) document.getElementById('cond-proof-receipt').checked = true;
+            if(c.requireCode) document.getElementById('cond-proof-code').checked = true;
+            
+            if(c.dailyLimit > 0) { document.getElementById('cond-limit-check').checked = true; document.getElementById('cond-limit-val').value = c.dailyLimit; document.getElementById('cond-limit-val').disabled = false; }
             if(c.rides > 0) { document.getElementById('cond-rides-check').checked = true; document.getElementById('cond-rides-val').value = c.rides; document.getElementById('cond-rides-val').disabled = false; }
             if(c.stars > 0) { document.getElementById('cond-star-check').checked = true; document.getElementById('cond-star-val').value = c.stars; document.getElementById('cond-star-val').disabled = false; }
             if(c.days > 0) { document.getElementById('cond-days-check').checked = true; document.getElementById('cond-days-val').value = c.days; document.getElementById('cond-days-val').disabled = false; document.getElementById('cond-days-unit').disabled = false; document.getElementById('cond-days-unit').value = c.daysUnit || 'days'; }
@@ -4262,12 +4270,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
             document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
             document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
-            document.getElementById('quest-reward-bonus').value = '';
-          document.getElementById('quest-reward-rating').value = '';
-            
-            // 🌟 ล้างค่า "อายุโบนัส" เป็นช่องว่างตอนสร้างแคมเปญใหม่
+            document.getElementById('quest-reward-bonus').value = ''; 
             document.getElementById('quest-reward-expire').value = ''; 
-            
+            document.getElementById('quest-reward-rating').value = '';
             document.getElementById('quest-reward-tier').value = 'none';
             document.getElementById('quest-is-active').checked = true;
         }
@@ -4280,10 +4285,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
         let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
-        
-        // 🌟 ดึงค่า "ดาว" ที่แอดมินตั้งแจก
         let rewardRating = parseFloat(document.getElementById('quest-reward-rating').value) || 0; 
-        
         let rewardTier = document.getElementById('quest-reward-tier').value;
 
         let targetTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
@@ -4292,15 +4294,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญให้คนขับด้วยครับ', 'error');
         if (targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกเป้าหมายระดับชั้นอย่างน้อย 1 กลุ่ม', 'error');
         if (targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะอย่างน้อย 1 ประเภท', 'error');
-        
-        // 🌟 ดักจับถ้าไม่แจกอะไรเลย (เช็กทั้ง โบนัส, เลื่อนขั้น และ ดาว)
-        if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) {
-            return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ (เงิน, ดาว หรือเลื่อนขั้น)', 'error');
-        }
+        if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ', 'error');
 
         let conditions = {
             manual: document.getElementById('cond-manual-check').checked,
             signup: document.getElementById('cond-signup-check').checked,
+            
+            // 🌟 เซฟค่ากฎร้านค้าพาร์ทเนอร์
+            requireSelfie: document.getElementById('cond-proof-selfie').checked,
+            requireReceipt: document.getElementById('cond-proof-receipt').checked,
+            requireCode: document.getElementById('cond-proof-code').checked,
+            
+            dailyLimit: document.getElementById('cond-limit-check').checked ? (parseInt(document.getElementById('cond-limit-val').value) || 0) : 0,
             rides: document.getElementById('cond-rides-check').checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
             stars: document.getElementById('cond-star-check').checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
             days: document.getElementById('cond-days-check').checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
@@ -4310,9 +4315,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
-            rewardBonus: rewardBonus, 
-            rewardExpireDays: rewardExpireDays, 
-            rewardRating: rewardRating, // 🌟 ส่ง "ดาว" ไปเซฟใน Firebase
+            rewardBonus: rewardBonus, rewardExpireDays: rewardExpireDays, rewardRating: rewardRating, 
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
@@ -5409,6 +5412,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               <!-- 🏁 เงื่อนไขความสำเร็จ -->
               <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
                   <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (ติ๊กเลือกผสมกันได้)</h3>
+                  
                   <div class="space-y-3 mt-3">
                       <div class="flex items-center gap-2">
                           <input type="checkbox" id="cond-rides-check" onchange="document.getElementById('cond-rides-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-rides-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
@@ -5430,13 +5434,41 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                               <option value="days">วัน</option><option value="months">เดือน</option><option value="years">ปี</option>
                           </select>
                       </div>
+
+                      <!-- 🌟 โหมดร้านค้าพาร์ทเนอร์ (Anti-Fraud) -->
+                      <div class="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/40 rounded-xl">
+                          <h4 class="text-[10px] font-black text-purple-600 dark:text-purple-400 mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> ระบบยืนยันตัวตน (ร้านค้าพาร์ทเนอร์)</h4>
+                          <div class="space-y-2">
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                  <input type="checkbox" id="cond-proof-selfie" class="w-4 h-4 accent-purple-500">
+                                  <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">📸 บังคับเซลฟี่หน้าร้าน หรือเซลฟี่คู่กับสินค้า</span>
+                              </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                  <input type="checkbox" id="cond-proof-receipt" class="w-4 h-4 accent-purple-500">
+                                  <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">🧾 บังคับแนบใบเสร็จ (ตรวจวันที่ + ตราปั๊มแอป)</span>
+                              </label>
+                              <label class="flex items-center gap-2 cursor-pointer">
+                                  <input type="checkbox" id="cond-proof-code" class="w-4 h-4 accent-purple-500">
+                                  <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">🎟️ บังคับกรอก "โค้ดลับใช้แล้วทิ้ง" (รับจากร้านค้า)</span>
+                              </label>
+                          </div>
+                      </div>
+
+                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
+                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="cond-limit-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24 text-red-600 dark:text-red-400">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
+                          <input type="number" id="cond-limit-val" disabled placeholder="เช่น 1" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                          <span class="text-[10px] font-bold text-gray-500">ครั้ง / วัน</span>
+                      </div>
+
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                          <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (สำหรับแจกคนใหม่)</label>
+                          <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (แจกคนใหม่)</label>
                       </div>
+                      
                       <div class="flex items-center gap-2 pt-1">
                           <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
-                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (แจกแมนนวล)</label>
+                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (แจกแมนนวล / ตรวจหลักฐาน)</label>
                       </div>
                   </div>
               </div>
