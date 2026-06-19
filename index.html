@@ -3798,26 +3798,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         openModal('modalCommissionSettings');
     }
 
-    // ฟังก์ชันล็อก/ปลดล็อก ช่องกรอกข้อมูลตามสวิตช์
-    window.toggleCommInputs = function() {
-        let isActive = document.getElementById('comm-is-active').checked;
-        let zone = document.getElementById('comm-inputs-zone');
-        let type = document.getElementById('comm-type').value;
-        let valLabel = document.getElementById('comm-val-label');
-
-        if(type === 'percent') valLabel.innerText = "หักกี่เปอร์เซ็นต์ (%)";
-        else valLabel.innerText = "หักราคาคงที่ (บาท)";
-
-        if(isActive) {
-            zone.classList.remove('opacity-40', 'pointer-events-none');
-        } else {
-            zone.classList.add('opacity-40', 'pointer-events-none');
-        }
-    }
-
-    // ผูก Event ให้เปลี่ยน Label อัตโนมัติเมื่อกดเลือก Dropdown
-    document.getElementById('comm-type').addEventListener('change', window.toggleCommInputs);
-
     window.saveCommissionSettings = function() {
         let isActive = document.getElementById('comm-is-active').checked;
         let type = document.getElementById('comm-type').value;
