@@ -1428,6 +1428,56 @@
   <script>
     const windowContext = window;
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwdopAPESHRrHEYTSa-CzFMbh0JX9WHUa37PMEJmxDkah7ui67cVtOn68cnM-2DtmR/exec";
+    const IMAGE_API_URL = "https://script.google.com/macros/s/AKfycbxbpzEC9wMq0uM4OCxxFs5Y9KVgt15fBN-E_Pvt8Xoau6yd_hi5ckq_SISPTBCGEta9/exec";
+
+    // ========================================================
+    // 🌟 ระบบอัปโหลดรูปภาพไป Google Drive & หน้าจอ Loading
+    // ========================================================
+    
+    // 1. ฟังก์ชันสร้างหน้าจอ Loading แบบ Overlay (ป้องกันคนกดปุ่มรัวๆ)
+    window.showGlobalLoading = function(isShow, text = "กำลังประมวลผล...") {
+        let loader = document.getElementById('global-loader');
+        if(!loader) {
+            loader = document.createElement('div');
+            loader.id = 'global-loader';
+            loader.className = 'fixed inset-0 z-[99999] bg-black/80 flex flex-col items-center justify-center text-white hidden transition-opacity';
+            loader.innerHTML = '<i class="fas fa-circle-notch fa-spin text-5xl mb-4 text-[#1da1f2]"></i><p id="global-loader-text" class="text-sm font-bold tracking-wide"></p>';
+            document.body.appendChild(loader);
+        }
+        if(isShow) {
+            document.getElementById('global-loader-text').innerText = text;
+            loader.classList.remove('hidden');
+        } else {
+            loader.classList.add('hidden');
+        }
+    }
+
+    // 2. ฟังก์ชันยิง API เอารูปไปฝากที่ Google Drive (รองรับ Base64)
+    window.uploadImageToDrive = async function(base64Data, prefix = "IMG") {
+        try {
+            let payload = {
+                base64: base64Data,
+                filename: prefix + "_" + Date.now() + ".jpg"
+            };
+            
+            // ยิงข้อมูลไปที่ Google Apps Script ที่เราเพิ่งสร้าง
+            let res = await fetch(IMAGE_API_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            
+            let result = await res.json();
+            if(result.status === 'success') {
+                return result.url; // ได้ลิงก์รูปสั้นๆ กลับมา!
+            } else {
+                console.error("Upload Error:", result.message);
+                return null;
+            }
+        } catch (e) {
+            console.error("Fetch Error:", e);
+            return null;
+        }
+    }
 
     let allBookings = null; let allCompletedJobs = {}; let allProfiles = {}; let allPromoData = {};
     let cropper = null; let currentPromoFilter = 'all'; let dispatchMode = 'manual';
@@ -2166,21 +2216,39 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (cropper) { cropper.destroy(); cropper = null; }
     }
 
-    function saveCroppedImage() {
-        if (!cropper) return; let pos = document.getElementById('cms-banner-position').value;
-        let cropOptions = { width: 600 }; if (pos === 'bottom') cropOptions = { width: 600, height: 120 }; if (pos === 'popup') cropOptions = { width: 480, height: 600 }; 
-        let canvas = cropper.getCroppedCanvas(cropOptions); let base64 = canvas.toDataURL('image/jpeg', 0.6);
-        let linkUrl = document.getElementById('cms-banner-link').value.trim(); let startTime = document.getElementById('cms-banner-start').value; let endTime = document.getElementById('cms-banner-end').value;
+    window.saveCroppedImage = async function() {
+        if (!cropper) return; 
+        let pos = document.getElementById('cms-banner-position').value;
+        let cropOptions = { width: 600 }; 
+        if (pos === 'bottom') cropOptions = { width: 600, height: 120 }; 
+        if (pos === 'popup') cropOptions = { width: 480, height: 600 }; 
+        
+        let canvas = cropper.getCroppedCanvas(cropOptions); 
+        let base64 = canvas.toDataURL('image/jpeg', 0.7); // ปรับการบีบอัดเป็น 0.7 เพื่อลดขนาดแต่ภาพชัด
+        let linkUrl = document.getElementById('cms-banner-link').value.trim(); 
+        let startTime = document.getElementById('cms-banner-start').value; 
+        let endTime = document.getElementById('cms-banner-end').value;
         let path = 'config/banners'; if (pos === 'bottom') path = 'config/bottom_banners'; if (pos === 'popup') path = 'config/popup_ad';
 
         let duration = document.getElementById('cms-banner-duration') ? parseInt(document.getElementById('cms-banner-duration').value) : null;
         let snoozeDays = document.getElementById('cms-banner-snooze') ? parseInt(document.getElementById('cms-banner-snooze').value) : 14; if(isNaN(snoozeDays)) snoozeDays = 14; 
         let targetPages = []; document.querySelectorAll('.cms-banner-pages:checked').forEach(cb => targetPages.push(cb.value));
 
-        let dataToSave = { imageUrl: base64, linkUrl: linkUrl, startTime: startTime || null, endTime: endTime || null, timestamp: firebase.database.ServerValue.TIMESTAMP };
+        window.showGlobalLoading(true, 'กำลังอัปโหลดแบนเนอร์ขึ้น Google Drive...');
+
+        // 🌟 โยนแบนเนอร์ขึ้น Google Drive
+        let finalImageUrl = await window.uploadImageToDrive(base64, "BANNER_" + pos.toUpperCase());
+        
+        if(!finalImageUrl) {
+            window.showGlobalLoading(false);
+            return showCustomAlert('อัปโหลดล้มเหลว', 'ส่งรูปแบนเนอร์ไป Google Drive ไม่สำเร็จ', 'error');
+        }
+
+        let dataToSave = { imageUrl: finalImageUrl, linkUrl: linkUrl, startTime: startTime || null, endTime: endTime || null, timestamp: firebase.database.ServerValue.TIMESTAMP };
         if (pos === 'popup') { dataToSave.duration = duration || 0; dataToSave.snoozeDays = snoozeDays; dataToSave.targetPages = targetPages.length > 0 ? targetPages : ['home']; }
 
         db.ref(path).push(dataToSave).then(() => {
+            window.showGlobalLoading(false); // ปิดหน้าโหลด
             showCustomAlert("สำเร็จ", 'อัปเดตสไลด์ภาพและตั้งเงื่อนไขโฆษณาเรียบร้อย!', 'success'); 
             if(document.getElementById('cms-banner-duration')) document.getElementById('cms-banner-duration').value = '';
             if(document.getElementById('cms-banner-snooze')) document.getElementById('cms-banner-snooze').value = '14';
@@ -2220,22 +2288,43 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
     db.ref('config/banners').on('value', fetchAllBanners); db.ref('config/bottom_banners').on('value', fetchAllBanners); db.ref('config/popup_ad').on('value', fetchAllBanners);
 
-    function addNewsContent() {
-        let title = document.getElementById('cms-news-title').value.trim(); let content = document.getElementById('cms-news-content').value.trim();
-        let isPromo = document.getElementById('cms-news-ispromo').checked; let startTime = document.getElementById('cms-news-start').value; let endTime = document.getElementById('cms-news-end').value;
+    window.addNewsContent = async function() {
+        let title = document.getElementById('cms-news-title').value.trim(); 
+        let content = document.getElementById('cms-news-content').value.trim();
+        let isPromo = document.getElementById('cms-news-ispromo').checked; 
+        let startTime = document.getElementById('cms-news-start').value; 
+        let endTime = document.getElementById('cms-news-end').value;
         let fileInput = document.getElementById('cms-news-file');
-        if(!title || !content) return showCustomAlert('ข้อมูลไม่ครบ', 'ใส่หัวข้อและเนื้อความข่าวสารด้วยครับ', 'error');
         let file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
 
-        if (file) { let reader = new FileReader(); reader.onload = function(e) { saveNewsToDb(title, content, isPromo, startTime, endTime, e.target.result); }; reader.readAsDataURL(file); } 
-        else { saveNewsToDb(title, content, isPromo, startTime, endTime, null); }
+        if(!title || !content) return showCustomAlert('ข้อมูลไม่ครบ', 'ใส่หัวข้อและเนื้อความข่าวสารด้วยครับ', 'error');
+
+        window.showGlobalLoading(true, 'กำลังส่งโพสต์ข่าวสารเข้าสู่ระบบ...');
+
+        if (file) { 
+            let reader = new FileReader(); 
+            reader.onload = async function(e) { 
+                // 🌟 โยนรูปข่าวขึ้น Google Drive
+                let finalUrl = await window.uploadImageToDrive(e.target.result, "NEWS");
+                if(!finalUrl) {
+                    window.showGlobalLoading(false);
+                    return showCustomAlert('อัปโหลดล้มเหลว', 'อัปโหลดรูปภาพไม่สำเร็จ', 'error');
+                }
+                saveNewsToDb(title, content, isPromo, startTime, endTime, finalUrl); 
+            }; 
+            reader.readAsDataURL(file); 
+        } else { 
+            saveNewsToDb(title, content, isPromo, startTime, endTime, null); 
+        }
     }
 
-    function saveNewsToDb(title, content, isPromo, startTime, endTime, imageUrl) {
+    window.saveNewsToDb = function(title, content, isPromo, startTime, endTime, imageUrl) {
         db.ref('news_promotions').push({ title, content, isPromo, imageUrl: imageUrl || null, startTime: startTime || null, endTime: endTime || null, timestamp: firebase.database.ServerValue.TIMESTAMP, dateStr: new Date().toLocaleDateString('th-TH',{day:'numeric', month:'short', year:'numeric'}) }).then(() => {
+            window.showGlobalLoading(false); // ปิดหน้าโหลด
             showCustomAlert('สำเร็จ', 'กระจายข่าวสารขึ้นหน้าแอปเรียบร้อย!', 'success'); 
             document.getElementById('cms-news-title').value=''; document.getElementById('cms-news-content').value=''; document.getElementById('cms-news-ispromo').checked=false; document.getElementById('cms-news-start').value=''; document.getElementById('cms-news-end').value='';
-            if(document.getElementById('cms-news-file')) document.getElementById('cms-news-file').value = ''; closeModal('modalAddNews');
+            if(document.getElementById('cms-news-file')) document.getElementById('cms-news-file').value = ''; 
+            closeModal('modalAddNews');
         });
     }
 
@@ -2665,7 +2754,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
 
     // ================= อัปเดตฟังก์ชันลงทะเบียน (ดึงโบนัสออโต้ + จดบันทึกอายุโบนัส Ledger) =================
-    window.saveNewDriver = function() {
+    window.saveNewDriver = async function() {
         let drvId = document.getElementById('add-drv-id').value.trim(); 
         let pin = document.getElementById('add-drv-pin').value.trim();
         let fname = document.getElementById('add-drv-fname').value.trim(); 
@@ -2684,43 +2773,38 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         initialVehicles[vId] = { id: vId, serviceType: vType, brand: document.getElementById('add-drv-vbrand').value.trim(), color: document.getElementById('add-drv-vcolor').value.trim(), plate: document.getElementById('add-drv-vplate').value.trim(), province: document.getElementById('add-drv-vprovince') ? document.getElementById('add-drv-vprovince').value.trim() : '', isOnline: false };
 
         let picUpload = document.getElementById('add-drv-pic-upload'); 
-        let profilePic = picUpload ? picUpload.getAttribute('data-base64') : null;
+        let profilePicBase64 = picUpload ? picUpload.getAttribute('data-base64') : null;
+        let finalPicUrl = null;
 
-        // 🌟 ลอจิกดึงโบนัสจาก Quest Center
-        let startTier = "New"; 
-        let startBonus = 0; 
-        let now = Date.now();
-        let newLedgerEntries = []; // ตัวแปรเก็บประวัติวันหมดอายุโบนัส
+        // 🌟 โชว์หน้าจอโหลดดิ้ง
+        window.showGlobalLoading(true, 'กำลังอัปโหลดรูปโปรไฟล์และบันทึกข้อมูล...');
 
+        // 🌟 ถ้ามีรูปภาพ ให้โยนไป Google Drive ก่อน
+        if(profilePicBase64) {
+            finalPicUrl = await window.uploadImageToDrive(profilePicBase64, "DRV_" + drvId);
+            if(!finalPicUrl) {
+                window.showGlobalLoading(false);
+                return showCustomAlert('อัปโหลดรูปไม่สำเร็จ', 'ไม่สามารถฝากรูปที่ Google Drive ได้ กรุณาลองใหม่', 'error');
+            }
+        }
+
+        let startTier = "New"; let startBonus = 0; let now = Date.now(); let newLedgerEntries = [];
         if (typeof allQuests === 'object') {
             for (let qId in allQuests) {
                 let q = allQuests[qId];
                 if (!q.isActive) continue;
                 if (q.startTime && new Date(q.startTime).getTime() > now) continue;
                 if (q.endTime && new Date(q.endTime).getTime() < now) continue;
-                
                 let c = q.conditions || {};
-                if (c.signup) {
-                    if (!q.targetTiers || q.targetTiers.includes('all') || q.targetTiers.includes('New')) {
-                        if (!q.targetVehicles || q.targetVehicles.includes('all') || q.targetVehicles.includes(vType)) {
-                            let bAmt = parseInt(q.rewardBonus) || 0;
-                            if (bAmt > 0) {
-                                startBonus += bAmt;
-                                let expDays = parseInt(q.rewardExpireDays) || 0;
-                                let expAt = expDays > 0 ? now + (expDays * 24 * 60 * 60 * 1000) : 0;
-                                
-                                // เก็บรายละเอียดเตรียมยัดลงสมุดบัญชีโบนัส (Ledger)
-                                newLedgerEntries.push({
-                                    amount: bAmt,
-                                    remaining: bAmt,
-                                    expireAt: expAt,
-                                    note: `โบนัสคนขับใหม่ (แคมเปญ: ${q.name})`,
-                                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                                });
-                            }
-                            if (q.rewardTier && q.rewardTier !== 'none') { startTier = q.rewardTier; }
-                        }
+                if (c.signup && (!q.targetTiers || q.targetTiers.includes('all') || q.targetTiers.includes('New')) && (!q.targetVehicles || q.targetVehicles.includes('all') || q.targetVehicles.includes(vType))) {
+                    let bAmt = parseInt(q.rewardBonus) || 0;
+                    if (bAmt > 0) {
+                        startBonus += bAmt;
+                        let expDays = parseInt(q.rewardExpireDays) || 0;
+                        let expAt = expDays > 0 ? now + (expDays * 24 * 60 * 60 * 1000) : 0;
+                        newLedgerEntries.push({ amount: bAmt, remaining: bAmt, expireAt: expAt, note: `โบนัสคนขับใหม่ (แคมเปญ: ${q.name})`, timestamp: firebase.database.ServerValue.TIMESTAMP });
                     }
+                    if (q.rewardTier && q.rewardTier !== 'none') { startTier = q.rewardTier; }
                 }
             }
         }
@@ -2728,20 +2812,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let driverData = {
             driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
             creditCash: 0, creditBonus: startBonus, tier: startTier, rating: "5.0", 
-            profilePic: profilePic, vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
+            profilePic: finalPicUrl, // 🌟 ใช้ URL สั้นๆ จาก Google Drive
+            vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
 
         db.ref('drivers_profile/' + drvId).set(driverData).then(() => {
             if(startBonus > 0) {
-                // 1. บันทึกประวัติการทำรายการกระเป๋ารวม
                 db.ref('wallet_transactions/' + drvId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: startBonus, note: "โบนัสแคมเปญสมัครใหม่", balanceAfter: startBonus, adminName: "SYSTEM_AUTO" });
-                
-                // 2. บันทึกรายละเอียดอายุโบนัสลงบัญชี Ledger (แก้ปัญหาที่พอกดเช็คโบนัสแล้วหน้าต่างว่างเปล่า)
-                newLedgerEntries.forEach(entry => {
-                    db.ref(`bonus_ledger/${drvId}`).push(entry);
-                });
+                newLedgerEntries.forEach(entry => db.ref(`bonus_ledger/${drvId}`).push(entry));
             }
+            window.showGlobalLoading(false); // ปิดหน้าโหลด
             showCustomAlert('ลงทะเบียนสำเร็จ', `เพิ่มคนขับรหัส ${drvId} เข้าระบบเรียบร้อย!`, 'success');
+            if(picUpload) { picUpload.removeAttribute('data-base64'); picUpload.value = ''; }
             closeModal('modalAddDriver');
         });
     }
@@ -3240,20 +3322,43 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         window.currentDriverVehicles[vId].serviceType = document.getElementById('v-type-' + vId).value; window.currentDriverVehicles[vId].brand = document.getElementById('v-brand-' + vId).value.trim(); window.currentDriverVehicles[vId].color = document.getElementById('v-color-' + vId).value.trim(); window.currentDriverVehicles[vId].plate = document.getElementById('v-plate-' + vId).value.trim(); let pEl = document.getElementById('v-province-' + vId); window.currentDriverVehicles[vId].province = pEl ? pEl.value.trim() : '';
     }
 
-    window.saveDriverUpdates = function() {
-        let driverId = window.currentDriverFocus; let newPin = document.getElementById('det-pin-input').value.trim(); let phone = document.getElementById('det-phone').value.trim(); let fname = document.getElementById('det-firstname').value.trim(); let lname = document.getElementById('det-lastname').value.trim(); let gender = document.getElementById('det-gender').value;
-        let tierEl = document.getElementById('det-tier'); let tier = tierEl ? tierEl.value : 'Standard'; let fullName = fname + (lname ? ' ' + lname : '');
+    window.saveDriverUpdates = async function() {
+        let driverId = window.currentDriverFocus; 
+        let newPin = document.getElementById('det-pin-input').value.trim(); 
+        let phone = document.getElementById('det-phone').value.trim(); 
+        let fname = document.getElementById('det-firstname').value.trim(); 
+        let lname = document.getElementById('det-lastname').value.trim(); 
+        let gender = document.getElementById('det-gender').value;
+        let tierEl = document.getElementById('det-tier-display'); // ดึงค่าระดับจากระบบโชว์
+        let tier = allProfiles[driverId].tier || 'Standard'; 
+        let fullName = fname + (lname ? ' ' + lname : '');
+        
         if (!newPin || newPin.length !== 4) return showCustomAlert('ข้อผิดพลาด', 'รหัสผ่าน (PIN) ต้องเป็นตัวเลข 4 หลักเท่านั้น', 'error');
         for (let vId in window.currentDriverVehicles) { window.updateTempVehicle(vId); }
-        let picUpload = document.getElementById('edit-drv-pic-upload'); let newPic = picUpload ? picUpload.getAttribute('data-base64') : null;
+        
+        let picUpload = document.getElementById('edit-drv-pic-upload'); 
+        let newPicBase64 = picUpload ? picUpload.getAttribute('data-base64') : null;
 
-        let updateData = { pin: newPin, name: fullName, phone: phone, gender: gender, tier: tier, vehicles: window.currentDriverVehicles };
-        if (tier === 'owner super legend') { updateData.rating = "100.0"; } else if (tier === 'F1 Legend') { updateData.rating = "10.0"; }
-        if(newPic) updateData.profilePic = newPic; 
+        window.showGlobalLoading(true, 'กำลังบันทึกข้อมูลพนักงาน...');
+
+        let updateData = { pin: newPin, name: fullName, phone: phone, gender: gender, vehicles: window.currentDriverVehicles };
+
+        // 🌟 ถ้ารูปถูกเปลี่ยน ให้โยนขึ้น Google Drive
+        if(newPicBase64) {
+            let finalPicUrl = await window.uploadImageToDrive(newPicBase64, "DRV_EDIT_" + driverId);
+            if(finalPicUrl) {
+                updateData.profilePic = finalPicUrl; 
+            } else {
+                window.showGlobalLoading(false);
+                return showCustomAlert('อัปโหลดล้มเหลว', 'ส่งรูปไป Google Drive ไม่สำเร็จ', 'error');
+            }
+        } 
 
         db.ref('drivers_profile/' + driverId).update(updateData).then(() => {
-            showCustomAlert('สำเร็จ', 'บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว', 'success');
             db.ref('driver_logs/' + driverId).push({ action: 'admin_updated', timestamp: firebase.database.ServerValue.TIMESTAMP, note: `แอดมินอัปเดตข้อมูลโปรไฟล์ทั่วไป` });
+            window.showGlobalLoading(false); // ปิดหน้าโหลด
+            showCustomAlert('สำเร็จ', 'บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว', 'success');
+            if(picUpload) { picUpload.removeAttribute('data-base64'); picUpload.value = ''; }
             closeDriverProfilePage();
         });
     }
