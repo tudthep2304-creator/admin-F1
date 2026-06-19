@@ -2789,42 +2789,7 @@
         });
     }
     
-    window.submitBlockDriver = function(driverId) {
-        let numStr = document.getElementById('block-duration-num').value;
-        let unit = document.getElementById('block-duration-unit').value;
-        let reason = document.getElementById('block-reason-input').value.trim();
-        
-        if(!reason) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุสาเหตุการระงับสิทธิ์ด้วยครับ', 'error');
-
-        let expireAt = 0;
-        if (unit !== 'permanent') {
-            let num = parseFloat(numStr);
-            if (isNaN(num) || num <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุตัวเลขระยะเวลาให้ถูกต้อง', 'error');
-            
-            let multiplier = 1;
-            if (unit === 'minutes') multiplier = 60 * 1000;
-            else if (unit === 'hours') multiplier = 60 * 60 * 1000;
-            else if (unit === 'days') multiplier = 24 * 60 * 60 * 1000;
-            else if (unit === 'months') multiplier = 30 * 24 * 60 * 60 * 1000;
-            else if (unit === 'years') multiplier = 365 * 24 * 60 * 60 * 1000;
-            
-            expireAt = Date.now() + (num * multiplier);
-        }
-
-        let payload = { pin: driverId, reason: reason, expireAt: expireAt, timestamp: firebase.database.ServerValue.TIMESTAMP };
-
-        db.ref('blocked_drivers/' + driverId).set(payload).then(() => {
-            db.ref('blocked_history/' + driverId).push(payload);
-            
-            // เตะออกจากระบบออนไลน์ (ลบจาก active_drivers โดยใช้ PIN)
-            let d = allProfiles[driverId];
-            if(d && d.pin) db.ref('active_drivers/' + d.pin).remove(); 
-            
-            showCustomAlert('ระงับสิทธิ์สำเร็จ', 'คนขับถูกระงับสิทธิ์และถูกตัดออกจากระบบออนไลน์แล้ว', 'success');
-            closeModal('modalBlockDriver');
-            showDriverDetails(driverId); 
-        });
-    }
+    
     // ==========================================
     // 🌟 ระบบหน้าจัดการ Blocked Drivers (ตารางรายชื่อ)
     // ==========================================
@@ -2963,58 +2928,125 @@
         tbody.innerHTML = html || '<tr><td colspan="2" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบพนักงานที่ตรงกับเงื่อนไขการค้นหา</td></tr>';
     }
 
-    // ==========================================
-    // 🌟 การทำงานปุ่มบล็อกจากโปรไฟล์
-    // ==========================================
-    window.submitBlockDriver = function(driverId) {
-        let numStr = document.getElementById('block-duration-num').value;
-        let unit = document.getElementById('block-duration-unit').value;
-        let reason = document.getElementById('block-reason-dropdown').value;
-        let note = document.getElementById('block-note-input').value.trim();
-        
-        if(!reason) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกสาเหตุหลักการระงับสิทธิ์', 'error');
+    // ========================================================
+    // 🌟 ระบบจัดการบล็อกคนขับ (บล็อก และ ปลดบล็อก) + บันทึกประวัติ
+    // ========================================================
 
+    // 1. ฟังก์ชันยืนยันการบล็อกคนขับ (และบันทึกประวัติ)
+    window.submitBlockDriver = function(driverId) {
+        if(!driverId) return;
+        let d = allProfiles[driverId];
+        let name = d ? d.name : 'พนักงาน';
+        
+        let reason = document.getElementById('block-reason-dropdown').value;
+        let num = parseInt(document.getElementById('block-duration-num').value);
+        let unit = document.getElementById('block-duration-unit').value;
+        let note = document.getElementById('block-note-input').value;
+
+        if(!reason) return showCustomAlert('แจ้งเตือน', 'กรุณาระบุเหตุผลการระงับสิทธิ์', 'warning');
+        
         let expireAt = 0;
-        if (unit !== 'permanent') {
-            let num = parseFloat(numStr);
-            if (isNaN(num) || num <= 0) return showCustomAlert('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุตัวเลขระยะเวลาให้ถูกต้อง', 'error');
-            
-            let multiplier = 1;
-            if (unit === 'minutes') multiplier = 60 * 1000;
-            else if (unit === 'hours') multiplier = 60 * 60 * 1000;
-            else if (unit === 'days') multiplier = 24 * 60 * 60 * 1000;
-            else if (unit === 'months') multiplier = 30 * 24 * 60 * 60 * 1000;
-            else if (unit === 'years') multiplier = 365 * 24 * 60 * 60 * 1000;
-            
-            expireAt = Date.now() + (num * multiplier);
+        let durationStr = "ถาวร";
+        
+        if(unit === "permanent") {
+            expireAt = 0;
+        } else {
+            if(!num || num < 1) return showCustomAlert('แจ้งเตือน', 'กรุณาระบุจำนวนเวลาที่ถูกต้อง', 'warning');
+            let ms = 0;
+            if(unit === "minutes") { ms = num * 60 * 1000; durationStr = `${num} นาที`; }
+            else if(unit === "hours") { ms = num * 60 * 60 * 1000; durationStr = `${num} ชั่วโมง`; }
+            else if(unit === "days") { ms = num * 24 * 60 * 60 * 1000; durationStr = `${num} วัน`; }
+            expireAt = Date.now() + ms;
         }
 
-        let payload = { pin: driverId, reason: reason, note: note, expireAt: expireAt, timestamp: firebase.database.ServerValue.TIMESTAMP };
+        // --- เตรียมข้อมูลสำหรับบันทึก ---
+        let now = Date.now();
+        let blockData = {
+            expireAt: expireAt,
+            reason: reason,
+            note: note || '',
+            timestamp: now,
+            action: 'block', // กำหนดการกระทำ
+            driverId: driverId // เพื่อเอาไว้ดึงข้อมูลในหน้าประวัติรวม
+        };
 
-        db.ref('blocked_drivers/' + driverId).set(payload).then(() => {
-            db.ref('blocked_history/' + driverId).push(payload); 
-            let d = allProfiles[driverId];
-            if(d && d.pin) db.ref('active_drivers/' + d.pin).remove(); 
-            
-            showCustomAlert('ระงับสิทธิ์สำเร็จ', 'คนขับถูกระงับสิทธิ์และถูกตัดออกจากระบบออนไลน์แล้ว', 'success');
+        showCustomAlert('ยืนยัน', `คุณต้องการระงับสิทธิ์ (${name})<br>เป็นเวลา ${durationStr} ใช่หรือไม่?`, 'question', () => {
             closeModal('modalBlockDriver');
-            showDriverDetails(driverId); 
-        });
-    }
+            showLoading(true, `กำลังดำเนินการระงับสิทธิ์ (${driverId})...`);
+            
+            // --- เริ่มเขียนข้อมูลลง Firebase ---
+            let updates = {};
+            
+            // (A) บันทึกสถานะปัจจุบัน (blocked_drivers/${driverId})
+            updates[`blocked_drivers/${driverId}`] = blockData;
+            
+            // (B) บันทึกประวัติ (blocked_history/${driverId}/${logId}) -> ใช้ .push().key เพื่อสร้าง ID อัตโนมัติ
+            let logId = db.ref().child(`blocked_history/${driverId}`).push().key;
+            updates[`blocked_history/${driverId}/${logId}`] = blockData;
+            
+            // (C) บันทึกประวัติแบบรวมทั้งหมด (blocked_history_all/${logId}) -> เพื่อให้หน้าประวัติรวมดึงง่าย
+            // โดยเราจะใช้ข้อมูลก้อนเดียวกัน แต่ใส่ข้อมูลคนขับเพิ่มไปให้ครบ (ถ้าต้องการ)
+            let masterLogData = {...blockData}; 
+            // ลบ node `blocked_history_all` ทิ้งไปเลยครับ เพราะลอจิกหน้าใหม่เราดึงจาก blocked_history แบบ nested ได้
+            // updates[`blocked_history_all/${logId}`] = masterLogData;
 
-    window.unblockDriver = function(driverId) {
-        showCustomConfirm('ปลดบล็อกคนขับ?', 'ยืนยันการคืนสิทธิ์ให้พนักงานคนนี้สามารถเปิดออนไลน์รับงานได้ตามปกติ?', () => {
-            db.ref('blocked_drivers/' + driverId).remove().then(() => {
-                db.ref('blocked_history/' + driverId).push({ pin: driverId, reason: 'แอดมินพิจารณาปลดบล็อกให้', action: 'unblock', timestamp: firebase.database.ServerValue.TIMESTAMP });
-                showCustomAlert('สำเร็จ', 'ปลดบล็อกคนขับเรียบร้อยแล้ว', 'success');
-                closeModal('modalBlockDriver'); 
-                
-                let currentTab = window.adminHistoryStack[window.adminHistoryStack.length - 1];
-                if (currentTab === 'driver-details') showDriverDetails(driverId); 
+            db.ref().update(updates, error => {
+                showLoading(false);
+                if(error) {
+                    showCustomAlert('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้: ' + error.message, 'error');
+                } else {
+                    // อัปเดตตารางหน้าระงับสิทธิ์ทันที
+                    if(window.filterBlockedDrivers) window.filterBlockedDrivers();
+                    
+                    // ปรับปรุงลอจิกหน้าประวัติรวม เพื่อให้มันโหลดข้อมูลใหม่
+                    // ในลอจิกหน้า All Block History เราดึงจาก blocked_history node
+                    // ดังนั้นเราแค่สั่ง .on('value') ที่นั่นให้ทำงาน (ซึ่งมันทำงานอัตโนมัติอยู่แล้วถ้า firebase อัปเดต)
+                    
+                    showCustomAlert('สำเร็จ', `ระงับสิทธิ์ (${name}) เรียบร้อยแล้ว`, 'success');
+                }
             });
         });
     }
 
+    // 2. ฟังก์ชันปลดบล็อกคนขับ (และบันทึกประวัติ)
+    window.unblockDriver = function(driverId) {
+        if(!driverId) return;
+        let d = allProfiles[driverId];
+        let name = d ? d.name : 'พนักงาน';
+        
+        showCustomAlert('ยืนยันปลดบล็อก', `คุณต้องการปลดล็อกการระงับสิทธิ์ของ (${name}) ใช่หรือไม่?`, 'question', () => {
+            closeModal('modalBlockDriver');
+            showLoading(true, `กำลังดำเนินการปลดล็อก (${driverId})...`);
+            
+            let now = Date.now();
+            let unblockData = {
+                timestamp: now,
+                action: 'unblock', // กำหนดการกระทำ
+                reason: 'ปลดล็อกโดยแอดมิน',
+                driverId: driverId
+            };
+            
+            // --- เริ่มเขียนข้อมูลลง Firebase ---
+            let updates = {};
+            
+            // (A) ลบสถานะบล็อกปัจจุบัน (blocked_drivers/${driverId})
+            updates[`blocked_drivers/${driverId}`] = null; // null คือการลบ
+            
+            // (B) บันทึกประวัติ (blocked_history/${driverId}/${logId}) -> ใช้ .push().key เพื่อสร้าง ID อัตโนมัติ
+            let logId = db.ref().child(`blocked_history/${driverId}`).push().key;
+            updates[`blocked_history/${driverId}/${logId}`] = unblockData;
+            
+            db.ref().update(updates, error => {
+                showLoading(false);
+                if(error) {
+                    showCustomAlert('ข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้: ' + error.message, 'error');
+                } else {
+                    if(window.filterBlockedDrivers) window.filterBlockedDrivers();
+                    showCustomAlert('สำเร็จ', `ปลดล็อก (${name}) เรียบร้อยแล้ว`, 'success');
+                }
+            });
+        });
+    }
     // ==========================================
     // 🌟 ระบบแสดงประวัติการบล็อก (Block History Timeline)
     // ==========================================
