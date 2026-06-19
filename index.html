@@ -829,10 +829,8 @@
     <option value="all">เป้าหมาย: ทุกระดับชั้น</option>
 </select>
                   <select id="filter-quest-vehicle" onchange="renderQuestsTable()" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-xs font-bold text-gray-600 dark:text-slate-300 outline-none">
-                      <option value="all">รถ: ทุกประเภท</option>
-                      <option value="car">🚗 รถยนต์เท่านั้น</option>
-                      <option value="bike">🏍️ มอเตอร์ไซค์เท่านั้น</option>
-                  </select>
+    <option value="all">รถ: ทุกประเภท</option>
+    </select>
               </div>
 
               <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
@@ -1170,21 +1168,13 @@
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">กลุ่มระดับชั้นคนขับ (Tier)</label>
                           <select id="rule-target-tier" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:border-emerald-500">
                               <option value="all">🌟 ทุกระดับชั้น</option>
-                              <option value="New">คนขับหน้าใหม่ (New)</option>
-                              <option value="Standard">Standard</option>
-                              <option value="Gold">Gold</option>
-                              <option value="Diamond">Diamond</option>
-                          </select>
+                              </select>
                       </div>
                       <div>
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทรถที่บังคับใช้</label>
                           <select id="rule-target-vehicle" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:border-emerald-500">
                               <option value="all">🚗 รถทุกประเภท</option>
-                              <option value="รถจักรยานยนต์">รถจักรยานยนต์</option>
-                              <option value="รถสามล้อ">รถสามล้อ</option>
-                              <option value="รถยนต์ 4 ประตู">รถยนต์ 4 ประตู</option>
-                              <option value="รถกระบะ">รถกระบะ</option>
-                          </select>
+                              </select>
                       </div>
                   </div>
 
@@ -2063,10 +2053,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         setInterval(() => {
             let drvCount = 0;
             if(windowContext.onlineDrivers) {
+                // 🌟 หา Default Vehicle Type จากระบบส่วนกลางมาเตรียมไว้ (ถ้าระบบว่างเปล่า ให้ใช้ 'unknown' ป้องกันบั๊ก)
+                let defaultVType = (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) 
+                                   ? window.systemVehicleTypes[0].id 
+                                   : 'unknown';
+
                 windowContext.onlineDrivers.forEach(d => {
                     drvCount++;
                     let name = allProfiles[d.pin] ? allProfiles[d.pin].name : `PIN: ${d.pin}`;
-                    let vType = d.serviceType || 'car'; 
+                    
+                    // 🌟 ใช้ Default จากส่วนกลาง แทนการ Hardcode 'car'
+                    let vType = d.serviceType || defaultVType; 
+                    
                     updateAdminMarker('drv_'+d.pin, d.lat, d.lng, name, 'driver', vType, null);
                 });
             }
@@ -2570,7 +2568,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 let j = allBookings[key]; 
                 if (j.status !== "รอผู้ขับขี่ตอบรับ") continue; 
                 
-                let srvIcon = j.serviceType === 'bike' ? '<i class="fas fa-motorcycle text-blue-500 dark:text-[#1da1f2] text-base" title="มอเตอร์ไซค์"></i>' : '<i class="fas fa-car-side text-blue-500 dark:text-[#1da1f2] text-base" title="รถยนต์"></i>';
+                // 🌟 ระบบไอคอนไดนามิก: ค้นหาไอคอนและชื่อรถจากส่วนกลาง
+                let vIconClass = 'fa-car-side';
+                let vTitle = 'ยานพาหนะ';
+                if (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) {
+                    let matchedVeh = window.systemVehicleTypes.find(v => v.id === j.serviceType);
+                    if (matchedVeh) {
+                        vIconClass = matchedVeh.icon || 'fa-car-side';
+                        vTitle = matchedVeh.name || 'ยานพาหนะ';
+                    } else {
+                        // ถ้าไม่ตรงกับอะไรเลย ให้เอาตัวแรกของระบบมาโชว์
+                        vIconClass = window.systemVehicleTypes[0].icon || 'fa-car-side';
+                        vTitle = window.systemVehicleTypes[0].name || 'ยานพาหนะ';
+                    }
+                }
+                let srvIcon = `<i class="fas ${vIconClass} text-blue-500 dark:text-[#1da1f2] text-base" title="${vTitle}"></i>`;
+                
                 let statusColor = "text-yellow-600 dark:text-yellow-500 bg-yellow-100 dark:bg-yellow-500/10 border-yellow-200 dark:border-yellow-500/20"; 
                 let priceDisplay = `฿${j.price}`;
                 
@@ -2680,14 +2693,29 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     window.renderDashboardVehicleToggles = function() {
         let container = document.getElementById('dashboard-vehicle-toggles');
         if(!container) return;
+        
         let html = '';
+
+        // 🌟 ดึงค่ารถ Default จากส่วนกลาง (ถ้าระบบว่างเปล่าให้เป็น unknown ป้องกันบั๊ก)
+        let defaultVType = (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) 
+                           ? window.systemVehicleTypes[0].id 
+                           : 'unknown';
+
         (window.systemVehicleTypes || []).forEach(v => {
             let total = 0; let online = 0;
             for (let pin in allProfiles) {
                 let p = allProfiles[pin];
                 let hasThisVehicle = false;
-                if (p.vehicles && Object.values(p.vehicles).some(veh => veh.serviceType === v.id)) { hasThisVehicle = true; } 
-                else if (!p.vehicles && (p.serviceType || 'car') === v.id) { hasThisVehicle = true; }
+                
+                // ตรวจสอบรถในโปรไฟล์คนขับ
+                if (p.vehicles && Object.values(p.vehicles).some(veh => veh.serviceType === v.id)) { 
+                    hasThisVehicle = true; 
+                } 
+                // 🌟 แก้ตรงนี้: เปลี่ยนจาก 'car' เป็น defaultVType ที่ดึงมาจากส่วนกลาง
+                else if (!p.vehicles && (p.serviceType || defaultVType) === v.id) { 
+                    hasThisVehicle = true; 
+                }
+
                 if (hasThisVehicle) {
                     total++;
                     let isOnline = (windowContext.onlineDrivers || []).some(od => String(od.pin) === String(pin) || String(od.driverPin) === String(pin));
@@ -2924,7 +2952,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
         let vSelect = document.getElementById('add-drv-vtype'); let vHtml = '';
         (window.systemVehicleTypes || []).forEach(vt => { vHtml += `<option value="${vt.id}">${vt.name}</option>`; });
-        if(vSelect) vSelect.innerHTML = vHtml || '<option value="car">รถยนต์</option>';
+        if(vSelect) {
+    if(vHtml) {
+        vSelect.innerHTML = vHtml;
+    } else {
+        vSelect.innerHTML = '<option value="" disabled selected>ไม่มีประเภทรถในระบบ (กรุณาไปเพิ่มที่ตั้งค่า)</option>';
+    }
+}
         openModal('modalAddDriver');
     }
 
@@ -3030,18 +3064,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if(document.getElementById('det-bonus')) document.getElementById('det-bonus').value = bonus;
 
         let t = d.tier || 'Standard';
-        if (t === 'owner super legend') t = '🚀 Owner Super Legend';
-        else if (t === 'F1 Legend') t = '👑 F1 Legend';
-        else if (t === 'Platinum') t = '💎 Platinum';
-        else if (t === 'Gold') t = '🥇 Gold';
-        else if (t === 'Silver') t = '🥈 Silver';
-        else t = '🥉 Standard';
         document.getElementById('det-tier-display').value = t;
 
-        let displayRating = "5.0";
-        if (d.tier === 'owner super legend') displayRating = "100.0";
-        else if (d.tier === 'F1 Legend') displayRating = "10.0";
-        else if (d.rating) displayRating = parseFloat(d.rating).toFixed(1);
+        // 🌟 จุดที่ 1: ใช้ค่าดาวตามจริงจาก Database (ที่เราล้างบางการฮาร์ดโค้ดดาวไปก่อนหน้านี้)
+        let displayRating = d.rating !== undefined ? parseFloat(d.rating).toFixed(1) : "5.0";
         document.getElementById('det-rating-display').value = displayRating;
 
         let editPreview = document.getElementById('edit-drv-pic-preview');
@@ -3062,7 +3088,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let statusEl = document.getElementById('det-online-status');
         let btnAction = document.getElementById('btn-profile-block-action');
         
-        // 🌟 แก้บั๊กตรงนี้: เปลี่ยนมาใช้ driverId ค้นหาแทน d.pin เพื่อให้แมตช์กับตอนที่บันทึก
         db.ref('blocked_drivers/' + driverId).once('value', snap => {
             let b = snap.val();
             let now = Date.now();
@@ -3092,10 +3117,25 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         });
 
         let vehicles = {};
-        if (d.vehicles) { vehicles = JSON.parse(JSON.stringify(d.vehicles)); } 
-        else if (d.plate) {
+        if (d.vehicles) { 
+            vehicles = JSON.parse(JSON.stringify(d.vehicles)); 
+        } else if (d.plate) {
             let vId = 'veh_' + Date.now();
-            vehicles[vId] = { id: vId, serviceType: d.serviceType || 'car', brand: d.brand || '', color: d.color || '', plate: d.plate || '', province: '', isOnline: false };
+            
+            // 🌟 จุดที่ 2: เปลี่ยนจากการบังคับเป็น 'car' มาดึงค่าจากระบบส่วนกลางแทน!
+            let defaultVType = (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) 
+                               ? window.systemVehicleTypes[0].id 
+                               : 'unknown';
+                               
+            vehicles[vId] = { 
+                id: vId, 
+                serviceType: d.serviceType || defaultVType, 
+                brand: d.brand || '', 
+                color: d.color || '', 
+                plate: d.plate || '', 
+                province: '', 
+                isOnline: false 
+            };
         }
         window.currentDriverVehicles = vehicles;
         renderDriverVehicles();
@@ -3462,9 +3502,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let v = window.currentDriverVehicles[vId];
             
             let selectHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] font-normal focus:border-blue-500 truncate transition">`;
+            
             if (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) {
                 window.systemVehicleTypes.forEach(vt => { let sel = (v.serviceType === vt.id) ? 'selected' : ''; selectHtml += `<option value="${vt.id}" ${sel}>${vt.name}</option>`; });
-            } else { selectHtml += `<option value="car">รถยนต์</option><option value="bike">มอเตอร์ไซค์</option>`; }
+            } else { 
+                // 🌟 ล้างการฮาร์ดโค้ดออก! เปลี่ยนเป็นข้อความแจ้งเตือนแทน
+                selectHtml += `<option value="" disabled selected>ไม่พบประเภทรถ (กำลังโหลด...)</option>`; 
+            }
             selectHtml += `</select>`;
 
             html += `
@@ -3488,7 +3532,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
     window.addDriverVehicle = function() {
         let vId = 'veh_' + Date.now();
-        window.currentDriverVehicles[vId] = { id: vId, serviceType: 'car', brand: '', color: '', plate: '', province: '', isOnline: false };
+        
+        // 🌟 ดึงค่าประเภทรถคันแรกสุดจากระบบส่วนกลางมาเป็นค่าเริ่มต้น
+        let defaultVType = (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) 
+                           ? window.systemVehicleTypes[0].id 
+                           : 'unknown';
+
+        window.currentDriverVehicles[vId] = { 
+            id: vId, 
+            serviceType: defaultVType, // 🌟 ใช้ค่าจากส่วนกลางแทน 'car'
+            brand: '', 
+            color: '', 
+            plate: '', 
+            province: '', 
+            isOnline: false 
+        };
+        
         renderDriverVehicles();
     }
     window.removeTempVehicle = function(vId) { delete window.currentDriverVehicles[vId]; renderDriverVehicles(); }
@@ -4974,7 +5033,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
     // ดึงข้อมูลตัวเลือกประเภทรถและระดับชั้นจากส่วนกลาง
     window.loadCentralOptionsForCommission = function() {
-        // ดึงรายชื่อ Tier
+        // ดึงรายชื่อ Tier จากส่วนกลาง
         db.ref('config/tiers').once('value', snap => {
             let select = document.getElementById('rule-target-tier');
             let html = '<option value="all">🌟 ทุกระดับชั้น</option>';
@@ -4983,24 +5042,26 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             } else {
                 html += '<option value="New">คนขับหน้าใหม่ (New)</option><option value="Standard">Standard</option><option value="Gold">Gold</option><option value="Diamond">Diamond</option>';
             }
-            select.innerHTML = html;
+            if(select) select.innerHTML = html;
         });
 
-        // ดึงรายชื่อประเภทยานพาหนะ (ตรง path 'vehicles' แก้ตามที่คุณใช้จริงได้เลยครับ)
-        db.ref('vehicles').once('value', snap => {
+        // 🌟 แก้ไขจุดนี้: เปลี่ยนจาก 'vehicles' เป็น 'system_settings/vehicle_types' ให้ดึงค่าจากส่วนกลางตัวจริง
+        db.ref('system_settings/vehicle_types').once('value', snap => {
             let select = document.getElementById('rule-target-vehicle');
             let html = '<option value="all">🚗 รถทุกประเภท</option>';
             
             if(snap.exists()) {
                 snap.forEach(child => { 
                     let vData = child.val();
-                    let vName = vData.name || vData.title || child.key; 
-                    html += `<option value="${vName}">${vName}</option>`; 
+                    let vName = vData.name || child.key; 
+                    // 🌟 ใช้ child.key เป็น value เพื่อความแม่นยำในการนำรหัสรถไปคำนวณหักเงินในระบบหลังบ้าน
+                    html += `<option value="${child.key}">${vName}</option>`; 
                 });
             } else {
-                html += '<option value="รถจักรยานยนต์">รถจักรยานยนต์</option><option value="รถสามล้อ">รถสามล้อ</option><option value="รถยนต์">รถยนต์</option>';
+                // ค่าสำรองกรณีระบบขัดข้อง
+                html += '<option value="" disabled>ไม่พบประเภทรถ (กรุณาตรวจสอบหน้าตั้งค่า)</option>';
             }
-            select.innerHTML = html;
+            if(select) select.innerHTML = html;
         });
     }
 
