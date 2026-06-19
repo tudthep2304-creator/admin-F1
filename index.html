@@ -603,15 +603,8 @@
                   
                   <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                       <select id="filter-blocked-tier" onchange="filterBlockedDrivers()" class="w-full sm:w-32 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
-                          <option value="all">ทุกระดับชั้น</option>
-                          <option value="New">🔰 New</option>
-                          <option value="Standard">🥉 Standard</option>
-                          <option value="Silver">🥈 Silver</option>
-                          <option value="Gold">🥇 Gold</option>
-                          <option value="Platinum">💎 Platinum</option>
-                          <option value="F1 Legend">👑 F1 Legend</option>
-                          <option value="owner super legend">🚀 Owner</option>
-                      </select>
+    <option value="all">ทุกระดับชั้น</option>
+</select>
                       <select id="filter-blocked-reason" onchange="filterBlockedDrivers()" class="w-full sm:w-36 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
                           <option value="all">แสดงทุกสาเหตุ</option>
                       </select>
@@ -833,13 +826,8 @@
                       <option value="inactive">🔴 ปิดใช้งาน</option>
                   </select>
                   <select id="filter-quest-tier" onchange="renderQuestsTable()" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-xs font-bold text-gray-600 dark:text-slate-300 outline-none">
-                      <option value="all">เป้าหมาย: ทุกระดับชั้น</option>
-                      <option value="New">🔰 เฉพาะ New</option>
-                      <option value="Standard">🥉 เฉพาะ Standard</option>
-                      <option value="Silver">🥈 เฉพาะ Silver</option>
-                      <option value="Gold">🥇 เฉพาะ Gold</option>
-                      <option value="Platinum">💎 เฉพาะ Platinum</option>
-                  </select>
+    <option value="all">เป้าหมาย: ทุกระดับชั้น</option>
+</select>
                   <select id="filter-quest-vehicle" onchange="renderQuestsTable()" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-xs font-bold text-gray-600 dark:text-slate-300 outline-none">
                       <option value="all">รถ: ทุกประเภท</option>
                       <option value="car">🚗 รถยนต์เท่านั้น</option>
@@ -950,14 +938,8 @@
                   <div>
                       <label class="block text-[9px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
                       <select id="abh-filter-tier" onchange="renderAllBlockHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
-                          <option value="all">ทุกระดับชั้น</option>
-                          <option value="New">New</option>
-                          <option value="Standard">Standard</option>
-                          <option value="Silver">Silver</option>
-                          <option value="Gold">Gold</option>
-                          <option value="Platinum">Platinum</option>
-                          <option value="F1 Legend">F1 Legend</option>
-                      </select>
+    <option value="all">ทุกระดับชั้น</option>
+</select>
                   </div>
                   <div>
                       <label class="block text-[9px] font-bold text-gray-500 mb-1">สาเหตุความผิด</label>
@@ -1254,13 +1236,19 @@
                   
                   <div>
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ชื่อระดับชั้น (Tier Name) <span class="text-red-500">*</span></label>
-                      <input type="text" id="tier-input-name" placeholder="เช่น Standard, Gold, Diamond" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-bold outline-none focus:border-amber-500">
-                      <p class="text-[9px] text-gray-400 mt-1">⚠️ พิมพ์ให้ถูกต้องชัดเจน เพราะระบบออโต้จะใช้ชื่อนี้ในการอ้างอิง</p>
+                      <input type="text" id="tier-input-name" placeholder="เช่น Standard, Gold, F1 Legend" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-bold outline-none focus:border-amber-500">
+                      <p class="text-[9px] text-gray-400 mt-1">⚠️ พิมพ์ให้ถูกต้องชัดเจน เพราะระบบจะใช้ชื่อนี้ในการอ้างอิง</p>
                   </div>
 
-                  <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">คำอธิบายเพิ่มเติม (ใส่หรือไม่ใส่ก็ได้)</label>
-                      <input type="text" id="tier-input-desc" placeholder="เช่น สำหรับคนขับทั่วไป" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-amber-500">
+                  <div class="grid grid-cols-2 gap-3">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">คะแนนดาวเริ่มต้น</label>
+                          <input type="number" id="tier-input-rating" step="0.1" placeholder="เช่น 5.0, 10.0" value="5.0" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-amber-600 dark:text-amber-500 border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-black text-center outline-none focus:border-amber-500">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">คำอธิบายเพิ่มเติม</label>
+                          <input type="text" id="tier-input-desc" placeholder="ใส่หรือไม่ใส่ก็ได้" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-amber-500">
+                      </div>
                   </div>
 
                   <button onclick="saveTierData()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm shadow-md transition mt-2"><i class="fas fa-save mr-1"></i> บันทึกข้อมูล</button>
@@ -2858,13 +2846,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
     // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
     window.getTierBadgeHtml = function(currentTier) {
-        if(currentTier === 'Silver') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40 whitespace-nowrap">Silver</span>`;
-        if(currentTier === 'Gold') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 whitespace-nowrap">Gold</span>`;
-        if(currentTier === 'Platinum') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-[#1da1f2] border border-blue-200 whitespace-nowrap">Platinum</span>`;
-        if(currentTier === 'F1 Legend') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-purple-500 to-indigo-500 text-white border border-purple-400 whitespace-nowrap">LEGEND</span>`;
-        if(currentTier === 'owner super legend') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-black text-yellow-300 border border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap">OWNER</span>`;
-        if(currentTier === 'New') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">🔰 New</span>`;
-        return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400 border border-gray-200 whitespace-nowrap">Standard</span>`;
+        let t = (currentTier || 'New').toLowerCase();
+        
+        // 🌟 สีพิเศษสำหรับ Keyword ที่เจอบ่อย (ยืดหยุ่นสูง มีชื่อใหม่ก็ยังโชว์สีสวยๆ ได้)
+        if(t.includes('silver') || t.includes('เงิน')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300/40 whitespace-nowrap">${currentTier}</span>`;
+        if(t.includes('gold') || t.includes('ทอง')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 whitespace-nowrap">${currentTier}</span>`;
+        if(t.includes('platinum') || t.includes('แพลทินัม')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-[#1da1f2] border border-blue-200 whitespace-nowrap">${currentTier}</span>`;
+        if(t.includes('legend') || t.includes('ตำนาน')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-purple-500 to-indigo-500 text-white border border-purple-400 whitespace-nowrap">${currentTier}</span>`;
+        if(t.includes('owner') || t.includes('เจ้าของ')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-black text-yellow-300 border border-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap">${currentTier}</span>`;
+        if(t.includes('new') || t.includes('ใหม่')) return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 whitespace-nowrap">${currentTier}</span>`;
+        
+        // 🌟 สีมาตรฐาน หากแอดมินตั้งชื่อประหลาดๆ นอกเหนือจากข้างบน แอปก็จะไม่พัง!
+        return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 border border-gray-300 dark:border-slate-600 whitespace-nowrap">${currentTier}</span>`;
     }
 
     window.filterDrivers = function() {
@@ -3954,7 +3947,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     // 🌟 ระบบสร้างแคมเปญและภารกิจแบบผสมเงื่อนไข (Composite Quest Center)
     // ========================================================
     let allQuests = {};
-    const tierLevels = { 'New': 0, 'Standard': 1, 'Silver': 2, 'Gold': 3, 'Platinum': 4 };
 
     db.ref('system_settings/quests').on('value', snap => {
         allQuests = snap.val() || {};
@@ -4067,13 +4059,16 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             rewardTierSelect.value = 'none'; rewardTierSelect.disabled = true; rewardTierSelect.classList.add('opacity-50', 'cursor-not-allowed');
         } else if (checkedTiers.length === 1) {
             rewardTierSelect.disabled = false; rewardTierSelect.classList.remove('opacity-50', 'cursor-not-allowed');
-            let targetLvl = tierLevels[checkedTiers[0]];
+            
+            // 🌟 เรียกใช้ window.tierLevels ที่ได้มาจากการประมวลผลระบบส่วนกลางแบบสดๆ!
+            let targetLvl = window.tierLevels[checkedTiers[0]]; 
+            
             for(let i=0; i<options.length; i++) {
                 if(options[i].value === 'none') continue;
-                if(tierLevels[options[i].value] <= targetLvl) { options[i].disabled = true; options[i].classList.add('text-gray-300'); } 
+                if(window.tierLevels[options[i].value] <= targetLvl) { options[i].disabled = true; options[i].classList.add('text-gray-300'); } 
                 else { options[i].disabled = false; options[i].classList.remove('text-gray-300'); }
             }
-            if(rewardTierSelect.value !== 'none' && tierLevels[rewardTierSelect.value] <= targetLvl) rewardTierSelect.value = 'none';
+            if(rewardTierSelect.value !== 'none' && window.tierLevels[rewardTierSelect.value] <= targetLvl) rewardTierSelect.value = 'none';
         } else {
             rewardTierSelect.disabled = false; rewardTierSelect.classList.remove('opacity-50', 'cursor-not-allowed');
             for(let i=0; i<options.length; i++) { options[i].disabled = false; options[i].classList.remove('text-gray-300'); }
@@ -5013,117 +5008,118 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     window.loadCentralOptionsForCommission();
 
     // ========================================================
-    // 🌟 ระบบจัดการระดับชั้นส่วนกลาง (Centralized Tier Management)
+    // 🌟 ระบบจัดการระดับชั้นส่วนกลาง (Centralized Tier Management - อัปเกรดครอบคลุม 100%)
     // ========================================================
+    if(typeof tabTitles !== 'undefined') { tabTitles['tier-settings'] = 'ศูนย์กลางจัดการระดับชั้น (Tiers)'; }
 
-    // ลงทะเบียนหน้าเข้าสู่ระบบ Navigation
-    if(typeof tabTitles !== 'undefined') {
-        tabTitles['tier-settings'] = 'ศูนย์กลางจัดการระดับชั้น (Tiers)';
-    }
+    window.systemTiersMap = {}; 
+    window.tierLevels = {}; // 🌟 ตัวแปรพิเศษ ใช้คำนวณลำดับสูง-ต่ำของระดับชั้นอัตโนมัติ
 
-    // 🌟 ดึงข้อมูลและวาดหน้าจอแบบ Real-time (อัปเกรดกระจายข้อมูลไปยังหน้าแคมเปญและปรับระดับ)
     db.ref('config/tiers').on('value', snap => {
         let container = document.getElementById('tier-list-container');
         if(!container) return;
+        
+        let html = ''; 
+        let questTierHtml = ''; 
+        let adjustModalHtml = '';
+        let airdropHtml = '<option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>';
+        let filterBlockedHtml = '<option value="all">ทุกระดับชั้น</option>';
+        let filterQuestHtml = '<option value="all">เป้าหมาย: ทุกระดับชั้น</option>';
+        let rewardTierHtml = '<option value="none">-- ไม่เลื่อน --</option>';
 
-        let html = '';
-        let questTierHtml = ''; // สำหรับหน้าสร้างแคมเปญ
-        let adjustModalHtml = ''; // สำหรับหน้าแอดมินปรับระดับแมนนวล
+        window.systemTiersMap = {}; 
+        window.tierLevels = {};
+        let tiersList = [];
 
         if(snap.exists()) {
             snap.forEach(child => {
                 let tierName = child.key;
                 let data = child.val();
-                let desc = data.description || 'ไม่มีคำอธิบาย';
+                // 🌟 โหลดข้อมูลมาเก็บไว้ใน Array ก่อน เพื่อนำไปคำนวณลำดับขั้น (ลำดับมาก-น้อย)
+                tiersList.push({ 
+                    name: tierName, 
+                    rating: data.defaultRating !== undefined ? data.defaultRating : 5.0, 
+                    desc: data.description || 'ไม่มีคำอธิบาย' 
+                });
+            });
 
-                // 1. วาดการ์ดในหน้าตั้งค่าหลัก
+            // 🌟 พระเอกอยู่ตรงนี้: สั่งให้มันเอา "คะแนนดาวเริ่มต้น" มาเรียงลำดับจากน้อยไปมาก
+            // เพื่อให้ระบบรู้ว่า ระดับไหนดาวเยอะกว่า แปลว่าตำแหน่งใหญ่กว่า!
+            tiersList.sort((a, b) => a.rating - b.rating);
+
+            // ค่อยเอาที่เรียงแล้วมากระจายจ่ายให้ทั่วทุกหน้าของแอป
+            tiersList.forEach((t, index) => {
+                window.systemTiersMap[t.name] = { desc: t.desc, rating: t.rating };
+                window.tierLevels[t.name] = index; // ให้ Index เป็น Level ความเก่ง (0, 1, 2, 3...)
+
+                // สร้างการ์ด UI หน้าตั้งค่า
                 html += `
                 <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400 text-amber-900 rounded-full flex items-center justify-center text-lg shadow-sm"><i class="fas fa-star"></i></div>
                         <div>
-                            <h3 class="font-black text-gray-800 dark:text-white text-sm">${tierName}</h3>
-                            <p class="text-[10px] text-gray-500">${desc}</p>
+                            <h3 class="font-black text-gray-800 dark:text-white text-sm">${t.name}</h3>
+                            <p class="text-[10px] text-gray-500">ดาวเริ่มต้น: <b>${t.rating}</b> | ${t.desc}</p>
                         </div>
                     </div>
                     <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="openTierModal('${tierName}', '${desc}')" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
-                        <button onclick="deleteTierData('${tierName}')" class="w-8 h-8 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.rating})" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteTierData('${t.name}')" class="w-8 h-8 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
 
-                // 2. สร้างโครงสร้าง Checkbox สำหรับป๊อปอัปแคมเปญ/ภารกิจ (Quest Modal)
-                questTierHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${tierName}" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> ${tierName}</label>`;
-
-                // 3. สร้าง Option สำหรับป๊อปอัปแอดมินปรับระดับแมนนวล (Adjust Tier Modal)
-                adjustModalHtml += `<option value="${tierName}">${tierName}</option>`;
+                // จ่ายก้อนตัวเลือกไปให้ทุก Dropdown ในแอป!
+                questTierHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${t.name}" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> ${t.name}</label>`;
+                adjustModalHtml += `<option value="${t.name}">${t.name}</option>`;
+                airdropHtml += `<option value="${t.name}">🎁 แจกเฉพาะกลุ่ม ${t.name}</option>`;
+                filterBlockedHtml += `<option value="${t.name}">เฉพาะ ${t.name}</option>`;
+                filterQuestHtml += `<option value="${t.name}">เฉพาะ ${t.name}</option>`;
+                rewardTierHtml += `<option value="${t.name}">เลื่อนเป็น ${t.name}</option>`;
             });
-
-            // แถมตัวเลือกพิเศษระดับสูงสุดของเจ้าของระบบไว้ท้ายสุดในหน้าปรับระดับแมนนวล
-            adjustModalHtml += `<option value="owner super legend">🚀 Owner Super Legend</option>`;
         }
         
-        // สั่งอัปเดต UI หน้าหลัก
-        container.innerHTML = html || '<div class="col-span-full py-10 text-center text-gray-400 font-bold"><i class="fas fa-box-open text-3xl block mb-2 opacity-30"></i> ยังไม่มีข้อมูลระดับชั้นในระบบ</div>';
+        container.innerHTML = html || '<div class="col-span-full py-10 text-center text-gray-400 font-bold">ยังไม่มีข้อมูลระดับชั้นในระบบ</div>';
         
-        // 🌟 ยิงข้อมูลเชื่อมเข้าสู่ศูนย์แคมเปญภารกิจโดยตรง
-        let qContainer = document.getElementById('quest-target-tier-container');
-        if(qContainer) qContainer.innerHTML = questTierHtml;
+        // 🌟 ยัดตัวเลือกที่สร้างเสร็จแล้ว กลับเข้าไปใน HTML ที่เราไปล้างบางไว้ในสเต็ป 1
+        if(document.getElementById('quest-target-tier-container')) document.getElementById('quest-target-tier-container').innerHTML = questTierHtml;
+        if(document.getElementById('trm-tier-select')) document.getElementById('trm-tier-select').innerHTML = adjustModalHtml;
+        if(document.getElementById('airdrop-tier-select')) document.getElementById('airdrop-tier-select').innerHTML = airdropHtml;
+        if(document.getElementById('filter-blocked-tier')) document.getElementById('filter-blocked-tier').innerHTML = filterBlockedHtml;
+        if(document.getElementById('abh-filter-tier')) document.getElementById('abh-filter-tier').innerHTML = filterBlockedHtml;
+        if(document.getElementById('filter-quest-tier')) document.getElementById('filter-quest-tier').innerHTML = filterQuestHtml;
+        if(document.getElementById('quest-reward-tier')) document.getElementById('quest-reward-tier').innerHTML = rewardTierHtml;
 
-        // 🌟 ยิงข้อมูลเชื่อมเข้าสู่ศูนย์ปรับระดับแมนนวลโดยตรง
-        let trmSelect = document.getElementById('trm-tier-select');
-        if(trmSelect) trmSelect.innerHTML = adjustModalHtml;
-
-        // อัปเดตหน้าตั้งค่าคอมมิชชันพ่วงไปด้วยเลย
-        if(typeof window.loadCentralOptionsForCommission === 'function') {
-            window.loadCentralOptionsForCommission();
-        }
+        if(typeof window.loadCentralOptionsForCommission === 'function') window.loadCentralOptionsForCommission();
     });
 
-    // เปิดหน้าต่างเพิ่ม/แก้ไข
-    window.openTierModal = function(id = '', desc = '') {
+    window.openTierModal = function(id = '', desc = '', rating = 5.0) {
         document.getElementById('tier-old-id').value = id;
-        document.getElementById('tier-input-name').value = id; // ใช้ Key เป็นชื่อเลย
+        document.getElementById('tier-input-name').value = id; 
         document.getElementById('tier-input-desc').value = desc;
-        
+        document.getElementById('tier-input-rating').value = rating; 
         document.getElementById('tier-modal-title').innerHTML = id ? '<i class="fas fa-edit mr-1"></i> แก้ไขระดับชั้น' : '<i class="fas fa-plus-circle mr-1"></i> เพิ่มระดับชั้นใหม่';
         openModal('modalTierForm');
     }
 
-    // บันทึกข้อมูลลงฐานข้อมูล
     window.saveTierData = function() {
         let oldId = document.getElementById('tier-old-id').value;
         let newName = document.getElementById('tier-input-name').value.trim();
         let desc = document.getElementById('tier-input-desc').value.trim();
+        let rating = parseFloat(document.getElementById('tier-input-rating').value) || 5.0; 
 
         if(!newName) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ชื่อระดับชั้นด้วยครับ', 'error');
-        
-        // กฎเหล็ก: ห้ามมีอักขระพิเศษในชื่อ Key ของ Firebase (จุด, #, $, [, ])
-        if(/[.#$\[\]]/.test(newName)) {
-            return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้นเด็ดขาดครับ', 'error');
-        }
+        if(/[.#$\[\]]/.test(newName)) return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้นเด็ดขาดครับ', 'error');
 
-        // ถ้าเป็นการแก้ไขชื่อใหม่ ต้องลบของเก่าทิ้งก่อน (เพราะเราใช้ชื่อเป็น Key)
-        if(oldId && oldId !== newName) {
-            db.ref('config/tiers/' + oldId).remove();
-        }
+        if(oldId && oldId !== newName) db.ref('config/tiers/' + oldId).remove();
 
-        // เซฟของใหม่ลงไป
-        db.ref('config/tiers/' + newName).set({
-            description: desc,
-            updatedAt: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-            showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เข้าสู่ระบบส่วนกลางแล้ว`, 'success');
-            closeModal('modalTierForm');
+        db.ref('config/tiers/' + newName).set({ description: desc, defaultRating: rating, updatedAt: firebase.database.ServerValue.TIMESTAMP }).then(() => {
+            showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เข้าสู่ระบบส่วนกลางแล้ว`, 'success'); closeModal('modalTierForm');
         });
     }
 
-    // ลบระดับชั้น
     window.deleteTierData = function(tierName) {
         showCustomConfirm('ยืนยันลบระดับชั้น?', `หากลบระดับ ${tierName} กฎคอมมิชชันที่ผูกกับระดับนี้อาจทำงานผิดพลาดได้!`, () => {
-            db.ref('config/tiers/' + tierName).remove().then(() => {
-                showCustomAlert('ลบสำเร็จ', 'นำระดับชั้นออกจากระบบส่วนกลางแล้ว', 'success');
-            });
+            db.ref('config/tiers/' + tierName).remove().then(() => { showCustomAlert('ลบสำเร็จ', 'นำระดับชั้นออกจากระบบส่วนกลางแล้ว', 'success'); });
         }, 'ลบข้อมูล', 'red');
     }
     
@@ -5335,12 +5331,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เลื่อนระดับ</label>
                           <select id="quest-reward-tier" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold focus:border-amber-500">
-                              <option value="none">-- ไม่เลื่อน --</option>
-                              <option value="Standard">🥉 Standard</option>
-                              <option value="Silver">🥈 Silver</option>
-                              <option value="Gold">🥇 Gold</option>
-                              <option value="Platinum">💎 Platinum</option>
-                          </select>
+    <option value="none">-- ไม่เลื่อน --</option>
+</select>
                       </div>
                   </div>
               </div>
@@ -5418,13 +5410,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               <div>
                   <label class="block text-[10px] font-bold text-gray-500 mb-1">เลือกระดับกลุ่มเป้าหมายที่จะแจกเงิน</label>
                   <select id="airdrop-tier-select" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-yellow-500">
-                      <option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>
-                      <option value="New">🔰 แจกเฉพาะกลุ่ม New</option>
-                      <option value="Standard">🥉 แจกเฉพาะกลุ่ม Standard</option>
-                      <option value="Silver">🥈 แจกเฉพาะกลุ่ม Silver</option>
-                      <option value="Gold">🥇 แจกเฉพาะกลุ่ม Gold</option>
-                      <option value="Platinum">💎 แจกเฉพาะกลุ่ม Platinum</option>
-                  </select>
+    <option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>
+</select>
               </div>
               <div class="grid grid-cols-2 gap-3">
                   <div>
