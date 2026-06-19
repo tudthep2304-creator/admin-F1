@@ -625,7 +625,8 @@
                   <h2 class="text-lg font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-wallet mr-1.5"></i> ศูนย์จัดการระบบการเงินและเครดิต</h2>
                   <div class="flex gap-2 w-full sm:w-auto">
                       <button onclick="openTierAirdropModal()" class="flex-1 sm:flex-none bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-gift"></i> แจกโบนัสกลุ่ม</button>
-                      <button onclick="openCommissionSettings()" class="flex-1 sm:flex-none bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-blue-200 dark:border-blue-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-cog"></i> ตั้งค่าหักเงิน</button>
+                    <button onclick="switchTab('all-wallet-history')" class="flex-1 sm:flex-none bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-indigo-200 dark:border-indigo-800/50 flex items-center justify-center gap-1.5 whitespace-nowrap"><i class="fas fa-history"></i> ประวัติรวม</button>  
+                    <button onclick="openCommissionSettings()" class="flex-1 sm:flex-none bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-bold text-[11px] px-4 py-2.5 rounded-xl transition shadow-sm border border-blue-200 dark:border-blue-800/50 flex items-center justify-center gap-1.5"><i class="fas fa-cog"></i> ตั้งค่าหักเงิน</button>
                   </div>
               </div>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
@@ -974,7 +975,77 @@
               </div>
           </div>
       </section>
-    
+    <!-- ================= หน้าประวัติการเงินทั้งหมด (All Wallet History) ================= -->
+      <section id="content-all-wallet-history" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
+              
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
+                  <h2 class="text-sm font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><i class="fas fa-exchange-alt"></i> ประวัติการทำธุรกรรมทั้งหมด (Wallet Transactions)</h2>
+                  <button onclick="exportAllWalletHistory()" class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800/50 px-3 py-1.5 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5 shadow-sm"><i class="fas fa-file-csv"></i> Export Data</button>
+              </div>
+
+              <!-- 🌟 แผงตัวกรองข้อมูลที่ซับซ้อน -->
+              <div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4 shrink-0 bg-gray-50 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ตั้งแต่วันที่</label>
+                      <input type="date" id="awh-filter-start" onchange="renderAllWalletHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-emerald-500 font-bold">
+                  </div>
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ถึงวันที่</label>
+                      <input type="date" id="awh-filter-end" onchange="renderAllWalletHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-emerald-500 font-bold">
+                  </div>
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">กลุ่มผู้ใช้</label>
+                      <select id="awh-filter-role" onchange="renderAllWalletHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-emerald-500 font-bold">
+                          <option value="all">ทั้งหมด</option>
+                          <option value="driver">คนขับ (Driver)</option>
+                          <option value="passenger">ลูกค้า (Passenger)</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">กระเป๋า (Wallet)</label>
+                      <select id="awh-filter-type" onchange="renderAllWalletHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-emerald-500 font-bold">
+                          <option value="all">ทั้งหมด</option>
+                          <option value="cash">เงินสด (Cash)</option>
+                          <option value="bonus">โบนัส (Bonus)</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ประเภทรายการ</label>
+                      <select id="awh-filter-action" onchange="renderAllWalletHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-emerald-500 font-bold">
+                          <option value="all">ทั้งหมด</option>
+                          <option value="add">รายรับ (+)</option>
+                          <option value="deduct">รายจ่าย (-)</option>
+                      </select>
+                  </div>
+                  <div class="col-span-2 md:col-span-1">
+                      <label class="block text-[9px] font-bold text-gray-500 mb-1">ค้นหา (ID/ชื่อ)</label>
+                      <div class="relative">
+                          <input type="text" id="awh-search-input" onkeyup="renderAllWalletHistory()" placeholder="ค้นหา..." class="w-full p-2 pl-7 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-emerald-500">
+                          <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-[10px]"></i>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- 🌟 ตารางแสดงประวัติรวม (กดที่หัวเพื่อจัดเรียง) -->
+              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
+                  <table class="w-full text-left border-collapse min-w-[900px]">
+                      <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
+                          <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
+                              <th onclick="sortAllWalletHistory('timestamp')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition whitespace-nowrap">วัน/เวลา <i id="wsort-icon-timestamp" class="fas fa-sort-down text-emerald-500 ml-1"></i></th>
+                              <th onclick="sortAllWalletHistory('userId')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition whitespace-nowrap">บัญชีผู้ใช้ <i id="wsort-icon-userId" class="fas fa-sort text-gray-400 ml-1"></i></th>
+                              <th onclick="sortAllWalletHistory('type')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition whitespace-nowrap text-center">ประเภทกระเป๋า <i id="wsort-icon-type" class="fas fa-sort text-gray-400 ml-1"></i></th>
+                              <th onclick="sortAllWalletHistory('amount')" class="py-2.5 px-3 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-600 transition text-right whitespace-nowrap">จำนวนเงิน <i id="wsort-icon-amount" class="fas fa-sort text-gray-400 ml-1"></i></th>
+                              <th class="py-2.5 px-3 text-right whitespace-nowrap text-gray-400">คงเหลือสุทธิ</th>
+                              <th class="py-2.5 px-3 text-left w-1/3">รายละเอียด / ผู้ทำรายการ</th>
+                          </tr>
+                      </thead>
+                      <tbody id="all-wallet-history-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </section>
   </main>
 
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
@@ -1462,7 +1533,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด' };
+    const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด' };
 
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
@@ -1508,7 +1579,8 @@
         if(tabId === 'quests') renderQuestsTable();
         if(tabId === 'map') { if(adminMap) google.maps.event.trigger(adminMap, 'resize'); }
         // 🌟 แก้ปัญหาหน้าตารางประวัติรวมขาวโพลน โดยสั่งให้โหลดเมื่อสลับมาหน้านี้
-        if(tabId === 'all-block-history') { if(typeof renderAllBlockHistory === 'function') renderAllBlockHistory(); } 
+        if(tabId === 'all-block-history') { if(typeof renderAllBlockHistory === 'function') renderAllBlockHistory(); }
+      if(tabId === 'all-wallet-history') { if(typeof renderAllWalletHistory === 'function') renderAllWalletHistory(); }
     }
 
     window.goBackAdmin = function() {
@@ -4038,6 +4110,158 @@
         }
         navTouchStartX = 0;
     }, { passive: true });
+
+// ========================================================
+    // 🌟 ระบบประวัติธุรกรรมการเงิน (All Wallet History)
+    // ========================================================
+    let globalWalletHistoryData = [];
+    let awhSortCol = 'timestamp';
+    let awhSortAsc = false; // false = ล่าสุดขึ้นก่อน
+
+    db.ref('wallet_transactions').on('value', snap => {
+        globalWalletHistoryData = [];
+        if(snap.exists()) {
+            snap.forEach(userNode => {
+                let uId = userNode.key;
+                userNode.forEach(logNode => {
+                    let log = logNode.val();
+                    // ตรวจสอบความถูกต้องของ Object ป้องกันบั๊ก
+                    if(typeof log === 'object' && log !== null && log.timestamp) {
+                        log.userId = uId; 
+                        globalWalletHistoryData.push(log);
+                    }
+                });
+            });
+        }
+        
+        let targetEl = document.getElementById('content-all-wallet-history');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderAllWalletHistory();
+        }
+    });
+
+    window.sortAllWalletHistory = function(col) {
+        if(awhSortCol === col) { awhSortAsc = !awhSortAsc; } 
+        else { awhSortCol = col; awhSortAsc = false; }
+        window.renderAllWalletHistory();
+    }
+
+    window.renderAllWalletHistory = function() {
+        let tbody = document.getElementById('all-wallet-history-tbody');
+        if(!tbody) return;
+
+        // ดึงค่าตัวกรอง
+        let fStart = document.getElementById('awh-filter-start').value;
+        let fEnd = document.getElementById('awh-filter-end').value;
+        let fRole = document.getElementById('awh-filter-role').value;
+        let fType = document.getElementById('awh-filter-type').value;
+        let fAction = document.getElementById('awh-filter-action').value;
+        let search = document.getElementById('awh-search-input').value.toLowerCase();
+
+        let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
+        let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
+
+        // ดึงข้อมูลลูกค้าเพื่อเทียบชื่อ (เพราะตารางนี้รวมทั้งคนขับและลูกค้า)
+        let passMap = {};
+        if(windowContext.currentPassengerData) {
+            windowContext.currentPassengerData.forEach(p => passMap[p.userId || p.phone] = p);
+        }
+
+        // กรองข้อมูล (Filter)
+        let filtered = globalWalletHistoryData.filter(log => {
+            if (log.timestamp < startTime || log.timestamp > endTime) return false;
+            if (fRole !== 'all' && log.role !== fRole) return false;
+            if (fType !== 'all' && log.walletType !== fType) return false;
+            if (fAction !== 'all' && log.actionType !== fAction) return false;
+
+            let uName = log.role === 'driver' ? ((allProfiles[log.userId] || {}).name || '') : ((passMap[log.userId] || {}).name || '');
+            let searchStr = `${log.userId} ${uName} ${log.note || ''}`.toLowerCase();
+            if (search && !searchStr.includes(search)) return false;
+
+            return true;
+        });
+
+        // จัดเรียงข้อมูล (Sort)
+        filtered.sort((a, b) => {
+            let valA, valB;
+            if(awhSortCol === 'timestamp') { valA = a.timestamp; valB = b.timestamp; }
+            else if(awhSortCol === 'userId') { valA = a.userId; valB = b.userId; }
+            else if(awhSortCol === 'type') { valA = a.walletType; valB = b.walletType; }
+            else if(awhSortCol === 'amount') { valA = parseFloat(a.amount || 0); valB = parseFloat(b.amount || 0); }
+
+            if (valA < valB) return awhSortAsc ? -1 : 1;
+            if (valA > valB) return awhSortAsc ? 1 : -1;
+            return 0;
+        });
+
+        // เปลี่ยนไอคอนลูกศรที่หัวตาราง
+        let cols = ['timestamp', 'userId', 'type', 'amount'];
+        cols.forEach(c => {
+            let icon = document.getElementById('wsort-icon-' + c);
+            if(icon) icon.className = (awhSortCol === c) ? (awhSortAsc ? 'fas fa-sort-up text-emerald-500 ml-1' : 'fas fa-sort-down text-emerald-500 ml-1') : 'fas fa-sort text-gray-400 ml-1';
+        });
+
+        // สร้าง HTML
+        let html = '';
+        filtered.forEach(log => {
+            let uName = log.role === 'driver' ? ((allProfiles[log.userId] || {}).name || 'คนขับ') : ((passMap[log.userId] || {}).name || 'ลูกค้า');
+            let roleBadge = log.role === 'driver' ? '<span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded text-[9px] border border-blue-200 dark:border-blue-800">คนขับ</span>' : '<span class="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-1.5 py-0.5 rounded text-[9px] border border-purple-200 dark:border-purple-800">ลูกค้า</span>';
+            
+            let typeBadge = log.walletType === 'cash' ? '<span class="text-green-600 dark:text-green-400 font-bold text-[10px]"><i class="fas fa-money-bill-wave mr-1"></i> Cash</span>' : '<span class="text-yellow-600 dark:text-yellow-500 font-bold text-[10px]"><i class="fas fa-star mr-1"></i> Bonus</span>';
+            
+            let isAdd = log.actionType === 'add';
+            let actionColor = isAdd ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400';
+            let actionPrefix = isAdd ? '+' : '-';
+            
+            let bal = log.balanceAfter !== undefined ? `฿${parseFloat(log.balanceAfter).toFixed(2)}` : '-';
+            let adminLabel = log.adminName ? `<br><span class="text-[9px] text-gray-400 mt-1 inline-block">ทำรายการโดย: ${log.adminName}</span>` : '';
+            
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-left">
+                <td class="py-3 px-3 text-[10px] text-gray-500 dark:text-slate-400 align-top whitespace-nowrap">${new Date(log.timestamp).toLocaleString('th-TH')}</td>
+                <td class="py-3 px-3 align-top">
+                    <div class="flex items-center gap-1.5 mb-0.5"><span class="font-bold text-gray-800 dark:text-white text-[11px]">${log.userId}</span> ${roleBadge}</div>
+                    <p class="text-[10px] text-gray-500 dark:text-slate-400">${uName}</p>
+                </td>
+                <td class="py-3 px-3 align-top text-center">${typeBadge}</td>
+                <td class="py-3 px-3 align-top text-right font-black ${actionColor} text-[11px] whitespace-nowrap">${actionPrefix}฿${parseFloat(log.amount).toFixed(2)}</td>
+                <td class="py-3 px-3 align-top text-right font-bold text-gray-600 dark:text-slate-300 text-[10px] whitespace-nowrap">${bal}</td>
+                <td class="py-3 px-3 align-top text-[10px] leading-relaxed">
+                    <p class="font-bold text-gray-800 dark:text-slate-200">${log.note || '-'}</p>
+                    ${adminLabel}
+                </td>
+            </tr>`;
+        });
+        tbody.innerHTML = html || '<tr><td colspan="6" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบประวัติที่ตรงกับเงื่อนไข</td></tr>';
+    }
+
+    // 🌟 ระบบ Export Data ประวัติการเงินเป็น Excel
+    window.exportAllWalletHistory = function() {
+        if(globalWalletHistoryData.length === 0) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีข้อมูลประวัติให้ Export', 'error');
+        let csv = "\uFEFFวัน/เวลา,กลุ่มผู้ใช้,ID ผู้ใช้,กระเป๋า,ประเภท,จำนวนเงิน(บาท),ยอดคงเหลือ(บาท),หมายเหตุ,ผู้ทำรายการ\n";
+        
+        let passMap = {};
+        if(windowContext.currentPassengerData) { windowContext.currentPassengerData.forEach(p => passMap[p.userId || p.phone] = p); }
+
+        globalWalletHistoryData.forEach(log => {
+            let roleStr = log.role === 'driver' ? 'คนขับ' : 'ลูกค้า';
+            let uName = log.role === 'driver' ? ((allProfiles[log.userId] || {}).name || 'คนขับ') : ((passMap[log.userId] || {}).name || 'ลูกค้า');
+            let typeStr = log.walletType === 'cash' ? 'เงินสด (Cash)' : 'โบนัส (Bonus)';
+            let actionStr = log.actionType === 'add' ? 'รายรับ (+)' : 'รายจ่าย (-)';
+            let dateStr = new Date(log.timestamp).toLocaleString('th-TH');
+            let noteStr = log.note || '-';
+            let balStr = log.balanceAfter !== undefined ? log.balanceAfter : '-';
+            let admStr = log.adminName || '-';
+
+            csv += `"${dateStr}","${roleStr}","${log.userId} (${uName})","${typeStr}","${actionStr}","${log.amount}","${balStr}","${noteStr}","${admStr}"\n`;
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", `F1_WalletHistory_${Date.now()}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
     
 </script>
 
