@@ -2907,16 +2907,26 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
 
     // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
-    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
-    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
     window.getTierBadgeHtml = function(currentTier) {
         let tierName = currentTier || 'New';
         
-        // 🌟 ดึงข้อมูลธีมสีจาก RAM ส่วนกลาง (ถ้าหาไม่เจอให้ใช้ default)
+        // 🌟 1. ดึงข้อมูลจากระบบตั้งค่าส่วนกลางก่อน
         let tierData = window.systemTiersMap[tierName] || {};
-        let theme = tierData.theme || 'default';
+        let theme = tierData.theme;
 
-        // 🌟 คลังแสงดีไซน์ป้ายกำกับ (เปลี่ยนชื่อระดับอะไรมา ดีไซน์ก็จะเกาะติดไปตลอด)
+        // 🌟 2. ถ้าระบบยังโหลดไม่เสร็จ หรือแอดมินยังไม่ได้ตั้งสี ให้ "เดาสี" จากชื่ออัตโนมัติ!
+        if (!theme) {
+            let lowerName = tierName.toLowerCase();
+            if (lowerName.includes('gold')) theme = 'amber';
+            else if (lowerName.includes('silver')) theme = 'slate';
+            else if (lowerName.includes('platinum') || lowerName.includes('diamond')) theme = 'blue';
+            else if (lowerName.includes('legend')) theme = 'legend';
+            else if (lowerName.includes('owner')) theme = 'owner';
+            else if (lowerName.includes('new')) theme = 'emerald';
+            else theme = 'default';
+        }
+
+        // 🌟 คลังแสงดีไซน์ป้ายกำกับ
         const themes = {
             'default': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 border border-gray-300 dark:border-slate-600 whitespace-nowrap">${tierName}</span>`,
             
