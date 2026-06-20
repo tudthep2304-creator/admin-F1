@@ -5962,25 +5962,75 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         setTimeout(() => window.updatePartnerDropdownText(), 50);
     };
     // ========================================================
+    // 🌟 ระบบ Dropdown อัจฉริยะ (ใช้ร่วมกัน โฆษณา & ข่าวสาร)
+    // ========================================================
+    window.buildTargetDropdowns = function(prefix) {
+        let tHtml = '';
+        if (window.systemTiersMap) {
+            Object.keys(window.systemTiersMap).forEach(tName => {
+                tHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${tName}" class="${prefix}-target-tier w-4 h-4 accent-blue-500" onchange="updateTargetDropdownText('${prefix}')"> ${tName}</label>`;
+            });
+        }
+        let tCont = document.getElementById(`${prefix}-tier-container`); if(tCont) tCont.innerHTML = tHtml;
+
+        let vHtml = '';
+        if (window.systemVehicleTypes) {
+            window.systemVehicleTypes.forEach(vt => {
+                vHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${vt.id}" class="${prefix}-target-vehicle w-4 h-4 accent-blue-500" onchange="updateTargetDropdownText('${prefix}')"> ${vt.name}</label>`;
+            });
+        }
+        let vCont = document.getElementById(`${prefix}-vehicle-container`); if(vCont) vCont.innerHTML = vHtml;
+    }
+
+    window.toggleAllTargets = function(source, targetClass, prefix) {
+        document.querySelectorAll('.' + targetClass).forEach(cb => cb.checked = source.checked);
+        window.updateTargetDropdownText(prefix);
+    }
+
+    window.updateTargetDropdownText = function(prefix) {
+        let tiers = Array.from(document.querySelectorAll(`.${prefix}-target-tier:checked`));
+        let tText = tiers.length > 0 ? `เลือกเป้าหมาย (${tiers.length})` : 'เลือกกลุ่ม...';
+        let totalTiers = window.systemTiersMap ? Object.keys(window.systemTiersMap).length : 5;
+        if(tiers.length === totalTiers && tiers.length > 0) tText = 'ทุกระดับชั้น';
+        let pTextEl = document.getElementById(`${prefix}-tier-text`); if(pTextEl) pTextEl.innerText = tText;
+
+        let vehs = Array.from(document.querySelectorAll(`.${prefix}-target-vehicle:checked`));
+        let vText = vehs.length > 0 ? `เลือกรถ (${vehs.length})` : 'เลือกรถ...';
+        if(window.systemVehicleTypes && vehs.length === window.systemVehicleTypes.length && vehs.length > 0) vText = 'รถทุกประเภท';
+        let vTextEl = document.getElementById(`${prefix}-veh-text`); if(vTextEl) vTextEl.innerText = vText;
+    }
+
+    // ========================================================
     // 🌟 ระบบจัดการแบนเนอร์โฆษณา ฝั่งคนขับ (Driver Banners)
     // ========================================================
     let drvCropper = null;
 
     window.openDriverBannerModal = function() {
-        // ดึงแคมเปญร้านค้าที่มีอยู่ มาทำเป็น Dropdown ให้แอดมินเลือก
+        window.buildTargetDropdowns('drv-banner'); // โหลดข้อมูลรถ/ระดับ
+        
         let campSelect = document.getElementById('drv-banner-camp-link');
         if(campSelect) {
             let html = '<option value="">-- ไม่ผูกปุ่มแคมเปญ --</option>';
             if (typeof allPartnerCampaigns !== 'undefined') {
                 Object.entries(allPartnerCampaigns).forEach(([k, v]) => {
-                    if (v.isActive !== false) {
-                        html += `<option value="${k}">[แคมเปญร้านค้า] ${v.name}</option>`;
-                    }
+                    if (v.isActive !== false) html += `<option value="${k}">[แคมเปญร้านค้า] ${v.name}</option>`;
                 });
             }
             campSelect.innerHTML = html;
         }
+        
+        document.getElementById('drv-banner-link').value = '';
+        document.getElementById('drv-banner-start').value = '';
+        document.getElementById('drv-banner-end').value = '';
+        if(document.getElementById('drv-banner-duration')) document.getElementById('drv-banner-duration').value = '';
+        if(document.getElementById('drv-banner-snooze')) document.getElementById('drv-banner-snooze').value = '1';
+
+        let area = document.getElementById('drv-cropArea'); if(area) area.classList.add('hidden');
+        let f = document.getElementById('drv-banner-file'); if(f) f.value = '';
+        if (drvCropper) { drvCropper.destroy(); drvCropper = null; }
+        
         openModal('modalAddDriverBanner');
+        setTimeout(() => window.updateTargetDropdownText('drv-banner'), 50);
     }
 
     let drvBannerFile = document.getElementById('drv-banner-file');
@@ -6013,8 +6063,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     window.cancelDriverCrop = function() {
         let area = document.getElementById('drv-cropArea'); if(area) area.classList.add('hidden');
         let f = document.getElementById('drv-banner-file'); if(f) f.value = '';
-        let lnk = document.getElementById('drv-banner-link'); if(lnk) lnk.value = '';
-        let cLnk = document.getElementById('drv-banner-camp-link'); if(cLnk) cLnk.value = '';
         if (drvCropper) { drvCropper.destroy(); drvCropper = null; }
     }
 
@@ -6025,14 +6073,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (pos === 'bottom') cropOptions = { width: 600, height: 120 }; 
         if (pos === 'popup') cropOptions = { width: 480, height: 600 }; 
         
+        let targetTiers = Array.from(document.querySelectorAll('.drv-banner-target-tier:checked')).map(cb => cb.value);
+        let targetVehicles = Array.from(document.querySelectorAll('.drv-banner-target-vehicle:checked')).map(cb => cb.value);
+        if(targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกเป้าหมายระดับชั้น', 'error');
+        if(targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะ', 'error');
+
         let canvas = drvCropper.getCroppedCanvas(cropOptions); 
-        let base64 = canvas.toDataURL('image/jpeg', 0.7); 
+        let base64 = canvas.toDataURL('image/jpeg', 0.8); 
         let linkUrl = document.getElementById('drv-banner-link').value.trim(); 
         let campLink = document.getElementById('drv-banner-camp-link').value;
         let startTime = document.getElementById('drv-banner-start').value; 
         let endTime = document.getElementById('drv-banner-end').value;
         
-        // แยก Node ใน Firebase ให้ชัดเจนว่าของคนขับ
         let path = 'config/driver_banners'; 
         if (pos === 'bottom') path = 'config/driver_bottom_banners'; 
         if (pos === 'popup') path = 'config/driver_popup_ad';
@@ -6045,12 +6097,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         }
 
         let dataToSave = { 
-            imageUrl: finalImageUrl, 
-            linkUrl: linkUrl, 
-            campaignId: campLink || null, // ผูกกับ ID แคมเปญร้านค้า
-            startTime: startTime || null, 
-            endTime: endTime || null, 
-            timestamp: firebase.database.ServerValue.TIMESTAMP 
+            imageUrl: finalImageUrl, linkUrl: linkUrl, campaignId: campLink || null, 
+            targetTiers: targetTiers, targetVehicles: targetVehicles,
+            startTime: startTime || null, endTime: endTime || null, 
+            timestamp: firebase.database.ServerValue.TIMESTAMP, isArchived: false
         };
         
         if (pos === 'popup') { 
@@ -6066,10 +6116,19 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         });
     }
 
-    // 🌟 ดึงข้อมูลโฆษณาคนขับมาโชว์ในตาราง
+    // ฟังก์ชันย้ายแบนเนอร์ไป History (Soft Delete)
+    window.archiveDriverBanner = function(path, id) {
+        showCustomConfirm('ยกเลิกแบนเนอร์?', 'ต้องการนำโฆษณานี้ออกและย้ายไปหน้าประวัติ?', () => { 
+            db.ref(`${path}/${id}`).update({ isArchived: true, archivedAt: firebase.database.ServerValue.TIMESTAMP }); 
+        }, 'ยืนยันยกเลิก', 'red');
+    }
+
     function fetchAllDriverBanners() {
         Promise.all([ db.ref('config/driver_banners').once('value'), db.ref('config/driver_bottom_banners').once('value'), db.ref('config/driver_popup_ad').once('value') ]).then(([snap1, snap2, snap3]) => {
-            let listContainer = document.getElementById('driver-banners-list'); if(!listContainer) return; listContainer.innerHTML = '';
+            let listContainer = document.getElementById('driver-banners-list'); 
+            let histContainer = document.getElementById('driver-banners-history-list');
+            if(listContainer) listContainer.innerHTML = '';
+            if(histContainer) histContainer.innerHTML = '';
             
             const drawItem = (snap, lbl, path) => {
                 if(snap.exists()) {
@@ -6085,16 +6144,29 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                             badgeHtml = `<p class="text-[9px] mt-1 bg-gray-100 text-gray-500 px-1 py-0.5 rounded inline-block truncate max-w-[150px]"><i class="fas fa-link"></i> ${b.linkUrl}</p>`;
                         }
 
-                        listContainer.innerHTML += `<div class="flex gap-3 bg-gray-50 dark:bg-slate-800/40 p-2 rounded-xl border border-gray-200 dark:border-slate-700 items-center text-left">
-                            <div class="w-20 h-12 bg-black rounded overflow-hidden shrink-0"><img src="${b.imageUrl}" class="w-full h-full object-contain"></div>
-                            <div class="flex-1 min-w-0"><p class="text-xs font-bold text-gray-800 dark:text-white">ตำแหน่ง: ${lbl}</p>${timer}${badgeHtml}</div>
-                            <button onclick="showCustomConfirm('ลบแบนเนอร์?', 'ต้องการลบรูปภาพคนขับนี้?', () => { db.ref('${path}/${child.key}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 w-8 h-8 rounded-lg text-sm hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
-                        </div>`;
+                        let tTiers = b.targetTiers ? (b.targetTiers.includes('all') ? 'ทุกระดับ' : b.targetTiers.join(',')) : 'ทั้งหมด';
+                        let tVehs = b.targetVehicles ? (b.targetVehicles.includes('all') ? 'ทุกประเภท' : b.targetVehicles.join(',')) : 'ทั้งหมด';
+                        let targetInfo = `<p class="text-[9px] text-gray-500 mt-0.5"><b>กลุ่มเป้าหมาย:</b> ${tTiers} | <b>รถ:</b> ${tVehs}</p>`;
+
+                        let htmlBlock = `<div class="flex gap-3 bg-gray-50 dark:bg-slate-800/40 p-2 rounded-xl border border-gray-200 dark:border-slate-700 items-center text-left mb-2">
+                            <div class="w-24 h-14 bg-black rounded overflow-hidden shrink-0"><img src="${b.imageUrl}" class="w-full h-full object-contain"></div>
+                            <div class="flex-1 min-w-0"><p class="text-xs font-bold text-gray-800 dark:text-white">ตำแหน่ง: ${lbl}</p>${targetInfo}${timer}${badgeHtml}</div>`;
+
+                        if(b.isArchived) {
+                            let archTime = new Date(b.archivedAt || b.timestamp).toLocaleString('th-TH');
+                            htmlBlock += `<div class="text-right text-[9px] text-gray-400 mr-2"><p>ถูกยกเลิกเมื่อ</p><p class="font-bold">${archTime}</p></div></div>`;
+                            if(histContainer) histContainer.innerHTML += htmlBlock;
+                        } else {
+                            htmlBlock += `<button onclick="archiveDriverBanner('${path}', '${child.key}')" class="text-red-500 bg-red-100 w-8 h-8 rounded-lg text-sm hover:bg-red-600 hover:text-white transition shrink-0"><i class="fas fa-times"></i></button></div>`;
+                            if(listContainer) listContainer.innerHTML += htmlBlock;
+                        }
                     });
                 }
             };
             drawItem(snap1, 'บน (16:9)', 'config/driver_banners'); drawItem(snap2, 'ล่าง Slim (5:1)', 'config/driver_bottom_banners'); drawItem(snap3, '💥 ป๊อปอัป (เปิดแอป)', 'config/driver_popup_ad');
-            if(listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">ไม่มีโฆษณาฝั่งคนขับ</p>';
+            
+            if(listContainer && listContainer.innerHTML === '') listContainer.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">ไม่มีโฆษณาที่กำลังแสดงผล</p>';
+            if(histContainer && histContainer.innerHTML === '') histContainer.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">ไม่มีประวัติเก่า</p>';
         });
     }
 
@@ -6102,46 +6174,43 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     db.ref('config/driver_bottom_banners').on('value', fetchAllDriverBanners); 
     db.ref('config/driver_popup_ad').on('value', fetchAllDriverBanners);
 
+    window.viewDriverBannerHistory = function() { openModal('modalDriverBannerHistory'); }
+    window.viewDriverNewsHistory = function() { openModal('modalDriverNewsHistory'); }
+
     // ========================================================
     // 🌟 ระบบข่าวสารประกาศ ฝั่งคนขับ (Driver News) + Cropper
     // ========================================================
-    let drvNewsCropper = null; // ตัวแปรเก็บเครื่องมือครอปรูปข่าว
+    let drvNewsCropper = null;
 
     window.openDriverNewsModal = function() {
-        // ดึงแคมเปญร้านค้ามาทำเป็น Dropdown
+        window.buildTargetDropdowns('drv-news'); // โหลดข้อมูลรถ/ระดับ
+
         let campSelect = document.getElementById('drv-news-camp-link');
         if(campSelect) {
             let html = '<option value="">-- ไม่ผูกปุ่มแคมเปญ --</option>';
             if (typeof allPartnerCampaigns !== 'undefined') {
                 Object.entries(allPartnerCampaigns).forEach(([k, v]) => {
-                    if (v.isActive !== false) {
-                        html += `<option value="${k}">[แคมเปญร้านค้า] ${v.name}</option>`;
-                    }
+                    if (v.isActive !== false) html += `<option value="${k}">[แคมเปญร้านค้า] ${v.name}</option>`;
                 });
             }
             campSelect.innerHTML = html;
         }
 
-        // ล้างค่าเก่า
         document.getElementById('drv-news-title').value = ''; 
         document.getElementById('drv-news-content').value = '';
         document.getElementById('drv-news-link').value = '';
         document.getElementById('drv-news-is-important').checked = false; 
         document.getElementById('drv-news-start').value = ''; 
         document.getElementById('drv-news-end').value = '';
-        
-        let fileInput = document.getElementById('drv-news-file');
-        if(fileInput) fileInput.value = '';
+        let fileInput = document.getElementById('drv-news-file'); if(fileInput) fileInput.value = '';
 
-        // ซ่อนกล่องครอป และ เคลียร์ Cropper
-        let cropArea = document.getElementById('drv-news-cropArea');
-        if(cropArea) cropArea.classList.add('hidden');
+        let cropArea = document.getElementById('drv-news-cropArea'); if(cropArea) cropArea.classList.add('hidden');
         if(drvNewsCropper) { drvNewsCropper.destroy(); drvNewsCropper = null; }
 
         openModal('modalAddDriverNews');
+        setTimeout(() => window.updateTargetDropdownText('drv-news'), 50);
     }
 
-    // 🌟 ดักจับเมื่อแอดมินเลือกรูปภาพ
     let drvNewsFile = document.getElementById('drv-news-file');
     if(drvNewsFile) {
         drvNewsFile.addEventListener('change', function(e) {
@@ -6150,14 +6219,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 let file = files[0];
                 document.getElementById('drv-news-imageToCrop').src = URL.createObjectURL(file);
                 document.getElementById('drv-news-cropArea').classList.remove('hidden');
-                
                 if (drvNewsCropper) drvNewsCropper.destroy();
-                // ✂️ เปิดโหมดครอปรูป สัดส่วน 16:9
-                drvNewsCropper = new Cropper(document.getElementById('drv-news-imageToCrop'), { 
-                    aspectRatio: 16 / 9, 
-                    viewMode: 1, 
-                    autoCropArea: 1 
-                });
+                drvNewsCropper = new Cropper(document.getElementById('drv-news-imageToCrop'), { aspectRatio: 16 / 9, viewMode: 1, autoCropArea: 1 });
             }
         });
     }
@@ -6171,38 +6234,33 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let campLink = document.getElementById('drv-news-camp-link').value;
         let extLink = document.getElementById('drv-news-link').value.trim();
 
+        let targetTiers = Array.from(document.querySelectorAll('.drv-news-target-tier:checked')).map(cb => cb.value);
+        let targetVehicles = Array.from(document.querySelectorAll('.drv-news-target-vehicle:checked')).map(cb => cb.value);
+        if(targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกเป้าหมายระดับชั้น', 'error');
+        if(targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะ', 'error');
+
         if(!title || !content) return showCustomAlert('ข้อมูลไม่ครบ', 'ใส่หัวข้อและเนื้อความข่าวสารด้วยครับ', 'error');
 
         window.showGlobalLoading(true, 'กำลังโพสต์ข่าวให้คนขับ...');
 
         if (drvNewsCropper) { 
-            // ✂️ ถ้ามีการตัดรูป ให้ดึงภาพจาก Cropper
             let canvas = drvNewsCropper.getCroppedCanvas({ width: 800 }); 
             let base64 = canvas.toDataURL('image/jpeg', 0.8); 
-            
             let finalUrl = await window.uploadImageToDrive(base64, "NEWS_DRV");
-            if(!finalUrl) { 
-                window.showGlobalLoading(false); 
-                return showCustomAlert('ล้มเหลว', 'อัปโหลดรูปภาพไม่สำเร็จ', 'error'); 
-            }
-            saveDriverNewsToDb(title, content, isImportant, startTime, endTime, finalUrl, campLink, extLink); 
+            if(!finalUrl) { window.showGlobalLoading(false); return showCustomAlert('ล้มเหลว', 'อัปโหลดรูปภาพไม่สำเร็จ', 'error'); }
+            saveDriverNewsToDb(title, content, isImportant, startTime, endTime, finalUrl, campLink, extLink, targetTiers, targetVehicles); 
         } else { 
-            // ถ้าไม่ได้เลือกรูป
-            saveDriverNewsToDb(title, content, isImportant, startTime, endTime, null, campLink, extLink); 
+            saveDriverNewsToDb(title, content, isImportant, startTime, endTime, null, campLink, extLink, targetTiers, targetVehicles); 
         }
     }
 
-    window.saveDriverNewsToDb = function(title, content, isImportant, startTime, endTime, imageUrl, campLink, extLink) {
+    window.saveDriverNewsToDb = function(title, content, isImportant, startTime, endTime, imageUrl, campLink, extLink, targetTiers, targetVehicles) {
         let payload = { 
-            title: title, 
-            content: content, 
-            isImportant: isImportant, 
-            imageUrl: imageUrl || null, 
-            campaignId: campLink || null,  // 🌟 บันทึก ID แคมเปญ
-            linkUrl: extLink || null,      // 🌟 บันทึก URL ภายนอก
-            startTime: startTime || null, 
-            endTime: endTime || null, 
-            timestamp: firebase.database.ServerValue.TIMESTAMP 
+            title: title, content: content, isImportant: isImportant, imageUrl: imageUrl || null, 
+            campaignId: campLink || null, linkUrl: extLink || null, 
+            targetTiers: targetTiers, targetVehicles: targetVehicles,
+            startTime: startTime || null, endTime: endTime || null, 
+            timestamp: firebase.database.ServerValue.TIMESTAMP, isArchived: false 
         };
 
         db.ref('driver_news').push(payload).then(() => {
@@ -6212,8 +6270,17 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         });
     }
 
+    window.archiveDriverNews = function(id) {
+        showCustomConfirm('ลบข่าวนี้?', 'ยืนยันนำข่าวสารนี้ออกจากระบบหลัก ย้ายไปหน้าประวัติ?', () => { 
+            db.ref(`driver_news/${id}`).update({ isArchived: true, archivedAt: firebase.database.ServerValue.TIMESTAMP }); 
+        }, 'ยืนยันนำออก', 'red');
+    }
+
     db.ref('driver_news').on('value', snap => {
-        let container = document.getElementById('driver-news-list'); if(!container) return; let html = '';
+        let container = document.getElementById('driver-news-list'); 
+        let histContainer = document.getElementById('driver-news-history-list');
+        if(container) container.innerHTML = ''; if(histContainer) histContainer.innerHTML = '';
+        
         if(snap.exists()) {
             let items = []; snap.forEach(child => { items.push({ id: child.key, ...child.val() }); }); 
             items.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -6221,7 +6288,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 let timer = (n.startTime || n.endTime) ? `<p class="text-[9px] text-yellow-600">⏱ ${n.startTime ? n.startTime.replace('T',' '):'เริ่ม'} - ${n.endTime ? n.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-gray-400">แสดงผลถาวร</p>`;
                 let imgHtml = n.imageUrl ? `<div class="w-12 h-12 bg-black rounded-lg overflow-hidden shrink-0 mt-2"><img src="${n.imageUrl}" class="w-full h-full object-cover"></div>` : '';
                 
-                // 🌟 ดึงข้อมูลป้ายกำกับลิงก์มาโชว์ในตาราง
                 let badgeHtml = '';
                 if(n.campaignId) {
                     let campName = (allPartnerCampaigns && allPartnerCampaigns[n.campaignId]) ? allPartnerCampaigns[n.campaignId].name : 'แคมเปญถูกลบแล้ว';
@@ -6230,22 +6296,35 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                     badgeHtml = `<p class="text-[9px] mt-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded inline-block truncate max-w-[150px]"><i class="fas fa-link"></i> ${n.linkUrl}</p>`;
                 }
 
-                html += `<div class="flex justify-between items-start bg-gray-50 dark:bg-slate-800/40 p-3 border border-gray-200 dark:border-slate-700 rounded-xl mb-2 text-left">
+                let tTiers = n.targetTiers ? (n.targetTiers.includes('all') ? 'ทุกระดับ' : n.targetTiers.join(',')) : 'ทั้งหมด';
+                let tVehs = n.targetVehicles ? (n.targetVehicles.includes('all') ? 'ทุกประเภท' : n.targetVehicles.join(',')) : 'ทั้งหมด';
+                let targetInfo = `<p class="text-[9px] text-gray-500 mt-0.5"><b>กลุ่ม:</b> ${tTiers} | <b>รถ:</b> ${tVehs}</p>`;
+
+                let htmlBlock = `<div class="flex justify-between items-start bg-gray-50 dark:bg-slate-800/40 p-3 border border-gray-200 dark:border-slate-700 rounded-xl mb-2 text-left">
                             <div class="min-w-0 flex-1">
                                 <div class="flex gap-2">
                                     ${imgHtml}
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-bold text-gray-800 dark:text-white truncate">${n.title} ${n.isImportant ? '<span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded ml-1">สำคัญ</span>':''}</p>
+                                        ${targetInfo}
                                         ${timer}
                                         ${badgeHtml}
                                     </div>
                                 </div>
-                            </div>
-                            <button onclick="showCustomConfirm('ลบข่าวนี้?', 'ยืนยันลบโพสต์นี้ออกจากบอร์ดคนขับ', () => { db.ref('driver_news/${n.id}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 w-8 h-8 rounded-lg text-sm shrink-0 flex items-center justify-center ml-2 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
-                        </div>`;
+                            </div>`;
+
+                if(n.isArchived) {
+                    let archTime = new Date(n.archivedAt || n.timestamp).toLocaleString('th-TH');
+                    htmlBlock += `<div class="text-right text-[9px] text-gray-400 ml-2 mt-1"><p>ลบเมื่อ</p><p class="font-bold">${archTime}</p></div></div>`;
+                    if(histContainer) histContainer.innerHTML += htmlBlock;
+                } else {
+                    htmlBlock += `<button onclick="archiveDriverNews('${n.id}')" class="text-red-500 bg-red-100 w-8 h-8 rounded-lg text-sm shrink-0 flex items-center justify-center ml-2 hover:bg-red-600 hover:text-white transition"><i class="fas fa-times"></i></button></div>`;
+                    if(container) container.innerHTML += htmlBlock;
+                }
             });
         }
-        container.innerHTML = html || '<p class="text-gray-400 text-xs text-center py-4">บอร์ดประกาศว่างเปล่า</p>';
+        if(container && container.innerHTML === '') container.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">บอร์ดประกาศว่างเปล่า</p>';
+        if(histContainer && histContainer.innerHTML === '') histContainer.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">ไม่มีประวัติข่าวสารเก่า</p>';
     });
 </script>
 
