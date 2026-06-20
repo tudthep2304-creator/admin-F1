@@ -1640,32 +1640,32 @@
         }
     }
 
-    // 2. ฟังก์ชันยิง API เอารูปไปฝากที่ Google Drive (รองรับ Base64)
-    window.uploadImageToDrive = async function(base64Data, prefix = "IMG") {
-        try {
-            let payload = {
-                base64: base64Data,
-                filename: prefix + "_" + Date.now() + ".jpg"
-            };
-            
-            // ยิงข้อมูลไปที่ Google Apps Script ที่เราเพิ่งสร้าง
-            let res = await fetch(IMAGE_API_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            
-            let result = await res.json();
-            if(result.status === 'success') {
-                return result.url; // ได้ลิงก์รูปสั้นๆ กลับมา!
-            } else {
-                console.error("Upload Error:", result.message);
-                return null;
-            }
-        } catch (e) {
-            console.error("Fetch Error:", e);
+    // แก้ไขฟังก์ชันเดิมในบรรทัดที่ 460 ประมาณนี้ครับ
+window.uploadImageToDrive = async function(base64Data, prefix = "IMG", folderName = "Uncategorized") {
+    try {
+        let payload = {
+            base64: base64Data,
+            filename: prefix + "_" + Date.now() + ".jpg",
+            folder: folderName // 📌 ส่งชื่อโฟลเดอร์แนบไปด้วย
+        };
+        
+        let res = await fetch(IMAGE_API_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        
+        let result = await res.json();
+        if(result.status === 'success') {
+            return result.url;
+        } else {
+            console.error("Upload Error:", result.message);
             return null;
         }
+    } catch (e) {
+        console.error("Fetch Error:", e);
+        return null;
     }
+}
 
     let allBookings = null; let allCompletedJobs = {}; let allProfiles = {}; let allPromoData = {};
     let cropper = null; let currentPromoFilter = 'all'; let dispatchMode = 'manual';
