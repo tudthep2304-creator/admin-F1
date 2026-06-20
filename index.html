@@ -55,12 +55,21 @@
         background-color: #252525 !important;
     }
 
-    /* บังคับสีตัวอักษรรองให้อ่านง่าย */
-    .text-gray-500, .text-slate-400 { color: #666666 !important; }
-    html.dark .dark\:text-slate-400, html.dark .dark\:text-slate-500 { color: #A0A0A0 !important; }
+    /* 🌟 จัดการสีตัวอักษรให้รองรับทั้ง โหมดสว่าง/มืด (แก้ไข !important ขัดกัน) */
     
-    html.dark .text-white { color: #E0E0E0 !important; }
-    .text-gray-800 { color: #121212 !important; }
+    /* 1. สำหรับโหมดสว่าง (Light Mode) */
+    html:not(.dark) .text-gray-500, 
+    html:not(.dark) .text-slate-400 { color: #666666 !important; }
+    html:not(.dark) .text-gray-800 { color: #121212 !important; }
+
+    /* 2. สำหรับโหมดมืด (Dark Mode) */
+    html.dark .dark\:text-slate-400, 
+    html.dark .dark\:text-slate-500,
+    html.dark .text-gray-500 { color: #A0A0A0 !important; }
+    
+    html.dark .dark\:text-white, 
+    html.dark .text-white,
+    html.dark .text-gray-800 { color: #E0E0E0 !important; } /* แปลงข้อความสีดำให้เป็นขาวอัตโนมัติ */
 
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
