@@ -1370,7 +1370,7 @@
 
       <!-- ================= หน้า: ข่าวสารฝั่งคนขับ ================= -->
       <section id="content-driver-news" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
-          <div class="flex justify-end"><button onclick="openModal('modalAddDriverNews')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> โพสต์ข่าวสารคนขับ</button></div>
+          <div class="flex justify-end"><button onclick="openDriverNewsModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> โพสต์ข่าวสารคนขับ</button></div>
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full flex flex-col h-[calc(100vh-140px)]">
               <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-bullhorn text-[#1da1f2] mr-1"></i> บอร์ดข่าวสารประกาศ (แอปคนขับ)</h2>
               <div id="driver-news-list" class="space-y-2 flex-1 overflow-y-auto pr-1 slim-scroll"></div>
@@ -1647,9 +1647,25 @@
           </div>
           <div class="p-5 space-y-4">
               <div><label class="block text-xs font-bold text-gray-500 mb-1">รูปภาพประกอบ (ถ้ามี)</label><input type="file" id="drv-news-file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:font-bold file:bg-blue-600/20 file:text-blue-500 cursor-pointer"></div>
-              <div><label class="block text-xs font-bold text-gray-500 mb-1">หัวข้อ (Title)</label><input type="text" id="drv-news-title" placeholder="เช่น กฎระเบียบใหม่" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm font-bold"></div>
+              <div><label class="block text-xs font-bold text-gray-500 mb-1">หัวข้อ (Title)</label><input type="text" id="drv-news-title" placeholder="เช่น กฎระเบียบใหม่, แคมเปญใหม่ล่าสุด" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm font-bold"></div>
               <div><label class="block text-xs font-bold text-gray-500 mb-1">รายละเอียด (Content)</label><textarea id="drv-news-content" rows="4" placeholder="รายละเอียดประกาศ..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm"></textarea></div>
               
+              <div class="bg-purple-50 dark:bg-slate-900 p-3 rounded-xl border border-purple-200 dark:border-slate-700">
+                  <label class="block text-[10px] font-black text-purple-600 mb-2"><i class="fas fa-link"></i> ผูกลิงก์ หรือ แคมเปญร้านค้า (เลือกอย่างใดอย่างหนึ่ง)</label>
+                  <div class="space-y-2">
+                      <div>
+                          <label class="block text-[9px] font-bold text-gray-500 mb-0.5">1. ปุ่มลัดเข้าแคมเปญร้านค้า</label>
+                          <select id="drv-news-camp-link" class="w-full p-2 bg-white dark:bg-purple-900/10 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50 rounded-lg text-xs outline-none focus:border-purple-500 font-bold">
+                              <option value="">-- ไม่ผูกปุ่มแคมเปญ --</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label class="block text-[9px] font-bold text-gray-500 mb-0.5">2. หรือ แนบลิงก์เว็บไซต์ภายนอก</label>
+                          <input type="text" id="drv-news-link" placeholder="https://..." class="w-full p-2 bg-white dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-blue-500">
+                      </div>
+                  </div>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 rounded-xl p-3">
                   <div class="flex items-center gap-2"><input type="checkbox" id="drv-news-is-important" class="w-4 h-4 accent-red-500 rounded cursor-pointer"><label for="drv-news-is-important" class="text-[11px] font-bold text-gray-700 dark:text-slate-300 cursor-pointer">ป้าย <span class="bg-red-500 text-white px-1 py-0.5 rounded ml-1 text-[10px]">IMPORTANT</span></label></div>
                   <div class="grid grid-cols-2 gap-2">
@@ -6023,12 +6039,43 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     // ========================================================
     // 🌟 ระบบข่าวสารประกาศ ฝั่งคนขับ (Driver News)
     // ========================================================
+    window.openDriverNewsModal = function() {
+        // ดึงแคมเปญร้านค้ามาทำเป็น Dropdown
+        let campSelect = document.getElementById('drv-news-camp-link');
+        if(campSelect) {
+            let html = '<option value="">-- ไม่ผูกปุ่มแคมเปญ --</option>';
+            if (typeof allPartnerCampaigns !== 'undefined') {
+                Object.entries(allPartnerCampaigns).forEach(([k, v]) => {
+                    if (v.isActive !== false) {
+                        html += `<option value="${k}">[แคมเปญร้านค้า] ${v.name}</option>`;
+                    }
+                });
+            }
+            campSelect.innerHTML = html;
+        }
+
+        // ล้างค่าเก่า
+        document.getElementById('drv-news-title').value = ''; 
+        document.getElementById('drv-news-content').value = '';
+        document.getElementById('drv-news-link').value = '';
+        document.getElementById('drv-news-is-important').checked = false; 
+        document.getElementById('drv-news-start').value = ''; 
+        document.getElementById('drv-news-end').value = '';
+        let fileInput = document.getElementById('drv-news-file');
+        if(fileInput) fileInput.value = '';
+
+        openModal('modalAddDriverNews');
+    }
+
     window.addDriverNewsContent = async function() {
         let title = document.getElementById('drv-news-title').value.trim(); 
         let content = document.getElementById('drv-news-content').value.trim();
         let isImportant = document.getElementById('drv-news-is-important').checked; 
         let startTime = document.getElementById('drv-news-start').value; 
         let endTime = document.getElementById('drv-news-end').value;
+        let campLink = document.getElementById('drv-news-camp-link').value;
+        let extLink = document.getElementById('drv-news-link').value.trim();
+
         let fileInput = document.getElementById('drv-news-file');
         let file = fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null;
 
@@ -6041,26 +6088,30 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             reader.onload = async function(e) { 
                 let finalUrl = await window.uploadImageToDrive(e.target.result, "NEWS_DRV");
                 if(!finalUrl) { window.showGlobalLoading(false); return showCustomAlert('ล้มเหลว', 'อัปโหลดรูปภาพไม่สำเร็จ', 'error'); }
-                saveDriverNewsToDb(title, content, isImportant, startTime, endTime, finalUrl); 
+                saveDriverNewsToDb(title, content, isImportant, startTime, endTime, finalUrl, campLink, extLink); 
             }; 
             reader.readAsDataURL(file); 
         } else { 
-            saveDriverNewsToDb(title, content, isImportant, startTime, endTime, null); 
+            saveDriverNewsToDb(title, content, isImportant, startTime, endTime, null, campLink, extLink); 
         }
     }
 
-    window.saveDriverNewsToDb = function(title, content, isImportant, startTime, endTime, imageUrl) {
-        db.ref('driver_news').push({ 
-            title, content, isImportant, imageUrl: imageUrl || null, 
-            startTime: startTime || null, endTime: endTime || null, 
+    window.saveDriverNewsToDb = function(title, content, isImportant, startTime, endTime, imageUrl, campLink, extLink) {
+        let payload = { 
+            title: title, 
+            content: content, 
+            isImportant: isImportant, 
+            imageUrl: imageUrl || null, 
+            campaignId: campLink || null,  // 🌟 บันทึก ID แคมเปญ
+            linkUrl: extLink || null,      // 🌟 บันทึก URL ภายนอก
+            startTime: startTime || null, 
+            endTime: endTime || null, 
             timestamp: firebase.database.ServerValue.TIMESTAMP 
-        }).then(() => {
+        };
+
+        db.ref('driver_news').push(payload).then(() => {
             window.showGlobalLoading(false); 
             showCustomAlert('สำเร็จ', 'ส่งข่าวสารเข้าแอปคนขับเรียบร้อย!', 'success'); 
-            document.getElementById('drv-news-title').value=''; document.getElementById('drv-news-content').value=''; 
-            document.getElementById('drv-news-is-important').checked=false; 
-            document.getElementById('drv-news-start').value=''; document.getElementById('drv-news-end').value='';
-            if(document.getElementById('drv-news-file')) document.getElementById('drv-news-file').value = ''; 
             closeModal('modalAddDriverNews');
         });
     }
@@ -6073,7 +6124,29 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             items.forEach(n => { 
                 let timer = (n.startTime || n.endTime) ? `<p class="text-[9px] text-yellow-600">⏱ ${n.startTime ? n.startTime.replace('T',' '):'เริ่ม'} - ${n.endTime ? n.endTime.replace('T',' '):'ตลอดไป'}</p>` : `<p class="text-[9px] text-gray-400">แสดงผลถาวร</p>`;
                 let imgHtml = n.imageUrl ? `<div class="w-12 h-12 bg-black rounded-lg overflow-hidden shrink-0 mt-2"><img src="${n.imageUrl}" class="w-full h-full object-cover"></div>` : '';
-                html += `<div class="flex justify-between items-start bg-gray-50 dark:bg-slate-800/40 p-3 border border-gray-200 dark:border-slate-700 rounded-xl mb-2 text-left"><div class="min-w-0 flex-1"><div class="flex gap-2">${imgHtml}<div class="flex-1 min-w-0"><p class="text-sm font-bold text-gray-800 dark:text-white truncate">${n.title} ${n.isImportant ? '<span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded ml-1">สำคัญ</span>':''}</p>${timer}</div></div></div><button onclick="showCustomConfirm('ลบข่าวนี้?', 'ยืนยันลบโพสต์นี้ออกจากบอร์ดคนขับ', () => { db.ref('driver_news/${n.id}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 w-8 h-8 rounded-lg text-sm shrink-0 flex items-center justify-center ml-2 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button></div>`;
+                
+                // 🌟 ดึงข้อมูลป้ายกำกับลิงก์มาโชว์ในตาราง
+                let badgeHtml = '';
+                if(n.campaignId) {
+                    let campName = (allPartnerCampaigns && allPartnerCampaigns[n.campaignId]) ? allPartnerCampaigns[n.campaignId].name : 'แคมเปญถูกลบแล้ว';
+                    badgeHtml = `<p class="text-[9px] mt-1 bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded inline-block"><i class="fas fa-store"></i> ลิงก์: ${campName}</p>`;
+                } else if(n.linkUrl) {
+                    badgeHtml = `<p class="text-[9px] mt-1 bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded inline-block truncate max-w-[150px]"><i class="fas fa-link"></i> ${n.linkUrl}</p>`;
+                }
+
+                html += `<div class="flex justify-between items-start bg-gray-50 dark:bg-slate-800/40 p-3 border border-gray-200 dark:border-slate-700 rounded-xl mb-2 text-left">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex gap-2">
+                                    ${imgHtml}
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold text-gray-800 dark:text-white truncate">${n.title} ${n.isImportant ? '<span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded ml-1">สำคัญ</span>':''}</p>
+                                        ${timer}
+                                        ${badgeHtml}
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="showCustomConfirm('ลบข่าวนี้?', 'ยืนยันลบโพสต์นี้ออกจากบอร์ดคนขับ', () => { db.ref('driver_news/${n.id}').remove(); }, 'ลบทิ้ง', 'red')" class="text-red-500 bg-red-100 w-8 h-8 rounded-lg text-sm shrink-0 flex items-center justify-center ml-2 hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
+                        </div>`;
             });
         }
         container.innerHTML = html || '<p class="text-gray-400 text-xs text-center py-4">บอร์ดประกาศว่างเปล่า</p>';
