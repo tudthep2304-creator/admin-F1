@@ -4295,6 +4295,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         }
     }
     
+    // ========================================================
+    // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - แบบดั้งเดิม
+    // ========================================================
     window.openQuestModal = function(questId = null) {
         ['rides','star','days','signup','manual'].forEach(type => {
             let chk = document.getElementById(`cond-${type}-check`); 
@@ -4302,7 +4305,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let val = document.getElementById(`cond-${type}-val`); 
             if(val) { val.value = ''; val.disabled = true; }
         });
-        document.getElementById('cond-days-unit').disabled = true; document.getElementById('cond-days-unit').value = 'days';
+        let dUnit = document.getElementById('cond-days-unit');
+        if(dUnit) { dUnit.disabled = true; dUnit.value = 'days'; }
+
         document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
 
@@ -4314,33 +4319,27 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-start').value = q.startTime || '';
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
-          document.getElementById('quest-reward-rating').value = q.rewardRating || '';
-            
-            // 🌟 ดึงค่า "อายุโบนัส" กลับมาโชว์ตอนแก้ไขแคมเปญ
             document.getElementById('quest-reward-expire').value = q.rewardExpireDays || ''; 
-            
+            document.getElementById('quest-reward-rating').value = q.rewardRating || ''; 
             document.getElementById('quest-reward-tier').value = q.rewardTier || 'none';
             document.getElementById('quest-is-active').checked = q.isActive;
 
             if(q.targetTiers) q.targetTiers.forEach(v => { let cb = document.querySelector(`.quest-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
             if(q.targetVehicles) q.targetVehicles.forEach(v => { let cb = document.querySelector(`.quest-target-vehicle[value="${v}"]`); if(cb) cb.checked = true; });
 
-            if(c.manual) document.getElementById('cond-manual-check').checked = true;
-            if(c.signup) document.getElementById('cond-signup-check').checked = true;
-            if(c.rides > 0) { document.getElementById('cond-rides-check').checked = true; document.getElementById('cond-rides-val').value = c.rides; document.getElementById('cond-rides-val').disabled = false; }
-            if(c.stars > 0) { document.getElementById('cond-star-check').checked = true; document.getElementById('cond-star-val').value = c.stars; document.getElementById('cond-star-val').disabled = false; }
-            if(c.days > 0) { document.getElementById('cond-days-check').checked = true; document.getElementById('cond-days-val').value = c.days; document.getElementById('cond-days-val').disabled = false; document.getElementById('cond-days-unit').disabled = false; document.getElementById('cond-days-unit').value = c.daysUnit || 'days'; }
+            if(c.manual) { let chk = document.getElementById('cond-manual-check'); if(chk) chk.checked = true; }
+            if(c.signup) { let chk = document.getElementById('cond-signup-check'); if(chk) chk.checked = true; }
+            if(c.rides > 0) { let chk = document.getElementById('cond-rides-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-rides-val'); if(val) { val.value = c.rides; val.disabled = false; } }
+            if(c.stars > 0) { let chk = document.getElementById('cond-star-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-star-val'); if(val) { val.value = c.stars; val.disabled = false; } }
+            if(c.days > 0) { let chk = document.getElementById('cond-days-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-days-val'); if(val) { val.value = c.days; val.disabled = false; } if(dUnit) { dUnit.disabled = false; dUnit.value = c.daysUnit || 'days'; } }
 
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
             document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
             document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
-            document.getElementById('quest-reward-bonus').value = '';
-          document.getElementById('quest-reward-rating').value = '';
-            
-            // 🌟 ล้างค่า "อายุโบนัส" เป็นช่องว่างตอนสร้างแคมเปญใหม่
+            document.getElementById('quest-reward-bonus').value = ''; 
             document.getElementById('quest-reward-expire').value = ''; 
-            
+            document.getElementById('quest-reward-rating').value = '';
             document.getElementById('quest-reward-tier').value = 'none';
             document.getElementById('quest-is-active').checked = true;
         }
@@ -4353,10 +4352,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let name = document.getElementById('quest-name').value.trim();
         let rewardBonus = parseInt(document.getElementById('quest-reward-bonus').value) || 0;
         let rewardExpireDays = parseInt(document.getElementById('quest-reward-expire').value) || 0; 
-        
-        // 🌟 ดึงค่า "ดาว" ที่แอดมินตั้งแจก
         let rewardRating = parseFloat(document.getElementById('quest-reward-rating').value) || 0; 
-        
         let rewardTier = document.getElementById('quest-reward-tier').value;
 
         let targetTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
@@ -4365,27 +4361,21 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญให้คนขับด้วยครับ', 'error');
         if (targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกเป้าหมายระดับชั้นอย่างน้อย 1 กลุ่ม', 'error');
         if (targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะอย่างน้อย 1 ประเภท', 'error');
-        
-        // 🌟 ดักจับถ้าไม่แจกอะไรเลย (เช็กทั้ง โบนัส, เลื่อนขั้น และ ดาว)
-        if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) {
-            return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ (เงิน, ดาว หรือเลื่อนขั้น)', 'error');
-        }
+        if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ', 'error');
 
         let conditions = {
-            manual: document.getElementById('cond-manual-check').checked,
-            signup: document.getElementById('cond-signup-check').checked,
-            rides: document.getElementById('cond-rides-check').checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
-            stars: document.getElementById('cond-star-check').checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
-            days: document.getElementById('cond-days-check').checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
-            daysUnit: document.getElementById('cond-days-unit').value
+            manual: document.getElementById('cond-manual-check')?.checked || false,
+            signup: document.getElementById('cond-signup-check')?.checked || false,
+            rides: document.getElementById('cond-rides-check')?.checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
+            stars: document.getElementById('cond-star-check')?.checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
+            days: document.getElementById('cond-days-check')?.checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
+            daysUnit: document.getElementById('cond-days-unit')?.value || 'days'
         };
 
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, conditions: conditions,
             startTime: document.getElementById('quest-start').value || null, endTime: document.getElementById('quest-end').value || null,
-            rewardBonus: rewardBonus, 
-            rewardExpireDays: rewardExpireDays, 
-            rewardRating: rewardRating, // 🌟 ส่ง "ดาว" ไปเซฟใน Firebase
+            rewardBonus: rewardBonus, rewardExpireDays: rewardExpireDays, rewardRating: rewardRating, 
             rewardTier: rewardTier, isActive: document.getElementById('quest-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
@@ -5717,6 +5707,67 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         tbody.innerHTML = html || '<tr><td colspan="5" class="py-10 text-center text-gray-400">ยังไม่มีประวัติการอนุมัติย้อนหลัง</td></tr>';
         openModal('modalPartnerHistory');
     }
+    // ========================================================
+    // 🌟 ระบบจัดการ Dropdown (Checkbox) ของหน้าต่างแคมเปญร้านค้า
+    // ========================================================
+    window.togglePartnerTiers = function(source) {
+        document.querySelectorAll('.partner-target-tier').forEach(cb => cb.checked = source.checked);
+        window.updatePartnerDropdownText();
+    }
+    window.togglePartnerVehs = function(source) {
+        document.querySelectorAll('.partner-target-vehicle').forEach(cb => cb.checked = source.checked);
+        window.updatePartnerDropdownText();
+    }
+    window.updatePartnerDropdownText = function() {
+        let tiers = Array.from(document.querySelectorAll('.partner-target-tier:checked'));
+        let tText = tiers.length > 0 ? `เลือกเป้าหมายแล้ว (${tiers.length})` : 'เลือกกลุ่มเป้าหมาย...';
+        
+        // เช็คจำนวน Tier ทั้งหมดในระบบ
+        let totalTiers = window.systemTiersMap ? Object.keys(window.systemTiersMap).length : 5;
+        if(tiers.length === totalTiers && tiers.length > 0) tText = 'ทุกระดับชั้น';
+        
+        let pTextEl = document.getElementById('partner-tier-text');
+        if(pTextEl) pTextEl.innerText = tText;
+
+        let vehs = Array.from(document.querySelectorAll('.partner-target-vehicle:checked'));
+        let vText = vehs.length > 0 ? `เลือกรถแล้ว (${vehs.length})` : 'เลือกรถ...';
+        if(window.systemVehicleTypes && vehs.length === window.systemVehicleTypes.length && vehs.length > 0) vText = 'รถทุกประเภท';
+        
+        let vTextEl = document.getElementById('partner-veh-text');
+        if(vTextEl) vTextEl.innerText = vText;
+    }
+
+    // ฟังก์ชันสร้าง Dropdown ดึงค่าจากส่วนกลาง
+    window.buildPartnerDropdowns = function() {
+        let tHtml = '';
+        if (window.systemTiersMap) {
+            Object.keys(window.systemTiersMap).forEach(tName => {
+                tHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${tName}" class="partner-target-tier w-4 h-4 accent-purple-500" onchange="updatePartnerDropdownText()"> ${tName}</label>`;
+            });
+        }
+        let tCont = document.getElementById('partner-target-tier-container'); 
+        if(tCont) tCont.innerHTML = tHtml;
+
+        let vHtml = '';
+        if (window.systemVehicleTypes) {
+            window.systemVehicleTypes.forEach(vt => {
+                vHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${vt.id}" class="partner-target-vehicle w-4 h-4 accent-purple-500" onchange="updatePartnerDropdownText()"> ${vt.name}</label>`;
+            });
+        }
+        let vCont = document.getElementById('partner-target-vehicle-container'); 
+        if(vCont) vCont.innerHTML = vHtml;
+    }
+
+    // แก้ไขฟังก์ชันเปิด Modal ให้มารันสร้าง Dropdown ก่อนเสมอ
+    let _oldOpenPartnerCampaignModal = window.openPartnerCampaignModal;
+    window.openPartnerCampaignModal = function(campId = null) {
+        window.buildPartnerDropdowns(); // สร้าง Checkbox ใหม่ทุกครั้งที่เปิด
+        if (typeof _oldOpenPartnerCampaignModal === 'function') {
+            _oldOpenPartnerCampaignModal(campId);
+        }
+        // รันอัปเดตข้อความหลังสร้างเสร็จ
+        setTimeout(() => window.updatePartnerDropdownText(), 50);
+    };
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
@@ -5827,16 +5878,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
           
           <div class="p-5 space-y-4">
               <input type="hidden" id="quest-id">
-              
               <div>
                   <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ (โชว์ให้คนขับเห็น)</label>
                   <input type="text" id="quest-name" placeholder="เช่น โปรวิ่งวันหยุด, สู้ฝนแจกโบนัส..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
               </div>
 
-              <!-- 🎯 เป้าหมายผู้เข้าร่วม -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
                   <div class="col-span-1 sm:col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
-                  
                   <div class="relative">
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
                       <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-tier-dd').classList.toggle('hidden')">
@@ -5844,12 +5892,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <i class="fas fa-chevron-down text-gray-400"></i>
                       </div>
                       <div id="quest-tier-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-    <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
-    
-    <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
-</div>
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
+                          <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
+                      </div>
                   </div>
-                  
                   <div class="relative">
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
                       <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-veh-dd').classList.toggle('hidden')">
@@ -5863,9 +5909,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
-              <!-- 🏁 เงื่อนไขความสำเร็จ -->
               <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
-                  <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ (ติ๊กเลือกผสมกันได้)</h3>
+                  <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ</h3>
                   <div class="space-y-3 mt-3">
                       <div class="flex items-center gap-2">
                           <input type="checkbox" id="cond-rides-check" onchange="document.getElementById('cond-rides-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-rides-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
@@ -5889,7 +5934,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                       </div>
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                          <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ (สำหรับแจกคนใหม่)</label>
+                          <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ</label>
                       </div>
                       <div class="flex items-center gap-2 pt-1">
                           <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
@@ -5898,7 +5943,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
-              <!-- 📅 ช่วงเวลา -->
               <div class="grid grid-cols-2 gap-3">
                   <div>
                       <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มภารกิจ (ว่าง=เริ่มทันที)</label>
@@ -5910,9 +5954,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
-              <!-- 🎁 ของรางวัล (เหลือกล่องเดียว ไม่ซ้ำแล้ว!) -->
               <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ (เลือกแจกอย่างใดอย่างหนึ่ง หรือทั้งหมด)</h3>
+                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ</h3>
                   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
@@ -6129,18 +6172,17 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
   <div id="modalPartnerCampaign" class="hidden fixed inset-0 z-[310] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 border border-purple-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
           <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-purple-50 dark:bg-purple-900/20 sticky top-0 z-10">
-              <h2 class="text-base font-bold text-purple-600 dark:text-purple-500" id="partner-modal-title"><i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้า</h2>
+              <h2 class="text-base font-bold text-purple-600 dark:text-purple-500" id="partner-modal-title"><i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์</h2>
               <button onclick="closeModal('modalPartnerCampaign')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
           </div>
           
           <div class="p-5 space-y-4">
               <input type="hidden" id="partner-camp-id">
               <div>
-                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ / ร้านค้า</label>
+                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ / ชื่อร้านค้า</label>
                   <input type="text" id="partner-camp-name" placeholder="เช่น แจกโบนัสกินกาแฟร้าน A..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-purple-500">
               </div>
 
-              <!-- 🎯 เป้าหมายผู้เข้าร่วม (ติ๊กถูกแบบ Dropdown) -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
                   <div class="col-span-1 sm:col-span-2"><h3 class="text-[10px] font-black text-blue-600 dark:text-blue-400 mb-1"><i class="fas fa-filter"></i> กำหนดผู้มีสิทธิ์เข้าร่วม</h3></div>
                   <div class="relative">
@@ -6167,7 +6209,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
-              <!-- 🛡️ โหมดตรวจจับการทุจริต -->
               <div class="p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/40 rounded-xl">
                   <h4 class="text-[10px] font-black text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> เงื่อนไขรับรางวัล (ระบบยืนยันตัวตนร้านค้า)</h4>
                   <div class="space-y-2">
@@ -6193,7 +6234,17 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </div>
               </div>
 
-              <!-- 🎁 ของรางวัล -->
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่ม (ว่าง=เริ่มทันที)</label>
+                      <input type="datetime-local" id="partner-camp-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=ตลอดไป)</label>
+                      <input type="datetime-local" id="partner-camp-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
+                  </div>
+              </div>
+
               <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
                   <h3 class="text-xs font-bold text-purple-600 mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับเมื่อแอดมินอนุมัติ</h3>
                   <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-purple-50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-200 dark:border-purple-800/50">
