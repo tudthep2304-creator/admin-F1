@@ -235,24 +235,13 @@
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-balance-scale"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">กฎระเบียบคนขับ</span>
                   </button>
-                  <button onclick="switchTab('commission-settings')" class="bg-gray-50 dark:bg-slate-800 border border-blue-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-hand-holding-usd"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-blue-700 dark:text-blue-500 leading-tight">ตั้งค่าคอมมิชชัน</span>
-                  </button>
+                <button onclick="switchTab('commission-settings')" class="bg-gray-50 dark:bg-slate-800 border border-blue-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-hand-holding-usd"></i></div>
+    <span class="text-[9px] sm:text-[11px] font-bold text-center text-blue-700 dark:text-blue-500 leading-tight">ตั้งค่าคอมมิชชัน</span>
+</button>
                   <button onclick="switchTab('blockdrivers')" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ban"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center text-red-500 dark:text-red-400 leading-tight">บล็อกคนขับ</span>
-                  </button>
-                  
-                  <button onclick="switchTab('partner-campaigns')" class="bg-purple-50 dark:bg-slate-800 border border-purple-200 dark:border-slate-700 hover:bg-purple-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-store"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-purple-700 dark:text-purple-400 leading-tight">แคมเปญร้านค้า</span>
-                  </button>
-                  
-                  <button onclick="switchTab('partner-approvals')" class="bg-purple-50 dark:bg-slate-800 border border-purple-200 dark:border-slate-700 hover:bg-purple-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95 relative">
-                      <div id="badge-partner-pending" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">0</div>
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-tasks"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-purple-700 dark:text-purple-400 leading-tight">ตรวจงานร้านค้า</span>
                   </button>
               </div>
           </div>
@@ -614,8 +603,8 @@
                   
                   <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                       <select id="filter-blocked-tier" onchange="filterBlockedDrivers()" class="w-full sm:w-32 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
-                        <option value="all">ทุกระดับชั้น</option>
-                      </select>
+    <option value="all">ทุกระดับชั้น</option>
+</select>
                       <select id="filter-blocked-reason" onchange="filterBlockedDrivers()" class="w-full sm:w-36 bg-gray-50 dark:bg-slate-800 text-black dark:text-white text-[11px] border border-gray-300 dark:border-slate-700 rounded-lg px-2 py-2 outline-none focus:border-red-500 transition font-bold">
                           <option value="all">แสดงทุกสาเหตุ</option>
                       </select>
@@ -947,8 +936,8 @@
                   <div>
                       <label class="block text-[9px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
                       <select id="abh-filter-tier" onchange="renderAllBlockHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
-                        <option value="all">ทุกระดับชั้น</option>
-                      </select>
+    <option value="all">ทุกระดับชั้น</option>
+</select>
                   </div>
                   <div>
                       <label class="block text-[9px] font-bold text-gray-500 mb-1">สาเหตุความผิด</label>
@@ -1623,57 +1612,6 @@
           </div>
       </div>
   </div>
-  <section id="content-partner-campaigns" class="tab-content hidden space-y-4">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h2 class="text-lg font-bold text-purple-600 dark:text-purple-500"><i class="fas fa-store mr-1.5"></i> ระบบแคมเปญร้านค้า (B2B Partner)</h2>
-                  <button onclick="openPartnerCampaignModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> สร้างแคมเปญร้านค้า</button>
-              </div>
-              <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700 hide-scrollbar">
-                  <table class="w-full text-left border-collapse min-w-[800px]">
-                      <thead><tr class="border-b border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 text-[10px] uppercase font-bold bg-purple-50/50 dark:bg-slate-800/50">
-                          <th class="py-3 px-3 w-[25%]">ชื่อแคมเปญ / ร้านค้า</th>
-                          <th class="py-3 px-2 w-[20%]">รางวัลที่จะแจก</th>
-                          <th class="py-3 px-2 text-center w-[20%]">สต็อกโค้ดลับ (ใบ)</th>
-                          <th class="py-3 px-2 text-center w-[15%]">สถานะ</th>
-                          <th class="py-3 px-3 text-center w-[20%]">จัดการ</th>
-                      </tr></thead>
-                      <tbody id="partner-campaigns-list" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50">
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </section>
-
-      <section id="content-partner-approvals" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
-          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
-                  <h2 class="text-sm font-black text-purple-600 dark:text-purple-400 flex items-center gap-2"><i class="fas fa-tasks"></i> ศูนย์ตรวจหลักฐานร้านค้าพาร์ทเนอร์</h2>
-                  <div class="flex gap-2 w-full sm:w-auto">
-                      <select id="partner-approval-status" class="w-full p-2 bg-gray-50 dark:bg-slate-800 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-purple-500 font-bold">
-                          <option value="pending">⏳ รอตรวจสอบ</option>
-                          <option value="approved">✅ อนุมัติแล้ว</option>
-                          <option value="rejected">❌ ปฏิเสธ</option>
-                      </select>
-                  </div>
-              </div>
-              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
-                  <table class="w-full text-left border-collapse min-w-[750px]">
-                      <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
-                          <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
-                              <th class="py-2.5 px-3">วันเวลาที่ส่ง</th>
-                              <th class="py-2.5 px-3">คนขับ</th>
-                              <th class="py-2.5 px-3 text-center">โค้ดที่อ้างสิทธิ์</th>
-                              <th class="py-2.5 px-3 text-center">รูปหลักฐาน</th>
-                              <th class="py-2.5 px-3 text-center">การจัดการ</th>
-                          </tr>
-                      </thead>
-                      <tbody id="partner-approvals-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </section>
   
   <script>
     const windowContext = window;
@@ -1873,7 +1811,7 @@
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'ระบบแคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'ศูนย์ตรวจงานร้านค้า' };
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน' };
     // 🌟 1. ระบบ History & Back Button
     window.adminHistoryStack = ['dashboard'];
 
@@ -5321,198 +5259,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             db.ref('config/tiers/' + tierName).remove().then(() => { showCustomAlert('ลบสำเร็จ', 'นำระดับชั้นออกจากระบบส่วนกลางแล้ว', 'success'); });
         }, 'ลบข้อมูล', 'red');
     }
-   // ========================================================
-    // 🌟 ระบบแคมเปญร้านค้าพาร์ทเนอร์ (Partner Campaigns - B2B)
-    // ========================================================
-    let allPartnerCampaigns = {};
-
-    db.ref('system_settings/partner_campaigns').on('value', snap => {
-        allPartnerCampaigns = snap.val() || {};
-        if(typeof renderPartnerCampaignsTable === 'function') renderPartnerCampaignsTable();
-    });
-
-    window.renderPartnerCampaignsTable = function() {
-        let lst = document.getElementById('partner-campaigns-list'); 
-        if(!lst) return;
-        let html = '';
-        let campsArr = Object.entries(allPartnerCampaigns).map(([k,v]) => ({id:k, ...v}));
-        
-        if (campsArr.length === 0) {
-            lst.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-gray-400 text-xs">ยังไม่มีแคมเปญร้านค้าพาร์ทเนอร์</td></tr>`; 
-            return;
-        }
-
-        campsArr.sort((a, b) => b.timestamp - a.timestamp).forEach(c => {
-            let timeStr = "ตลอดไป";
-            if (c.startTime || c.endTime) {
-                timeStr = `${c.startTime ? new Date(c.startTime).toLocaleDateString('th-TH') : 'เริ่มแล้ว'} ถึง ${c.endTime ? new Date(c.endTime).toLocaleDateString('th-TH') : 'ตลอดไป'}`;
-            }
-
-            let rewardStr = "";
-            if (c.rewardBonus > 0) rewardStr += `<span class="text-yellow-600 font-bold text-xs">+฿${c.rewardBonus} 🟡</span><br>`;
-            if (c.rewardRating > 0) rewardStr += `<span class="text-amber-500 font-bold text-[10px]">+${c.rewardRating} ⭐</span>`;
-            
-            let limitStr = c.dailyLimit > 0 ? ` (ได้ ${c.dailyLimit} ครั้ง/วัน)` : '';
-
-            let toggleClass = c.isActive ? 'text-emerald-500' : 'text-gray-300';
-            let toggleIcon = c.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
-
-            // เช็คสต็อกโค้ด
-            let codeHtml = '-';
-            if(c.requireCode) {
-                let totalCodes = c.codes ? Object.keys(c.codes).length : 0;
-                let usedCodes = c.codes ? Object.values(c.codes).filter(x => x.used).length : 0;
-                codeHtml = `<span class="font-bold text-purple-600">${usedCodes}/${totalCodes}</span><br><button onclick="downloadPartnerCodes('${c.id}')" class="text-[9px] bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded border border-gray-300 mt-1 shadow-sm"><i class="fas fa-download"></i> โหลดโค้ด</button>`;
-            }
-
-            html += `
-            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition border-b border-gray-100 dark:border-slate-800">
-                <td class="py-3 px-3">
-                    <p class="font-bold text-purple-600 dark:text-purple-400 text-xs">${c.name}</p>
-                    <p class="text-[9px] text-gray-400 mt-1"><i class="far fa-clock"></i> ${timeStr}</p>
-                </td>
-                <td class="py-3 px-2 text-left">${rewardStr}<br><span class="text-[9px] text-gray-500">${limitStr}</span></td>
-                <td class="py-3 px-2 text-center text-[10px]">${codeHtml}</td>
-                <td class="py-3 px-2 text-center text-[10px]">
-                    <button onclick="togglePartnerCampStatus('${c.id}', ${!c.isActive})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
-                </td>
-                <td class="py-3 px-3 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                        <button onclick="openPartnerCampaignModal('${c.id}')" class="bg-blue-50 text-blue-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit text-[11px]"></i></button>
-                        <button onclick="deletePartnerCampaign('${c.id}')" class="bg-red-50 text-red-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt text-[11px]"></i></button>
-                    </div>
-                </td>
-            </tr>`;
-        });
-        lst.innerHTML = html;
-    }
-
-    window.openPartnerCampaignModal = function(campId = null) {
-        if (campId && allPartnerCampaigns[campId]) {
-            let c = allPartnerCampaigns[campId];
-            document.getElementById('partner-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญร้านค้า';
-            document.getElementById('partner-camp-id').value = campId;
-            document.getElementById('partner-camp-name').value = c.name || '';
-            
-            document.getElementById('pc-proof-selfie').checked = c.requireSelfie || false;
-            document.getElementById('pc-proof-receipt').checked = c.requireReceipt || false;
-            document.getElementById('pc-proof-code').checked = c.requireCode || false;
-            document.getElementById('pc-code-amount').disabled = !c.requireCode;
-            document.getElementById('pc-code-amount').value = ''; 
-            document.getElementById('pc-code-amount').placeholder = "พิมพ์จำนวนเพื่อเพิ่มโค้ด...";
-
-            document.getElementById('partner-camp-start').value = c.startTime || '';
-            document.getElementById('partner-camp-end').value = c.endTime || '';
-            
-            document.getElementById('partner-reward-bonus').value = c.rewardBonus || '';
-            document.getElementById('partner-reward-expire').value = c.rewardExpireDays || '';
-            document.getElementById('partner-reward-rating').value = c.rewardRating || '';
-            document.getElementById('partner-reward-limit').value = c.dailyLimit || '';
-            document.getElementById('partner-camp-is-active').checked = c.isActive !== false;
-        } else {
-            document.getElementById('partner-modal-title').innerHTML = '<i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์';
-            document.getElementById('partner-camp-id').value = '';
-            document.getElementById('partner-camp-name').value = '';
-            
-            document.getElementById('pc-proof-selfie').checked = false;
-            document.getElementById('pc-proof-receipt').checked = false;
-            document.getElementById('pc-proof-code').checked = false;
-            document.getElementById('pc-code-amount').disabled = true;
-            document.getElementById('pc-code-amount').value = '';
-            document.getElementById('pc-code-amount').placeholder = "เช่น 100";
-
-            document.getElementById('partner-camp-start').value = '';
-            document.getElementById('partner-camp-end').value = '';
-            
-            document.getElementById('partner-reward-bonus').value = '';
-            document.getElementById('partner-reward-expire').value = '';
-            document.getElementById('partner-reward-rating').value = '';
-            document.getElementById('partner-reward-limit').value = '';
-            document.getElementById('partner-camp-is-active').checked = true;
-        }
-        openModal('modalPartnerCampaign');
-    }
-
-    window.savePartnerCampaign = function() {
-        let id = document.getElementById('partner-camp-id').value || 'PTN_' + Date.now();
-        let name = document.getElementById('partner-camp-name').value.trim();
-        let requireSelfie = document.getElementById('pc-proof-selfie').checked;
-        let requireReceipt = document.getElementById('pc-proof-receipt').checked;
-        let requireCode = document.getElementById('pc-proof-code').checked;
-        let codeAmount = parseInt(document.getElementById('pc-code-amount').value) || 0;
-        
-        let rewardBonus = parseInt(document.getElementById('partner-reward-bonus').value) || 0;
-        let rewardRating = parseFloat(document.getElementById('partner-reward-rating').value) || 0;
-        
-        if(!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญร้านค้า', 'error');
-        if(!requireSelfie && !requireReceipt && !requireCode) return showCustomAlert('ข้อผิดพลาด', 'กรุณาเลือกเงื่อนไขหลักฐานอย่างน้อย 1 อย่างครับ', 'error');
-        if(rewardBonus === 0 && rewardRating === 0) return showCustomAlert('ข้อผิดพลาด', 'กรุณาตั้งรางวัล (เงิน หรือ ดาว)', 'error');
-
-        let payload = {
-            name: name,
-            requireSelfie: requireSelfie,
-            requireReceipt: requireReceipt,
-            requireCode: requireCode,
-            startTime: document.getElementById('partner-camp-start').value || null,
-            endTime: document.getElementById('partner-camp-end').value || null,
-            rewardBonus: rewardBonus,
-            rewardExpireDays: parseInt(document.getElementById('partner-reward-expire').value) || 0,
-            rewardRating: rewardRating,
-            dailyLimit: parseInt(document.getElementById('partner-reward-limit').value) || 0,
-            isActive: document.getElementById('partner-camp-is-active').checked,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        // ถ้ามีการขอเจนโค้ดเพิ่ม
-        let newCodes = {};
-        if(requireCode && codeAmount > 0) {
-            let prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PTN');
-            for(let i=0; i<codeAmount; i++) {
-                let rnd = Math.floor(1000 + Math.random() * 9000); 
-                let cStr = prefix + rnd;
-                newCodes[cStr] = { code: cStr, used: false };
-            }
-        }
-
-        let updates = {};
-        updates[`system_settings/partner_campaigns/${id}`] = payload;
-        
-        db.ref().update(updates).then(() => {
-            if (Object.keys(newCodes).length > 0) {
-                db.ref(`system_settings/partner_campaigns/${id}/codes`).update(newCodes);
-            }
-            showCustomAlert('สำเร็จ', 'บันทึกแคมเปญร้านค้าเรียบร้อย', 'success');
-            closeModal('modalPartnerCampaign');
-        });
-    }
-
-    window.togglePartnerCampStatus = function(id, status) {
-        db.ref(`system_settings/partner_campaigns/${id}`).update({ isActive: status });
-    }
-
-    window.deletePartnerCampaign = function(id) {
-        showCustomConfirm('ลบแคมเปญร้านค้า?', 'ลบถาวรจะไม่สามารถกู้คืนได้ โค้ดที่แจกไปแล้วจะใช้งานไม่ได้', () => {
-            db.ref(`system_settings/partner_campaigns/${id}`).remove();
-            showCustomAlert('ลบสำเร็จ', 'แคมเปญถูกลบออกจากระบบแล้ว', 'success');
-        }, 'ลบทิ้ง', 'red');
-    }
-
-    window.downloadPartnerCodes = function(campId) {
-        let c = allPartnerCampaigns[campId];
-        if(!c || !c.codes) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีโค้ดให้ดาวน์โหลด', 'error');
-        
-        let csv = "\uFEFFแคมเปญ,รหัสโค้ด,สถานะการใช้งาน\n";
-        for(let k in c.codes) {
-            let stat = c.codes[k].used ? 'ใช้แล้ว' : 'ยังไม่ใช้';
-            csv += `"${c.name}","${k}","${stat}"\n`;
-        }
-        
-        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        let link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", `PartnerCodes_${c.name}_${Date.now()}.csv`);
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
-    } 
+    
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
@@ -5760,7 +5507,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               <div>
                   <label class="block text-[10px] font-bold text-gray-500 mb-1">ปรับเปลี่ยนระดับชั้น (Driver Tier)</label>
                   <select id="trm-tier-select" onchange="autoFillOverrideStars()" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
-                    </select>
+    </select>
               </div>
 
               <div>
@@ -5921,84 +5668,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
           </div>
       </div>
   </div>
-  <div id="modalPartnerCampaign" class="hidden fixed inset-0 z-[310] bg-black/80 flex items-center justify-center p-4">
-          <div class="bg-white dark:bg-slate-900 border border-purple-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-              <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-purple-50 dark:bg-purple-900/20 sticky top-0 z-10">
-                  <h2 class="text-base font-bold text-purple-600 dark:text-purple-500" id="partner-modal-title"><i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์</h2>
-                  <button onclick="closeModal('modalPartnerCampaign')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-              </div>
-              
-              <div class="p-5 space-y-4">
-                  <input type="hidden" id="partner-camp-id">
-                  <div>
-                      <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ / ชื่อร้านค้า (โชว์ให้คนขับเห็น)</label>
-                      <input type="text" id="partner-camp-name" placeholder="เช่น แจกโบนัสกินกาแฟร้าน A..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-purple-500">
-                  </div>
-
-                  <div class="p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/40 rounded-xl">
-                      <h4 class="text-[10px] font-black text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> เงื่อนไขรับรางวัล (ระบบยืนยันตัวตนร้านค้า)</h4>
-                      <div class="space-y-2">
-                          <label class="flex items-center gap-2 cursor-pointer">
-                              <input type="checkbox" id="pc-proof-selfie" class="w-4 h-4 accent-red-500">
-                              <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">📸 บังคับเซลฟี่หน้าร้าน หรือเซลฟี่คู่กับสินค้า</span>
-                          </label>
-                          <label class="flex items-center gap-2 cursor-pointer">
-                              <input type="checkbox" id="pc-proof-receipt" class="w-4 h-4 accent-red-500">
-                              <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">🧾 บังคับแนบใบเสร็จ (ให้ตรวจวันที่ + ตราปั๊มร้าน)</span>
-                          </label>
-                          <div class="flex items-center gap-2">
-                              <input type="checkbox" id="pc-proof-code" onchange="document.getElementById('pc-code-amount').disabled = !this.checked; if(this.checked) document.getElementById('pc-code-amount').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                              <label for="pc-proof-code" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0">🎟️ สร้างโค้ดสุ่มให้ร้านค้าแจก (ใบ)</label>
-                              <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                          </div>
-                      </div>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3">
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่ม (ว่าง=เริ่มทันที)</label>
-                          <input type="datetime-local" id="partner-camp-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=ตลอดไป)</label>
-                          <input type="datetime-local" id="partner-camp-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
-                      </div>
-                  </div>
-
-                  <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                      <h3 class="text-xs font-bold text-purple-600 mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับ</h3>
-                      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-purple-50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-200 dark:border-purple-800/50">
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
-                              <input type="number" id="partner-reward-bonus" placeholder="เช่น 50" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                          </div>
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">อายุโบนัส (วัน)</label>
-                              <input type="number" id="partner-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                          </div>
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เพิ่มดาว (⭐)</label>
-                              <input type="number" step="0.1" id="partner-reward-rating" placeholder="เช่น 0.2" class="w-full p-2 bg-white dark:bg-slate-900 text-amber-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                          </div>
-                          <div>
-                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">จำกัดสิทธิ์</label>
-                              <div class="relative">
-                                  <input type="number" id="partner-reward-limit" placeholder="เช่น 1" class="w-full p-2 bg-white dark:bg-slate-900 text-red-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500 pr-12">
-                                  <span class="absolute right-2 top-2 text-[9px] text-gray-500">ครั้ง/วัน</span>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-
-                  <div class="flex items-center gap-2 mt-2">
-                      <input type="checkbox" id="partner-camp-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                      <label for="partner-camp-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญร้านค้านี้ทันที 🟢</label>
-                  </div>
-
-                  <button onclick="savePartnerCampaign()" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกแคมเปญร้านค้า</button>
-              </div>
-          </div>
-      </div>
   
 </body>
 </html>
