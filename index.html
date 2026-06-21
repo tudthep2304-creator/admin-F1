@@ -4650,10 +4650,35 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if(lst) lst.innerHTML = html;
     }
 
+    // 🌟 ระบบเปิด-ปิด กล่องตัวเลือก Multi-Select
+    window.toggleCustomDropdown = function(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+    
+    // 🌟 คลิกที่อื่นเพื่อปิด Dropdown
+    document.addEventListener('click', function(e) {
+        if(!e.target.closest('#dropdown-tier-container')) document.getElementById('tier-options')?.classList.add('hidden');
+        if(!e.target.closest('#dropdown-veh-container')) document.getElementById('veh-options')?.classList.add('hidden');
+    });
+
+    // 🌟 ระบบอัปเดตข้อความบนปุ่มเมื่อกดติ๊กถูก
+    window.updateMultiSelectText = function(type) {
+        if(type === 'tier') {
+            let checked = Array.from(document.querySelectorAll('.tier-checkbox:checked'));
+            let txt = checked.length > 0 ? checked.map(c => c.dataset.name).join(', ') : '-- เลือกกลุ่มเป้าหมาย --';
+            document.getElementById('tier-select-text').innerText = txt;
+        } else {
+            let checked = Array.from(document.querySelectorAll('.veh-checkbox:checked'));
+            let txt = checked.length > 0 ? checked.map(c => c.dataset.name).join(', ') : '-- เลือกประเภทรถ --';
+            document.getElementById('veh-select-text').innerText = txt;
+        }
+    }
+
     // ========================================================
-    // 🌟 3. ระบบเปิดหน้าต่างป๊อปอัป และดึงข้อมูลเก่ามาแสดง
+    // 🌟 ระบบเปิดหน้าต่างป๊อปอัป และดึงข้อมูลเก่ามาแสดง
     // ========================================================
     window.openQuestModal = function(questId = null) {
+        // เคลียร์ฟอร์ม
         document.getElementById('quest-id').value = '';
         document.getElementById('quest-name').value = '';
         document.getElementById('quest-target-rating').value = '';
@@ -4668,17 +4693,50 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         document.getElementById('dynamic-conditions-list').innerHTML = '';
         document.getElementById('dynamic-rewards-list').innerHTML = '';
 
+        // 🌟 ดึงข้อมูลจากส่วนกลาง (System Variables) ของจริง
         let mainTiers = window.systemTiers && window.systemTiers.length > 0 ? window.systemTiers : ['Normal','Silver','Gold','Platinum'];
         let mainVehs = window.systemVehicleTypes && window.systemVehicleTypes.length > 0 ? window.systemVehicleTypes : [{id:'bike',name:'มอเตอร์ไซค์'},{id:'car',name:'รถยนต์'}];
 
-        let tierHtml = '<option value="all">-- ทุกระดับชั้น --</option><option value="new_signup">✨ สมัครลงทะเบียนแอปสำเร็จ</option>';
-        mainTiers.forEach(t => { tierHtml += `<option value="${t}">${t}</option>`; });
-        document.getElementById('quest-target-tier-select').innerHTML = tierHtml;
+        // 🌟 วาดกล่องติ๊กถูกของ ระดับชั้น
+        let tierHtml = `
+            <label class="flex items-center gap-2 p-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-100 dark:border-slate-700">
+                <input type="checkbox" value="all" data-name="ทุกระดับชั้น" class="tier-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="updateMultiSelectText('tier')">
+                <span class="text-[11px] font-bold text-gray-700 dark:text-slate-300">ทุกระดับชั้น (All)</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-100 dark:border-slate-700 bg-amber-50/30 dark:bg-amber-900/10">
+                <input type="checkbox" value="new_signup" data-name="สมัครใหม่" class="tier-checkbox w-4 h-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500" onchange="updateMultiSelectText('tier')">
+                <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400">✨ สมัครลงทะเบียนแอปสำเร็จ</span>
+            </label>
+        `;
+        mainTiers.forEach(t => {
+            tierHtml += `
+            <label class="flex items-center gap-2 p-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
+                <input type="checkbox" value="${t}" data-name="${t}" class="tier-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="updateMultiSelectText('tier')">
+                <span class="text-[11px] font-bold text-gray-700 dark:text-slate-300">${t}</span>
+            </label>`;
+        });
+        document.getElementById('tier-options').innerHTML = tierHtml;
 
-        let vehHtml = '<option value="all">-- ทุกประเภท --</option>';
-        mainVehs.forEach(v => { vehHtml += `<option value="${v.id}">${v.name}</option>`; });
-        document.getElementById('quest-target-vehicle-select').innerHTML = vehHtml;
+        // 🌟 วาดกล่องติ๊กถูกของ ประเภทยานพาหนะ
+        let vehHtml = `
+            <label class="flex items-center gap-2 p-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer border-b border-gray-100 dark:border-slate-700">
+                <input type="checkbox" value="all" data-name="ทุกประเภท" class="veh-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="updateMultiSelectText('veh')">
+                <span class="text-[11px] font-bold text-gray-700 dark:text-slate-300">ทุกประเภท (All)</span>
+            </label>
+        `;
+        mainVehs.forEach(v => {
+            vehHtml += `
+            <label class="flex items-center gap-2 p-2.5 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer">
+                <input type="checkbox" value="${v.id}" data-name="${v.name}" class="veh-checkbox w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="updateMultiSelectText('veh')">
+                <span class="text-[11px] font-bold text-gray-700 dark:text-slate-300">${v.name}</span>
+            </label>`;
+        });
+        document.getElementById('veh-options').innerHTML = vehHtml;
 
+        document.getElementById('select-condition-type').disabled = false;
+        document.getElementById('btn-add-condition').disabled = false;
+
+        // โหลดข้อมูลเก่า (กรณีแก้ไขแคมเปญ)
         if (questId && window.allQuests[questId]) {
             let q = window.allQuests[questId]; let c = q.conditions || {};
             
@@ -4701,11 +4759,14 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-is-active').checked = q.isActive ?? true;
 
-            if (c.signup) document.getElementById('quest-target-tier-select').value = 'new_signup';
-            else if (q.targetTiers && q.targetTiers[0] !== 'all') document.getElementById('quest-target-tier-select').value = q.targetTiers[0];
+            // ติ๊กข้อมูลกลุ่มเป้าหมายเดิม
+            if (c.signup) { let cb = document.querySelector('.tier-checkbox[value="new_signup"]'); if(cb) cb.checked = true; }
+            if (q.targetTiers) { q.targetTiers.forEach(t => { let cb = document.querySelector(`.tier-checkbox[value="${t}"]`); if(cb) cb.checked = true; }); }
+            if (q.targetVehicles) { q.targetVehicles.forEach(v => { let cb = document.querySelector(`.veh-checkbox[value="${v}"]`); if(cb) cb.checked = true; }); }
             
-            if (q.targetVehicles && q.targetVehicles[0] !== 'all') document.getElementById('quest-target-vehicle-select').value = q.targetVehicles[0];
+            updateMultiSelectText('tier'); updateMultiSelectText('veh');
 
+            // วาดเงื่อนไขเดิม
             let condList = document.getElementById('dynamic-conditions-list');
             let hasMainCond = false;
             
@@ -4714,15 +4775,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             else if (c.onlineHours > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours, '', true, true)); hasMainCond = true; }
             else if (c.peakHoursData) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData, '', true, true)); hasMainCond = true; }
 
-            // ดึงเงื่อนไขควบ (AR) กลับมาแบบไม่มีปุ่มกากบาทให้ลบ
-            if (c.minAr > 0) {
-                condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', c.minAr, '', false, false));
-            }
+            if (c.minAr > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', c.minAr, '', false, false));
 
-            // สั่งล็อก Dropdown ถ้ามีเงื่อนไขหลักอยู่แล้ว
             document.getElementById('select-condition-type').disabled = hasMainCond;
             document.getElementById('btn-add-condition').disabled = hasMainCond;
 
+            // วาดรางวัลเดิม
             let rewList = document.getElementById('dynamic-rewards-list');
             if (q.rewardCredit > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('credit', q.rewardCredit));
             if (q.rewardBonus > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('bonus', q.rewardBonus));
@@ -4730,12 +4788,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if (q.rewardTierUp) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('tierup'));
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างแคมเปญภารกิจDRV';
+            updateMultiSelectText('tier'); updateMultiSelectText('veh');
         }
         openModal('modalAddQuest');
     }
 
     // ========================================================
-    // 🌟 4. ระบบบันทึกข้อมูลแบบใหม่ (Dynamic Fields)
+    // 🌟 ระบบบันทึกข้อมูล
     // ========================================================
     window.saveQuestCampaignDRV = function() {
         let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
@@ -4744,16 +4803,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อแคมเปญภารกิจ DRV ด้วยครับ', 'error');
 
-        let tierSelectVal = document.getElementById('quest-target-tier-select').value;
-        let vehSelectVal = document.getElementById('quest-target-vehicle-select').value;
+        // กวาดข้อมูลจาก Custom Checkboxes
+        let targetTiers = Array.from(document.querySelectorAll('.tier-checkbox:checked')).map(cb => cb.value);
+        let targetVehicles = Array.from(document.querySelectorAll('.veh-checkbox:checked')).map(cb => cb.value);
         
-        let isSignup = false; let targetTiers = ['all'];
-        if (tierSelectVal === 'new_signup') isSignup = true;
-        else if (tierSelectVal !== 'all') targetTiers = [tierSelectVal];
-        let targetVehicles = vehSelectVal === 'all' ? ['all'] : [vehSelectVal];
+        let isSignup = false;
+        // แยกเงื่อนไขสมัครใหม่ออกจาก Tiers
+        if (targetTiers.includes('new_signup')) {
+            isSignup = true;
+            targetTiers = targetTiers.filter(t => t !== 'new_signup');
+        }
+        
+        // ถ้าไม่ได้เลือกอะไรเลย หรือ มีการเลือก "ทุกระดับ (all)" ให้ใส่ค่า 'all' กลับไป
+        if (targetTiers.length === 0 || targetTiers.includes('all')) targetTiers = ['all'];
+        if (targetVehicles.length === 0 || targetVehicles.includes('all')) targetVehicles = ['all'];
 
         let limitChecked = document.getElementById('cond-limit-check').checked;
-
         let conditions = {
             signup: isSignup,
             days: parseInt(document.getElementById('cond-days-val').value) || 0,
@@ -7090,17 +7155,28 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   <h3 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-slate-700 pb-1.5"><i class="fas fa-users mr-1"></i> กลุ่มเป้าหมาย</h3>
                   
                   <div class="grid grid-cols-2 gap-3">
-                      <div>
+                      <div class="relative" id="dropdown-tier-container">
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
-                          <select id="quest-target-tier-select" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 text-[11px] font-bold text-gray-800 dark:text-white">
-                              <!-- Render by JS -->
-                          </select>
+                          <div class="relative">
+                              <button type="button" onclick="toggleCustomDropdown('tier-options')" class="w-full p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none flex justify-between items-center text-[11px] font-bold text-gray-800 dark:text-white transition hover:bg-gray-100 dark:hover:bg-slate-800">
+                                  <span id="tier-select-text" class="truncate">-- เลือกกลุ่มเป้าหมาย --</span>
+                                  <i class="fas fa-chevron-down text-gray-400 ml-2"></i>
+                              </button>
+                              <div id="tier-options" class="hidden absolute z-[100] w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                                  </div>
+                          </div>
                       </div>
-                      <div>
+
+                      <div class="relative" id="dropdown-veh-container">
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
-                          <select id="quest-target-vehicle-select" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 text-[11px] font-bold text-gray-800 dark:text-white">
-                              <!-- Render by JS -->
-                          </select>
+                          <div class="relative">
+                              <button type="button" onclick="toggleCustomDropdown('veh-options')" class="w-full p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none flex justify-between items-center text-[11px] font-bold text-gray-800 dark:text-white transition hover:bg-gray-100 dark:hover:bg-slate-800">
+                                  <span id="veh-select-text" class="truncate">-- เลือกประเภทรถ --</span>
+                                  <i class="fas fa-chevron-down text-gray-400 ml-2"></i>
+                              </button>
+                              <div id="veh-options" class="hidden absolute z-[100] w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                                  </div>
+                          </div>
                       </div>
                   </div>
 
