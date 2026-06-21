@@ -4523,14 +4523,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if(lst) lst.innerHTML = html;
     }
 
-    // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - อัปเกรดจำกัดสิทธิ์
     // 🌟 ระบบดึงข้อมูลแคมเปญมาแสดงบนฟอร์ม
     window.openQuestModal = function(questId = null) {
         // เคลียร์ค่าตั้งต้นทั้งหมด
         document.getElementById('quest-id').value = '';
         document.getElementById('quest-name').value = '';
         document.getElementById('quest-target-rating').value = '';
-        document.getElementById('cond-signup-check').checked = false;
         document.getElementById('cond-days-val').value = '';
         document.getElementById('cond-days-unit').value = 'days';
         document.getElementById('cond-limit-val').value = '';
@@ -4540,20 +4538,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         document.getElementById('dynamic-conditions-list').innerHTML = '';
         document.getElementById('dynamic-rewards-list').innerHTML = '';
 
-        // Render ตัวเลือกกลุ่มเป้าหมาย (Tiers & Vehicles) จากระบบ
-        let tierHtml = '';
-        (window.systemTiers || ['Normal','Silver','Gold','Platinum']).forEach(t => {
-            tierHtml += `<label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="quest-target-tier w-3.5 h-3.5 rounded border-gray-300" value="${t}"> <span class="text-gray-700 dark:text-slate-300 font-bold">${t}</span></label> `;
+        // 🌟 สร้าง Dropdown: ระดับชั้น (ใส่ "สมัครใหม่" ไว้บนสุดเป็น Option พิเศษ)
+        let tierHtml = '<option value="all">-- ทุกระดับชั้น --</option>';
+        tierHtml += '<option value="new_signup">✨ สมัครลงทะเบียนแอปสำเร็จ</option>';
+        (window.systemTiers || ['Normal','Silver','Gold','Platinum','Legend']).forEach(t => {
+            tierHtml += `<option value="${t}">${t}</option>`;
         });
-        document.getElementById('target-tiers-container').innerHTML = tierHtml;
+        document.getElementById('quest-target-tier-select').innerHTML = tierHtml;
 
-        let vehHtml = '';
-        (window.systemVehicleTypes || [{id:'bike',name:'มอเตอร์ไซค์'},{id:'car',name:'รถยนต์ทั่วไป'}]).forEach(v => {
-            vehHtml += `<label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="quest-target-vehicle w-3.5 h-3.5 rounded border-gray-300" value="${v.id}"> <span class="text-gray-700 dark:text-slate-300">${v.name}</span></label> `;
+        // 🌟 สร้าง Dropdown: ประเภทยานพาหนะ
+        let vehHtml = '<option value="all">-- ทุกประเภท --</option>';
+        (window.systemVehicleTypes || [{id:'bike',name:'มอเตอร์ไซค์'},{id:'car',name:'รถยนต์'}]).forEach(v => {
+            vehHtml += `<option value="${v.id}">${v.name}</option>`;
         });
-        document.getElementById('target-vehicles-container').innerHTML = vehHtml;
+        document.getElementById('quest-target-vehicle-select').innerHTML = vehHtml;
 
-        // ถ้าเป็นการกดแก้ไข ให้โหลดข้อมูลเก่ากลับมาจับคู่ลงฟิลด์
+        // ถ้าเป็นการแก้ไข ให้โหลดข้อมูลกลับเข้า Dropdown
         if (questId && allQuests[questId]) {
             let q = allQuests[questId]; 
             let c = q.conditions || {};
@@ -4562,7 +4562,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-id').value = questId;
             document.getElementById('quest-name').value = q.name || '';
             document.getElementById('quest-target-rating').value = q.targetMinRating || '';
-            document.getElementById('cond-signup-check').checked = c.signup || false;
             document.getElementById('cond-days-val').value = c.days || '';
             document.getElementById('cond-days-unit').value = c.daysUnit || 'days';
             document.getElementById('cond-limit-val').value = c.dailyLimit || '';
@@ -4570,9 +4569,21 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-end').value = q.endTime || '';
             document.getElementById('quest-is-active').checked = q.isActive ?? true;
 
-            // ติ๊กเลือกกลุ่มเป้าหมายเดิม
-            if(q.targetTiers) q.targetTiers.forEach(v => { let cb = document.querySelector(`.quest-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
-            if(q.targetVehicles) q.targetVehicles.forEach(v => { let cb = document.querySelector(`.quest-target-vehicle[value="${v}"]`); if(cb) cb.checked = true; });
+            // คืนค่า Dropdown ระดับ (ถ้าเป็นเงื่อนไขสมัครใหม่ ให้บังคับเลือก new_signup)
+            if (c.signup) {
+                document.getElementById('quest-target-tier-select').value = 'new_signup';
+            } else if (q.targetTiers && q.targetTiers[0] !== 'all') {
+                document.getElementById('quest-target-tier-select').value = q.targetTiers[0];
+            } else {
+                document.getElementById('quest-target-tier-select').value = 'all';
+            }
+
+            // คืนค่า Dropdown ยานพาหนะ
+            if (q.targetVehicles && q.targetVehicles[0] !== 'all') {
+                document.getElementById('quest-target-vehicle-select').value = q.targetVehicles[0];
+            } else {
+                document.getElementById('quest-target-vehicle-select').value = 'all';
+            }
 
             // โหลดรายการเงื่อนไขแบบ Dynamic กลับมา
             let condList = document.getElementById('dynamic-conditions-list');
@@ -4600,19 +4611,29 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
         let name = document.getElementById('quest-name').value.trim();
         let targetMinRating = parseFloat(document.getElementById('quest-target-rating').value) || 0;
-        let targetTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
-        let targetVehicles = Array.from(document.querySelectorAll('.quest-target-vehicle:checked')).map(cb => cb.value);
-
+        
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อแคมเปญภารกิจ DRV ด้วยครับ', 'error');
-        if (targetTiers.length === 0) targetTiers = ['all'];
-        if (targetVehicles.length === 0) targetVehicles = ['all'];
+
+        // จัดการตรรกะ Dropdown ระดับชั้น และการสมัครใหม่
+        let tierSelectVal = document.getElementById('quest-target-tier-select').value;
+        let vehSelectVal = document.getElementById('quest-target-vehicle-select').value;
+        
+        let isSignup = false;
+        let targetTiers = ['all'];
+        if (tierSelectVal === 'new_signup') {
+            isSignup = true; // แยกเซฟเป็นเงื่อนไข
+        } else if (tierSelectVal !== 'all') {
+            targetTiers = [tierSelectVal]; // เซฟเป็นระดับชั้นปกติ
+        }
+
+        let targetVehicles = vehSelectVal === 'all' ? ['all'] : [vehSelectVal];
 
         // กวาดข้อมูลจาก Dynamic Conditions
         let conditions = {
-            signup: document.getElementById('cond-signup-check').checked,
+            signup: isSignup, // บันทึกค่าสมัครใหม่ลงฐานข้อมูลเงื่อนไข
             days: parseInt(document.getElementById('cond-days-val').value) || 0,
             daysUnit: document.getElementById('cond-days-unit').value,
-            dailyLimit: parseInt(document.getElementById('cond-limit-val').value) || 0, // สิทธิ์การทำสำเร็จภารกิจ
+            dailyLimit: parseInt(document.getElementById('cond-limit-val').value) || 0,
         };
 
         document.querySelectorAll('.condition-item-row').forEach(row => {
@@ -4634,7 +4655,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             }
         });
 
-        // กวาดข้อมูลจาก Dynamic Rewards
         let payload = {
             name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, targetMinRating: targetMinRating,
             conditions: conditions, startTime: document.getElementById('quest-start').value || null,
@@ -4642,14 +4662,14 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             timestamp: firebase.database.ServerValue.TIMESTAMP
         };
 
-        // ตรวจสอบค่ารางวัล
+        // กวาดข้อมูลของรางวัล
         document.querySelectorAll('.reward-item-row').forEach(row => {
             let type = row.getAttribute('data-type');
             let val = parseFloat(row.querySelector('.reward-input-val')?.value) || 0;
             if (type === 'credit') payload.rewardCredit = val;
             if (type === 'bonus') payload.rewardBonus = val;
             if (type === 'stars') payload.rewardRating = val;
-            if (type === 'tierup') payload.rewardTierUp = true; // เปิดใช้งานระบบอัปเกรดอัตโนมัติ 1 ขั้น
+            if (type === 'tierup') payload.rewardTierUp = true;
         });
 
         db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
@@ -7096,36 +7116,29 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-3">
                   <h3 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-slate-700 pb-1.5"><i class="fas fa-users mr-1"></i> กลุ่มเป้าหมาย</h3>
                   
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="grid grid-cols-2 gap-3">
                       <div>
-                          <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับ (Tier)</label>
-                          <div class="flex flex-wrap gap-2" id="target-tiers-container">
-                              </div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
+                          <select id="quest-target-tier-select" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 text-[11px] font-bold text-gray-800 dark:text-white">
+                              </select>
                       </div>
                       <div>
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
-                          <div class="flex flex-wrap gap-2" id="target-vehicles-container">
-                              </div>
+                          <select id="quest-target-vehicle-select" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 text-[11px] font-bold text-gray-800 dark:text-white">
+                              </select>
                       </div>
                   </div>
 
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-gray-50 dark:border-slate-700/50">
+                  <div class="grid grid-cols-2 gap-3 pt-2 border-t border-gray-50 dark:border-slate-700/50">
                       <div>
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">เกรดดาวไม่ต่ำกว่า</label>
-                          <input type="number" id="quest-target-rating" step="0.1" min="0" max="5" placeholder="เช่น 4.5" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-mono text-center">
-                      </div>
-                      <div class="flex items-center pt-4">
-                          <label class="flex items-center gap-2 cursor-pointer select-none">
-                              <input type="checkbox" id="cond-signup-check" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 bg-gray-50 dark:bg-slate-900">
-                              <span class="font-bold text-gray-700 dark:text-slate-300">สมัครลงทะเบียนแอปสำเร็จ</span>
-                          </label>
+                          <input type="number" id="quest-target-rating" step="0.1" min="0" max="5" placeholder="เช่น 4.5" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-mono text-center font-bold">
                       </div>
                       <div>
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">อายุสมาชิกครบ</label>
                           <div class="flex gap-1">
-                              <input type="number" id="cond-days-val" placeholder="ตัวเลข" class="w-20 p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-center focus:border-blue-500 font-bold">
-                              <select id="cond-days-unit" class="flex-1 p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-700 dark:text-slate-300">
-                                  <select id="cond-days-unit" class="flex-1 p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-700 dark:text-slate-300">
+                              <input type="number" id="cond-days-val" placeholder="ตัวเลข" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-center focus:border-blue-500 font-bold">
+                              <select id="cond-days-unit" class="w-20 p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-700 dark:text-slate-300">
                                   <option value="days">วัน</option>
                                   <option value="months">เดือน</option>
                                   <option value="years">ปี</option>
