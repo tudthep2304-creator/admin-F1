@@ -847,9 +847,15 @@
       <!-- ================= หน้าแคมเปญและภารกิจ (Quest Center) ================= -->
       <section id="content-quests" class="tab-content hidden space-y-4">
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h2 class="text-lg font-bold text-amber-600 dark:text-amber-500"><i class="fas fa-bullseye mr-1.5"></i> ระบบแคมเปญและภารกิจ (Quest Center)</h2>
-                  <button onclick="openQuestModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> สร้างแคมเปญใหม่</button>
+              <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4 shrink-0 border-b border-gray-100 dark:border-slate-800 pb-4">
+                  <div class="flex-1 min-w-0 mb-2 lg:mb-0">
+                      <h2 class="text-lg font-bold text-gray-800 dark:text-white truncate"><i class="fas fa-bullseye mr-1.5 text-blue-500"></i> ภารกิจแคมเปญ (Quest Center)</h2>
+                      <p class="text-[10px] text-gray-500 mt-1">สร้างเงื่อนไขภารกิจเพื่อให้คนขับทำยอดและรับรางวัลอัตโนมัติ</p>
+                  </div>
+                  <div class="flex flex-row flex-wrap gap-2 w-full lg:w-auto shrink-0">
+                      <button onclick="viewAllQuestHistory()" class="flex-1 lg:flex-none bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800/50 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm whitespace-nowrap"><i class="fas fa-history"></i> ประวัติรวมทั้งหมด</button>
+                      <button onclick="openQuestModal()" class="flex-1 lg:flex-none bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-2 whitespace-nowrap"><i class="fas fa-plus"></i> สร้างภารกิจใหม่</button>
+                  </div>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4 border-b border-gray-200 dark:border-slate-700 pb-4">
@@ -4409,9 +4415,40 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     // ========================================================
     let allQuests = {};
 
+    // ========================================================
+    // 🌟 ระบบดึงข้อมูลแคมเปญภารกิจ (Quest Center)
+    // ========================================================
+    let allQuests = {};
+    let globalAllQuestHistory = []; // 🌟 เก็บประวัติภาพรวมภารกิจทั้งหมด
+
     db.ref('system_settings/quests').on('value', snap => {
         allQuests = snap.val() || {};
+        globalAllQuestHistory = []; // ล้าง Array เก่า
+        
+        // กวาดข้อมูลคนขับที่ทำสำเร็จจากทุกแคมเปญมารวมกัน
+        for(let qId in allQuests) {
+            let q = allQuests[qId];
+            if(q.completedBy) {
+                for(let pin in q.completedBy) {
+                    globalAllQuestHistory.push({
+                        questId: qId,
+                        questName: q.name || 'ไม่ระบุชื่อภารกิจ',
+                        driverPin: pin,
+                        timestamp: q.completedBy[pin].timestamp || q.completedBy[pin]
+                    });
+                }
+            }
+        }
+
+        // รีเฟรชตารางหน้าหลัก
         if(typeof renderQuestsTable === 'function') renderQuestsTable();
+        updateFilterQuestDropdowns();
+        
+        // ถ้าระหว่างนั้นแอดมินเปิดหน้าต่าง "ประวัติรวม" ค้างไว้อยู่ ก็ให้รีเฟรชตารางแบบเรียลไทม์
+        let targetEl = document.getElementById('modalAllQuestHistory');
+        if(targetEl && !targetEl.classList.contains('hidden')) {
+            window.renderAllQuestHistory();
+        }
     });
 
     window.renderQuestsTable = function() {
@@ -4602,7 +4639,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); 
     }
 
-    // 🌟 3. ดูประวัติคนขับที่ทำภารกิจสำเร็จ
+    // 🌟 ดูประวัติคนขับที่ทำภารกิจสำเร็จ (รายแคมเปญ)
     window.viewQuestHistory = function(questId) {
         let q = allQuests[questId];
         if(!q) return showCustomAlert('ข้อผิดพลาด', 'ไม่พบข้อมูลแคมเปญนี้', 'error');
@@ -4647,50 +4684,76 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         tbody.innerHTML = html;
         openModal('modalQuestHistory');
     }
-    // 🌟 ดูประวัติคนขับที่ทำภารกิจสำเร็จ
-    window.viewQuestHistory = function(questId) {
-        let q = allQuests[questId];
-        if(!q) return showCustomAlert('ข้อผิดพลาด', 'ไม่พบข้อมูลแคมเปญนี้', 'error');
+    // 🌟 ฟังก์ชันสำหรับหน้าต่าง "ภาพรวมประวัติภารกิจทั้งหมด"
+    window.viewAllQuestHistory = function() {
+        document.getElementById('all-quest-start').value = '';
+        document.getElementById('all-quest-end').value = '';
+        
+        renderAllQuestHistory();
+        openModal('modalAllQuestHistory');
+    }
 
-        document.getElementById('quest-history-title').innerHTML = `<i class="fas fa-history mr-1"></i> ประวัติผู้ทำสำเร็จ: ${q.name}`;
-        let tbody = document.getElementById('quest-history-tbody');
-        
+    window.renderAllQuestHistory = function() {
+        let tbody = document.getElementById('all-quest-history-tbody');
+        if(!tbody) return;
+
+        let fStart = document.getElementById('all-quest-start').value;
+        let fEnd = document.getElementById('all-quest-end').value;
+
+        let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
+        let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
+
+        // คัดกรองข้อมูลตามวันที่
+        let filtered = globalAllQuestHistory.filter(item => {
+            if (item.timestamp < startTime || item.timestamp > endTime) return false;
+            return true;
+        });
+
+        // เรียงจากล่าสุดขึ้นมาก่อน
+        filtered.sort((a,b) => b.timestamp - a.timestamp);
+
         let html = '';
-        let completedList = [];
-        
-        // ดึงข้อมูลคนขับที่ทำสำเร็จแล้ว (จาก Object completedBy)
-        if(q.completedBy) {
-            for(let pin in q.completedBy) {
-                completedList.push({
-                    driverPin: pin,
-                    timestamp: q.completedBy[pin].timestamp || q.completedBy[pin] // รองรับโครงสร้างข้อมูลทั้งแบบเก่า/ใหม่
-                });
-            }
+        if(filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-400 text-[11px]">ไม่พบประวัติผู้ทำภารกิจสำเร็จในช่วงเวลานี้</td></tr>';
+            return;
         }
-        
-        // เรียงจากคนทำสำเร็จล่าสุดขึ้นมาก่อน
-        completedList.sort((a,b) => b.timestamp - a.timestamp);
-        
-        if(completedList.length === 0) {
-            html = '<tr><td colspan="3" class="py-10 text-center text-gray-400">ยังไม่มีคนขับทำภารกิจนี้สำเร็จครับ</td></tr>';
-        } else {
-            completedList.forEach(item => {
-                let d = allProfiles[item.driverPin] || {};
-                let dName = d.name || 'ไม่ทราบชื่อ';
-                let dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString('th-TH') : 'ไม่ระบุเวลา';
-                html += `
-                <tr class="border-b border-gray-100 dark:border-slate-800 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
-                    <td class="py-2.5 px-3 text-[10px] text-gray-500 dark:text-slate-400">${dateStr}</td>
-                    <td class="py-2.5 px-3">
-                        <p class="font-bold text-gray-800 dark:text-white text-[11px]">${dName}</p>
-                        <p class="text-[10px] text-blue-500 dark:text-[#1da1f2] font-mono mt-0.5">PIN: ${item.driverPin}</p>
-                    </td>
-                    <td class="py-2.5 px-3 text-right"><span class="bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded text-[9px] border border-emerald-200"><i class="fas fa-check"></i> สำเร็จรับรางวัลแล้ว</span></td>
-                </tr>`;
-            });
-        }
+
+        filtered.forEach(item => {
+            let d = allProfiles[item.driverPin] || {};
+            let dName = d.name || 'ไม่ทราบชื่อ';
+            let dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString('th-TH') : 'ไม่ระบุเวลา';
+            
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <td class="py-2.5 px-3 text-[10px] text-gray-500 dark:text-slate-400">${dateStr}</td>
+                <td class="py-2.5 px-3 font-bold text-blue-600 dark:text-blue-400 text-[11px]">${item.questName}</td>
+                <td class="py-2.5 px-3">
+                    <p class="font-bold text-gray-800 dark:text-white text-[11px]">${dName}</p>
+                    <p class="text-[10px] text-blue-500 dark:text-[#1da1f2] font-mono mt-0.5">PIN: ${item.driverPin}</p>
+                </td>
+                <td class="py-2.5 px-3 text-right"><span class="bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded text-[9px] border border-emerald-200 font-bold"><i class="fas fa-check"></i> สำเร็จรับรางวัลแล้ว</span></td>
+            </tr>`;
+        });
         tbody.innerHTML = html;
-        openModal('modalQuestHistory');
+    }
+
+    window.exportAllQuestHistory = function() {
+        if(globalAllQuestHistory.length === 0) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีข้อมูลภาพรวมให้ Export', 'error');
+        
+        let csv = "\uFEFFวัน/เวลาที่สำเร็จ,ชื่อแคมเปญภารกิจ,คนขับ(PIN),ชื่อคนขับ,สถานะ\n";
+        let exportData = [...globalAllQuestHistory].sort((a,b) => b.timestamp - a.timestamp);
+        
+        exportData.forEach(item => {
+            let d = allProfiles[item.driverPin] || {};
+            let dName = d.name || 'ไม่ทราบชื่อ';
+            let dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString('th-TH') : '-';
+            
+            csv += `"${dateStr}","${item.questName}","${item.driverPin}","${dName}","สำเร็จรับรางวัลแล้ว"\n`;
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", `AllQuestsHistory_Overview_${Date.now()}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
     // ========================================================
     // 🌟 ระบบประวัติการบล็อกทั้งหมด (All Block History) + จัดเรียง (Sort)
@@ -7475,6 +7538,44 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </thead>
                   <tbody id="quest-history-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
                       <tr><td colspan="3" class="py-10 text-center text-gray-400 text-xs">กำลังโหลดข้อมูล...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  <div id="modalAllQuestHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-indigo-500/50 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-indigo-50 dark:bg-indigo-900/20 shrink-0">
+              <h2 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 pl-2"><i class="fas fa-history mr-1"></i> ภาพรวมผู้ทำภารกิจสำเร็จทั้งหมด</h2>
+              <button onclick="closeModal('modalAllQuestHistory')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-2 shrink-0 bg-gray-50 dark:bg-slate-800/40 p-3 border-b border-gray-200 dark:border-slate-700">
+              <div>
+                  <label class="block text-[9px] font-bold text-gray-500 mb-1">ตั้งแต่วันที่</label>
+                  <input type="date" id="all-quest-start" onchange="renderAllQuestHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
+              </div>
+              <div>
+                  <label class="block text-[9px] font-bold text-gray-500 mb-1">ถึงวันที่</label>
+                  <input type="date" id="all-quest-end" onchange="renderAllQuestHistory()" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[10px] focus:border-indigo-500 font-bold">
+              </div>
+              <div class="flex items-end">
+                  <button onclick="exportAllQuestHistory()" class="w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800/50 px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1.5 shadow-sm"><i class="fas fa-file-csv"></i> Export Data</button>
+              </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll bg-gray-50 dark:bg-slate-900/50">
+              <table class="w-full text-left border-collapse min-w-[700px]">
+                  <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
+                      <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
+                          <th class="py-2.5 px-3">วัน/เวลาที่สำเร็จ</th>
+                          <th class="py-2.5 px-3">ชื่อแคมเปญภารกิจ</th>
+                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
+                          <th class="py-2.5 px-3 text-right">สถานะ</th>
+                      </tr>
+                  </thead>
+                  <tbody id="all-quest-history-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                      <tr><td colspan="4" class="py-10 text-center text-gray-400 text-xs">กำลังโหลดข้อมูล...</td></tr>
                   </tbody>
               </table>
           </div>
