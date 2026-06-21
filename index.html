@@ -4489,17 +4489,23 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
     
     // ========================================================
-    // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - แบบดั้งเดิม
+    // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - อัปเกรดจำกัดสิทธิ์
     // ========================================================
     window.openQuestModal = function(questId = null) {
-        ['rides','star','days','signup','manual'].forEach(type => {
+        // ล้างค่าเก่าทั้งหมดรวมถึงเงื่อนไข limit
+        ['rides','star','days','signup','manual','limit'].forEach(type => {
             let chk = document.getElementById(`cond-${type}-check`); 
             if(chk) { chk.checked = false; chk.disabled = false; }
             let val = document.getElementById(`cond-${type}-val`); 
             if(val) { val.value = ''; val.disabled = true; }
         });
+        
         let dUnit = document.getElementById('cond-days-unit');
         if(dUnit) { dUnit.disabled = true; dUnit.value = 'days'; }
+        
+        // ล้างค่า dropdown การจำกัดสิทธิ์
+        let lUnit = document.getElementById('cond-limit-unit');
+        if(lUnit) { lUnit.disabled = true; lUnit.value = 'day'; }
 
         document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
@@ -4525,6 +4531,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if(c.rides > 0) { let chk = document.getElementById('cond-rides-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-rides-val'); if(val) { val.value = c.rides; val.disabled = false; } }
             if(c.stars > 0) { let chk = document.getElementById('cond-star-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-star-val'); if(val) { val.value = c.stars; val.disabled = false; } }
             if(c.days > 0) { let chk = document.getElementById('cond-days-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-days-val'); if(val) { val.value = c.days; val.disabled = false; } if(dUnit) { dUnit.disabled = false; dUnit.value = c.daysUnit || 'days'; } }
+            
+            // 🌟 ดึงข้อมูล "การจำกัดสิทธิ์" กลับมาแสดงตอนกดแก้ไข
+            if(c.dailyLimit > 0) { 
+                let chk = document.getElementById('cond-limit-check'); if(chk) chk.checked = true; 
+                let val = document.getElementById('cond-limit-val'); if(val) { val.value = c.dailyLimit; val.disabled = false; } 
+                if(lUnit) { lUnit.disabled = false; lUnit.value = c.limitUnit || 'day'; } 
+            }
 
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
@@ -4536,7 +4549,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-reward-tier').value = 'none';
             document.getElementById('quest-is-active').checked = true;
         }
-        window.updateQuestDropdownText();
+        
+        if (typeof window.updateQuestDropdownText === 'function') { window.updateQuestDropdownText(); }
         openModal('modalAddQuest');
     }
 
@@ -4556,13 +4570,16 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะอย่างน้อย 1 ประเภท', 'error');
         if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ', 'error');
 
+        // 🌟 ยัดเงื่อนไขการจำกัดสิทธิ์ (limit) เข้าไปตรงๆ เลย
         let conditions = {
             manual: document.getElementById('cond-manual-check')?.checked || false,
             signup: document.getElementById('cond-signup-check')?.checked || false,
             rides: document.getElementById('cond-rides-check')?.checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
             stars: document.getElementById('cond-star-check')?.checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
             days: document.getElementById('cond-days-check')?.checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
-            daysUnit: document.getElementById('cond-days-unit')?.value || 'days'
+            daysUnit: document.getElementById('cond-days-unit')?.value || 'days',
+            dailyLimit: document.getElementById('cond-limit-check')?.checked ? (parseInt(document.getElementById('cond-limit-val').value) || 0) : 0,
+            limitUnit: document.getElementById('cond-limit-unit')?.value || 'day'
         };
 
         let payload = {
@@ -4577,10 +4594,11 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             closeModal('modalAddQuest'); 
         });
     }
+
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
     window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
 
-// ========================================================
+    // ========================================================
     // 🌟 ระบบประวัติการบล็อกทั้งหมด (All Block History) + จัดเรียง (Sort)
     // ========================================================
     let globalBlockHistoryData = [];
@@ -5516,18 +5534,16 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         }, 'ลบข้อมูล', 'red');
     }
     // ========================================================
-    // 🌟 ระบบแคมเปญร้านค้าพาร์ทเนอร์ (B2B Partner Campaigns & Approvals)
+    // 🌟 ระบบแคมเปญร้านค้าพาร์ทเนอร์ (B2B Partner Campaigns & Approvals) - อัปเกรดจำกัดสิทธิ์
     // ========================================================
     let allPartnerCampaigns = {};
     let allPartnerRequests = [];
 
-    // ดึงรายชื่อแคมเปญร้านค้า
     db.ref('system_settings/partner_campaigns').on('value', snap => {
         allPartnerCampaigns = snap.val() || {};
         if(typeof renderPartnerCampaignsTable === 'function') renderPartnerCampaignsTable();
     });
 
-    // ดึงคำขอรออนุมัติ และ ประวัติ
     db.ref('partner_requests').on('value', snap => {
         allPartnerRequests = [];
         if(snap.exists()) {
@@ -5563,7 +5579,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if (rewardStr === "") rewardStr = "-";
             
             let tTiers = c.targetTiers && c.targetTiers.length > 0 ? (c.targetTiers.includes('all') ? 'ทุกระดับ' : c.targetTiers.join(', ')) : 'ทุกระดับ';
-            let limitStr = c.dailyLimit > 0 ? `<br><span class="text-[9px] text-red-500 font-bold">ได้ ${c.dailyLimit} ครั้ง/วัน</span>` : '';
+            
+            // 🌟 แปลงหน่วยจำกัดสิทธิ์มาโชว์ในตารางให้สวยงาม
+            let limitUnitStr = c.limitUnit === 'month' ? 'เดือน' : (c.limitUnit === 'week' ? 'สัปดาห์' : (c.limitUnit === 'all' ? 'แคมเปญ' : 'วัน'));
+            let limitStr = c.dailyLimit > 0 ? `<br><span class="text-[9px] text-red-500 font-bold">จำกัด ${c.dailyLimit} ครั้ง / ${limitUnitStr}</span>` : '';
 
             let toggleClass = c.isActive ? 'text-emerald-500' : 'text-gray-300';
             let toggleIcon = c.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
@@ -5595,48 +5614,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         lst.innerHTML = html;
     }
 
-    // 🌟 ระบบจัดการ UI Dropdown สำหรับหน้าแคมเปญร้านค้า
-    window.togglePartnerTiers = function(source) {
-        document.querySelectorAll('.partner-target-tier').forEach(cb => cb.checked = source.checked);
-        window.updatePartnerDropdownText();
-    }
-    window.togglePartnerVehs = function(source) {
-        document.querySelectorAll('.partner-target-vehicle').forEach(cb => cb.checked = source.checked);
-        window.updatePartnerDropdownText();
-    }
-    window.updatePartnerDropdownText = function() {
-        let tiers = Array.from(document.querySelectorAll('.partner-target-tier:checked'));
-        let tText = tiers.length > 0 ? `เลือกเป้าหมายแล้ว (${tiers.length})` : 'เลือกกลุ่มเป้าหมาย...';
-        if(tiers.length === (window.systemTiersMap ? Object.keys(window.systemTiersMap).length : 5)) tText = 'ทุกระดับชั้น';
-        document.getElementById('partner-tier-text').innerText = tText;
-
-        let vehs = Array.from(document.querySelectorAll('.partner-target-vehicle:checked'));
-        let vText = vehs.length > 0 ? `เลือกรถแล้ว (${vehs.length})` : 'เลือกรถ...';
-        if(vehs.length === window.systemVehicleTypes.length && vehs.length > 0) vText = 'รถทุกประเภท';
-        document.getElementById('partner-veh-text').innerText = vText;
-    }
-
-    // ฟังก์ชันสร้างตัวเลือก Dropdown จากส่วนกลาง
-    window.buildPartnerDropdowns = function() {
-        let tHtml = '';
-        if (window.systemTiersMap) {
-            Object.keys(window.systemTiersMap).forEach(tName => {
-                tHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${tName}" class="partner-target-tier w-4 h-4 accent-purple-500" onchange="updatePartnerDropdownText()"> ${tName}</label>`;
-            });
-        }
-        let tCont = document.getElementById('partner-target-tier-container'); if(tCont) tCont.innerHTML = tHtml;
-
-        let vHtml = '';
-        if (window.systemVehicleTypes) {
-            window.systemVehicleTypes.forEach(vt => {
-                vHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300"><input type="checkbox" value="${vt.id}" class="partner-target-vehicle w-4 h-4 accent-purple-500" onchange="updatePartnerDropdownText()"> ${vt.name}</label>`;
-            });
-        }
-        let vCont = document.getElementById('partner-target-vehicle-container'); if(vCont) vCont.innerHTML = vHtml;
-    }
-
     window.openPartnerCampaignModal = function(campId = null) {
-        window.buildPartnerDropdowns(); // สร้างตัวเลือก Dropdown
+        if(typeof window.buildPartnerDropdowns === 'function') window.buildPartnerDropdowns(); 
         document.querySelectorAll('.partner-target-tier').forEach(cb => cb.checked = false);
         document.querySelectorAll('.partner-target-vehicle').forEach(cb => cb.checked = false);
 
@@ -5648,15 +5627,14 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             
             document.getElementById('pc-proof-selfie').checked = c.requireSelfie || false;
             document.getElementById('pc-proof-receipt').checked = c.requireReceipt || false;
-            document.getElementById('pc-proof-code').checked = c.requireCode || false;
-            document.getElementById('pc-code-amount').disabled = !c.requireCode;
-            document.getElementById('pc-code-amount').value = ''; 
-            document.getElementById('pc-code-amount').placeholder = "เพิ่มโค้ดพิมพ์ตรงนี้...";
-
-            let lChk = document.getElementById('pc-limit-check'); let lVal = document.getElementById('pc-limit-val');
-            if(lChk && lVal) {
-                if(c.dailyLimit > 0) { lChk.checked = true; lVal.disabled = false; lVal.value = c.dailyLimit; }
-                else { lChk.checked = false; lVal.disabled = true; lVal.value = ''; }
+            
+            let pcCode = document.getElementById('pc-proof-code');
+            let pcAmount = document.getElementById('pc-code-amount');
+            if(pcCode) pcCode.checked = c.requireCode || false;
+            if(pcAmount) {
+                pcAmount.disabled = !c.requireCode;
+                pcAmount.value = ''; 
+                pcAmount.placeholder = "พิมพ์เพิ่มโค้ด...";
             }
 
             document.getElementById('partner-camp-start').value = c.startTime || '';
@@ -5664,6 +5642,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-reward-bonus').value = c.rewardBonus || '';
             document.getElementById('partner-reward-expire').value = c.rewardExpireDays || '';
             document.getElementById('partner-reward-rating').value = c.rewardRating || '';
+            
+            // 🌟 ดึงข้อมูลจำกัดสิทธิ์มาแสดง
+            let lChk = document.getElementById('pc-limit-check');
+            let lVal = document.getElementById('pc-limit-val');
+            let lUnit = document.getElementById('pc-limit-unit');
+            
+            if(c.dailyLimit > 0) { 
+                if(lChk) lChk.checked = true;
+                if(lVal) { lVal.value = c.dailyLimit; lVal.disabled = false; }
+                if(lUnit) { lUnit.value = c.limitUnit || 'day'; lUnit.disabled = false; }
+            } else {
+                if(lChk) lChk.checked = false;
+                if(lVal) { lVal.value = ''; lVal.disabled = true; }
+                if(lUnit) { lUnit.value = 'day'; lUnit.disabled = true; }
+            }
+
             document.getElementById('partner-camp-is-active').checked = c.isActive !== false;
 
             if(c.targetTiers) c.targetTiers.forEach(v => { let cb = document.querySelector(`.partner-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
@@ -5675,22 +5669,30 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-camp-name').value = '';
             document.getElementById('pc-proof-selfie').checked = false;
             document.getElementById('pc-proof-receipt').checked = false;
-            document.getElementById('pc-proof-code').checked = false;
-            document.getElementById('pc-code-amount').disabled = true;
-            document.getElementById('pc-code-amount').value = '';
-            document.getElementById('pc-code-amount').placeholder = "เช่น 100";
             
-            let lChk = document.getElementById('pc-limit-check'); let lVal = document.getElementById('pc-limit-val');
-            if(lChk) lChk.checked = false; if(lVal) { lVal.disabled = true; lVal.value = ''; }
-
+            let pcCode = document.getElementById('pc-proof-code');
+            let pcAmount = document.getElementById('pc-code-amount');
+            if(pcCode) pcCode.checked = false;
+            if(pcAmount) { pcAmount.disabled = true; pcAmount.value = ''; pcAmount.placeholder = "เช่น 100"; }
+            
             document.getElementById('partner-camp-start').value = '';
             document.getElementById('partner-camp-end').value = '';
             document.getElementById('partner-reward-bonus').value = '';
             document.getElementById('partner-reward-expire').value = '';
             document.getElementById('partner-reward-rating').value = '';
+            
+            // ล้างข้อมูลการจำกัดสิทธิ์ตอนสร้างใหม่
+            let lChk = document.getElementById('pc-limit-check');
+            let lVal = document.getElementById('pc-limit-val');
+            let lUnit = document.getElementById('pc-limit-unit');
+            if(lChk) lChk.checked = false;
+            if(lVal) { lVal.value = ''; lVal.disabled = true; }
+            if(lUnit) { lUnit.value = 'day'; lUnit.disabled = true; }
+
             document.getElementById('partner-camp-is-active').checked = true;
         }
-        window.updatePartnerDropdownText();
+        
+        setTimeout(() => { if (typeof window.updatePartnerDropdownText === 'function') window.updatePartnerDropdownText(); }, 50);
         openModal('modalPartnerCampaign');
     }
 
@@ -5705,7 +5707,14 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let targetTiers = Array.from(document.querySelectorAll('.partner-target-tier:checked')).map(cb => cb.value);
         let targetVehicles = Array.from(document.querySelectorAll('.partner-target-vehicle:checked')).map(cb => cb.value);
         
-        let dailyLimit = document.getElementById('pc-limit-check').checked ? (parseInt(document.getElementById('pc-limit-val').value) || 0) : 0;
+        // 🌟 ดึงค่าการจำกัดสิทธิ์
+        let lChkEl = document.getElementById('pc-limit-check');
+        let lValEl = document.getElementById('pc-limit-val');
+        let dailyLimit = lChkEl && lChkEl.checked && lValEl ? (parseInt(lValEl.value) || 0) : 0;
+        
+        let lUnitEl = document.getElementById('pc-limit-unit');
+        let limitUnit = lChkEl && lChkEl.checked && lUnitEl ? lUnitEl.value : 'day';
+
         let rewardBonus = parseInt(document.getElementById('partner-reward-bonus').value) || 0;
         let rewardRating = parseFloat(document.getElementById('partner-reward-rating').value) || 0;
         
@@ -5722,7 +5731,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             startTime: document.getElementById('partner-camp-start').value || null,
             endTime: document.getElementById('partner-camp-end').value || null,
             rewardBonus: rewardBonus, rewardExpireDays: parseInt(document.getElementById('partner-reward-expire').value) || 0,
-            rewardRating: rewardRating, dailyLimit: dailyLimit,
+            rewardRating: rewardRating, 
+            dailyLimit: dailyLimit, limitUnit: limitUnit, // 🌟 เซฟข้อมูลการจำกัดสิทธิ์ลง DB
             isActive: document.getElementById('partner-camp-is-active').checked,
             timestamp: firebase.database.ServerValue.TIMESTAMP
         };
@@ -5763,7 +5773,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         triggerDownload(csv, `PartnerCodes_${c.name}_${Date.now()}.csv`);
     }
 
-    // 🌟 ระบบอนุมัติหลักฐาน
     window.renderPartnerApprovals = function() {
         let tbody = document.getElementById('partner-approvals-tbody'); if(!tbody) return;
         let filtered = allPartnerRequests.filter(req => req.status === 'pending');
@@ -5818,20 +5827,15 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let newBonus = currentBonus;
             let newRating = currentRating;
 
-            // คำนวณรางวัล
             if(camp.rewardBonus > 0) newBonus += camp.rewardBonus;
             if(camp.rewardRating > 0) newRating += camp.rewardRating;
-            if(newRating > 5.0) newRating = 5.0; // สมมติว่าแม็กซ์ 5.0
+            if(newRating > 5.0) newRating = 5.0;
 
-            // อัปเดตโปรไฟล์คนขับ
             updates[`drivers_profile/${driverPin}/creditBonus`] = newBonus;
             updates[`drivers_profile/${driverPin}/rating`] = newRating.toFixed(1);
-
-            // อัปเดตสถานะคำขอเป็น approved
             updates[`partner_requests/${reqId}/status`] = 'approved';
             updates[`partner_requests/${reqId}/approvedAt`] = firebase.database.ServerValue.TIMESTAMP;
 
-            // บันทึก Ledger โบนัส
             if(camp.rewardBonus > 0) {
                 let expDays = camp.rewardExpireDays || 0;
                 let expAt = expDays > 0 ? Date.now() + (expDays * 24 * 60 * 60 * 1000) : 0;
@@ -5842,7 +5846,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 updates[`wallet_transactions/${driverPin}/${txRef.key}`] = { timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: camp.rewardBonus, note: `อนุมัติแคมเปญร้านค้า: ${camp.name}`, balanceAfter: newBonus, adminName: "แอดมินตรวจงาน" };
             }
 
-            // ถ้ามีโค้ดลับ ต้องปรับสถานะโค้ดเป็น used
             if(claimedCode && camp.codes && camp.codes[claimedCode]) {
                 updates[`system_settings/partner_campaigns/${campId}/codes/${claimedCode}/used`] = true;
             }
@@ -6490,6 +6493,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                               <option value="days">วัน</option><option value="months">เดือน</option><option value="years">ปี</option>
                           </select>
                       </div>
+                    <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
+                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; document.getElementById('cond-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="cond-limit-check" class="text-[10px] font-bold text-red-600 dark:text-red-400 cursor-pointer shrink-0">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
+                          <input type="number" id="cond-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                          <span class="text-[10px] font-bold text-gray-500 shrink-0">ต่อ</span>
+                          <select id="cond-limit-unit" disabled class="flex-1 min-w-[70px] p-1.5 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-[10px] font-bold focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                              <option value="day">วัน</option>
+                              <option value="week">สัปดาห์</option>
+                              <option value="month">เดือน</option>
+                              <option value="all">แคมเปญ</option>
+                          </select>
+                      </div>
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
                           <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ</label>
@@ -6783,11 +6798,17 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <label for="pc-proof-code" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0">🎟️ โค้ดลับที่ร้านค้าแจก (สร้างกี่ใบ?)</label>
                           <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
                       </div>
-                      <div class="flex items-center gap-2 pt-2 border-t border-red-200/50 mt-2">
-                          <input type="checkbox" id="pc-limit-check" onchange="document.getElementById('pc-limit-val').disabled = !this.checked; if(this.checked) document.getElementById('pc-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="pc-limit-check" class="text-[10px] font-bold text-red-600 dark:text-red-400 cursor-pointer shrink-0">🛑 จำกัดสิทธิ์ต่อคนขับ</label>
-                          <input type="number" id="pc-limit-val" disabled placeholder="เช่น 1" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <span class="text-[10px] font-bold text-gray-500">ครั้ง / วัน</span>
+                      <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-red-200/50 mt-2">
+                          <input type="checkbox" id="pc-limit-check" onchange="document.getElementById('pc-limit-val').disabled = !this.checked; document.getElementById('pc-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('pc-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="pc-limit-check" class="text-[10px] font-bold text-red-600 dark:text-red-400 cursor-pointer shrink-0">🛑 จำกัดสิทธิ์/คนขับ</label>
+                          <input type="number" id="pc-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                          <span class="text-[10px] font-bold text-gray-500 shrink-0">ต่อ</span>
+                          <select id="pc-limit-unit" disabled class="flex-1 min-w-[70px] p-1.5 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-[10px] font-bold focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                              <option value="day">วัน</option>
+                              <option value="week">สัปดาห์</option>
+                              <option value="month">เดือน</option>
+                              <option value="all">แคมเปญ</option>
+                          </select>
                       </div>
                   </div>
               </div>
