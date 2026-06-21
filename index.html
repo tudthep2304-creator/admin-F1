@@ -5573,13 +5573,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     let allPartnerCampaigns = {};
     let allPartnerRequests = [];
 
-    // ดึงรายชื่อแคมเปญร้านค้า
+    // 1. ดึงรายชื่อแคมเปญร้านค้า
     db.ref('system_settings/partner_campaigns').on('value', snap => {
         allPartnerCampaigns = snap.val() || {};
         if(typeof renderPartnerCampaignsTable === 'function') renderPartnerCampaignsTable();
     });
 
-    // ดึงคำขอรออนุมัติ และ ประวัติ
+    // 2. ดึงคำขอรออนุมัติ และ ประวัติ
     db.ref('partner_requests').on('value', snap => {
         allPartnerRequests = [];
         if(snap.exists()) {
@@ -5617,7 +5617,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let tTiers = c.targetTiers && c.targetTiers.length > 0 ? (c.targetTiers.includes('all') ? 'ทุกระดับ' : c.targetTiers.join(', ')) : 'ทุกระดับ';
             
             // 🌟 แปลงหน่วยจำกัดสิทธิ์มาโชว์ในตารางให้สวยงาม
-            let limitUnitStr = c.limitUnit === 'month' ? 'เดือน' : (c.limitUnit === 'all' ? 'แคมเปญ' : 'วัน');
+            let limitUnitStr = c.limitUnit === 'month' ? 'เดือน' : (c.limitUnit === 'week' ? 'สัปดาห์' : (c.limitUnit === 'all' ? 'แคมเปญ' : 'วัน'));
             let limitStr = c.dailyLimit > 0 ? `<br><span class="text-[9px] text-red-500 font-bold">จำกัด ${c.dailyLimit} ครั้ง / ${limitUnitStr}</span>` : '';
 
             let toggleClass = c.isActive ? 'text-emerald-500' : 'text-gray-300';
@@ -5705,9 +5705,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             
             document.getElementById('pc-proof-selfie').checked = c.requireSelfie || false;
             document.getElementById('pc-proof-receipt').checked = c.requireReceipt || false;
-            document.getElementById('pc-proof-code').checked = c.requireCode || false;
             
+            let pcCode = document.getElementById('pc-proof-code');
             let pcAmount = document.getElementById('pc-code-amount');
+            if(pcCode) pcCode.checked = c.requireCode || false;
             if(pcAmount) {
                 pcAmount.disabled = !c.requireCode;
                 pcAmount.value = ''; 
@@ -5720,11 +5721,20 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-reward-expire').value = c.rewardExpireDays || '';
             document.getElementById('partner-reward-rating').value = c.rewardRating || '';
             
-            // 🌟 ดึงข้อมูลจำกัดสิทธิ์และหน่วยกลับมาโชว์
-            let lVal = document.getElementById('partner-reward-limit');
-            let lUnit = document.getElementById('partner-reward-limit-unit');
-            if(lVal) lVal.value = c.dailyLimit || '';
-            if(lUnit) lUnit.value = c.limitUnit || 'day';
+            // 🌟 ดึงข้อมูลจำกัดสิทธิ์และหน่วยกลับมาโชว์ (สำคัญมากตรงนี้)
+            let lChk = document.getElementById('pc-limit-check');
+            let lVal = document.getElementById('pc-limit-val');
+            let lUnit = document.getElementById('pc-limit-unit');
+            
+            if(c.dailyLimit > 0) { 
+                if(lChk) lChk.checked = true;
+                if(lVal) { lVal.value = c.dailyLimit; lVal.disabled = false; }
+                if(lUnit) { lUnit.value = c.limitUnit || 'day'; lUnit.disabled = false; }
+            } else {
+                if(lChk) lChk.checked = false;
+                if(lVal) { lVal.value = ''; lVal.disabled = true; }
+                if(lUnit) { lUnit.value = 'day'; lUnit.disabled = true; }
+            }
 
             document.getElementById('partner-camp-is-active').checked = c.isActive !== false;
 
@@ -5750,10 +5760,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-reward-rating').value = '';
             
             // ล้างข้อมูลการจำกัดสิทธิ์ตอนสร้างใหม่
-            let lVal = document.getElementById('partner-reward-limit');
-            let lUnit = document.getElementById('partner-reward-limit-unit');
-            if(lVal) lVal.value = '';
-            if(lUnit) lUnit.value = 'day';
+            let lChk = document.getElementById('pc-limit-check');
+            let lVal = document.getElementById('pc-limit-val');
+            let lUnit = document.getElementById('pc-limit-unit');
+            if(lChk) lChk.checked = false;
+            if(lVal) { lVal.value = ''; lVal.disabled = true; }
+            if(lUnit) { lUnit.value = 'day'; lUnit.disabled = true; }
 
             document.getElementById('partner-camp-is-active').checked = true;
         }
@@ -5774,11 +5786,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let targetVehicles = Array.from(document.querySelectorAll('.partner-target-vehicle:checked')).map(cb => cb.value);
         
         // 🌟 ดึงค่าการจำกัดสิทธิ์ (ตัวเลข และ หน่วย)
-        let lValEl = document.getElementById('partner-reward-limit');
-        let dailyLimit = lValEl ? (parseInt(lValEl.value) || 0) : 0;
+        let lChkEl = document.getElementById('pc-limit-check');
+        let lValEl = document.getElementById('pc-limit-val');
+        let dailyLimit = lChkEl && lChkEl.checked && lValEl ? (parseInt(lValEl.value) || 0) : 0;
         
-        let lUnitEl = document.getElementById('partner-reward-limit-unit');
-        let limitUnit = lUnitEl ? lUnitEl.value : 'day';
+        let lUnitEl = document.getElementById('pc-limit-unit');
+        let limitUnit = lChkEl && lChkEl.checked && lUnitEl ? lUnitEl.value : 'day';
 
         let rewardBonus = parseInt(document.getElementById('partner-reward-bonus').value) || 0;
         let rewardRating = parseFloat(document.getElementById('partner-reward-rating').value) || 0;
@@ -6706,6 +6719,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           </select>
                       </div>
                       <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
+                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; document.getElementById('cond-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="cond-limit-check" class="text-[10px] font-bold text-red-600 dark:text-red-400 cursor-pointer shrink-0 w-24">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
+                          <input type="number" id="cond-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                          <span class="text-[10px] font-bold text-gray-500">ต่อ</span>
+                          <select id="cond-limit-unit" disabled class="w-full p-1.5 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-[10px] font-bold focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                              <option value="day">วัน</option>
+                              <option value="week">สัปดาห์</option>
+                              <option value="month">เดือน</option>
+                              <option value="all">แคมเปญ</option>
+                          </select>
+                      </div>
+                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
                           <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
                           <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ</label>
                       </div>
@@ -6984,7 +7009,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
               <div class="p-3 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/40 rounded-xl">
                   <h4 class="text-[10px] font-black text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> เงื่อนไขรับรางวัล (ระบบยืนยันตัวตนร้านค้า)</h4>
-                  <div class="space-y-2">
+                  <div class="space-y-3">
                       <label class="flex items-center gap-2 cursor-pointer">
                           <input type="checkbox" id="pc-proof-selfie" class="w-4 h-4 accent-red-500">
                           <span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">📸 บังคับเซลฟี่หน้าร้าน หรือถ่ายคู่กับสินค้า</span>
@@ -6998,31 +7023,57 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <label for="pc-proof-code" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0">🎟️ โค้ดลับที่ร้านค้าแจก (สร้างกี่ใบ?)</label>
                           <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
                       </div>
-                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
-                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; document.getElementById('cond-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="cond-limit-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24 text-red-600 dark:text-red-400">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
-                          <input type="number" id="cond-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                      <div class="flex items-center gap-2 pt-2 border-t border-red-200/50 mt-2">
+                          <input type="checkbox" id="pc-limit-check" onchange="document.getElementById('pc-limit-val').disabled = !this.checked; document.getElementById('pc-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('pc-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="pc-limit-check" class="text-[10px] font-bold text-red-600 dark:text-red-400 cursor-pointer shrink-0 w-24">🛑 จำกัดสิทธิ์/คนขับ</label>
+                          <input type="number" id="pc-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
                           <span class="text-[10px] font-bold text-gray-500">ต่อ</span>
-                          <select id="cond-limit-unit" disabled class="p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-[10px] font-bold text-red-600 focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                          <select id="pc-limit-unit" disabled class="w-full p-1.5 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-[10px] font-bold focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
                               <option value="day">วัน</option>
                               <option value="week">สัปดาห์</option>
                               <option value="month">เดือน</option>
-                              <option value="all">ตลอดแคมเปญ</option>
+                              <option value="all">แคมเปญ</option>
                           </select>
-                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">จำกัดสิทธิ์</label>
-                              <div class="flex items-center gap-1">
-                                  <input type="number" id="partner-reward-limit" placeholder="ครั้ง" class="w-1/2 p-2 bg-white dark:bg-slate-900 text-red-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                                  <span class="text-[9px] text-gray-500">/</span>
-                                  <select id="partner-reward-limit-unit" class="w-1/2 p-2 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[10px] font-bold focus:border-purple-500">
-                                      <option value="day">วัน</option>
-                                      <option value="month">เดือน</option>
-                                      <option value="all">แคมเปญ</option>
-                                  </select>
-                              </div>
-                          </div>
                       </div>
                   </div>
               </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่ม (ว่าง=เริ่มทันที)</label>
+                      <input type="datetime-local" id="partner-camp-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=ตลอดไป)</label>
+                      <input type="datetime-local" id="partner-camp-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-purple-500">
+                  </div>
+              </div>
+
+              <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
+                  <h3 class="text-xs font-bold text-purple-600 mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับเมื่อแอดมินอนุมัติ</h3>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-purple-50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-200 dark:border-purple-800/50">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัสเงิน (🟡)</label>
+                          <input type="number" id="partner-reward-bonus" placeholder="เช่น 50" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">อายุโบนัส (วัน)</label>
+                          <input type="number" id="partner-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เพิ่มคะแนนดาว (⭐)</label>
+                          <input type="number" step="0.1" id="partner-reward-rating" placeholder="เช่น 0.2" class="w-full p-2 bg-white dark:bg-slate-900 text-amber-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
+                      </div>
+                  </div>
+              </div>
+
+              <div class="flex items-center gap-2 mt-2">
+                  <input type="checkbox" id="partner-camp-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                  <label for="partner-camp-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญร้านค้านี้ทันที 🟢</label>
+              </div>
+
+              <button onclick="savePartnerCampaign()" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกและสร้างแคมเปญร้านค้า</button>
+          </div>
 
               <div class="grid grid-cols-2 gap-3">
                   <div>
