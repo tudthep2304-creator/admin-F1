@@ -4420,21 +4420,14 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         }
     }
 
-    // 🌟 ฟังก์ชันสร้างแถวเงื่อนไข (Dynamic Conditions)
-    window.createConditionRowHtml = function(type, value = '', unit = 'รอบ') {
+    // 🌟 ฟังก์ชันสร้างแถวเงื่อนไข (เพิ่มระบบ ล็อกไม่ให้ลบ และ กำหนดตัวหลัก)
+    window.createConditionRowHtml = function(type, value = '', unit = 'รอบ', isDeletable = true, isMain = false) {
         let id = 'cond-row-' + Date.now() + Math.floor(Math.random() * 1000);
         let title = ''; let inputHtml = '';
 
         if (type === 'rides') {
             title = '<i class="fas fa-car text-blue-500 mr-1.5"></i> วิ่งสะสมครบ';
-            inputHtml = `
-                <div class="flex items-center gap-1 w-full mt-2 sm:mt-0">
-                    <input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน">
-                    <select class="cond-input-unit p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300 font-bold">
-                        <option value="รอบ" ${unit === 'รอบ' ? 'selected' : ''}>รอบ</option>
-                        <option value="ชั่วโมง" ${unit === 'ชั่วโมง' ? 'selected' : ''}>ชม.</option>
-                    </select>
-                </div>`;
+            inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"><select class="cond-input-unit p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300 font-bold"><option value="รอบ" ${unit === 'รอบ' ? 'selected' : ''}>รอบ</option><option value="ชั่วโมง" ${unit === 'ชั่วโมง' ? 'selected' : ''}>ชม.</option></select></div>`;
         } else if (type === 'stars') {
             title = '<i class="fas fa-star text-amber-500 mr-1.5"></i> รีวิวดาวติดต่อกัน';
             inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="ครั้ง"> <span class="text-gray-500 text-[10px]">ครั้ง</span></div>`;
@@ -4442,40 +4435,73 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             title = '<i class="fas fa-clock text-indigo-500 mr-1.5"></i> ออนไลน์สะสม';
             inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="ชั่วโมง"> <span class="text-gray-500 text-[10px]">ชม.</span></div>`;
         } else if (type === 'ar') {
-            title = '<i class="fas fa-percentage text-emerald-500 mr-1.5"></i> อัตรารับงาน (AR)';
-            inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="% ขั้นต่ำ"> <span class="text-gray-500 text-[10px]">%</span></div>`;
+            title = '<i class="fas fa-lock text-rose-500 mr-1.5"></i> อัตรารับงาน (AR) ขั้นต่ำ';
+            // ใช้ 90 เป็นค่า Default ถ้าไม่ได้ระบุ
+            let arVal = value ? value : '90';
+            inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border border-rose-200 dark:border-rose-900 rounded bg-white dark:bg-slate-900 text-center font-bold text-rose-600" value="${arVal}" placeholder="%"><span class="text-gray-500 text-[10px]">%</span></div>`;
         } else if (type === 'peak') {
             title = '<i class="fas fa-business-time text-rose-500 mr-1.5"></i> เวลาพิเศษ (Peak)';
             let times = value ? value.split('|') : ['', '', ''];
-            inputHtml = `
-                <div class="flex items-center flex-wrap gap-1 w-full mt-2 sm:mt-0">
-                    <input type="time" class="cond-input-time-start p-1 flex-1 min-w-[70px] bg-white dark:bg-slate-900 border dark:border-slate-700 rounded" value="${times[0] || ''}">
-                    <span class="text-gray-400">-</span>
-                    <input type="time" class="cond-input-time-end p-1 flex-1 min-w-[70px] bg-white dark:bg-slate-900 border dark:border-slate-700 rounded" value="${times[1] || ''}">
-                    <input type="number" class="cond-input-val w-12 p-1 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${times[2] || ''}" placeholder="รอบ">
-                </div>`;
+            inputHtml = `<div class="flex items-center flex-wrap gap-1 w-full mt-2 sm:mt-0"><input type="time" class="cond-input-time-start p-1 flex-1 min-w-[70px] bg-white dark:bg-slate-900 border dark:border-slate-700 rounded" value="${times[0] || ''}"><span class="text-gray-400">-</span><input type="time" class="cond-input-time-end p-1 flex-1 min-w-[70px] bg-white dark:bg-slate-900 border dark:border-slate-700 rounded" value="${times[1] || ''}"><input type="number" class="cond-input-val w-12 p-1 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${times[2] || ''}" placeholder="รอบ"></div>`;
         }
 
+        // ตรวจสอบว่าให้แสดงปุ่มกากบาทลบไหม
+        let delBtn = isDeletable ? `
+            <button type="button" onclick="removeConditionRow('${id}', ${isMain})" class="absolute top-2 right-2 sm:relative sm:top-0 sm:right-0 text-gray-400 hover:text-red-500 p-1 transition" title="ลบทิ้ง">
+                <i class="fas fa-times-circle text-sm"></i>
+            </button>` : `<div class="w-6 h-6 hidden sm:block"></div>`; // ช่องว่างเปล่าๆ กัน Layout พัง
+
+        // ถ้าเป็นตัวหลัก ให้ใส่กรอบสีเหลืองเน้น
+        let borderStyle = isMain ? 'border-amber-200 dark:border-amber-700/50 border-2' : 'border-gray-200 dark:border-slate-700/70 border';
+        let bgStyle = isMain ? 'bg-amber-50/30 dark:bg-amber-900/10' : 'bg-white dark:bg-slate-800';
+
         return `
-            <div id="${id}" data-type="${type}" class="condition-item-row flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700/70 rounded-lg shadow-sm relative group animate-fade-in">
+            <div id="${id}" data-type="${type}" class="condition-item-row flex flex-col sm:flex-row sm:items-center justify-between p-3 ${bgStyle} ${borderStyle} rounded-lg shadow-sm relative group animate-fade-in">
                 <div class="flex flex-col sm:flex-row sm:items-center w-full pr-6 sm:pr-2">
                     <span class="font-bold text-gray-700 dark:text-slate-300 w-full sm:w-5/12">${title}</span>
                     <div class="w-full sm:w-7/12">${inputHtml}</div>
                 </div>
-                <button type="button" onclick="document.getElementById('${id}').remove()" class="absolute top-2 right-2 sm:relative sm:top-0 sm:right-0 text-gray-400 hover:text-red-500 p-1 transition" title="ลบเงื่อนไขนี้">
-                    <i class="fas fa-times-circle text-sm"></i>
-                </button>
+                ${delBtn}
             </div>`;
     }
 
+    // 🌟 ฟังก์ชันลบเงื่อนไข
+    window.removeConditionRow = function(id, isMain) {
+        document.getElementById(id)?.remove();
+        // ถ้าแอดมินลบ "เงื่อนไขหลัก" ทิ้ง ให้ล้างเงื่อนไขควบออกให้หมด และปลดล็อก Dropdown
+        if (isMain) {
+            document.getElementById('dynamic-conditions-list').innerHTML = '';
+            document.getElementById('select-condition-type').disabled = false;
+            document.getElementById('btn-add-condition').disabled = false;
+        }
+    }
+
+    // 🌟 ฟังก์ชันเพิ่มเงื่อนไข
     window.handleAddConditionRow = function() {
-        let select = document.getElementById('select-condition-type'); let type = select.value;
+        let select = document.getElementById('select-condition-type'); 
+        let type = select.value;
         if (!type) return;
+
         let list = document.getElementById('dynamic-conditions-list');
-        list.insertAdjacentHTML('beforeend', window.createConditionRowHtml(type));
-        if (type === 'rides') list.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar'));
+        
+        // 1. เพิ่มเงื่อนไขหลักที่เลือก (ลบได้, เป็นตัวหลัก)
+        list.insertAdjacentHTML('beforeend', window.createConditionRowHtml(type, '', 'รอบ', true, true));
+        
+        // 2. แอบเพิ่มเงื่อนไขควบ (AR) ถ้าเลือกโหมดที่เกี่ยวกับการวิ่ง/ออนไลน์ (ล็อกลบไม่ได้, ไม่ใช่ตัวหลัก)
+        if (type === 'rides' || type === 'peak' || type === 'online') {
+            list.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', '90', '', false, false));
+        }
+
+        // 3. ปิดการใช้งาน Dropdown และปุ่ม (บังคับ 1 แคมเปญ = 1 เงื่อนไขหลัก)
+        select.disabled = true;
+        document.getElementById('btn-add-condition').disabled = true;
         select.value = '';
     }
+
+    // ==========================================
+    // แทรกโค้ดอัปเดตระบบปลดล็อกในฟังก์ชัน openQuestModal
+    // (ให้หาฟังก์ชัน window.openQuestModal เดิม แล้วเปลี่ยนท่อนดึงเงื่อนไขให้เป็นแบบนี้ครับ)
+    // ==========================================
 
     // 🌟 ฟังก์ชันสร้างแถวรางวัล (Dynamic Rewards) - แก้ไข UI กรอบพัง และให้กล่องสีเขียวลงมาอีกบรรทัดเต็มๆ
     window.createRewardRowHtml = function(type, value = '') {
@@ -4681,11 +4707,21 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if (q.targetVehicles && q.targetVehicles[0] !== 'all') document.getElementById('quest-target-vehicle-select').value = q.targetVehicles[0];
 
             let condList = document.getElementById('dynamic-conditions-list');
-            if (c.rides > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ'));
-            if (c.stars > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('stars', c.stars));
-            if (c.onlineHours > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours));
-            if (c.minAr > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', c.minAr));
-            if (c.peakHoursData) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData));
+            let hasMainCond = false;
+            
+            if (c.rides > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ', true, true)); hasMainCond = true; }
+            else if (c.stars > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('stars', c.stars, '', true, true)); hasMainCond = true; }
+            else if (c.onlineHours > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours, '', true, true)); hasMainCond = true; }
+            else if (c.peakHoursData) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData, '', true, true)); hasMainCond = true; }
+
+            // ดึงเงื่อนไขควบ (AR) กลับมาแบบไม่มีปุ่มกากบาทให้ลบ
+            if (c.minAr > 0) {
+                condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', c.minAr, '', false, false));
+            }
+
+            // สั่งล็อก Dropdown ถ้ามีเงื่อนไขหลักอยู่แล้ว
+            document.getElementById('select-condition-type').disabled = hasMainCond;
+            document.getElementById('btn-add-condition').disabled = hasMainCond;
 
             let rewList = document.getElementById('dynamic-rewards-list');
             if (q.rewardCredit > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('credit', q.rewardCredit));
@@ -7090,37 +7126,37 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               <!-- เงื่อนไขแคมเปญ -->
               <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-3">
                   <div class="border-b border-gray-100 dark:border-slate-700 pb-2">
-                      <h3 class="text-[11px] font-bold text-amber-600 dark:text-amber-400"><i class="fas fa-list-ul mr-1"></i> เงื่อนไข</h3>
+                      <h3 class="text-[11px] font-bold text-amber-600 dark:text-amber-400"><i class="fas fa-list-ul mr-1"></i> เงื่อนไขแคมเปญภารกิจ DRV (เลือกได้ 1 อย่าง)</h3>
                   </div>
                   
-                  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                      <select id="select-condition-type" class="w-full sm:flex-1 p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] focus:border-amber-500 font-bold text-gray-700 dark:text-slate-300">
+                  <!-- 🌟 จัดแถว Dropdown และปุ่มให้อยู่บรรทัดเดียวกันเสมอ -->
+                  <div class="flex items-center gap-2 w-full">
+                      <select id="select-condition-type" class="flex-1 p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] focus:border-amber-500 font-bold text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:bg-gray-200">
                           <option value="">-- เลือกเงื่อนไขเพื่อเพิ่ม --</option>
                           <option value="rides">วิ่งสะสมครบ</option>
                           <option value="stars">รีวิวดาวติดต่อกัน</option>
                           <option value="online">ออนไลน์สะสม</option>
-                          <option value="ar">อัตรารับงาน (AR) ขั้นต่ำ</option>
                           <option value="peak">วิ่งช่วงเวลาพิเศษ (Peak Hours)</option>
                       </select>
-                      <button type="button" onclick="handleAddConditionRow()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
+                      <button type="button" id="btn-add-condition" onclick="handleAddConditionRow()" class="shrink-0 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-plus"></i> เพิ่ม</button>
                   </div>
                   
                   <div id="dynamic-conditions-list" class="space-y-2 min-h-[40px] bg-gray-50 dark:bg-slate-900/30 p-2 rounded-xl border border-dashed border-gray-200 dark:border-slate-800">
                       <!-- Dynamic Rows -->
                   </div>
               </div>
-
+            
               <!-- จำกัดสิทธิ์และเวลา -->
               <div class="bg-rose-50/50 dark:bg-slate-800/80 p-4 rounded-xl border border-rose-100 dark:border-slate-700/60 shadow-sm">
-                  <!-- โซนจำกัดสิทธิ์ -->
-                  <div class="flex items-center gap-2 flex-wrap mb-4 pb-4 border-b border-rose-100 dark:border-slate-700">
-                      <label class="flex items-center gap-1.5 cursor-pointer">
+                  <!-- โซนจำกัดสิทธิ์ (จัดให้อยู่บรรทัดเดียว) -->
+                  <div class="flex items-center flex-nowrap gap-1.5 sm:gap-2 mb-4 pb-4 border-b border-rose-100 dark:border-slate-700 w-full overflow-hidden">
+                      <label class="flex items-center gap-1.5 cursor-pointer shrink-0">
                           <input type="checkbox" id="cond-limit-check" onchange="toggleLimitInputs(this.checked)" class="w-4 h-4 rounded border-gray-300 text-rose-500 focus:ring-rose-500 bg-white dark:bg-slate-900">
-                          <span class="font-bold text-rose-600 dark:text-rose-400 text-[11px]"><i class="fas fa-dot-circle mr-1"></i>จำกัดสิทธิ์/คนขับ</span>
+                          <span class="font-bold text-rose-600 dark:text-rose-400 text-[11px]"><i class="fas fa-dot-circle mr-1"></i>จำกัดสิทธิ์รับรางวัล (ต่อคน)</span>
                       </label>
-                      <input type="number" id="cond-limit-val" placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-center font-bold text-[11px] disabled:opacity-50 disabled:bg-gray-100" disabled>
-                      <span class="text-gray-500 font-bold text-[11px]">ต่อ</span>
-                      <select id="cond-limit-unit" class="flex-1 min-w-[80px] p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-[11px] disabled:opacity-50 disabled:bg-gray-100" disabled>
+                      <input type="number" id="cond-limit-val" placeholder="ครั้ง" class="w-14 sm:w-16 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-center font-bold text-[11px] disabled:opacity-50 disabled:bg-gray-100 shrink-0" disabled>
+                      <span class="text-gray-500 font-bold text-[11px] shrink-0">ต่อ</span>
+                      <select id="cond-limit-unit" class="min-w-0 flex-1 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none font-bold text-[11px] disabled:opacity-50 disabled:bg-gray-100" disabled>
                           <option value="day">วัน</option>
                           <option value="week">สัปดาห์</option>
                           <option value="month">เดือน</option>
@@ -7135,27 +7171,28 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <input type="datetime-local" id="quest-start" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-rose-500 font-bold text-[10px] text-gray-800 dark:text-white">
                       </div>
                       <div>
-                          <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขตแคมเปญ</label>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต</label>
                           <input type="datetime-local" id="quest-end" class="w-full p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-rose-500 font-bold text-[10px] text-gray-800 dark:text-white">
                       </div>
                   </div>
               </div>
 
               <!-- รางวัล -->
-              <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-3">
+              <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-3 mt-4">
                   <div class="border-b border-gray-100 dark:border-slate-700 pb-2">
                       <h3 class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-gift mr-1"></i> รางวัล</h3>
                   </div>
 
-                  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                      <select id="select-reward-type" class="w-full sm:flex-1 p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] focus:border-emerald-500 font-bold text-gray-700 dark:text-slate-300">
+                  <!-- 🌟 จัดแถว Dropdown และปุ่มให้อยู่บรรทัดเดียวกันเสมอ -->
+                  <div class="flex items-center gap-2 w-full">
+                      <select id="select-reward-type" class="flex-1 p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] focus:border-emerald-500 font-bold text-gray-700 dark:text-slate-300">
                           <option value="">-- เลือกรางวัลเพื่อเพิ่ม --</option>
                           <option value="credit">เครดิต</option>
                           <option value="bonus">โบนัสเงินสด</option>
                           <option value="stars">แต้มดาว</option>
                           <option value="tierup">เลื่อนระดับชั้น (อัปเกรด 1 ขั้น)</option>
                       </select>
-                      <button type="button" onclick="handleAddRewardRow()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
+                      <button type="button" onclick="handleAddRewardRow()" class="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
                   </div>
 
                   <div id="dynamic-rewards-list" class="space-y-2 min-h-[40px] bg-gray-50 dark:bg-slate-900/30 p-2 rounded-xl border border-dashed border-gray-200 dark:border-slate-800">
