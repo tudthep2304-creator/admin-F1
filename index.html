@@ -4437,7 +4437,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
         // รีเฟรชตารางหน้าหลัก
         if(typeof renderQuestsTable === 'function') renderQuestsTable();
-        updateFilterQuestDropdowns();
+        if(typeof updateFilterQuestDropdowns === 'function') updateFilterQuestDropdowns();
         
         // ถ้าระหว่างนั้นแอดมินเปิดหน้าต่าง "ประวัติรวม" ค้างไว้อยู่ ก็ให้รีเฟรชตารางแบบเรียลไทม์
         let targetEl = document.getElementById('modalAllQuestHistory');
