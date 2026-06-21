@@ -4479,6 +4479,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 <td class="py-3 px-2 text-right">${rewardStr}</td>
                 <td class="py-3 px-3 text-center">
                     <div class="flex items-center justify-center gap-2">
+                        <button onclick="viewQuestHistory('${q.id}')" class="bg-indigo-50 text-indigo-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-indigo-600 hover:text-white transition" title="ดูประวัติคนทำสำเร็จ"><i class="fas fa-history text-[11px]"></i></button>
+                        
                         <button onclick="toggleQuestStatus('${q.id}', ${!q.isActive})" class="text-xl ${toggleClass} hover:scale-110 transition" title="เปิด/ปิด"><i class="fas ${toggleIcon}"></i></button>
                         <button onclick="openQuestModal('${q.id}')" class="bg-blue-50 text-blue-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit text-[11px]"></i></button>
                         <button onclick="deleteQuest('${q.id}')" class="bg-red-50 text-red-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt text-[11px]"></i></button>
@@ -4489,90 +4491,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if(lst) lst.innerHTML = html;
     }
 
-    // 🌟 ระบบจัดการ UI สำหรับ Dropdown Checkbox แบบใหม่
-    window.toggleAllTiers = function(source) {
-        document.querySelectorAll('.quest-target-tier').forEach(cb => cb.checked = source.checked);
-        window.updateQuestDropdownText();
-    }
-    window.toggleAllVehs = function(source) {
-        document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = source.checked);
-        window.updateQuestDropdownText();
-    }
-    window.updateQuestDropdownText = function() {
-        let tiers = Array.from(document.querySelectorAll('.quest-target-tier:checked'));
-        let tText = tiers.length > 0 ? `เลือกเป้าหมายแล้ว (${tiers.length})` : 'เลือกกลุ่มเป้าหมาย...';
-        if(tiers.length === 5) tText = 'ทุกระดับชั้น';
-        document.getElementById('quest-tier-text').innerText = tText;
-
-        let vehs = Array.from(document.querySelectorAll('.quest-target-vehicle:checked'));
-        let vText = vehs.length > 0 ? `เลือกรถแล้ว (${vehs.length})` : 'เลือกรถ...';
-        if(vehs.length === window.systemVehicleTypes.length && vehs.length > 0) vText = 'รถทุกประเภท';
-        document.getElementById('quest-veh-text').innerText = vText;
-
-        window.checkQuestTierSelection();
-    }
-
-    window.checkQuestTierSelection = function() {
-        let checkedTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
-        let rewardTierSelect = document.getElementById('quest-reward-tier'); let options = rewardTierSelect.options;
-
-        if (checkedTiers.length > 1) {
-            rewardTierSelect.value = 'none'; rewardTierSelect.disabled = true; rewardTierSelect.classList.add('opacity-50', 'cursor-not-allowed');
-        } else if (checkedTiers.length === 1) {
-            rewardTierSelect.disabled = false; rewardTierSelect.classList.remove('opacity-50', 'cursor-not-allowed');
-            
-            // 🌟 เรียกใช้ window.tierLevels ที่ได้มาจากการประมวลผลระบบส่วนกลางแบบสดๆ!
-            let targetLvl = window.tierLevels[checkedTiers[0]]; 
-            
-            for(let i=0; i<options.length; i++) {
-                if(options[i].value === 'none') continue;
-                if(window.tierLevels[options[i].value] <= targetLvl) { options[i].disabled = true; options[i].classList.add('text-gray-300'); } 
-                else { options[i].disabled = false; options[i].classList.remove('text-gray-300'); }
-            }
-            if(rewardTierSelect.value !== 'none' && window.tierLevels[rewardTierSelect.value] <= targetLvl) rewardTierSelect.value = 'none';
-        } else {
-            rewardTierSelect.disabled = false; rewardTierSelect.classList.remove('opacity-50', 'cursor-not-allowed');
-            for(let i=0; i<options.length; i++) { options[i].disabled = false; options[i].classList.remove('text-gray-300'); }
-        }
-    }
-
-// 🌟 ฟังก์ชันล็อก UI เมื่อเลือกเงื่อนไข "แจกคนใหม่"
-    window.handleSignupConditionChange = function(checkbox) {
-        let isSignup = checkbox.checked;
-
-        if (isSignup) {
-            // 1. บังคับเลือกเป้าหมายเป็น New อย่างเดียว
-            document.querySelectorAll('.quest-target-tier').forEach(cb => {
-                if (cb.value === 'New') cb.checked = true;
-                else { cb.checked = false; cb.disabled = true; }
-            });
-            window.updateQuestDropdownText();
-
-            // 2. ปิดการติ๊กเงื่อนไขอื่นๆ ทั้งหมด (เพราะเพิ่งสมัคร จะมีรอบวิ่งได้ยังไง)
-            ['rides', 'star', 'days'].forEach(type => {
-                let chk = document.getElementById(`cond-${type}-check`);
-                if(chk) { chk.checked = false; chk.disabled = true; }
-                let val = document.getElementById(`cond-${type}-val`);
-                if(val) { val.value = ''; val.disabled = true; }
-            });
-            document.getElementById('cond-days-unit').disabled = true;
-            
-            let manualChk = document.getElementById('cond-manual-check');
-            if(manualChk) { manualChk.checked = false; manualChk.disabled = true; }
-
-        } else {
-            // ปลดล็อกทุกอย่างกลับมาเป็นปกติ
-            document.querySelectorAll('.quest-target-tier').forEach(cb => cb.disabled = false);
-            ['rides', 'star', 'days', 'manual'].forEach(type => {
-                let chk = document.getElementById(`cond-${type}-check`);
-                if(chk) chk.disabled = false;
-            });
-        }
-    }
-    
-    // ========================================================
     // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - อัปเกรดจำกัดสิทธิ์
-    // ========================================================
     window.openQuestModal = function(questId = null) {
         // ล้างค่าเก่าทั้งหมดรวมถึงเงื่อนไข limit
         ['rides','star','days','signup','manual','limit'].forEach(type => {
@@ -4678,8 +4597,101 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
 
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
-    window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
+    
+    window.deleteQuest = function(qId) { 
+        showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); 
+    }
 
+    // 🌟 3. ดูประวัติคนขับที่ทำภารกิจสำเร็จ
+    window.viewQuestHistory = function(questId) {
+        let q = allQuests[questId];
+        if(!q) return showCustomAlert('ข้อผิดพลาด', 'ไม่พบข้อมูลแคมเปญนี้', 'error');
+
+        document.getElementById('quest-history-title').innerHTML = `<i class="fas fa-history mr-1"></i> ประวัติผู้ทำสำเร็จ: ${q.name}`;
+        let tbody = document.getElementById('quest-history-tbody');
+        
+        let html = '';
+        let completedList = [];
+        
+        // ดึงข้อมูลคนขับที่ทำสำเร็จแล้ว (จาก Object completedBy)
+        if(q.completedBy) {
+            for(let pin in q.completedBy) {
+                completedList.push({
+                    driverPin: pin,
+                    timestamp: q.completedBy[pin].timestamp || q.completedBy[pin] // รองรับโครงสร้างข้อมูลทั้งแบบเก่า/ใหม่
+                });
+            }
+        }
+        
+        // เรียงจากคนทำสำเร็จล่าสุดขึ้นมาก่อน
+        completedList.sort((a,b) => b.timestamp - a.timestamp);
+        
+        if(completedList.length === 0) {
+            html = '<tr><td colspan="3" class="py-10 text-center text-gray-400 text-[11px]">ยังไม่มีคนขับทำภารกิจนี้สำเร็จครับ</td></tr>';
+        } else {
+            completedList.forEach(item => {
+                let d = allProfiles[item.driverPin] || {};
+                let dName = d.name || 'ไม่ทราบชื่อ';
+                let dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString('th-TH') : 'ไม่ระบุเวลา';
+                html += `
+                <tr class="border-b border-gray-100 dark:border-slate-800 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                    <td class="py-2.5 px-3 text-[10px] text-gray-500 dark:text-slate-400">${dateStr}</td>
+                    <td class="py-2.5 px-3">
+                        <p class="font-bold text-gray-800 dark:text-white text-[11px]">${dName}</p>
+                        <p class="text-[10px] text-blue-500 dark:text-[#1da1f2] font-mono mt-0.5">PIN: ${item.driverPin}</p>
+                    </td>
+                    <td class="py-2.5 px-3 text-right"><span class="bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded text-[9px] border border-emerald-200 font-bold"><i class="fas fa-check"></i> สำเร็จรับรางวัลแล้ว</span></td>
+                </tr>`;
+            });
+        }
+        tbody.innerHTML = html;
+        openModal('modalQuestHistory');
+    }
+    // 🌟 ดูประวัติคนขับที่ทำภารกิจสำเร็จ
+    window.viewQuestHistory = function(questId) {
+        let q = allQuests[questId];
+        if(!q) return showCustomAlert('ข้อผิดพลาด', 'ไม่พบข้อมูลแคมเปญนี้', 'error');
+
+        document.getElementById('quest-history-title').innerHTML = `<i class="fas fa-history mr-1"></i> ประวัติผู้ทำสำเร็จ: ${q.name}`;
+        let tbody = document.getElementById('quest-history-tbody');
+        
+        let html = '';
+        let completedList = [];
+        
+        // ดึงข้อมูลคนขับที่ทำสำเร็จแล้ว (จาก Object completedBy)
+        if(q.completedBy) {
+            for(let pin in q.completedBy) {
+                completedList.push({
+                    driverPin: pin,
+                    timestamp: q.completedBy[pin].timestamp || q.completedBy[pin] // รองรับโครงสร้างข้อมูลทั้งแบบเก่า/ใหม่
+                });
+            }
+        }
+        
+        // เรียงจากคนทำสำเร็จล่าสุดขึ้นมาก่อน
+        completedList.sort((a,b) => b.timestamp - a.timestamp);
+        
+        if(completedList.length === 0) {
+            html = '<tr><td colspan="3" class="py-10 text-center text-gray-400">ยังไม่มีคนขับทำภารกิจนี้สำเร็จครับ</td></tr>';
+        } else {
+            completedList.forEach(item => {
+                let d = allProfiles[item.driverPin] || {};
+                let dName = d.name || 'ไม่ทราบชื่อ';
+                let dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString('th-TH') : 'ไม่ระบุเวลา';
+                html += `
+                <tr class="border-b border-gray-100 dark:border-slate-800 text-left hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                    <td class="py-2.5 px-3 text-[10px] text-gray-500 dark:text-slate-400">${dateStr}</td>
+                    <td class="py-2.5 px-3">
+                        <p class="font-bold text-gray-800 dark:text-white text-[11px]">${dName}</p>
+                        <p class="text-[10px] text-blue-500 dark:text-[#1da1f2] font-mono mt-0.5">PIN: ${item.driverPin}</p>
+                    </td>
+                    <td class="py-2.5 px-3 text-right"><span class="bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded text-[9px] border border-emerald-200"><i class="fas fa-check"></i> สำเร็จรับรางวัลแล้ว</span></td>
+                </tr>`;
+            });
+        }
+        tbody.innerHTML = html;
+        openModal('modalQuestHistory');
+    }
     // ========================================================
     // 🌟 ระบบประวัติการบล็อกทั้งหมด (All Block History) + จัดเรียง (Sort)
     // ========================================================
@@ -7441,6 +7453,28 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                   </thead>
                   <tbody id="all-privilege-history-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
                       <tr><td colspan="5" class="py-10 text-center text-gray-400 text-xs">กำลังโหลดข้อมูล...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  <div id="modalQuestHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-blue-500/50 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-blue-50 dark:bg-blue-900/20 shrink-0">
+              <h2 class="text-sm font-bold text-blue-600 dark:text-blue-400 pl-2" id="quest-history-title"><i class="fas fa-history mr-1"></i> ประวัติผู้ทำภารกิจสำเร็จ</h2>
+              <button onclick="closeModal('modalQuestHistory')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll bg-gray-50 dark:bg-slate-900/50">
+              <table class="w-full text-left border-collapse min-w-[400px]">
+                  <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
+                      <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
+                          <th class="py-2.5 px-3">วัน/เวลาที่สำเร็จ</th>
+                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
+                          <th class="py-2.5 px-3 text-right">สถานะ</th>
+                      </tr>
+                  </thead>
+                  <tbody id="quest-history-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                      <tr><td colspan="3" class="py-10 text-center text-gray-400 text-xs">กำลังโหลดข้อมูล...</td></tr>
                   </tbody>
               </table>
           </div>
