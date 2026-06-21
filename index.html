@@ -4677,6 +4677,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     // ========================================================
     // 🌟 ระบบเปิดหน้าต่างป๊อปอัป และดึงข้อมูลเก่ามาแสดง
     // ========================================================
+    // ========================================================
+    // 🌟 ระบบเปิดหน้าต่างป๊อปอัป และดึงข้อมูลเก่ามาแสดง
+    // ========================================================
     window.openQuestModal = function(questId = null) {
         // เคลียร์ฟอร์ม
         document.getElementById('quest-id').value = '';
@@ -4693,8 +4696,18 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         document.getElementById('dynamic-conditions-list').innerHTML = '';
         document.getElementById('dynamic-rewards-list').innerHTML = '';
 
-        // 🌟 ดึงข้อมูลจากส่วนกลาง (System Variables) ของจริง
-        let mainTiers = window.systemTiers && window.systemTiers.length > 0 ? window.systemTiers : ['Normal','Silver','Gold','Platinum'];
+        // 🌟 ดึงข้อมูลจากส่วนกลาง (System Variables) ตัวจริงของระบบ!
+        let mainTiers = [];
+        if (window.systemTiersMap && Object.keys(window.systemTiersMap).length > 0) {
+            // สูบชื่อระดับทั้งหมดออกมาจาก systemTiersMap
+            mainTiers = Object.keys(window.systemTiersMap);
+        } else if (window.systemTiers && window.systemTiers.length > 0) {
+            mainTiers = window.systemTiers;
+        } else {
+            // สำรองให้ตรงกับรูประบบจริง
+            mainTiers = ['New', 'Standard', 'Silver', 'Gold', 'Platinum', 'Legend', 'Owner Super Legend'];
+        }
+
         let mainVehs = window.systemVehicleTypes && window.systemVehicleTypes.length > 0 ? window.systemVehicleTypes : [{id:'bike',name:'มอเตอร์ไซค์'},{id:'car',name:'รถยนต์'}];
 
         // 🌟 วาดกล่องติ๊กถูกของ ระดับชั้น
