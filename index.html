@@ -4639,7 +4639,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let q = allQuests[questId];
         if(!q) return showCustomAlert('ข้อผิดพลาด', 'ไม่พบข้อมูลแคมเปญนี้', 'error');
 
-        document.getElementById('quest-history-title').innerHTML = `<i class="fas fa-history mr-1"></i> ประวัติผู้ทำสำเร็จ: ${q.name}`;
+        document.getElementById('quest-history-title').innerHTML = '<i class="fas fa-history mr-1"></i> ประวัติผู้ทำสำเร็จ: ' + q.name;
         let tbody = document.getElementById('quest-history-tbody');
         
         let html = '';
