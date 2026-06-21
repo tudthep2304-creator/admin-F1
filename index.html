@@ -4524,67 +4524,247 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
 
     // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - อัปเกรดจำกัดสิทธิ์
+    // 🌟 ระบบดึงข้อมูลแคมเปญมาแสดงบนฟอร์ม
     window.openQuestModal = function(questId = null) {
-        // ล้างค่าเก่าทั้งหมดรวมถึงเงื่อนไข limit
-        ['rides','star','days','signup','manual','limit'].forEach(type => {
-            let chk = document.getElementById(`cond-${type}-check`); 
-            if(chk) { chk.checked = false; chk.disabled = false; }
-            let val = document.getElementById(`cond-${type}-val`); 
-            if(val) { val.value = ''; val.disabled = true; }
+        // เคลียร์ค่าตั้งต้นทั้งหมด
+        document.getElementById('quest-id').value = '';
+        document.getElementById('quest-name').value = '';
+        document.getElementById('quest-target-rating').value = '';
+        document.getElementById('cond-signup-check').checked = false;
+        document.getElementById('cond-days-val').value = '';
+        document.getElementById('cond-days-unit').value = 'days';
+        document.getElementById('cond-limit-val').value = '';
+        document.getElementById('quest-start').value = '';
+        document.getElementById('quest-end').value = '';
+        document.getElementById('quest-is-active').checked = true;
+        document.getElementById('dynamic-conditions-list').innerHTML = '';
+        document.getElementById('dynamic-rewards-list').innerHTML = '';
+
+        // Render ตัวเลือกกลุ่มเป้าหมาย (Tiers & Vehicles) จากระบบ
+        let tierHtml = '';
+        (window.systemTiers || ['Normal','Silver','Gold','Platinum']).forEach(t => {
+            tierHtml += `<label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="quest-target-tier w-3.5 h-3.5 rounded border-gray-300" value="${t}"> <span class="text-gray-700 dark:text-slate-300 font-bold">${t}</span></label> `;
         });
-        
-        let dUnit = document.getElementById('cond-days-unit');
-        if(dUnit) { dUnit.disabled = true; dUnit.value = 'days'; }
-        
-        // ล้างค่า dropdown การจำกัดสิทธิ์
-        let lUnit = document.getElementById('cond-limit-unit');
-        if(lUnit) { lUnit.disabled = true; lUnit.value = 'day'; }
+        document.getElementById('target-tiers-container').innerHTML = tierHtml;
 
-        document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
-        document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
+        let vehHtml = '';
+        (window.systemVehicleTypes || [{id:'bike',name:'มอเตอร์ไซค์'},{id:'car',name:'รถยนต์ทั่วไป'}]).forEach(v => {
+            vehHtml += `<label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="quest-target-vehicle w-3.5 h-3.5 rounded border-gray-300" value="${v.id}"> <span class="text-gray-700 dark:text-slate-300">${v.name}</span></label> `;
+        });
+        document.getElementById('target-vehicles-container').innerHTML = vehHtml;
 
+        // ถ้าเป็นการกดแก้ไข ให้โหลดข้อมูลเก่ากลับมาจับคู่ลงฟิลด์
         if (questId && allQuests[questId]) {
-            let q = allQuests[questId]; let c = q.conditions || {};
-            document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญ';
+            let q = allQuests[questId]; 
+            let c = q.conditions || {};
+            
+            document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญภารกิจ DRV';
             document.getElementById('quest-id').value = questId;
-            document.getElementById('quest-name').value = q.name;
+            document.getElementById('quest-name').value = q.name || '';
+            document.getElementById('quest-target-rating').value = q.targetMinRating || '';
+            document.getElementById('cond-signup-check').checked = c.signup || false;
+            document.getElementById('cond-days-val').value = c.days || '';
+            document.getElementById('cond-days-unit').value = c.daysUnit || 'days';
+            document.getElementById('cond-limit-val').value = c.dailyLimit || '';
             document.getElementById('quest-start').value = q.startTime || '';
             document.getElementById('quest-end').value = q.endTime || '';
-            document.getElementById('quest-reward-bonus').value = q.rewardBonus || '';
-            document.getElementById('quest-reward-expire').value = q.rewardExpireDays || ''; 
-            document.getElementById('quest-reward-rating').value = q.rewardRating || ''; 
-            document.getElementById('quest-reward-tier').value = q.rewardTier || 'none';
-            document.getElementById('quest-is-active').checked = q.isActive;
+            document.getElementById('quest-is-active').checked = q.isActive ?? true;
 
+            // ติ๊กเลือกกลุ่มเป้าหมายเดิม
             if(q.targetTiers) q.targetTiers.forEach(v => { let cb = document.querySelector(`.quest-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
             if(q.targetVehicles) q.targetVehicles.forEach(v => { let cb = document.querySelector(`.quest-target-vehicle[value="${v}"]`); if(cb) cb.checked = true; });
 
-            if(c.manual) { let chk = document.getElementById('cond-manual-check'); if(chk) chk.checked = true; }
-            if(c.signup) { let chk = document.getElementById('cond-signup-check'); if(chk) chk.checked = true; }
-            if(c.rides > 0) { let chk = document.getElementById('cond-rides-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-rides-val'); if(val) { val.value = c.rides; val.disabled = false; } }
-            if(c.stars > 0) { let chk = document.getElementById('cond-star-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-star-val'); if(val) { val.value = c.stars; val.disabled = false; } }
-            if(c.days > 0) { let chk = document.getElementById('cond-days-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-days-val'); if(val) { val.value = c.days; val.disabled = false; } if(dUnit) { dUnit.disabled = false; dUnit.value = c.daysUnit || 'days'; } }
-            
-            // 🌟 ดึงข้อมูล "การจำกัดสิทธิ์" กลับมาแสดงตอนกดแก้ไข
-            if(c.dailyLimit > 0) { 
-                let chk = document.getElementById('cond-limit-check'); if(chk) chk.checked = true; 
-                let val = document.getElementById('cond-limit-val'); if(val) { val.value = c.dailyLimit; val.disabled = false; } 
-                if(lUnit) { lUnit.disabled = false; lUnit.value = c.limitUnit || 'day'; } 
-            }
+            // โหลดรายการเงื่อนไขแบบ Dynamic กลับมา
+            let condList = document.getElementById('dynamic-conditions-list');
+            if (c.rides > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ'));
+            if (c.stars > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('stars', c.stars));
+            if (c.onlineHours > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours));
+            if (c.minAr > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', c.minAr));
+            if (c.peakHoursData) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData));
+
+            // โหลดของรางวัลเดิมกลับมา
+            let rewList = document.getElementById('dynamic-rewards-list');
+            if (q.rewardCredit > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('credit', q.rewardCredit));
+            if (q.rewardBonus > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('bonus', q.rewardBonus));
+            if (q.rewardRating > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('stars', q.rewardRating));
+            if (q.rewardTierUp) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('tierup'));
 
         } else {
-            document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
-            document.getElementById('quest-id').value = ''; document.getElementById('quest-name').value = '';
-            document.getElementById('quest-start').value = ''; document.getElementById('quest-end').value = '';
-            document.getElementById('quest-reward-bonus').value = ''; 
-            document.getElementById('quest-reward-expire').value = ''; 
-            document.getElementById('quest-reward-rating').value = '';
-            document.getElementById('quest-reward-tier').value = 'none';
-            document.getElementById('quest-is-active').checked = true;
+            document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างแคมเปญภารกิจDRV';
         }
-        
-        if (typeof window.updateQuestDropdownText === 'function') { window.updateQuestDropdownText(); }
         openModal('modalAddQuest');
+    }
+
+    // 🌟 ฟังก์ชันเก็บรวบรวมข้อมูลและส่งขึ้น Firebase
+    window.saveQuestCampaignDRV = function() {
+        let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
+        let name = document.getElementById('quest-name').value.trim();
+        let targetMinRating = parseFloat(document.getElementById('quest-target-rating').value) || 0;
+        let targetTiers = Array.from(document.querySelectorAll('.quest-target-tier:checked')).map(cb => cb.value);
+        let targetVehicles = Array.from(document.querySelectorAll('.quest-target-vehicle:checked')).map(cb => cb.value);
+
+        if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อแคมเปญภารกิจ DRV ด้วยครับ', 'error');
+        if (targetTiers.length === 0) targetTiers = ['all'];
+        if (targetVehicles.length === 0) targetVehicles = ['all'];
+
+        // กวาดข้อมูลจาก Dynamic Conditions
+        let conditions = {
+            signup: document.getElementById('cond-signup-check').checked,
+            days: parseInt(document.getElementById('cond-days-val').value) || 0,
+            daysUnit: document.getElementById('cond-days-unit').value,
+            dailyLimit: parseInt(document.getElementById('cond-limit-val').value) || 0, // สิทธิ์การทำสำเร็จภารกิจ
+        };
+
+        document.querySelectorAll('.condition-item-row').forEach(row => {
+            let type = row.getAttribute('data-type');
+            let valInput = row.querySelector('.cond-input-val')?.value;
+            if (type === 'rides') {
+                conditions.rides = parseInt(valInput) || 0;
+                conditions.ridesUnit = row.querySelector('.cond-input-unit').value;
+            } else if (type === 'stars') {
+                conditions.stars = parseInt(valInput) || 0;
+            } else if (type === 'online') {
+                conditions.onlineHours = parseInt(valInput) || 0;
+            } else if (type === 'ar') {
+                conditions.minAr = parseInt(valInput) || 0;
+            } else if (type === 'peak') {
+                let s = row.querySelector('.cond-input-time-start').value;
+                let e = row.querySelector('.cond-input-time-end').value;
+                conditions.peakHoursData = `${s}|${e}|${parseInt(valInput) || 0}`;
+            }
+        });
+
+        // กวาดข้อมูลจาก Dynamic Rewards
+        let payload = {
+            name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, targetMinRating: targetMinRating,
+            conditions: conditions, startTime: document.getElementById('quest-start').value || null,
+            endTime: document.getElementById('quest-end').value || null, isActive: document.getElementById('quest-is-active').checked,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        // ตรวจสอบค่ารางวัล
+        document.querySelectorAll('.reward-item-row').forEach(row => {
+            let type = row.getAttribute('data-type');
+            let val = parseFloat(row.querySelector('.reward-input-val')?.value) || 0;
+            if (type === 'credit') payload.rewardCredit = val;
+            if (type === 'bonus') payload.rewardBonus = val;
+            if (type === 'stars') payload.rewardRating = val;
+            if (type === 'tierup') payload.rewardTierUp = true; // เปิดใช้งานระบบอัปเกรดอัตโนมัติ 1 ขั้น
+        });
+
+        db.ref('system_settings/quests/' + qId).update(payload).then(() => { 
+            showCustomAlert('บันทึกสำเร็จ', 'อัปเดตแคมเปญภารกิจ DRV เรียบร้อยแล้ว', 'success'); 
+            closeModal('modalAddQuest'); 
+        });
+    }
+    // 🌟 ฟังก์ชันสร้างแถวเงื่อนไข (Dynamic Conditions) เข้าสู่รายการ
+    window.createConditionRowHtml = function(type, value = '', unit = 'รอบ') {
+        let id = 'cond-row-' + Date.now() + Math.floor(Math.random() * 1000);
+        let title = '';
+        let inputHtml = '';
+
+        if (type === 'rides') {
+            title = '<i class="fas fa-car text-blue-500 mr-1.5"></i> วิ่งสะสมครบ';
+            inputHtml = `
+                <input type="number" class="cond-input-val w-24 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน">
+                <select class="cond-input-unit p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300 font-bold">
+                    <option value="รอบ" ${unit === 'รอบ' ? 'selected' : ''}>รอบ</option>
+                    <option value="ชั่วโมง" ${unit === 'ชั่วโมง' ? 'selected' : ''}>ชั่วโมง</option>
+                </select>
+            `;
+        } else if (type === 'stars') {
+            title = '<i class="fas fa-star text-amber-500 mr-1.5"></i> รีวิวดาวติดต่อกัน';
+            inputHtml = `<input type="number" class="cond-input-val w-24 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="ครั้ง"> <span class="text-gray-500 ml-1">ครั้งต่อเนื่อง</span>`;
+        } else if (type === 'online') {
+            title = '<i class="fas fa-clock text-indigo-500 mr-1.5"></i> ออนไลน์สะสม';
+            inputHtml = `<input type="number" class="cond-input-val w-24 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="ชั่วโมง"> <span class="text-gray-500 ml-1">ชั่วโมง</span>`;
+        } else if (type === 'ar') {
+            title = '<i class="fas fa-percentage text-emerald-500 mr-1.5"></i> อัตรารับงาน (AR) ขั้นต่ำ';
+            inputHtml = `<input type="number" class="cond-input-val w-24 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="เปอร์เซ็นต์"> <span class="text-gray-500 ml-1">%</span>`;
+        } else if (type === 'peak') {
+            title = '<i class="fas fa-business-time text-rose-500 mr-1.5"></i> วิ่งช่วงเวลาพิเศษ (Peak Hours)';
+            let times = value ? value.split('|') : ['', '', '']; // start_time|end_time|rides
+            inputHtml = `
+                <span class="text-gray-400">จาก</span> <input type="time" class="cond-input-time-start p-1 bg-white dark:bg-slate-900 border dark:border-slate-700 rounded" value="${times[0] || ''}">
+                <span class="text-gray-400">ถึง</span> <input type="time" class="cond-input-time-end p-1 bg-white dark:bg-slate-900 border dark:border-slate-700 rounded" value="${times[1] || ''}">
+                <span class="text-gray-400 ml-2">ครบ</span> <input type="number" class="cond-input-val w-16 p-1 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${times[2] || ''}" placeholder="รอบ"> <span class="text-gray-400">รอบ</span>
+            `;
+        }
+
+        return `
+            <div id="${id}" data-type="${type}" class="condition-item-row flex items-center justify-between p-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700/70 rounded-lg shadow-sm group animate-fade-in">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-bold text-gray-700 dark:text-slate-300 min-w-[150px]">${title}</span>
+                    <div class="flex items-center gap-1.5">${inputHtml}</div>
+                </div>
+                <button type="button" onclick="document.getElementById('${id}').remove()" class="text-gray-400 hover:text-red-500 p-1 transition opacity-80 group-hover:opacity-100" title="ลบเงื่อนไขนี้">
+                    <i class="fas fa-times-circle text-sm"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    // 🌟 กดปุ่มเพิ่มเงื่อนไขจาก Dropdown (รองรับการใส่เงื่อนไขควบอัตโนมัติแต่ลบออกได้)
+    window.handleAddConditionRow = function() {
+        let select = document.getElementById('select-condition-type');
+        let type = select.value;
+        if (!type) return;
+
+        let list = document.getElementById('dynamic-conditions-list');
+        
+        // 1. เพิ่มเงื่อนไขหลักที่เลือกลงไป
+        list.insertAdjacentHTML('beforeend', window.createConditionRowHtml(type));
+
+        // 2. ⚡ เงื่อนไขควบพิเศษ: ถ้าแอดมินเลือก "วิ่งสะสมครบ" ให้สั่งเพิ่ม "อัตรารับงาน (AR)" พ่วงไปด้วยเลยทันที
+        if (type === 'rides') {
+            list.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar'));
+        }
+
+        select.value = ''; // ล้างค่า Dropdown กลับเป็นค่าว่าง
+    }
+
+    // 🌟 ฟังก์ชันสร้างแถวรางวัล (Dynamic Rewards) เข้าสู่รายการ
+    window.createRewardRowHtml = function(type, value = '') {
+        let id = 'reward-row-' + Date.now() + Math.floor(Math.random() * 1000);
+        let title = '';
+        let inputHtml = '';
+
+        if (type === 'credit') {
+            title = '<i class="fas fa-wallet text-blue-500 mr-1.5"></i> เครดิตเข้าระบบ';
+            inputHtml = `<input type="number" class="reward-input-val w-28 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวนเครดิต"> <span class="text-gray-400 ml-1">เครดิต</span>`;
+        } else if (type === 'bonus') {
+            title = '<i class="fas fa-coins text-amber-500 mr-1.5"></i> โบนัสเงินสด';
+            inputHtml = `<input type="number" class="reward-input-val w-28 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวนเงิน"> <span class="text-gray-400 ml-1">บาท</span>`;
+        } else if (type === 'stars') {
+            title = '<i class="fas fa-star-half-alt text-yellow-500 mr-1.5"></i> แต้มดาว';
+            inputHtml = `<input type="number" class="reward-input-val w-28 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="แต้มดาว"> <span class="text-gray-400 ml-1">คะแนน</span>`;
+        } else if (type === 'tierup') {
+            title = '<i class="fas fa-level-up-alt text-emerald-500 mr-1.5"></i> เลื่อนระดับชั้น';
+            inputHtml = `<span class="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 px-3 py-1 rounded font-bold text-[10px] border border-emerald-200 dark:border-emerald-800/30">✨ อัปเกรดขึ้น 1 ขั้นอัตโนมัติ</span>`;
+        }
+
+        return `
+            <div id="${id}" data-type="${type}" class="reward-item-row flex items-center justify-between p-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700/70 rounded-lg shadow-sm group animate-fade-in">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-gray-700 dark:text-slate-300 min-w-[150px]">${title}</span>
+                    <div class="flex items-center gap-1.5">${inputHtml}</div>
+                </div>
+                <button type="button" onclick="document.getElementById('${id}').remove()" class="text-gray-400 hover:text-red-500 p-1 transition opacity-80 group-hover:opacity-100" title="ลบรางวัลนี้">
+                    <i class="fas fa-times-circle text-sm"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    // 🌟 กดปุ่มเพิ่มรางวัลจาก Dropdown
+    window.handleAddRewardRow = function() {
+        let select = document.getElementById('select-reward-type');
+        let type = select.value;
+        if (!type) return;
+
+        let list = document.getElementById('dynamic-rewards-list');
+        list.insertAdjacentHTML('beforeend', window.createRewardRowHtml(type));
+        select.value = '';
     }
 
     window.saveQuestCampaign = function() {
@@ -6897,133 +7077,130 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
       </div>
   </div>
   <!-- 🌟 หน้าต่างสร้างแคมเปญ/ภารกิจ (แก้บั๊กกล่องรางวัลเบิ้ล) -->
-  <div id="modalAddQuest" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-slate-900 border border-amber-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 sticky top-0 z-10">
-              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500" id="quest-modal-title"><i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่</h2>
-              <button onclick="closeModal('modalAddQuest')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-          </div>
+  <div id="modalAddQuest" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-blue-500/40 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col h-[90vh] overflow-hidden animate-fade-in">
           
-          <div class="p-5 space-y-4">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-blue-50 dark:bg-blue-900/20 shrink-0">
+              <h2 class="text-sm font-bold text-blue-600 dark:text-blue-400 pl-2" id="quest-modal-title"><i class="fas fa-bullseye mr-1"></i> สร้างแคมเปญภารกิจDRV</h2>
+              <button onclick="closeModal('modalAddQuest')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white"><i class="fas fa-times"></i></button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-5 space-y-5 slim-scroll bg-gray-50/50 dark:bg-slate-900/40 text-xs">
               <input type="hidden" id="quest-id">
-              <div>
-                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อแคมเปญ (โชว์ให้คนขับเห็น)</label>
-                  <input type="text" id="quest-name" placeholder="เช่น โปรวิ่งวันหยุด, สู้ฝนแจกโบนัส..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
+
+              <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm">
+                  <label class="block text-[11px] font-bold text-gray-700 dark:text-slate-300 mb-1.5">ชื่อแคมเปญภารกิจ DRV</label>
+                  <input type="text" id="quest-name" placeholder="ตัวอย่าง: ภารกิจนักล่าช่วงเร่งด่วนประจำสัปดาห์" class="w-full p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 text-gray-800 dark:text-white font-bold">
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
-                  <div class="col-span-1 sm:col-span-2"><h3 class="text-xs font-bold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-slate-600 pb-1"><i class="fas fa-filter text-blue-500"></i> เป้าหมายผู้เข้าร่วม (Target)</h3></div>
-                  <div class="relative">
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
-                      <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-tier-dd').classList.toggle('hidden')">
-                          <span id="quest-tier-text" class="truncate text-gray-700 dark:text-gray-300">เลือกกลุ่มเป้าหมาย...</span>
-                          <i class="fas fa-chevron-down text-gray-400"></i>
+              <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-3">
+                  <h3 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-slate-700 pb-1.5"><i class="fas fa-users mr-1"></i> กลุ่มเป้าหมาย</h3>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับ (Tier)</label>
+                          <div class="flex flex-wrap gap-2" id="target-tiers-container">
+                              </div>
                       </div>
-                      <div id="quest-tier-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
-                          <div id="quest-target-tier-container" class="flex flex-col gap-2"></div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
+                          <div class="flex flex-wrap gap-2" id="target-vehicles-container">
+                              </div>
                       </div>
                   </div>
-                  <div class="relative">
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
-                      <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('quest-veh-dd').classList.toggle('hidden')">
-                          <span id="quest-veh-text" class="truncate text-gray-700 dark:text-gray-300">เลือกรถ...</span>
-                          <i class="fas fa-chevron-down text-gray-400"></i>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-gray-50 dark:border-slate-700/50">
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">เกรดดาวไม่ต่ำกว่า</label>
+                          <input type="number" id="quest-target-rating" step="0.1" min="0" max="5" placeholder="เช่น 4.5" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-mono text-center">
                       </div>
-                      <div id="quest-veh-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllVehs(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด / ยกเลิก</label>
-                          <div id="quest-target-vehicle-container" class="flex flex-col gap-2"></div>
+                      <div class="flex items-center pt-4">
+                          <label class="flex items-center gap-2 cursor-pointer select-none">
+                              <input type="checkbox" id="cond-signup-check" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 bg-gray-50 dark:bg-slate-900">
+                              <span class="font-bold text-gray-700 dark:text-slate-300">สมัครลงทะเบียนแอปสำเร็จ</span>
+                          </label>
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1">อายุสมาชิกครบ</label>
+                          <div class="flex gap-1">
+                              <input type="number" id="cond-days-val" placeholder="ตัวเลข" class="w-20 p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-center focus:border-blue-500 font-bold">
+                              <select id="cond-days-unit" class="flex-1 p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-700 dark:text-slate-300">
+                                  <select id="cond-days-unit" class="flex-1 p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-700 dark:text-slate-300">
+                                  <option value="days">วัน</option>
+                                  <option value="months">เดือน</option>
+                                  <option value="years">ปี</option>
+                              </select>
+                          </div>
                       </div>
                   </div>
               </div>
 
-              <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-200 dark:border-blue-900/30">
-                  <h3 class="text-xs font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800/50 pb-1 mb-2"><i class="fas fa-flag-checkered"></i> เงื่อนไขความสำเร็จ</h3>
-                  <div class="space-y-3 mt-3">
-                      <div class="flex items-center gap-2">
-                          <input type="checkbox" id="cond-rides-check" onchange="document.getElementById('cond-rides-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-rides-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
-                          <label for="cond-rides-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24">🚕 วิ่งสะสมให้ครบ</label>
-                          <input type="number" id="cond-rides-val" disabled class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <span class="text-[10px] font-bold text-gray-500">รอบ</span>
-                      </div>
-                      <div class="flex items-center gap-2">
-                          <input type="checkbox" id="cond-star-check" onchange="document.getElementById('cond-star-val').disabled = !this.checked; if(this.checked) document.getElementById('cond-star-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
-                          <label for="cond-star-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24">⭐ รีวิว 5 ดาวติดกัน</label>
-                          <input type="number" id="cond-star-val" disabled class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <span class="text-[10px] font-bold text-gray-500">ครั้ง</span>
-                      </div>
-                      <div class="flex items-center gap-2">
-                          <input type="checkbox" id="cond-days-check" onchange="document.getElementById('cond-days-val').disabled = !this.checked; document.getElementById('cond-days-unit').disabled = !this.checked; if(this.checked) document.getElementById('cond-days-val').focus();" class="w-4 h-4 accent-amber-500 cursor-pointer shrink-0">
-                          <label for="cond-days-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24">⏱️ อายุสมาชิกครบ</label>
-                          <input type="number" id="cond-days-val" disabled class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <select id="cond-days-unit" disabled class="p-1.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500 disabled:opacity-50 disabled:bg-gray-100">
-                              <option value="days">วัน</option><option value="months">เดือน</option><option value="years">ปี</option>
+              <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-3">
+                  <div class="flex justify-between items-center border-b border-gray-100 dark:border-slate-700 pb-1.5">
+                      <h3 class="text-[11px] font-bold text-amber-600 dark:text-amber-400"><i class="fas fa-tasks mr-1"></i> เงื่อนไขแคมเปญภารกิจ DRV</h3>
+                      <div class="flex items-center gap-1.5">
+                          <select id="select-condition-type" class="p-1.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] focus:border-amber-500 font-bold text-gray-700 dark:text-slate-300">
+                              <option value="">-- เลือกเงื่อนไขเพื่อเพิ่ม --</option>
+                              <option value="rides">วิ่งสะสมครบ</option>
+                              <option value="stars">รีวิวดาวติดต่อกัน</option>
+                              <option value="online">ออนไลน์สะสม</option>
+                              <option value="ar">อัตรารับงาน (AR) ขั้นต่ำ</option>
+                              <option value="peak">วิ่งช่วงเวลาพิเศษ (Peak Hours)</option>
                           </select>
-                      </div>
-                    <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
-                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; document.getElementById('cond-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="cond-limit-check" class="text-[10px] font-bold text-red-600 dark:text-red-400 cursor-pointer shrink-0">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
-                          <input type="number" id="cond-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <span class="text-[10px] font-bold text-gray-500 shrink-0">ต่อ</span>
-                          <select id="cond-limit-unit" disabled class="flex-1 min-w-[70px] p-1.5 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-[10px] font-bold focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                              <option value="day">วัน</option>
-                              <option value="week">สัปดาห์</option>
-                              <option value="month">เดือน</option>
-                              <option value="all">แคมเปญ</option>
-                          </select>
-                      </div>
-                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
-                          <input type="checkbox" id="cond-signup-check" onchange="handleSignupConditionChange(this)" class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                          <label for="cond-signup-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">📝 สมัครลงทะเบียนแอปสำเร็จ</label>
-                      </div>
-                      <div class="flex items-center gap-2 pt-1">
-                          <input type="checkbox" id="cond-manual-check" class="w-4 h-4 accent-amber-500 cursor-pointer">
-                          <label for="cond-manual-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">🏆 พิจารณาโดยแอดมิน (แจกแมนนวล)</label>
+                          <button type="button" onclick="handleAddConditionRow()" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
                       </div>
                   </div>
+                  
+                  <div id="dynamic-conditions-list" class="space-y-2 min-h-[40px] bg-gray-50 dark:bg-slate-900/30 p-2 rounded-xl border border-dashed border-gray-200 dark:border-slate-800">
+                      </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มภารกิจ (ว่าง=เริ่มทันที)</label>
-                      <input type="datetime-local" id="quest-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none">
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">จำกัดสิทธิ์ทำภารกิจ (ครั้ง/คน)</label>
+                      <input type="number" id="cond-limit-val" placeholder="ปล่อยว่างไว้ = ไม่จำกัดสิทธิ์" class="w-full p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 text-center font-bold">
                   </div>
                   <div>
-                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขต (ว่าง=แจกตลอด)</label>
-                      <input type="datetime-local" id="quest-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none">
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาเริ่มภารกิจ</label>
+                      <input type="datetime-local" id="quest-start" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-800 dark:text-white">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เวลาหมดเขตแคมเปญ</label>
+                      <input type="datetime-local" id="quest-end" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-bold text-gray-800 dark:text-white">
                   </div>
               </div>
 
-              <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
-                  <h3 class="text-xs font-bold text-amber-600 mb-2"><i class="fas fa-gift"></i> รางวัลเมื่อทำสำเร็จ</h3>
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-200 dark:border-amber-800/50">
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัส (🟡)</label>
-                          <input type="number" id="quest-reward-bonus" placeholder="เช่น 100" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-amber-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">อายุโบนัส (วัน)</label>
-                          <input type="number" id="quest-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-amber-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เพิ่มดาว (⭐)</label>
-                          <input type="number" step="0.1" id="quest-reward-rating" placeholder="เช่น 0.5" class="w-full p-2 bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-500 border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-amber-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เลื่อนระดับ</label>
-                          <select id="quest-reward-tier" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-amber-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold focus:border-amber-500">
-                              <option value="none">-- ไม่เลื่อน --</option>
+              <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm space-y-3">
+                  <div class="flex justify-between items-center border-b border-gray-100 dark:border-slate-700 pb-1.5">
+                      <h3 class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400"><i class="fas fa-gift mr-1"></i> รางวัล</h3>
+                      <div class="flex items-center gap-1.5">
+                          <select id="select-reward-type" class="p-1.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] focus:border-emerald-500 font-bold text-gray-700 dark:text-slate-300">
+                              <option value="">-- เลือกรางวัลเพื่อเพิ่ม --</option>
+                              <option value="credit">เครดิต</option>
+                              <option value="bonus">โบนัสเงินสด</option>
+                              <option value="stars">แต้มดาว</option>
+                              <option value="tierup">เลื่อนระดับชั้น (อัปเกรด 1 ขั้น)</option>
                           </select>
+                          <button type="button" onclick="handleAddRewardRow()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
                       </div>
                   </div>
+
+                  <div id="dynamic-rewards-list" class="space-y-2 min-h-[40px] bg-gray-50 dark:bg-slate-900/30 p-2 rounded-xl border border-dashed border-gray-200 dark:border-slate-800">
+                      </div>
               </div>
 
-              <div class="flex items-center gap-2 mt-2">
-                  <input type="checkbox" id="quest-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                  <label for="quest-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดใช้งานแคมเปญนี้ทันที 🟢</label>
+              <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-100 dark:border-slate-700/60 shadow-sm">
+                  <span class="font-bold text-gray-700 dark:text-slate-300">สถานะการเปิดเปิดใช้งานแคมเปญภารกิจนี้</span>
+                  <label class="relative inline-flex items-center cursor-pointer select-none">
+                      <input type="checkbox" id="quest-is-active" class="sr-only peer" checked>
+                      <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-500"></div>
+                  </label>
               </div>
+          </div>
 
-              <button onclick="saveQuestCampaign()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกแคมเปญ</button>
+          <div class="p-3 border-t border-gray-200 dark:border-slate-800 flex justify-end gap-2 bg-gray-50 dark:bg-slate-900 shrink-0">
+              <button onclick="closeModal('modalAddQuest')" class="bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-300 px-4 py-2 rounded-xl font-bold transition">ยกเลิก</button>
+              <button onclick="saveQuestCampaignDRV()" class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl font-bold shadow-md transition"><i class="fas fa-save mr-1"></i> บันทึกข้อมูลแคมเปญ</button>
           </div>
       </div>
   </div>
