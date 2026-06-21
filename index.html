@@ -271,6 +271,11 @@
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข่าวสารคนขับ</span>
                   </button>
+                <!-- 🌟 เมนูใหม่ 5: สิทธิพิเศษคนขับ (คูปองร้านค้า) -->
+                  <button onclick="switchTab('driver-privileges')" class="bg-pink-50 dark:bg-slate-800 border border-pink-200 dark:border-slate-700 hover:bg-pink-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-pink-100 dark:bg-pink-900/30 text-pink-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-gift"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-pink-600 dark:text-pink-400 leading-tight">สิทธิพิเศษคนขับ</span>
+                  </button>
               </div>
           </div>
 
@@ -1380,6 +1385,34 @@
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full flex flex-col h-[calc(100vh-140px)]">
               <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-bullhorn text-[#1da1f2] mr-1"></i> บอร์ดข่าวสารประกาศ (แอปคนขับ)</h2>
               <div id="driver-news-list" class="space-y-2 flex-1 overflow-y-auto pr-1 slim-scroll"></div>
+          </div>
+      </section>
+    <!-- ================= หน้า: สิทธิพิเศษคนขับ (แจกโค้ดฟรี) ================= -->
+      <section id="content-driver-privileges" class="tab-content hidden space-y-4 pb-8 mt-2 h-full">
+          <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md flex flex-col h-[calc(100vh-140px)] max-h-[800px]">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 shrink-0">
+                  <div>
+                      <h2 class="text-lg font-bold text-pink-500 dark:text-pink-400"><i class="fas fa-gift mr-1.5"></i> ระบบสิทธิพิเศษแจกโค้ดฟรี (Driver Privileges)</h2>
+                      <p class="text-[10px] text-gray-500 mt-1">ให้คนขับกดรับโค้ดส่วนลดจากร้านค้าได้ทันที โดยไม่ต้องรอแอดมินอนุมัติ</p>
+                  </div>
+                  <button onclick="openPrivilegeModal()" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> เพิ่มสิทธิพิเศษ</button>
+              </div>
+              <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1 border border-gray-100 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-800/30">
+                  <table class="w-full text-left border-collapse min-w-[800px]">
+                      <thead class="sticky top-0 z-10 bg-gray-200 dark:bg-slate-700 shadow-sm border-b border-gray-300 dark:border-slate-600">
+                          <tr class="text-gray-600 dark:text-slate-300 text-[10px] uppercase font-bold select-none">
+                              <th class="py-2.5 px-3 w-[25%]">ชื่อสิทธิพิเศษ / ร้านค้า</th>
+                              <th class="py-2.5 px-2 w-[20%]">เป้าหมายรับสิทธิ์</th>
+                              <th class="py-2.5 px-2 text-center w-[20%]">สต็อกโค้ด (ใบ)</th>
+                              <th class="py-2.5 px-2 text-right w-[15%]">สถานะ</th>
+                              <th class="py-2.5 px-3 text-center w-[20%]">จัดการ</th>
+                          </tr>
+                      </thead>
+                      <tbody id="driver-privileges-list" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                          <tr><td colspan="5" class="py-10 text-center text-gray-400 text-xs">กำลังโหลดข้อมูล...</td></tr>
+                      </tbody>
+                  </table>
+              </div>
           </div>
       </section>
   </main>
@@ -4489,17 +4522,23 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
     
     // ========================================================
-    // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - แบบดั้งเดิม
+    // 🌟 ระบบแคมเปญและภารกิจ (Quest Center) - ฉบับสมบูรณ์
     // ========================================================
     window.openQuestModal = function(questId = null) {
-        ['rides','star','days','signup','manual'].forEach(type => {
+        // ล้างค่าเก่าทั้งหมดรวมถึงเงื่อนไข limit
+        ['rides','star','days','signup','manual','limit'].forEach(type => {
             let chk = document.getElementById(`cond-${type}-check`); 
             if(chk) { chk.checked = false; chk.disabled = false; }
             let val = document.getElementById(`cond-${type}-val`); 
             if(val) { val.value = ''; val.disabled = true; }
         });
+        
         let dUnit = document.getElementById('cond-days-unit');
         if(dUnit) { dUnit.disabled = true; dUnit.value = 'days'; }
+        
+        // ล้างค่า dropdown การจำกัดสิทธิ์
+        let lUnit = document.getElementById('cond-limit-unit');
+        if(lUnit) { lUnit.disabled = true; lUnit.value = 'day'; }
 
         document.querySelectorAll('.quest-target-tier').forEach(cb => { cb.checked = false; cb.disabled = false; });
         document.querySelectorAll('.quest-target-vehicle').forEach(cb => cb.checked = false);
@@ -4525,6 +4564,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if(c.rides > 0) { let chk = document.getElementById('cond-rides-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-rides-val'); if(val) { val.value = c.rides; val.disabled = false; } }
             if(c.stars > 0) { let chk = document.getElementById('cond-star-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-star-val'); if(val) { val.value = c.stars; val.disabled = false; } }
             if(c.days > 0) { let chk = document.getElementById('cond-days-check'); if(chk) chk.checked = true; let val = document.getElementById('cond-days-val'); if(val) { val.value = c.days; val.disabled = false; } if(dUnit) { dUnit.disabled = false; dUnit.value = c.daysUnit || 'days'; } }
+            
+            // 🌟 ดึงข้อมูล "การจำกัดสิทธิ์" กลับมาแสดงตอนกดแก้ไข
+            if(c.dailyLimit > 0) { 
+                let chk = document.getElementById('cond-limit-check'); if(chk) chk.checked = true; 
+                let val = document.getElementById('cond-limit-val'); if(val) { val.value = c.dailyLimit; val.disabled = false; } 
+                if(lUnit) { lUnit.disabled = false; lUnit.value = c.limitUnit || 'day'; } 
+            }
 
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างเงื่อนไขแคมเปญใหม่';
@@ -4536,7 +4582,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('quest-reward-tier').value = 'none';
             document.getElementById('quest-is-active').checked = true;
         }
-        window.updateQuestDropdownText();
+        
+        // ถ้ามีฟังก์ชันนี้ ให้รันเพื่ออัปเดตข้อความ Dropdown
+        if (typeof window.updateQuestDropdownText === 'function') { window.updateQuestDropdownText(); }
         openModal('modalAddQuest');
     }
 
@@ -4556,13 +4604,16 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเลือกประเภทยานพาหนะอย่างน้อย 1 ประเภท', 'error');
         if (rewardBonus === 0 && rewardTier === 'none' && rewardRating === 0) return showCustomAlert('ใจร้ายจัง!', 'กรุณาตั้งของรางวัลให้คนขับด้วยครับ', 'error');
 
+        // 🌟 ยัดเงื่อนไขการจำกัดสิทธิ์ (limit) เข้าไปตรงๆ เลย
         let conditions = {
             manual: document.getElementById('cond-manual-check')?.checked || false,
             signup: document.getElementById('cond-signup-check')?.checked || false,
             rides: document.getElementById('cond-rides-check')?.checked ? (parseInt(document.getElementById('cond-rides-val').value) || 0) : 0,
             stars: document.getElementById('cond-star-check')?.checked ? (parseInt(document.getElementById('cond-star-val').value) || 0) : 0,
             days: document.getElementById('cond-days-check')?.checked ? (parseInt(document.getElementById('cond-days-val').value) || 0) : 0,
-            daysUnit: document.getElementById('cond-days-unit')?.value || 'days'
+            daysUnit: document.getElementById('cond-days-unit')?.value || 'days',
+            dailyLimit: document.getElementById('cond-limit-check')?.checked ? (parseInt(document.getElementById('cond-limit-val').value) || 0) : 0,
+            limitUnit: document.getElementById('cond-limit-unit')?.value || 'day'
         };
 
         let payload = {
@@ -4577,10 +4628,11 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             closeModal('modalAddQuest'); 
         });
     }
+
     window.toggleQuestStatus = function(qId, status) { db.ref('system_settings/quests/' + qId).update({ isActive: status }); }
     window.deleteQuest = function(qId) { showCustomConfirm('ลบแคมเปญทิ้ง?', 'ยืนยันว่าต้องการลบแคมเปญนี้ออกอย่างถาวร?', () => { db.ref('system_settings/quests/' + qId).remove(); }, 'ลบทิ้ง', 'red'); }
 
-// ========================================================
+    // ========================================================
     // 🌟 ระบบประวัติการบล็อกทั้งหมด (All Block History) + จัดเรียง (Sort)
     // ========================================================
     let globalBlockHistoryData = [];
@@ -5563,7 +5615,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if (rewardStr === "") rewardStr = "-";
             
             let tTiers = c.targetTiers && c.targetTiers.length > 0 ? (c.targetTiers.includes('all') ? 'ทุกระดับ' : c.targetTiers.join(', ')) : 'ทุกระดับ';
-            let limitStr = c.dailyLimit > 0 ? `<br><span class="text-[9px] text-red-500 font-bold">ได้ ${c.dailyLimit} ครั้ง/วัน</span>` : '';
+            
+            // 🌟 แปลงหน่วยจำกัดสิทธิ์มาโชว์ในตารางให้สวยงาม
+            let limitUnitStr = c.limitUnit === 'month' ? 'เดือน' : (c.limitUnit === 'all' ? 'แคมเปญ' : 'วัน');
+            let limitStr = c.dailyLimit > 0 ? `<br><span class="text-[9px] text-red-500 font-bold">จำกัด ${c.dailyLimit} ครั้ง / ${limitUnitStr}</span>` : '';
 
             let toggleClass = c.isActive ? 'text-emerald-500' : 'text-gray-300';
             let toggleIcon = c.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
@@ -5607,13 +5662,15 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     window.updatePartnerDropdownText = function() {
         let tiers = Array.from(document.querySelectorAll('.partner-target-tier:checked'));
         let tText = tiers.length > 0 ? `เลือกเป้าหมายแล้ว (${tiers.length})` : 'เลือกกลุ่มเป้าหมาย...';
-        if(tiers.length === (window.systemTiersMap ? Object.keys(window.systemTiersMap).length : 5)) tText = 'ทุกระดับชั้น';
-        document.getElementById('partner-tier-text').innerText = tText;
+        if(tiers.length === (window.systemTiersMap ? Object.keys(window.systemTiersMap).length : 5) && tiers.length > 0) tText = 'ทุกระดับชั้น';
+        let tierEl = document.getElementById('partner-tier-text');
+        if(tierEl) tierEl.innerText = tText;
 
         let vehs = Array.from(document.querySelectorAll('.partner-target-vehicle:checked'));
         let vText = vehs.length > 0 ? `เลือกรถแล้ว (${vehs.length})` : 'เลือกรถ...';
-        if(vehs.length === window.systemVehicleTypes.length && vehs.length > 0) vText = 'รถทุกประเภท';
-        document.getElementById('partner-veh-text').innerText = vText;
+        if(window.systemVehicleTypes && vehs.length === window.systemVehicleTypes.length && vehs.length > 0) vText = 'รถทุกประเภท';
+        let vehEl = document.getElementById('partner-veh-text');
+        if(vehEl) vehEl.innerText = vText;
     }
 
     // ฟังก์ชันสร้างตัวเลือก Dropdown จากส่วนกลาง
@@ -5636,7 +5693,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
 
     window.openPartnerCampaignModal = function(campId = null) {
-        window.buildPartnerDropdowns(); // สร้างตัวเลือก Dropdown
+        window.buildPartnerDropdowns(); 
         document.querySelectorAll('.partner-target-tier').forEach(cb => cb.checked = false);
         document.querySelectorAll('.partner-target-vehicle').forEach(cb => cb.checked = false);
 
@@ -5649,14 +5706,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('pc-proof-selfie').checked = c.requireSelfie || false;
             document.getElementById('pc-proof-receipt').checked = c.requireReceipt || false;
             document.getElementById('pc-proof-code').checked = c.requireCode || false;
-            document.getElementById('pc-code-amount').disabled = !c.requireCode;
-            document.getElementById('pc-code-amount').value = ''; 
-            document.getElementById('pc-code-amount').placeholder = "เพิ่มโค้ดพิมพ์ตรงนี้...";
-
-            let lChk = document.getElementById('pc-limit-check'); let lVal = document.getElementById('pc-limit-val');
-            if(lChk && lVal) {
-                if(c.dailyLimit > 0) { lChk.checked = true; lVal.disabled = false; lVal.value = c.dailyLimit; }
-                else { lChk.checked = false; lVal.disabled = true; lVal.value = ''; }
+            
+            let pcAmount = document.getElementById('pc-code-amount');
+            if(pcAmount) {
+                pcAmount.disabled = !c.requireCode;
+                pcAmount.value = ''; 
+                pcAmount.placeholder = "พิมพ์เพิ่มโค้ด...";
             }
 
             document.getElementById('partner-camp-start').value = c.startTime || '';
@@ -5664,6 +5719,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-reward-bonus').value = c.rewardBonus || '';
             document.getElementById('partner-reward-expire').value = c.rewardExpireDays || '';
             document.getElementById('partner-reward-rating').value = c.rewardRating || '';
+            
+            // 🌟 ดึงข้อมูลจำกัดสิทธิ์และหน่วยกลับมาโชว์
+            let lVal = document.getElementById('partner-reward-limit');
+            let lUnit = document.getElementById('partner-reward-limit-unit');
+            if(lVal) lVal.value = c.dailyLimit || '';
+            if(lUnit) lUnit.value = c.limitUnit || 'day';
+
             document.getElementById('partner-camp-is-active').checked = c.isActive !== false;
 
             if(c.targetTiers) c.targetTiers.forEach(v => { let cb = document.querySelector(`.partner-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
@@ -5675,22 +5737,28 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-camp-name').value = '';
             document.getElementById('pc-proof-selfie').checked = false;
             document.getElementById('pc-proof-receipt').checked = false;
-            document.getElementById('pc-proof-code').checked = false;
-            document.getElementById('pc-code-amount').disabled = true;
-            document.getElementById('pc-code-amount').value = '';
-            document.getElementById('pc-code-amount').placeholder = "เช่น 100";
             
-            let lChk = document.getElementById('pc-limit-check'); let lVal = document.getElementById('pc-limit-val');
-            if(lChk) lChk.checked = false; if(lVal) { lVal.disabled = true; lVal.value = ''; }
-
+            let pcCode = document.getElementById('pc-proof-code');
+            let pcAmount = document.getElementById('pc-code-amount');
+            if(pcCode) pcCode.checked = false;
+            if(pcAmount) { pcAmount.disabled = true; pcAmount.value = ''; pcAmount.placeholder = "เช่น 100"; }
+            
             document.getElementById('partner-camp-start').value = '';
             document.getElementById('partner-camp-end').value = '';
             document.getElementById('partner-reward-bonus').value = '';
             document.getElementById('partner-reward-expire').value = '';
             document.getElementById('partner-reward-rating').value = '';
+            
+            // ล้างข้อมูลการจำกัดสิทธิ์ตอนสร้างใหม่
+            let lVal = document.getElementById('partner-reward-limit');
+            let lUnit = document.getElementById('partner-reward-limit-unit');
+            if(lVal) lVal.value = '';
+            if(lUnit) lUnit.value = 'day';
+
             document.getElementById('partner-camp-is-active').checked = true;
         }
-        window.updatePartnerDropdownText();
+        
+        setTimeout(() => window.updatePartnerDropdownText(), 50);
         openModal('modalPartnerCampaign');
     }
 
@@ -5705,7 +5773,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let targetTiers = Array.from(document.querySelectorAll('.partner-target-tier:checked')).map(cb => cb.value);
         let targetVehicles = Array.from(document.querySelectorAll('.partner-target-vehicle:checked')).map(cb => cb.value);
         
-        let dailyLimit = document.getElementById('pc-limit-check').checked ? (parseInt(document.getElementById('pc-limit-val').value) || 0) : 0;
+        // 🌟 ดึงค่าการจำกัดสิทธิ์ (ตัวเลข และ หน่วย)
+        let lValEl = document.getElementById('partner-reward-limit');
+        let dailyLimit = lValEl ? (parseInt(lValEl.value) || 0) : 0;
+        
+        let lUnitEl = document.getElementById('partner-reward-limit-unit');
+        let limitUnit = lUnitEl ? lUnitEl.value : 'day';
+
         let rewardBonus = parseInt(document.getElementById('partner-reward-bonus').value) || 0;
         let rewardRating = parseFloat(document.getElementById('partner-reward-rating').value) || 0;
         
@@ -5722,7 +5796,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             startTime: document.getElementById('partner-camp-start').value || null,
             endTime: document.getElementById('partner-camp-end').value || null,
             rewardBonus: rewardBonus, rewardExpireDays: parseInt(document.getElementById('partner-reward-expire').value) || 0,
-            rewardRating: rewardRating, dailyLimit: dailyLimit,
+            rewardRating: rewardRating, 
+            dailyLimit: dailyLimit, limitUnit: limitUnit, // 🌟 ยัดลง Payload ตัวจริงแล้ว!
             isActive: document.getElementById('partner-camp-is-active').checked,
             timestamp: firebase.database.ServerValue.TIMESTAMP
         };
@@ -5899,6 +5974,146 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         });
         tbody.innerHTML = html || '<tr><td colspan="5" class="py-10 text-center text-gray-400">ยังไม่มีประวัติการอนุมัติย้อนหลัง</td></tr>';
         openModal('modalPartnerHistory');
+    }
+    // ========================================================
+    // 🌟 ระบบสิทธิพิเศษคนขับ (Driver Privileges - แจกโค้ดฟรี)
+    // ========================================================
+    let allDriverPrivileges = {};
+
+    // ดึงข้อมูลสิทธิพิเศษจาก Firebase
+    db.ref('system_settings/driver_privileges').on('value', snap => {
+        allDriverPrivileges = snap.val() || {};
+        if(typeof renderPrivilegesTable === 'function') renderPrivilegesTable();
+    });
+
+    // วาดตารางสิทธิพิเศษ
+    window.renderPrivilegesTable = function() {
+        let lst = document.getElementById('driver-privileges-list'); if(!lst) return;
+        let html = '';
+        let privArr = Object.entries(allDriverPrivileges).map(([k,v]) => ({id:k, ...v}));
+        
+        if (privArr.length === 0) {
+            lst.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-gray-400 text-xs">ยังไม่มีสิทธิพิเศษในระบบ</td></tr>`; return;
+        }
+
+        privArr.sort((a, b) => b.timestamp - a.timestamp).forEach(p => {
+            let timeStr = "ตลอดไป";
+            if (p.startTime || p.endTime) timeStr = `${p.startTime ? new Date(p.startTime).toLocaleDateString('th-TH') : 'เริ่มแล้ว'} - ${p.endTime ? new Date(p.endTime).toLocaleDateString('th-TH') : 'ตลอดไป'}`;
+
+            let tTiers = p.targetTiers && p.targetTiers.length > 0 ? (p.targetTiers.includes('all') ? 'ทุกระดับ' : p.targetTiers.join(', ')) : 'ทุกระดับ';
+            let limitUnitStr = p.limitUnit === 'month' ? 'เดือน' : (p.limitUnit === 'week' ? 'สัปดาห์' : (p.limitUnit === 'all' ? 'แคมเปญ' : 'วัน'));
+            let limitStr = p.limitCount > 0 ? `<br><span class="text-[9px] text-pink-500 font-bold">ได้ ${p.limitCount} ครั้ง/${limitUnitStr}</span>` : '';
+
+            let toggleClass = p.isActive ? 'text-emerald-500' : 'text-gray-300';
+            let toggleIcon = p.isActive ? 'fa-toggle-on' : 'fa-toggle-off';
+
+            let totalCodes = p.codes ? Object.keys(p.codes).length : 0;
+            let usedCodes = p.codes ? Object.values(p.codes).filter(x => x.used).length : 0;
+            let codeHtml = `<span class="font-bold text-pink-600">${usedCodes}/${totalCodes}</span><br><button onclick="downloadPrivilegeCodes('${p.id}')" class="text-[9px] bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded border border-gray-300 dark:border-slate-700 mt-1 shadow-sm hover:bg-gray-200"><i class="fas fa-download"></i> โหลดโค้ด</button>`;
+
+            html += `
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition border-b border-gray-100 dark:border-slate-800">
+                <td class="py-3 px-3"><p class="font-bold text-pink-600 dark:text-pink-400 text-xs">${p.name}</p><p class="text-[9px] text-gray-400 mt-1"><i class="far fa-clock"></i> ${timeStr}</p></td>
+                <td class="py-3 px-2 text-[10px] text-gray-500 dark:text-slate-400"><b class="text-blue-500">${tTiers}</b>${limitStr}</td>
+                <td class="py-3 px-2 text-center text-[10px]">${codeHtml}</td>
+                <td class="py-3 px-2 text-right text-[10px]"><button onclick="db.ref('system_settings/driver_privileges/${p.id}').update({isActive: ${!p.isActive}})" class="text-xl ${toggleClass} hover:scale-110 transition block ml-auto mt-1"><i class="fas ${toggleIcon}"></i></button></td>
+                <td class="py-3 px-3 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <button onclick="openPrivilegeModal('${p.id}')" class="bg-blue-50 text-blue-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-600 hover:text-white transition"><i class="fas fa-edit text-[11px]"></i></button>
+                        <button onclick="showCustomConfirm('ลบสิทธิพิเศษ?', 'ลบถาวร โค้ดที่แจกไปจะใช้ไม่ได้', () => { db.ref('system_settings/driver_privileges/${p.id}').remove(); }, 'ลบทิ้ง', 'red')" class="bg-red-50 text-red-500 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt text-[11px]"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+        lst.innerHTML = html;
+    }
+
+    window.openPrivilegeModal = function(id = null) {
+        if(typeof window.buildTargetDropdowns === 'function') window.buildTargetDropdowns('priv'); 
+        document.querySelectorAll('.priv-target-tier').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.priv-target-vehicle').forEach(cb => cb.checked = false);
+
+        if (id && allDriverPrivileges[id]) {
+            let p = allDriverPrivileges[id];
+            document.getElementById('privilege-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขสิทธิพิเศษ';
+            document.getElementById('priv-id').value = id;
+            document.getElementById('priv-name').value = p.name || '';
+            document.getElementById('priv-code-amount').disabled = true; document.getElementById('priv-code-amount').placeholder = "เพิ่มโค้ดไม่ได้ (ให้สร้างใหม่)";
+            
+            document.getElementById('priv-limit-val').value = p.limitCount || '';
+            document.getElementById('priv-limit-unit').value = p.limitUnit || 'day';
+            document.getElementById('priv-start').value = p.startTime || '';
+            document.getElementById('priv-end').value = p.endTime || '';
+            document.getElementById('priv-is-active').checked = p.isActive !== false;
+
+            if(p.targetTiers) p.targetTiers.forEach(v => { let cb = document.querySelector(`.priv-target-tier[value="${v}"]`); if(cb) cb.checked = true; });
+            if(p.targetVehicles) p.targetVehicles.forEach(v => { let cb = document.querySelector(`.priv-target-vehicle[value="${v}"]`); if(cb) cb.checked = true; });
+
+        } else {
+            document.getElementById('privilege-modal-title').innerHTML = '<i class="fas fa-gift mr-1"></i> เพิ่มสิทธิพิเศษใหม่';
+            document.getElementById('priv-id').value = '';
+            document.getElementById('priv-name').value = '';
+            document.getElementById('priv-code-amount').disabled = false; document.getElementById('priv-code-amount').value = ''; document.getElementById('priv-code-amount').placeholder = "เช่น 100";
+            
+            document.getElementById('priv-limit-val').value = '';
+            document.getElementById('priv-limit-unit').value = 'day';
+            document.getElementById('priv-start').value = '';
+            document.getElementById('priv-end').value = '';
+            document.getElementById('priv-is-active').checked = true;
+        }
+        openModal('modalAddPrivilege');
+        setTimeout(() => { if(typeof window.updateTargetDropdownText === 'function') window.updateTargetDropdownText('priv'); }, 50);
+    }
+
+    window.saveDriverPrivilege = function() {
+        let id = document.getElementById('priv-id').value || 'PRV_' + Date.now();
+        let name = document.getElementById('priv-name').value.trim();
+        let codeAmount = parseInt(document.getElementById('priv-code-amount').value) || 0;
+        
+        let targetTiers = Array.from(document.querySelectorAll('.priv-target-tier:checked')).map(cb => cb.value);
+        let targetVehicles = Array.from(document.querySelectorAll('.priv-target-vehicle:checked')).map(cb => cb.value);
+        
+        let limitCount = parseInt(document.getElementById('priv-limit-val').value) || 0;
+        let limitUnit = document.getElementById('priv-limit-unit').value;
+        
+        if(!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อสิทธิพิเศษ', 'error');
+        if(targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'เลือกเป้าหมายระดับชั้นด้วยครับ', 'error');
+        if(targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'เลือกประเภทยานพาหนะด้วยครับ', 'error');
+
+        let payload = {
+            name: name, targetTiers: targetTiers, targetVehicles: targetVehicles,
+            startTime: document.getElementById('priv-start').value || null, endTime: document.getElementById('priv-end').value || null,
+            limitCount: limitCount, limitUnit: limitUnit,
+            isActive: document.getElementById('priv-is-active').checked, timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        let isNew = !document.getElementById('priv-id').value;
+        let newCodes = {};
+        if(isNew && codeAmount > 0) {
+            let prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PRV');
+            for(let i=0; i<codeAmount; i++) {
+                let rnd = Math.floor(10000 + Math.random() * 90000); 
+                let cStr = prefix + rnd;
+                newCodes[cStr] = { code: cStr, used: false, claimedBy: null };
+            }
+        }
+
+        db.ref(`system_settings/driver_privileges/${id}`).update(payload).then(() => {
+            if (Object.keys(newCodes).length > 0) { db.ref(`system_settings/driver_privileges/${id}/codes`).update(newCodes); }
+            showCustomAlert('สำเร็จ', 'บันทึกสิทธิพิเศษเข้าระบบเรียบร้อย!', 'success');
+            closeModal('modalAddPrivilege');
+        });
+    }
+
+    window.downloadPrivilegeCodes = function(id) {
+        let p = allDriverPrivileges[id];
+        if(!p || !p.codes) return showCustomAlert('ข้อผิดพลาด', 'ไม่มีโค้ดให้ดาวน์โหลด', 'error');
+        let csv = "\uFEFFสิทธิพิเศษ,รหัสโค้ด,สถานะ,คนขับที่รับไป\n";
+        for(let k in p.codes) { let c = p.codes[k]; let stat = c.used ? 'กดรับแล้ว' : 'ยังว่าง'; let drv = c.claimedBy || '-'; csv += `"${p.name}","${k}","${stat}","${drv}"\n`; }
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", `PrivilegeCodes_${p.name}_${Date.now()}.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
     // ========================================================
     // 🌟 ระบบจัดการ Dropdown (Checkbox) ของหน้าต่างแคมเปญร้านค้า
@@ -6783,11 +6998,28 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <label for="pc-proof-code" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0">🎟️ โค้ดลับที่ร้านค้าแจก (สร้างกี่ใบ?)</label>
                           <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
                       </div>
-                      <div class="flex items-center gap-2 pt-2 border-t border-red-200/50 mt-2">
-                          <input type="checkbox" id="pc-limit-check" onchange="document.getElementById('pc-limit-val').disabled = !this.checked; if(this.checked) document.getElementById('pc-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="pc-limit-check" class="text-[10px] font-bold text-red-600 dark:text-red-400 cursor-pointer shrink-0">🛑 จำกัดสิทธิ์ต่อคนขับ</label>
-                          <input type="number" id="pc-limit-val" disabled placeholder="เช่น 1" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
-                          <span class="text-[10px] font-bold text-gray-500">ครั้ง / วัน</span>
+                      <div class="flex items-center gap-2 pt-2 border-t border-blue-200/50 dark:border-blue-800/50 mt-2">
+                          <input type="checkbox" id="cond-limit-check" onchange="document.getElementById('cond-limit-val').disabled = !this.checked; document.getElementById('cond-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('cond-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="cond-limit-check" class="text-[10px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer shrink-0 w-24 text-red-600 dark:text-red-400">🛑 จำกัดสิทธิ์ทำภารกิจ</label>
+                          <input type="number" id="cond-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-xs font-bold text-center focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                          <span class="text-[10px] font-bold text-gray-500">ต่อ</span>
+                          <select id="cond-limit-unit" disabled class="p-1.5 bg-white dark:bg-slate-900 border border-red-300 dark:border-red-800/50 rounded-lg outline-none text-[10px] font-bold text-red-600 focus:border-red-500 disabled:opacity-50 disabled:bg-gray-100">
+                              <option value="day">วัน</option>
+                              <option value="week">สัปดาห์</option>
+                              <option value="month">เดือน</option>
+                              <option value="all">ตลอดแคมเปญ</option>
+                          </select>
+                              <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">จำกัดสิทธิ์</label>
+                              <div class="flex items-center gap-1">
+                                  <input type="number" id="partner-reward-limit" placeholder="ครั้ง" class="w-1/2 p-2 bg-white dark:bg-slate-900 text-red-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
+                                  <span class="text-[9px] text-gray-500">/</span>
+                                  <select id="partner-reward-limit-unit" class="w-1/2 p-2 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[10px] font-bold focus:border-purple-500">
+                                      <option value="day">วัน</option>
+                                      <option value="month">เดือน</option>
+                                      <option value="all">แคมเปญ</option>
+                                  </select>
+                              </div>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -6876,6 +7108,89 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
           </div>
           <div class="flex-1 overflow-y-auto p-4 slim-scroll bg-gray-50 dark:bg-slate-900/50" id="driver-news-history-list">
               </div>
+      </div>
+  </div>
+  <!-- 🌟 หน้าต่างสร้างสิทธิพิเศษคนขับ (Driver Privileges) -->
+  <div id="modalAddPrivilege" class="hidden fixed inset-0 z-[320] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-pink-500/50 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-pink-50 dark:bg-pink-900/20 sticky top-0 z-10">
+              <h2 class="text-base font-bold text-pink-600 dark:text-pink-500" id="privilege-modal-title"><i class="fas fa-gift mr-1"></i> เพิ่มสิทธิพิเศษใหม่</h2>
+              <button onclick="closeModal('modalAddPrivilege')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <input type="hidden" id="priv-id">
+              <div>
+                  <label class="block text-[11px] font-bold text-gray-500 mb-1">ชื่อสิทธิพิเศษ / ชื่อร้าน</label>
+                  <input type="text" id="priv-name" placeholder="เช่น ส่วนลด 50% ร้านกาแฟ B..." class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl outline-none text-sm font-bold focus:border-pink-500">
+              </div>
+
+              <!-- 🎯 เป้าหมายผู้เข้าร่วม -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
+                  <div class="col-span-1 sm:col-span-2"><h3 class="text-[10px] font-black text-blue-600 dark:text-blue-400 mb-1"><i class="fas fa-filter"></i> กำหนดผู้มีสิทธิ์กดรับ</h3></div>
+                  <div class="relative">
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ระดับชั้น (Tier)</label>
+                      <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('priv-tier-dd').classList.toggle('hidden')">
+                          <span id="priv-tier-text" class="truncate text-gray-700 dark:text-gray-300">เลือกกลุ่มเป้าหมาย...</span>
+                          <i class="fas fa-chevron-down text-gray-400"></i>
+                      </div>
+                      <div id="priv-tier-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTargets(this, 'priv-target-tier', 'priv')" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
+                          <div id="priv-tier-container" class="flex flex-col gap-2"></div>
+                      </div>
+                  </div>
+                  <div class="relative">
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ประเภทยานพาหนะ</label>
+                      <div class="p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('priv-veh-dd').classList.toggle('hidden')">
+                          <span id="priv-veh-text" class="truncate text-gray-700 dark:text-gray-300">เลือกรถ...</span>
+                          <i class="fas fa-chevron-down text-gray-400"></i>
+                      </div>
+                      <div id="priv-veh-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-blue-600 border-b border-gray-100 pb-2 mb-1"><input type="checkbox" onchange="toggleAllTargets(this, 'priv-target-vehicle', 'priv')" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
+                          <div id="priv-vehicle-container" class="flex flex-col gap-2"></div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- 🎟️ สร้างโค้ด และ จำกัดสิทธิ์ -->
+              <div class="p-3 bg-pink-50 dark:bg-pink-900/10 border border-pink-200 dark:border-pink-800/40 rounded-xl space-y-3">
+                  <div class="flex items-center gap-2">
+                      <label class="text-[10px] font-bold text-pink-600 dark:text-pink-400 shrink-0 w-32"><i class="fas fa-ticket-alt"></i> จำนวนโค้ดที่จะแจก (ใบ)</label>
+                      <input type="number" id="priv-code-amount" placeholder="เช่น 100" class="w-full p-2 bg-white dark:bg-slate-900 border border-pink-300 dark:border-pink-800/50 rounded-lg outline-none text-xs font-bold focus:border-pink-500 text-center">
+                  </div>
+                  
+                  <div class="flex items-center gap-2 pt-2 border-t border-pink-200/50">
+                      <label class="text-[10px] font-bold text-gray-700 dark:text-gray-300 shrink-0 w-32">🛑 สิทธิ์การกดรับ / คนขับ</label>
+                      <input type="number" id="priv-limit-val" placeholder="ครั้ง" class="w-16 p-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold text-center focus:border-pink-500">
+                      <span class="text-[9px] text-gray-500">/</span>
+                      <select id="priv-limit-unit" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-[10px] font-bold focus:border-pink-500">
+                          <option value="day">วัน</option>
+                          <option value="week">สัปดาห์</option>
+                          <option value="month">เดือน</option>
+                          <option value="all">ตลอดแคมเปญ</option>
+                      </select>
+                  </div>
+              </div>
+
+              <!-- 📅 ช่วงเวลา -->
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">เริ่มแจก (ว่าง=เริ่มทันที)</label>
+                      <input type="datetime-local" id="priv-start" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-pink-500">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">หมดเขต (ว่าง=แจกตลอด)</label>
+                      <input type="datetime-local" id="priv-end" class="w-full p-2 bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-[10px] outline-none focus:border-pink-500">
+                  </div>
+              </div>
+
+              <div class="flex items-center gap-2 mt-2">
+                  <input type="checkbox" id="priv-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                  <label for="priv-is-active" class="text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer">เปิดให้กดรับสิทธิ์ได้ทันที 🟢</label>
+              </div>
+
+              <button onclick="saveDriverPrivilege()" class="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกสิทธิพิเศษ</button>
+          </div>
       </div>
   </div>
 </body>
