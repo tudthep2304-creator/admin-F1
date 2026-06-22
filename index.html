@@ -228,12 +228,11 @@
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการคนขับ</span>
                   </button>
-                <button onclick="switchTab('content-social-management')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition font-medium text-sm group">
-            <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-slate-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/30 flex items-center justify-center transition">
-                <i class="fas fa-thumbs-up group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition"></i>
-            </div>
-            กระดานระบบ Social
-        </button>
+                <!-- 🌟 เมนู: กระดานระบบ Social -->
+                  <button onclick="switchTab('content-social-management'); renderSocialLeaderboard();" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 hover:bg-indigo-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-thumbs-up"></i></div>
+                      <span class="text-[9px] sm:text-[11px] font-bold text-center text-indigo-700 dark:text-indigo-400 leading-tight">ระบบ Social</span>
+                  </button>
                   <button onclick="switchTab('wallet'); renderWalletTab();" class="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-wallet"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">กระเป๋าเงิน</span>
