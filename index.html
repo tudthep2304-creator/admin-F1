@@ -784,17 +784,29 @@
                           <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
                       </div>
                   </div>
-                  <div>
-                      <div class="flex justify-between items-center mb-0.5">
-                          <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300">คะแนนดาว</label>
-                      </div>
-                      <div class="relative">
-                          <input type="text" id="det-rating-display" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-yellow-600 dark:text-yellow-500 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed pr-7 text-center">
-                          <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
+                  <div class="col-span-2 sm:col-span-1">
+                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ความนิยม (Social Score)</label>
+                      <div class="grid grid-cols-4 gap-1">
+                          <div class="bg-white dark:bg-slate-900/50 border border-emerald-200 dark:border-emerald-800/30 rounded-lg p-1 text-center" title="ถูกใจ">
+                              <i class="fas fa-thumbs-up text-emerald-500 text-[10px] mb-0.5"></i>
+                              <p id="det-likes" class="text-[10px] font-black text-gray-800 dark:text-white">0</p>
+                          </div>
+                          <div class="bg-white dark:bg-slate-900/50 border border-red-200 dark:border-red-800/30 rounded-lg p-1 text-center" title="ไม่ถูกใจ">
+                              <i class="fas fa-thumbs-down text-red-500 text-[10px] mb-0.5"></i>
+                              <p id="det-dislikes" class="text-[10px] font-black text-gray-800 dark:text-white">0</p>
+                          </div>
+                          <div class="bg-white dark:bg-slate-900/50 border border-pink-200 dark:border-pink-800/30 rounded-lg p-1 text-center" title="ผู้ติดตาม">
+                              <i class="fas fa-heart text-pink-500 text-[10px] mb-0.5"></i>
+                              <p id="det-followers" class="text-[10px] font-black text-gray-800 dark:text-white">0</p>
+                          </div>
+                          <div class="bg-white dark:bg-slate-900/50 border border-blue-200 dark:border-blue-800/30 rounded-lg p-1 text-center" title="แชร์">
+                              <i class="fas fa-share text-blue-500 text-[10px] mb-0.5"></i>
+                              <p id="det-shares" class="text-[10px] font-black text-gray-800 dark:text-white">0</p>
+                          </div>
                       </div>
                   </div>
                   <div class="col-span-2 mt-1">
-                      <button onclick="openAdjustTierRatingModal(currentDriverFocus);" class="w-full bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50 rounded-lg py-1.5 sm:py-2 text-[11px] font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-gavel"></i> แอดมินปรับระดับ / แจกดาวแมนนวล</button>
+                      <button onclick="openAdjustTierRatingModal(currentDriverFocus);" class="w-full bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/50 rounded-lg py-1.5 sm:py-2 text-[11px] font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-gavel"></i> แอดมินปรับระดับ / แก้ไข Social Score</button>
                   </div>
               </div>
 
@@ -3463,9 +3475,12 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let t = d.tier || 'Standard';
         document.getElementById('det-tier-display').value = t;
 
-        // 🌟 จุดที่ 1: ใช้ค่าดาวตามจริงจาก Database (ที่เราล้างบางการฮาร์ดโค้ดดาวไปก่อนหน้านี้)
-        let displayRating = d.rating !== undefined ? parseFloat(d.rating).toFixed(1) : "5.0";
-        document.getElementById('det-rating-display').value = displayRating;
+
+        // ดึงค่า Social Score โชว์หน้าโปรไฟล์
+document.getElementById('det-likes').innerText = d.likes || 0;
+document.getElementById('det-dislikes').innerText = d.dislikes || 0;
+document.getElementById('det-followers').innerText = d.followers || 0;
+document.getElementById('det-shares').innerText = d.shares || 0;
 
         let editPreview = document.getElementById('edit-drv-pic-preview');
         let editPlaceholder = document.getElementById('edit-drv-pic-placeholder');
