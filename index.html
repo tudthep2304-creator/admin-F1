@@ -596,6 +596,16 @@
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 slim-scroll">
+            <div class="pb-3 flex justify-between items-center shrink-0">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="social-search-input" onkeyup="renderSocialLeaderboard()" placeholder="ค้นหาชื่อ หรือ รหัส PIN..." class="w-full bg-white dark:bg-slate-800 text-gray-800 dark:text-white text-xs font-bold border border-gray-300 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2 outline-none focus:border-indigo-500 transition shadow-sm">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-[10px]"></i>
+                </div>
+                <div class="text-[10px] text-gray-500 font-bold hidden sm:block">เรียงอันดับจาก: <span class="text-indigo-500">คะแนนความนิยม</span></div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <table class="w-full text-left border-collapse min-w-[800px]">
             <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
                 <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead class="bg-gray-100 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 text-[11px] uppercase font-bold">
@@ -3398,6 +3408,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         } else if(table) { table.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-gray-400">ยังไม่มีคนขับ</td></tr>'; }
         
         let statTotal = document.getElementById('stat-total-drivers'); if(statTotal) statTotal.innerText = count;
+        if(typeof renderSocialLeaderboard === 'function') renderSocialLeaderboard();
     });
 
     window.generateDriverId = function() {
@@ -7179,16 +7190,16 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
     // ========================================================
-    // 🌟 ระบบจัดการกระดาน Social (Social Leaderboard)
+    // 🌟 ระบบจัดการกระดาน Social (Social Leaderboard) อัปเกรด
     // ========================================================
     window.renderSocialLeaderboard = function() {
         let tbody = document.getElementById('social-leaderboard-tbody');
         if(!tbody) return;
 
+        let keyword = (document.getElementById('social-search-input')?.value || '').toLowerCase();
         let driversArray = [];
         let totalLikes = 0, totalDislikes = 0, totalFollowers = 0, activeDrivers = 0;
 
-        // ดึงข้อมูลคนขับทั้งหมดมาวิเคราะห์
         for (let drvId in allProfiles) {
             let d = allProfiles[drvId];
             let l = parseInt(d.likes) || 0;
@@ -7196,55 +7207,50 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             let f = parseInt(d.followers) || 0;
             let s = parseInt(d.shares) || 0;
 
-            // เก็บสถิติรวม
             totalLikes += l; totalDislikes += dl; totalFollowers += f;
             if(l > 0 || dl > 0 || f > 0) activeDrivers++;
 
-            // คำนวณเปอร์เซ็นต์ความนิยม (ไลค์ / (ไลค์+ดิสไลค์))
             let ratio = 0;
-            if ((l + dl) > 0) {
-                ratio = (l / (l + dl)) * 100;
-            }
-
-            // คำนวณคะแนนรวม (Score) เพื่อจัดอันดับ (สูตร: ไลค์ 1 คะแนน, ผู้ติดตาม 2 คะแนน, หักดิสไลค์ 2 คะแนน)
+            if ((l + dl) > 0) ratio = (l / (l + dl)) * 100;
             let scoreForSorting = l + (f * 2) - (dl * 2);
 
+            // 🌟 ระบบค้นหา
+            let searchStr = `${drvId} ${d.name || ''}`.toLowerCase();
+            if (keyword && !searchStr.includes(keyword)) continue;
+
             driversArray.push({
-                id: drvId,
-                name: d.name || 'ไม่ทราบชื่อ',
-                tier: d.tier || 'Normal',
-                likes: l,
-                dislikes: dl,
-                followers: f,
-                shares: s,
-                ratio: ratio,
-                score: scoreForSorting
+                id: drvId, name: d.name || 'ไม่ทราบชื่อ', tier: d.tier || 'New',
+                likes: l, dislikes: dl, followers: f, shares: s, ratio: ratio, score: scoreForSorting
             });
         }
 
-        // อัปเดตสถิติด้านบน
-        document.getElementById('social-stat-total-likes').innerText = totalLikes.toLocaleString();
-        document.getElementById('social-stat-total-dislikes').innerText = totalDislikes.toLocaleString();
-        document.getElementById('social-stat-total-followers').innerText = totalFollowers.toLocaleString();
-        document.getElementById('social-stat-active-drivers').innerText = activeDrivers.toLocaleString();
+        // อัปเดตสถิติด้านบน (แสดงยอดรวมทั้งหมด ไม่ใช่แค่ยอดที่ค้นหา)
+        let elL = document.getElementById('social-stat-total-likes'); if(elL) elL.innerText = totalLikes.toLocaleString();
+        let elD = document.getElementById('social-stat-total-dislikes'); if(elD) elD.innerText = totalDislikes.toLocaleString();
+        let elF = document.getElementById('social-stat-total-followers'); if(elF) elF.innerText = totalFollowers.toLocaleString();
+        let elA = document.getElementById('social-stat-active-drivers'); if(elA) elA.innerText = activeDrivers.toLocaleString();
 
-        // จัดอันดับเรียงจากคะแนนรวมมากไปน้อย
         driversArray.sort((a, b) => b.score - a.score);
 
         let html = '';
         driversArray.forEach((d, index) => {
-            // ทำสีเปอร์เซ็นต์ตามเกณฑ์ (เขียว=ดีมาก, เหลือง=ปานกลาง, แดง=วิกฤต)
             let ratioColor = 'text-gray-400';
             if(d.ratio >= 90) ratioColor = 'text-emerald-500 font-bold';
             else if(d.ratio >= 70) ratioColor = 'text-amber-500 font-bold';
             else if(d.ratio > 0 || d.dislikes > 0) ratioColor = 'text-red-500 font-bold';
 
+            // ดึงป้าย Tier สวยๆ มาโชว์
+            let tierBadgeHtml = typeof window.getTierBadgeHtml === 'function' ? window.getTierBadgeHtml(d.tier) : `<span class="text-[9px]">${d.tier}</span>`;
+
             html += `
             <tr class="border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-[11px]">
                 <td class="py-2.5 px-4 text-center font-bold text-gray-400">#${index + 1}</td>
                 <td class="py-2.5 px-4">
-                    <p class="font-bold text-gray-800 dark:text-white">${d.name}</p>
-                    <p class="text-[9px] text-gray-500">PIN: ${d.id} | Tier: <span class="uppercase text-amber-600">${d.tier}</span></p>
+                    <p class="font-bold text-gray-800 dark:text-white cursor-pointer hover:text-indigo-500 transition" onclick="showDriverDetails('${d.id}')">${d.name}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="text-[9px] text-gray-500 font-mono">PIN: ${d.id}</span>
+                        ${tierBadgeHtml}
+                    </div>
                 </td>
                 <td class="py-2.5 px-4 text-center font-black text-emerald-600">${d.likes.toLocaleString()}</td>
                 <td class="py-2.5 px-4 text-center font-black text-red-500">${d.dislikes.toLocaleString()}</td>
@@ -7253,21 +7259,15 @@ document.getElementById('det-shares').innerText = d.shares || 0;
                     <span class="${ratioColor}">${d.ratio > 0 ? d.ratio.toFixed(0) + '%' : '-'}</span>
                 </td>
                 <td class="py-2.5 px-4 text-right">
-                    <button onclick="openAdjustTierRatingModal('${d.id}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 px-2 py-1 rounded text-[10px] font-bold transition">
-                        <i class="fas fa-edit"></i> แก้ไขคะแนน
+                    <button onclick="openAdjustTierRatingModal('${d.id}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 px-2 py-1 rounded text-[10px] font-bold shadow-sm transition">
+                        <i class="fas fa-edit"></i> แก้ไข
                     </button>
                 </td>
             </tr>`;
         });
 
-        tbody.innerHTML = html || '<tr><td colspan="7" class="py-10 text-center text-gray-400">ยังไม่มีข้อมูลคนขับในระบบ</td></tr>';
+        tbody.innerHTML = html || `<tr><td colspan="7" class="py-10 text-center text-gray-400">ไม่พบข้อมูลคนที่ค้นหา</td></tr>`;
     }
-
-    // 🌟 ดักจับการกดเมนู ให้โหลดข้อมูลกระดาน Social ทันทีที่เข้าหน้านี้
-    // นำโค้ด 3 บรรทัดนี้ ไปแทรกไว้ในฟังก์ชัน switchTab(tabId) ของคุณแอดมินครับ
-    // if (tabId === 'content-social-management') {
-    //     renderSocialLeaderboard();
-    // }
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
