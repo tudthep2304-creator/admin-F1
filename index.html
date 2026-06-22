@@ -4504,20 +4504,32 @@ document.getElementById('det-shares').innerText = d.shares || 0;
     
     // 🌟 ฟังก์ชันเปิดป๊อปอัป (ปรับแก้ให้ดึงเฉพาะ Social Score)
     window.openAdjustTierRatingModal = function(drvId) {
-        currentWalletDriverId = drvId;
-        let d = allProfiles[drvId]; if(!d) return;
+        let d = allProfiles[drvId];
+        if(!d) return;
+
         document.getElementById('trm-drv-name').innerText = d.name || 'ไม่ทราบชื่อ';
         document.getElementById('trm-drv-id').innerText = drvId;
-        
-        let cTier = d.tier || 'New';
-        document.getElementById('trm-tier-select').value = cTier;
+
+        // วาดตัวเลือกระดับชั้น (Tiers)
+        let tierSelect = document.getElementById('trm-tier-select');
+        tierSelect.innerHTML = '';
+        if(window.systemTiersMap) {
+            Object.keys(window.systemTiersMap).forEach(t => {
+                tierSelect.innerHTML += `<option value="${t}" ${t === d.tier ? 'selected' : ''}>${t}</option>`;
+            });
+        } else {
+            ['New', 'Standard', 'Silver', 'Gold', 'Platinum', 'Legend', 'Owner Super Legend'].forEach(t => {
+                tierSelect.innerHTML += `<option value="${t}" ${t === d.tier ? 'selected' : ''}>${t}</option>`;
+            });
+        }
+
+        // 🌟 ดึงยอด Social Score เดิมจากฐานข้อมูลมาใส่ในช่อง
+        document.getElementById('edit-likes').value = parseInt(d.likes) || 0;
+        document.getElementById('edit-dislikes').value = parseInt(d.dislikes) || 0;
+        document.getElementById('edit-followers').value = parseInt(d.followers) || 0;
+        document.getElementById('edit-shares').value = parseInt(d.shares) || 0;
+
         document.getElementById('trm-note').value = '';
-        
-        // ดึงค่า Social Score ของคนขับมาแสดง
-        document.getElementById('edit-likes').value = d.likes || 0;
-        document.getElementById('edit-dislikes').value = d.dislikes || 0;
-        document.getElementById('edit-followers').value = d.followers || 0;
-        document.getElementById('edit-shares').value = d.shares || 0;
 
         openModal('modalAdjustTierRating');
     }
@@ -4529,38 +4541,62 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         // ไม่ต้องทำอะไรแล้ว ปล่อยว่างไว้เพื่อป้องกัน Error อนาคต
     }
 
-    // 🌟 ฟังก์ชันบันทึกข้อมูล (ปรับให้ส่งค่า Social Score ขึ้น Firebase)
-    function submitTierRatingAdjustment() {
-    let newTier = document.getElementById('trm-tier-select').value;
-    let note = document.getElementById('trm-note').value;
-
-    // 🌟 ดึงค่า Social Score ใหม่จากหน้าต่างป๊อปอัปที่เราเพิ่งสร้าง
-    let newLikes = parseInt(document.getElementById('edit-likes').value) || 0;
-    let newDislikes = parseInt(document.getElementById('edit-dislikes').value) || 0;
-    let newFollowers = parseInt(document.getElementById('edit-followers').value) || 0;
-    let newShares = parseInt(document.getElementById('edit-shares').value) || 0;
-
-    // อัปเดตข้อมูลขึ้น Firebase
-    firebase.database().ref('drivers/' + currentDriverFocus).update({
-        tier: newTier,
-        tierNote: note,
-        likes: newLikes,
-        dislikes: newDislikes,
-        followers: newFollowers,
-        shares: newShares
-    }).then(() => {
-        closeTierRatingModal(); // ปิดหน้าต่าง (ใช้ชื่อฟังก์ชันตาม HTML ของคุณแอดมิน)
-        alert('อัปเดตระดับและ Social Score เรียบร้อยแล้ว!');
+    // 🌟 ฟังก์ชันบันทึกข้อมูล (ปรับให้ส่งค่า Social Score ขึ้น Firebase ให้ถูกโหนด)
+    window.submitTierRatingAdjustment = function() {
+        // ดึงรหัสคนขับจากหน้าต่างป๊อปอัปให้ชัวร์ที่สุด
+        let drvId = document.getElementById('trm-drv-id').innerText.replace('PIN:', '').trim();
+        // เผื่อเหนียว ดึงจากตัวแปรเดิมถ้าหาไม่เจอ
+        if (!drvId && typeof currentDriverFocus !== 'undefined') drvId = currentDriverFocus; 
         
-        // รีเฟรชหน้าต่างประวัติคนขับให้โชว์เลขใหม่
-        if(typeof showDriverDetails === 'function') {
-            showDriverDetails(currentDriverFocus); 
-        }
-    }).catch(error => {
-        console.error("Error updating Tier/Social Score: ", error);
-        alert('เกิดข้อผิดพลาด: ' + error.message);
-    });
-}
+        let newTier = document.getElementById('trm-tier-select').value;
+        let note = document.getElementById('trm-note').value.trim();
+
+        if(!drvId) return showCustomAlert('Error', 'ไม่พบข้อมูลคนขับ', 'error');
+
+        // 🌟 ดึงค่า Social Score ใหม่จากหน้าต่างป๊อปอัป
+        let newLikes = parseInt(document.getElementById('edit-likes').value) || 0;
+        let newDislikes = parseInt(document.getElementById('edit-dislikes').value) || 0;
+        let newFollowers = parseInt(document.getElementById('edit-followers').value) || 0;
+        let newShares = parseInt(document.getElementById('edit-shares').value) || 0;
+
+        let updates = {};
+        
+        // 🌟 สำคัญ: เปลี่ยนมาบันทึกลงโหนด drivers_profile
+        updates[`drivers_profile/${drvId}/tier`] = newTier;
+        updates[`drivers_profile/${drvId}/likes`] = newLikes;
+        updates[`drivers_profile/${drvId}/dislikes`] = newDislikes;
+        updates[`drivers_profile/${drvId}/followers`] = newFollowers;
+        updates[`drivers_profile/${drvId}/shares`] = newShares;
+
+        // 🌟 บันทึกประวัติการปรับเปลี่ยนลงฐานข้อมูลด้วย (Admin Log)
+        let histRef = db.ref(`tier_history/${drvId}`).push();
+        updates[`tier_history/${drvId}/${histRef.key}`] = {
+            oldTier: (allProfiles[drvId] && allProfiles[drvId].tier) ? allProfiles[drvId].tier : 'New',
+            newTier: newTier,
+            note: note || 'แอดมินปรับ Social Score แมนนวล',
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            adminName: "แอดมินระบบ"
+        };
+
+        db.ref().update(updates).then(() => {
+            // เปลี่ยนจากการใช้ alert() ธรรมดา มาใช้ป๊อปอัปสวยๆ ของเรา
+            showCustomAlert('สำเร็จ', 'อัปเดตระดับและ Social Score เรียบร้อยแล้ว', 'success');
+            
+            // ปิดหน้าต่างป๊อปอัป
+            if(typeof closeTierRatingModal === 'function') closeTierRatingModal();
+            else closeModal('modalAdjustTierRating');
+            
+            // รีเฟรชหน้าต่างประวัติคนขับให้โชว์เลขใหม่ทันที
+            if(typeof showDriverDetails === 'function') showDriverDetails(drvId);
+            
+            // 🌟 ให้กระดานผู้นำ (Social Leaderboard) จัดอันดับใหม่ทันทีด้วย!
+            if(typeof renderSocialLeaderboard === 'function') renderSocialLeaderboard();
+            
+        }).catch(error => {
+            console.error("Error updating Tier/Social Score: ", error);
+            showCustomAlert('เกิดข้อผิดพลาด', error.message, 'error');
+        });
+    }
     // 🌟 ฟังก์ชันเปิด-ปิด ช่องกรอกจำกัดสิทธิ์
     window.toggleLimitInputs = function(isChecked) {
         document.getElementById('cond-limit-val').disabled = !isChecked;
