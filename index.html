@@ -1033,13 +1033,12 @@
           </div>
       </section>
 
-      <!-- ================= หน้าจัดการระดับคนขับ (Tiers & ดาว) ================= -->
       <section id="content-tiers" class="tab-content hidden space-y-4">
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3 border-b border-gray-200 dark:border-slate-800 pb-4">
                   <div>
                       <h2 class="text-lg font-bold text-amber-600 dark:text-amber-500"><i class="fas fa-balance-scale mr-1.5"></i> กฎระเบียบและบทลงโทษ (Penalties)</h2>
-                      <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">ตั้งค่าการหักคะแนนดาวและลดระดับอัตโนมัติเมื่อคนขับทำผิดกฎ</p>
+                      <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">ตั้งค่าการลงโทษและลดระดับอัตโนมัติเมื่อคนขับทำผิดกฎ</p>
                   </div>
                   <button onclick="savePenaltyRules()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 shrink-0"><i class="fas fa-save"></i> บันทึกกฎ</button>
               </div>
@@ -1048,23 +1047,23 @@
                   <div class="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-200 dark:border-red-800/30">
                       <h3 class="text-sm font-bold text-red-600 dark:text-red-400 mb-3"><i class="fas fa-ban"></i> การยกเลิกงาน (Cancellation)</h3>
                       <div class="flex items-center justify-between gap-4">
-                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หักคะแนนดาวเมื่อคนขับ "กดยกเลิกงาน" หลังรับงานไปแล้ว</label>
+                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">บวกยอด "ดิสไลก์ (Dislike)" อัตโนมัติเมื่อคนขับกดยกเลิกงาน</label>
                           <div class="flex items-center gap-2 shrink-0">
-                              <span class="text-xs text-red-500 font-bold">-</span>
-                              <input type="number" id="rule-cancel-penalty" step="0.1" placeholder="0.5" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-red-500">
-                              <span class="text-xs font-bold text-gray-500">ดาว</span>
+                              <span class="text-xs text-red-500 font-bold">+</span>
+                              <input type="number" id="rule-cancel-penalty" min="0" placeholder="1" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-red-500">
+                              <span class="text-xs font-bold text-gray-500">ครั้ง</span>
                           </div>
                       </div>
                   </div>
 
                   <div class="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-xl border border-orange-200 dark:border-orange-800/30">
-                      <h3 class="text-sm font-bold text-orange-600 dark:text-orange-400 mb-3"><i class="fas fa-star-half-alt"></i> การถูกลูกค้ารีวิวต่ำกว่าเกณฑ์</h3>
+                      <h3 class="text-sm font-bold text-orange-600 dark:text-orange-400 mb-3"><i class="fas fa-thumbs-down"></i> การบริการต่ำกว่ามาตรฐาน (Poor Service)</h3>
                       <div class="flex items-center justify-between gap-4">
-                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หักคะแนนเมื่อถูกลูกค้า "รีวิว 1 ดาว"</label>
+                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หักยอด "ไลก์ (Like)" สะสมทิ้งทันที เมื่อลูกค้ากดไม่ถูกใจ</label>
                           <div class="flex items-center gap-2 shrink-0">
                               <span class="text-xs text-orange-500 font-bold">-</span>
-                              <input type="number" id="rule-dislike-penalty" step="0.1" placeholder="1.0" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-orange-500">
-                              <span class="text-xs font-bold text-gray-500">ดาว</span>
+                              <input type="number" id="rule-dislike-penalty" min="0" placeholder="1" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-orange-500">
+                              <span class="text-xs font-bold text-gray-500">ครั้ง</span>
                           </div>
                       </div>
                   </div>
@@ -1072,10 +1071,10 @@
                   <div class="bg-gray-50 dark:bg-slate-800/40 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
                       <h3 class="text-sm font-bold text-gray-700 dark:text-slate-300 mb-3"><i class="fas fa-arrow-down text-gray-500"></i> การตกชั้นอัตโนมัติ (Demotion)</h3>
                       <div class="flex items-center justify-between gap-4">
-                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หากคะแนนดาวต่ำกว่าเกณฑ์นี้ จะถูกลดไปอยู่ระดับ "Standard" ทันที</label>
+                          <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หาก <span class="text-indigo-500">เปอร์เซ็นต์ความนิยม (%)</span> ต่ำกว่าเกณฑ์นี้ จะถูกลดไปอยู่ระดับ "Standard" ทันที</label>
                           <div class="flex items-center gap-2 shrink-0">
-                              <input type="number" id="rule-demote-threshold" step="0.1" placeholder="4.5" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-gray-500">
-                              <span class="text-xs font-bold text-gray-500">ดาว</span>
+                              <input type="number" id="rule-demote-threshold" step="1" max="100" min="0" placeholder="70" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-gray-500">
+                              <span class="text-xs font-bold text-gray-500">%</span>
                           </div>
                       </div>
                   </div>
@@ -1417,10 +1416,6 @@
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">ลำดับขั้น (1=ต่ำสุด, 2, 3...)</label>
                           <input type="number" id="tier-input-level" placeholder="เช่น 1, 2, 3" value="1" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-blue-600 dark:text-[#1da1f2] border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-black text-center outline-none focus:border-amber-500 shadow-inner">
                       </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-500 mb-1">คะแนนดาวเริ่มต้น</label>
-                          <input type="number" id="tier-input-rating" step="0.1" placeholder="เช่น 5.0" value="5.0" class="w-full p-2.5 bg-gray-50 dark:bg-slate-800 text-amber-600 dark:text-amber-500 border border-gray-300 dark:border-slate-700 rounded-xl text-sm font-black text-center outline-none focus:border-amber-500">
-                      </div>
                   </div>
 
                   <div>
@@ -1445,11 +1440,7 @@
                       <h4 class="text-[10px] font-black text-blue-600 dark:text-[#1da1f2] uppercase"><i class="fas fa-magic"></i> กฎพิเศษสำหรับระดับนี้</h4>
                       <label class="flex items-start gap-2 cursor-pointer">
                           <input type="checkbox" id="tier-rule-reset" class="w-4 h-4 mt-0.5 accent-blue-500">
-                          <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300 leading-tight">รีเซ็ตดาวกลับเป็น "ดาวเริ่มต้น" อัตโนมัติเมื่อเลื่อนขึ้นมาระดับนี้ (ล้างประวัติดาวตก)</span>
-                      </label>
-                      <label class="flex items-start gap-2 cursor-pointer">
-                          <input type="checkbox" id="tier-rule-invincible" class="w-4 h-4 mt-0.5 accent-amber-500">
-                          <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300 leading-tight">⭐ สถานะดาวอมตะ (ล็อกค่าดาวไม่ให้ลด, ไม่ถูกหารเฉลี่ยจากลูกค้า, และสามารถตั้งค่าทะลุ 5.0 ได้)</span>
+                          <span class="text-[10px] font-bold text-gray-600 dark:text-gray-300 leading-tight">รีเซ็ตคะแนน Social Score อัตโนมัติเมื่อเลื่อนขึ้นมาระดับนี้ (ล้างประวัติการถูกดิสไลก์เดิมทั้งหมดให้เป็น 0)</span>
                       </label>
                   </div>
 
@@ -4835,7 +4826,7 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         // เคลียร์ฟอร์ม
         document.getElementById('quest-id').value = '';
         document.getElementById('quest-name').value = '';
-        document.getElementById('quest-target-rating').value = '';
+        document.getElementById('quest-target-likes').value = ''; // 🌟 เปลี่ยนเป็น likes
         document.getElementById('cond-days-val').value = '';
         
         document.getElementById('cond-limit-check').checked = false;
@@ -4851,22 +4842,17 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         let now = new Date();
         let tzoffset = now.getTimezoneOffset() * 60000; 
         
-        // 1. หาเวลาปัจจุบัน (ขั้นต่ำ)
         let localISOMin = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 16);
-        
-        // 2. คำนวณเวลาสูงสุด (บวกไปอีก 1 ปี หรือ 365 วัน)
         let maxDate = new Date(now);
         maxDate.setFullYear(maxDate.getFullYear() + 1);
         let localISOMax = (new Date(maxDate.getTime() - tzoffset)).toISOString().slice(0, 16);
         
-        // 3. บังคับใส่ขอบเขตให้ปฏิทินทั้ง 2 ช่อง
         document.getElementById('quest-start').min = localISOMin;
         document.getElementById('quest-start').max = localISOMax;
-        
         document.getElementById('quest-end').min = localISOMin;
         document.getElementById('quest-end').max = localISOMax;
 
-        // 🌟 ดึงข้อมูลจากส่วนกลาง (System Variables) ตัวจริงของระบบ!
+        // 🌟 ดึงข้อมูลจากส่วนกลาง
         let mainTiers = [];
         if (window.systemTiersMap && Object.keys(window.systemTiersMap).length > 0) {
             mainTiers = Object.keys(window.systemTiersMap);
@@ -4924,7 +4910,7 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-edit mr-1"></i> แก้ไขแคมเปญภารกิจ DRV';
             document.getElementById('quest-id').value = questId;
             document.getElementById('quest-name').value = q.name || '';
-            document.getElementById('quest-target-rating').value = q.targetMinRating || '';
+            document.getElementById('quest-target-likes').value = q.targetLikes || ''; // 🌟 เปลี่ยนเป็น likes
             document.getElementById('cond-days-val').value = c.days || '';
             document.getElementById('cond-days-unit').value = c.daysUnit || 'days';
             
@@ -4948,22 +4934,22 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             updateMultiSelectText('tier'); updateMultiSelectText('veh');
 
             // วาดเงื่อนไขเดิม
-              let condList = document.getElementById('dynamic-conditions-list');
-              let hasMainCond = false;
+            let condList = document.getElementById('dynamic-conditions-list');
+            let hasMainCond = false;
 
-              if (c.rides > 0) {
-                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ', true, true));
-                  hasMainCond = true;
-              } else if (c.likes > 0 || c.stars > 0) { // 🌟 แก้ให้ดึงค่า Likes
-                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('likes', c.likes || c.stars, '', true, true));
-                  hasMainCond = true;
-              } else if (c.onlineHours > 0) {
-                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours, '', true, true));
-                  hasMainCond = true;
-              } else if (c.peakHoursData) {
-                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData, '', true, true));
-                  hasMainCond = true;
-              }
+            if (c.rides > 0) {
+                condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ', true, true));
+                hasMainCond = true;
+            } else if (c.likes > 0) { // 🌟 แก้ให้ดึงค่า Likes
+                condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('likes', c.likes, '', true, true));
+                hasMainCond = true;
+            } else if (c.onlineHours > 0) {
+                condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours, '', true, true));
+                hasMainCond = true;
+            } else if (c.peakHoursData) {
+                condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData, '', true, true));
+                hasMainCond = true;
+            }
             if (c.minAr > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', c.minAr, '', false, false));
 
             document.getElementById('select-condition-type').disabled = hasMainCond;
@@ -4987,20 +4973,18 @@ document.getElementById('det-shares').innerText = d.shares || 0;
     window.saveQuestCampaignDRV = function() {
         let qId = document.getElementById('quest-id').value || 'QST_' + Date.now();
         let name = document.getElementById('quest-name').value.trim();
-        let targetMinRating = parseFloat(document.getElementById('quest-target-rating').value) || 0;
+        let targetLikes = parseInt(document.getElementById('quest-target-likes').value) || 0; // 🌟 เปลี่ยนเป็น likes
         
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อแคมเปญภารกิจ DRV ด้วยครับ', 'error');
-      
-      // 🌟 ดักเช็คเวลาเริ่มต้นต้องไม่เป็นอดีต (ตรวจสอบเฉพาะกรณีสร้างแคมเปญใหม่เท่านั้น)
+       
         let isNewQuest = !document.getElementById('quest-id').value;
+        let startVal = document.getElementById('quest-start').value; // เอามาไว้ตรงนี้ก่อน
         if (isNewQuest && startVal) {
-            // ลบออก 60000 ms (1 นาที) เพื่อเป็นบัฟเฟอร์เผื่อแอดมินใช้เวลาพิมพ์หน้าฟอร์มนานกว่าจะกดเซฟ
             if (new Date(startVal).getTime() < (Date.now() - 60000)) {
                 return showCustomAlert('ตั้งเวลาผิดพลาด', 'เวลาเริ่มต้นต้องไม่เป็นเวลาในอดีตครับ', 'error');
             }
         }
-      // 🌟 2. ดักเช็คเวลา! (ป้องกันเวลาหมดเขต น้อยกว่าเวลาเริ่ม)
-        let startVal = document.getElementById('quest-start').value;
+        
         let endVal = document.getElementById('quest-end').value;
         if (startVal && endVal) {
             if (new Date(startVal) >= new Date(endVal)) {
@@ -5008,13 +4992,11 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             }
         }
 
-        // 🌟 3. ดักเช็คว่าใส่เงื่อนไขและรางวัลหรือยัง?
         let condRows = document.querySelectorAll('.condition-item-row');
         let rewRows = document.querySelectorAll('.reward-item-row');
         if (condRows.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเพิ่ม "เงื่อนไขแคมเปญ" อย่างน้อย 1 อย่างครับ', 'error');
         if (rewRows.length === 0) return showCustomAlert('ใจร้ายจัง!', 'อย่าลืมเพิ่ม "ของรางวัล" ให้คนขับด้วยนะครับ', 'error');
 
-        // 🌟 4. ดักเช็คกรณีเลือก Peak Hours ว่าใส่เวลาครบไหม?
         let isPeakError = false;
         condRows.forEach(row => {
             if (row.getAttribute('data-type') === 'peak') {
@@ -5025,18 +5007,15 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         });
         if (isPeakError) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุเวลา "จาก-ถึง" ในเงื่อนไขช่วงเวลาพิเศษให้ครบถ้วนครับ', 'error');
 
-        // กวาดข้อมูลจาก Custom Checkboxes
         let targetTiers = Array.from(document.querySelectorAll('.tier-checkbox:checked')).map(cb => cb.value);
         let targetVehicles = Array.from(document.querySelectorAll('.veh-checkbox:checked')).map(cb => cb.value);
         
         let isSignup = false;
-        // แยกเงื่อนไขสมัครใหม่ออกจาก Tiers
         if (targetTiers.includes('new_signup')) {
             isSignup = true;
             targetTiers = targetTiers.filter(t => t !== 'new_signup');
         }
         
-        // ถ้าไม่ได้เลือกอะไรเลย หรือ มีการเลือก "ทุกระดับ (all)" ให้ใส่ค่า 'all' กลับไป
         if (targetTiers.length === 0 || targetTiers.includes('all')) targetTiers = ['all'];
         if (targetVehicles.length === 0 || targetVehicles.includes('all')) targetVehicles = ['all'];
 
@@ -5064,7 +5043,8 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         });
 
         let payload = {
-            name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, targetMinRating: targetMinRating,
+            name: name, targetTiers: targetTiers, targetVehicles: targetVehicles, 
+            targetLikes: targetLikes, // 🌟 เปลี่ยนเป็น targetLikes
             conditions: conditions, startTime: document.getElementById('quest-start').value || null,
             endTime: document.getElementById('quest-end').value || null, isActive: document.getElementById('quest-is-active').checked,
             timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -6033,25 +6013,22 @@ document.getElementById('det-shares').innerText = d.shares || 0;
                 let data = child.val();
                 tiersList.push({ 
                     name: child.key, 
-                    rating: data.defaultRating !== undefined ? data.defaultRating : 5.0, 
                     level: data.rankLevel || 1,
                     theme: data.badgeTheme || 'default', // 🌟 ดึงค่าธีมสี
                     desc: data.description || 'ไม่มีคำอธิบาย',
-                    resetOnPromote: data.resetOnPromote || false,
-                    isInvincible: data.isInvincible || false
+                    resetOnPromote: data.resetOnPromote || false
                 });
             });
 
             tiersList.sort((a, b) => a.level - b.level);
 
             tiersList.forEach((t) => {
-                // 🌟 เก็บธีมสีลง RAM ด้วย
-                window.systemTiersMap[t.name] = { desc: t.desc, rating: t.rating, theme: t.theme, resetOnPromote: t.resetOnPromote, isInvincible: t.isInvincible };
+                // 🌟 เก็บข้อมูลลง RAM (ลบ rating และ isInvincible ออกแล้ว)
+                window.systemTiersMap[t.name] = { desc: t.desc, theme: t.theme, resetOnPromote: t.resetOnPromote };
                 window.tierLevels[t.name] = t.level; 
 
                 let specialBadges = '';
-                if(t.resetOnPromote) specialBadges += `<span class="bg-blue-100 text-blue-600 px-1 py-0.5 rounded text-[8px] mr-1">รีเซ็ตดาว</span>`;
-                if(t.isInvincible) specialBadges += `<span class="bg-amber-100 text-amber-600 px-1 py-0.5 rounded text-[8px]">⭐ อมตะ</span>`;
+                if(t.resetOnPromote) specialBadges += `<span class="bg-blue-100 text-blue-600 px-1 py-0.5 rounded text-[8px] mr-1">รีเซ็ตคะแนน</span>`;
 
                 html += `
                 <div class="bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
@@ -6059,12 +6036,12 @@ document.getElementById('det-shares').innerText = d.shares || 0;
                         <div class="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400 text-amber-900 rounded-full flex items-center justify-center text-lg shadow-sm"><i class="fas fa-medal"></i></div>
                         <div>
                             <h3 class="font-black text-gray-800 dark:text-white text-sm">LV.${t.level} : ${t.name}</h3>
-                            <p class="text-[10px] text-gray-500 mb-1">ดาวเริ่ม: <b>${t.rating}</b> | ${t.desc}</p>
+                            <p class="text-[10px] text-gray-500 mb-1">${t.desc}</p>
                             <div>${window.getTierBadgeHtml(t.name)} ${specialBadges}</div>
                         </div>
                     </div>
                     <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.rating}, ${t.level}, '${t.theme}', ${t.resetOnPromote}, ${t.isInvincible})" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.level}, '${t.theme}', ${t.resetOnPromote})" class="w-8 h-8 bg-blue-100 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
                         <button onclick="deleteTierData('${t.name}')" class="w-8 h-8 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
@@ -6096,11 +6073,9 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         document.getElementById('tier-old-id').value = id;
         document.getElementById('tier-input-name').value = id; 
         document.getElementById('tier-input-desc').value = desc;
-        document.getElementById('tier-input-rating').value = rating; 
         document.getElementById('tier-input-level').value = level; 
         document.getElementById('tier-input-theme').value = theme; // 🌟 หยอดค่าธีม
         document.getElementById('tier-rule-reset').checked = isReset; 
-        document.getElementById('tier-rule-invincible').checked = isInv; 
 
         document.getElementById('tier-modal-title').innerHTML = id ? '<i class="fas fa-edit mr-1"></i> แก้ไขระดับชั้น' : '<i class="fas fa-plus-circle mr-1"></i> เพิ่มระดับชั้นใหม่';
         openModal('modalTierForm');
@@ -6111,11 +6086,9 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         let oldId = document.getElementById('tier-old-id').value;
         let newName = document.getElementById('tier-input-name').value.trim();
         let desc = document.getElementById('tier-input-desc').value.trim();
-        let rating = parseFloat(document.getElementById('tier-input-rating').value) || 5.0; 
         let level = parseInt(document.getElementById('tier-input-level').value) || 1; 
         let theme = document.getElementById('tier-input-theme').value; // 🌟 อ่านค่าธีม
         let isReset = document.getElementById('tier-rule-reset').checked; 
-        let isInv = document.getElementById('tier-rule-invincible').checked; 
 
         if(!newName) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ชื่อระดับชั้นด้วยครับ', 'error');
         if(/[.#$\[\]]/.test(newName)) return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้น', 'error');
@@ -6124,11 +6097,9 @@ document.getElementById('det-shares').innerText = d.shares || 0;
 
         db.ref('config/tiers/' + newName).set({ 
             description: desc, 
-            defaultRating: rating, 
             rankLevel: level, 
             badgeTheme: theme, // 🌟 เซฟธีมสีลง Firebase!
             resetOnPromote: isReset, 
-            isInvincible: isInv,     
             updatedAt: firebase.database.ServerValue.TIMESTAMP 
         }).then(() => {
             showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เรียบร้อยแล้ว`, 'success'); 
@@ -6429,18 +6400,16 @@ document.getElementById('det-shares').innerText = d.shares || 0;
 
             let updates = {};
             let currentBonus = parseFloat(d.creditBonus || 0);
-            let currentRating = parseFloat(d.rating || 5.0);
             let newBonus = currentBonus;
-            let newRating = currentRating;
 
+            // บวกโบนัสให้คนขับตามที่แคมเปญกำหนด
             if(camp.rewardBonus > 0) newBonus += camp.rewardBonus;
-            if(newRating > 5.0) newRating = 5.0;
 
             updates[`drivers_profile/${driverPin}/creditBonus`] = newBonus;
-            updates[`drivers_profile/${driverPin}/rating`] = newRating.toFixed(1);
             updates[`partner_requests/${reqId}/status`] = 'approved';
             updates[`partner_requests/${reqId}/approvedAt`] = firebase.database.ServerValue.TIMESTAMP;
 
+            // บันทึกประวัติการแจกโบนัสลงบัญชี (Ledger & Wallet Transactions)
             if(camp.rewardBonus > 0) {
                 let expDays = camp.rewardExpireDays || 0;
                 let expAt = expDays > 0 ? Date.now() + (expDays * 24 * 60 * 60 * 1000) : 0;
@@ -6451,6 +6420,7 @@ document.getElementById('det-shares').innerText = d.shares || 0;
                 updates[`wallet_transactions/${driverPin}/${txRef.key}`] = { timestamp: firebase.database.ServerValue.TIMESTAMP, role: 'driver', walletType: 'bonus', actionType: 'add', amount: camp.rewardBonus, note: `อนุมัติแคมเปญร้านค้า: ${camp.name}`, balanceAfter: newBonus, adminName: "แอดมินตรวจงาน" };
             }
 
+            // ถ้ามีโค้ดส่วนลด ให้ตัดโค้ดนั้นว่าใช้งานแล้ว
             if(claimedCode && camp.codes && camp.codes[claimedCode]) {
                 updates[`system_settings/partner_campaigns/${campId}/codes/${claimedCode}/used`] = true;
             }
@@ -6459,7 +6429,6 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             showCustomAlert('สำเร็จ!', `อนุมัติงานร้านค้าและแจกรางวัลให้คนขับ ${driverPin} เรียบร้อยแล้ว`, 'success');
         });
     }
-
     window.rejectPartnerProof = function(reqId, driverPin) {
         let reason = prompt("กรุณาระบุเหตุผลที่ไม่อนุมัติ (เช่น รูปไม่ชัด, ไม่มีตราปั๊มร้าน):");
         if(reason === null) return;
@@ -7615,8 +7584,11 @@ document.getElementById('det-shares').innerText = d.shares || 0;
 
                   <div class="grid grid-cols-2 gap-3 pt-2 border-t border-gray-50 dark:border-slate-700/50">
                       <div>
-                          <label class="block text-[10px] font-bold text-gray-500 mb-1">เกรดดาวไม่ต่ำกว่า</label>
-                          <input type="number" id="quest-target-rating" step="0.1" min="0" max="5" placeholder="เช่น 4.5" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-blue-500 font-mono text-center font-bold">
+                          <label class="block text-[10px] font-bold text-gray-500 mb-1"><i class="fas fa-thumbs-up text-emerald-500 mr-1"></i> ยอดไลก์สะสมไม่ต่ำกว่า</label>
+                          <div class="relative">
+                              <input type="number" id="quest-target-likes" min="0" placeholder="เช่น 100" class="w-full p-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none focus:border-emerald-500 font-mono text-center font-bold pr-8">
+                              <span class="absolute right-3 top-2.5 text-[9px] text-gray-400 font-bold">ไลก์</span>
+                          </div>
                       </div>
                       <div>
                           <label class="block text-[10px] font-bold text-gray-500 mb-1">อายุสมาชิกครบ</label>
@@ -7729,7 +7701,7 @@ document.getElementById('det-shares').innerText = d.shares || 0;
   <div id="modalAdjustTierRating" class="hidden fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
           <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
-              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500 pl-2"><i class="fas fa-trophy mr-1"></i> ปรับระดับ & ดาวควบคุม</h2>
+              <h2 class="text-base font-bold text-amber-600 dark:text-amber-500 pl-2"><i class="fas fa-trophy mr-1"></i> ปรับระดับ & Social Score</h2>
               <button onclick="closeTierRatingModal()" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white relative z-50"><i class="fas fa-times"></i></button>
           </div>
           
@@ -7744,8 +7716,8 @@ document.getElementById('det-shares').innerText = d.shares || 0;
 
               <div>
                   <label class="block text-[10px] font-bold text-gray-500 mb-1">ปรับเปลี่ยนระดับชั้น (Driver Tier)</label>
-                  <select id="trm-tier-select" onchange="autoFillOverrideStars()" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
-    </select>
+                  <select id="trm-tier-select" class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-bold focus:border-amber-500">
+                  </select>
               </div>
 
               <div>
@@ -7775,7 +7747,7 @@ document.getElementById('det-shares').innerText = d.shares || 0;
                   <input type="text" id="trm-note" placeholder="เหตุผลการเลื่อนระดับ..." class="w-full p-2.5 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-xs focus:border-amber-500">
               </div>
               
-              <button onclick="submitTierRatingAdjustment()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-check"></i> บันทึกระดับพนักงาน</button>
+              <button onclick="submitTierRatingAdjustment()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-check"></i> บันทึกข้อมูล</button>
           </div>
       </div>
   </div>
@@ -8005,7 +7977,7 @@ document.getElementById('det-shares').innerText = d.shares || 0;
 
               <div class="border-t border-dashed border-gray-300 dark:border-slate-700 pt-4">
                   <h3 class="text-xs font-bold text-purple-600 mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับเมื่อแอดมินอนุมัติ</h3>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-purple-50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-200 dark:border-purple-800/50">
+                  <div class="grid grid-cols-2 gap-3 bg-purple-50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-200 dark:border-purple-800/50">
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">โบนัสเงิน (🟡)</label>
                           <input type="number" id="partner-reward-bonus" placeholder="เช่น 50" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
@@ -8013,10 +7985,6 @@ document.getElementById('det-shares').innerText = d.shares || 0;
                       <div>
                           <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">อายุโบนัส (วัน)</label>
                           <input type="number" id="partner-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 bg-white dark:bg-slate-900 text-yellow-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-1">เพิ่มคะแนนดาว (⭐)</label>
-                          <input type="number" step="0.1" id="partner-reward-rating" placeholder="เช่น 0.2" class="w-full p-2 bg-white dark:bg-slate-900 text-amber-600 border border-purple-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold text-center focus:border-purple-500">
                       </div>
                   </div>
               </div>
