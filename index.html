@@ -2752,10 +2752,10 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         // 🌟 ดึงข้อมูลกระเป๋าเงินลูกค้าจาก Firebase สดๆ
         db.ref('passengers_profile/' + uid).once('value', snap => {
             let d = snap.val() || {};
-            let cash = parseFloat(d.creditCash || 0).toFixed(0);
-            let bonus = parseFloat(d.creditBonus || 0).toFixed(0);
-            document.getElementById('pdet-wallet-cash').innerText = `฿${cash}`;
-            document.getElementById('pdet-wallet-bonus').innerText = `฿${bonus}`;
+            let rawCash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
+let rawBonus = parseFloat(d.creditBonus || 0);
+if(document.getElementById('det-cash')) document.getElementById('det-cash').value = '฿' + rawCash.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+if(document.getElementById('det-bonus')) document.getElementById('det-bonus').value = '฿' + rawBonus.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         });
 
         openModal('modalPassengerDetails');
@@ -3438,14 +3438,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                 count++; let d = child.val(); let displayId = child.key; 
                 let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
                 let genderIcon = d.gender === 'female' ? `<i class="fas fa-venus text-pink-500 mx-1" title="หญิง"></i>` : `<i class="fas fa-mars text-blue-500 mx-1" title="ชาย"></i>`;
-                let cashVal = parseFloat(d.creditCash || d.credit || 0).toFixed(0); 
-                let bonusVal = parseFloat(d.creditBonus || 0).toFixed(0);
-                
-                let creditDisplay = `
-                    <span class="whitespace-nowrap bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-money-bill-wave"></i> ${cashVal}</span>
-                    <span class="whitespace-nowrap bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-star"></i> ${bonusVal}</span>
-                `;
+                let rawCashVal = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0)); 
+let rawBonusVal = parseFloat(d.creditBonus || 0);
 
+let creditDisplay = `
+    <span class="whitespace-nowrap bg-blue-50 dark:bg-slate-800 text-blue-500 border border-blue-100 dark:border-slate-700 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1">฿${rawCashVal.toLocaleString('en-US')}</span>
+    <span class="whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-500 border border-amber-200 dark:border-amber-800/50 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1"><i class="fas fa-star"></i> ${rawBonusVal.toLocaleString('en-US')}</span>
+`;
                 let profilePicHtml = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
                 
                 html += `
@@ -6293,7 +6292,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-camp-end').value = '';
             document.getElementById('partner-reward-bonus').value = '';
             document.getElementById('partner-reward-expire').value = '';
-            document.getElementById('partner-reward-rating').value = '';
             
             // ล้างข้อมูลการจำกัดสิทธิ์ตอนสร้างใหม่
             let lChk = document.getElementById('pc-limit-check');
