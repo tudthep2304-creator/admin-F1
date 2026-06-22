@@ -626,6 +626,65 @@
         </div>
     </section>
 
+    <!-- 🌟 หน้าต่างตรวจสอบประวัติการกด Social ของคนขับ -->
+  <div id="modalSocialHistory" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-indigo-500/50 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-indigo-50 dark:bg-indigo-900/20 shrink-0">
+              <h2 class="text-base font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                  <i class="fas fa-list-ul"></i> ประวัติการโต้ตอบ: <span id="sh-drv-name" class="text-gray-800 dark:text-white ml-1">ชื่อคนขับ</span>
+              </h2>
+              <button onclick="closeModal('modalSocialHistory')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <!-- 🌟 แผงตัวกรองข้อมูล (Filters) -->
+          <div class="p-4 bg-gray-50 dark:bg-slate-800/40 border-b border-gray-200 dark:border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-3 shrink-0">
+              <div class="flex items-center gap-2">
+                  <input type="date" id="sh-filter-start" onchange="renderSocialHistoryTable()" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold focus:border-indigo-500 outline-none transition">
+                  <span class="text-gray-500 font-bold">-</span>
+                  <input type="date" id="sh-filter-end" onchange="renderSocialHistoryTable()" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold focus:border-indigo-500 outline-none transition">
+              </div>
+              
+              <!-- 🌟 Custom Multi-Select Dropdown -->
+              <div class="relative w-full col-span-1 md:col-span-2">
+                  <div class="w-full p-2.5 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-xl text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('sh-action-dd').classList.toggle('hidden')">
+                      <span id="sh-action-text" class="text-indigo-600 dark:text-indigo-400"><i class="fas fa-filter"></i> แสดงทุกการกระทำ (4)</span>
+                      <i class="fas fa-chevron-down text-gray-400"></i>
+                  </div>
+                  <div id="sh-action-dd" class="hidden absolute w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 p-1.5 rounded transition">
+                          <input type="checkbox" value="like" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-emerald-500"> <i class="fas fa-thumbs-up text-emerald-500 w-4 text-center"></i> กดไลก์ (Like)
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 p-1.5 rounded transition">
+                          <input type="checkbox" value="dislike" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-red-500"> <i class="fas fa-thumbs-down text-red-500 w-4 text-center"></i> กดดิสไลก์ (Dislike)
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 p-1.5 rounded transition">
+                          <input type="checkbox" value="follower" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-indigo-500"> <i class="fas fa-user-plus text-indigo-500 w-4 text-center"></i> กดติดตาม (Follow)
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 p-1.5 rounded transition">
+                          <input type="checkbox" value="share" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-blue-500"> <i class="fas fa-share text-blue-500 w-4 text-center"></i> แชร์โปรไฟล์ (Share)
+                      </label>
+                  </div>
+              </div>
+          </div>
+
+          <!-- 🌟 ตารางแสดงประวัติ -->
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll bg-white dark:bg-slate-900">
+              <table class="w-full text-left border-collapse min-w-[650px]">
+                  <thead class="sticky top-0 bg-gray-100 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 text-[11px] uppercase font-bold z-10 shadow-sm">
+                      <tr>
+                          <th class="py-3 px-4 w-[25%] rounded-tl-lg">วัน/เวลา</th>
+                          <th class="py-3 px-4 w-[35%]">บัญชีผู้โดยสาร</th>
+                          <th class="py-3 px-4 w-[20%] text-center">การกระทำ</th>
+                          <th class="py-3 px-4 w-[20%] text-right rounded-tr-lg">จัดการ (ลบยอด)</th>
+                      </tr>
+                  </thead>
+                  <tbody id="social-history-tbody" class="text-[11px] divide-y divide-gray-100 dark:divide-slate-800/50">
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
       <section id="content-vehicles" class="tab-content hidden space-y-4">
           <div class="flex justify-between items-center bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 rounded-2xl shadow-md">
               <h2 class="text-base font-bold text-gray-800 dark:text-white"><i class="fas fa-car-side text-[#1da1f2] mr-2"></i> ประเภทรถทั้งหมด</h2>
@@ -7246,7 +7305,9 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             <tr class="border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-[11px]">
                 <td class="py-2.5 px-4 text-center font-bold text-gray-400">#${index + 1}</td>
                 <td class="py-2.5 px-4">
-                    <p class="font-bold text-gray-800 dark:text-white cursor-pointer hover:text-indigo-500 transition" onclick="showDriverDetails('${d.id}')">${d.name}</p>
+                    <p class="font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline transition flex items-center gap-1.5" onclick="openSocialHistoryModal('${d.id}', '${d.name}')">
+                        <i class="fas fa-search-plus text-[10px]"></i> ${d.name}
+                    </p>
                     <div class="flex items-center gap-1.5 mt-0.5">
                         <span class="text-[9px] text-gray-500 font-mono">PIN: ${d.id}</span>
                         ${tierBadgeHtml}
@@ -7268,6 +7329,138 @@ document.getElementById('det-shares').innerText = d.shares || 0;
 
         tbody.innerHTML = html || `<tr><td colspan="7" class="py-10 text-center text-gray-400">ไม่พบข้อมูลคนที่ค้นหา</td></tr>`;
     }
+
+    // ========================================================
+    // 🌟 ระบบตรวจสอบประวัติ Social เชิงลึก & ลบการกระทำ
+    // ========================================================
+    window.currentSocialDriverId = null;
+    let allDriverSocialLogs = []; // เก็บประวัติของคนขับที่กำลังดูอยู่
+
+    // 1. ฟังก์ชันเปิดหน้าต่าง
+    window.openSocialHistoryModal = function(driverId, driverName) {
+        window.currentSocialDriverId = driverId;
+        document.getElementById('sh-drv-name').innerText = driverName;
+        
+        // รีเซ็ตตัวกรอง
+        document.getElementById('sh-filter-start').value = '';
+        document.getElementById('sh-filter-end').value = '';
+        document.querySelectorAll('.sh-action-cb').forEach(cb => cb.checked = true);
+        updateSocialActionFilter();
+
+        openModal('modalSocialHistory');
+        
+        // สมองกลดึงข้อมูลจาก Firebase (สมมติว่าเก็บบันทึกใน node: social_logs)
+        db.ref(`social_logs/${driverId}`).on('value', snap => {
+            allDriverSocialLogs = [];
+            if(snap.exists()) {
+                snap.forEach(child => {
+                    allDriverSocialLogs.push({ id: child.key, ...child.val() });
+                });
+            }
+            renderSocialHistoryTable();
+        });
+    }
+
+    // 2. ฟังก์ชันอัปเดตข้อความใน Dropdown
+    window.updateSocialActionFilter = function() {
+        let checkedBoxes = document.querySelectorAll('.sh-action-cb:checked');
+        let textEl = document.getElementById('sh-action-text');
+        
+        if(checkedBoxes.length === 4) {
+            textEl.innerHTML = '<i class="fas fa-filter text-indigo-500"></i> แสดงทุกการกระทำ (4)';
+        } else if(checkedBoxes.length === 0) {
+            textEl.innerHTML = '<i class="fas fa-filter text-red-500"></i> ไม่ได้เลือกเลย';
+        } else {
+            textEl.innerHTML = `<i class="fas fa-filter text-indigo-500"></i> เลือกไว้ (${checkedBoxes.length}) รายการ`;
+        }
+        renderSocialHistoryTable();
+    }
+
+    // 3. ฟังก์ชันวาดตารางและกรองข้อมูล
+    window.renderSocialHistoryTable = function() {
+        let tbody = document.getElementById('social-history-tbody');
+        if(!tbody) return;
+
+        let fStart = document.getElementById('sh-filter-start').value;
+        let fEnd = document.getElementById('sh-filter-end').value;
+        let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
+        let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
+
+        // ดึงค่า Checkbox ที่ถูกติ๊ก
+        let allowedActions = Array.from(document.querySelectorAll('.sh-action-cb:checked')).map(cb => cb.value);
+
+        let filtered = allDriverSocialLogs.filter(log => {
+            let time = log.timestamp || 0;
+            if(time < startTime || time > endTime) return false;
+            if(!allowedActions.includes(log.action)) return false;
+            return true;
+        });
+
+        filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        let html = '';
+        filtered.forEach(log => {
+            let dateStr = log.timestamp ? new Date(log.timestamp).toLocaleString('th-TH') : '-';
+            
+            // ตั้งค่าสีและไอคอนตามการกระทำ
+            let actionBadge = '';
+            if(log.action === 'like') actionBadge = '<span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded font-bold border border-emerald-200 flex items-center justify-center gap-1"><i class="fas fa-thumbs-up"></i> ไลก์</span>';
+            else if(log.action === 'dislike') actionBadge = '<span class="bg-red-50 text-red-600 px-2 py-1 rounded font-bold border border-red-200 flex items-center justify-center gap-1"><i class="fas fa-thumbs-down"></i> ดิสไลก์</span>';
+            else if(log.action === 'follower') actionBadge = '<span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold border border-indigo-200 flex items-center justify-center gap-1"><i class="fas fa-user-plus"></i> ติดตาม</span>';
+            else if(log.action === 'share') actionBadge = '<span class="bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-200 flex items-center justify-center gap-1"><i class="fas fa-share"></i> แชร์</span>';
+
+            html += `
+            <tr class="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
+                <td class="py-3 px-4 text-gray-500 dark:text-slate-400">${dateStr}</td>
+                <td class="py-3 px-4">
+                    <p class="font-bold text-gray-800 dark:text-white">${log.passengerName || 'สมาชิกลูกค้า'}</p>
+                    <p class="text-[9px] text-gray-400 font-mono">UID: ${log.passengerId || '-'}</p>
+                </td>
+                <td class="py-3 px-4">${actionBadge}</td>
+                <td class="py-3 px-4 text-right">
+                    <button onclick="deleteMaliciousAction('${log.id}', '${log.action}')" class="bg-red-100 dark:bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition flex items-center justify-end gap-1.5 ml-auto">
+                        <i class="fas fa-trash-alt"></i> ลบ & คืนยอด
+                    </button>
+                </td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html || '<tr><td colspan="4" class="py-10 text-center text-gray-400">ไม่พบประวัติการโต้ตอบในช่วงเวลานี้</td></tr>';
+    }
+
+    // 4. ฟังก์ชันลบประวัติและหักยอดดิสไลก์/ไลก์คืนออกจากโปรไฟล์
+    window.deleteMaliciousAction = function(logId, actionType) {
+        let actionNameTH = actionType === 'dislike' ? 'ดิสไลก์' : (actionType === 'like' ? 'ไลก์' : (actionType === 'follower' ? 'ผู้ติดตาม' : 'แชร์'));
+        
+        showCustomConfirm('ลบประวัติและหักยอด?', `ระบบจะลบประวัติการกด ${actionNameTH} จากลูกค้ารายนี้ และจะหักยอด ${actionNameTH} ออกจากโปรไฟล์คนขับด้วย ยืนยันหรือไม่?`, () => {
+            let driverId = window.currentSocialDriverId;
+            let targetNode = actionType + "s"; // เติม s ต่อท้ายเพื่อให้ตรงกับฐานข้อมูล (likes, dislikes, followers, shares)
+
+            // ดึงยอดยอดปัจจุบันจากโปรไฟล์ แล้วหักลบ 1
+            db.ref(`drivers_profile/${driverId}/${targetNode}`).once('value', snap => {
+                let currentCount = parseInt(snap.val()) || 0;
+                let newCount = currentCount > 0 ? currentCount - 1 : 0;
+
+                let updates = {};
+                updates[`drivers_profile/${driverId}/${targetNode}`] = newCount; // หักยอดในโปรไฟล์คนขับ
+                updates[`social_logs/${driverId}/${logId}`] = null; // ลบประวัติทิ้ง
+
+                // อัปเดตขึ้นฐานข้อมูลทีเดียว 2 จุด
+                db.ref().update(updates).then(() => {
+                    showCustomAlert('สำเร็จ', 'ลบประวัติการกลั่นแกล้งและคืนความยุติธรรมให้คนขับเรียบร้อยแล้ว!', 'success');
+                });
+            });
+        }, 'ยืนยันการลบ', 'red');
+    }
+
+    // (ลูกเล่นเสริม) ปิด Dropdown ถ้าคลิกที่อื่น
+    window.addEventListener('click', function(e) {
+        let dd = document.getElementById('sh-action-dd');
+        let trigger = document.getElementById('sh-action-text');
+        if (dd && !dd.contains(e.target) && e.target !== trigger && !trigger.contains(e.target)) {
+            dd.classList.add('hidden');
+        }
+    });
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
