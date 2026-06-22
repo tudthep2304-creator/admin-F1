@@ -4440,8 +4440,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if (type === 'rides') {
             title = '<i class="fas fa-car text-blue-500 mr-1.5"></i> วิ่งสะสมครบ';
             inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"><select class="cond-input-unit p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300 font-bold"><option value="รอบ" ${unit === 'รอบ' ? 'selected' : ''}>รอบ</option><option value="ชั่วโมง" ${unit === 'ชั่วโมง' ? 'selected' : ''}>ชม.</option></select></div>`;
-        } else if (type === 'stars') {
-            title = '<i class="fas fa-star text-amber-500 mr-1.5"></i> รีวิวดาวติดต่อกัน';
+        } else if (type === 'likes') { // 🌟 เปลี่ยนตรงนี้เป็น likes
+            title = '<i class="fas fa-thumbs-up text-emerald-500 mr-1.5"></i> ยอดถูกใจ (Like) สะสม';
             inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="ครั้ง"> <span class="text-gray-500 text-[10px]">ครั้ง</span></div>`;
         } else if (type === 'online') {
             title = '<i class="fas fa-clock text-indigo-500 mr-1.5"></i> ออนไลน์สะสม';
@@ -4610,7 +4610,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let condArr = []; let c = q.conditions || {};
             if (c.signup) condArr.push("✨ สมัครลงทะเบียนแอปสำเร็จ");
             if (c.rides > 0) condArr.push(`วิ่งครบ <b>${c.rides}</b> ${c.ridesUnit || 'รอบ'}`);
-            if (c.stars > 0) condArr.push(`5 ดาวติดกัน <b>${c.stars}</b> ครั้ง`);
+            if (c.likes > 0 || c.stars > 0) condArr.push(`ยอดถูกใจสะสม <b>${c.likes || c.stars}</b> ครั้ง`);
             if (c.onlineHours > 0) condArr.push(`ออนไลน์สะสม <b>${c.onlineHours}</b> ชม.`);
             if (c.minAr > 0) condArr.push(`AR ขั้นต่ำ <b>${c.minAr}%</b>`);
             if (c.peakHoursData) { let p = c.peakHoursData.split('|'); condArr.push(`เวลา ${p[0]}-${p[1]} ครบ <b>${p[2]}</b> รอบ`); }
@@ -4800,16 +4800,22 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             updateMultiSelectText('tier'); updateMultiSelectText('veh');
 
             // วาดเงื่อนไขเดิม
-            let condList = document.getElementById('dynamic-conditions-list');
-            let hasMainCond = false;
-            
-            if (c.rides > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ', true, true)); hasMainCond = true; }
-            else if (type === 'likes') { // 🌟 เปลี่ยนตรงนี้เป็น likes แล้ว
-            title = '<i class="fas fa-thumbs-up text-emerald-500 mr-1.5"></i> ยอดถูกใจ (Like) สะสม';
-            inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="ครั้ง"> <span class="text-gray-500 text-[10px]">ครั้ง</span></div>`;
-            else if (c.onlineHours > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours, '', true, true)); hasMainCond = true; }
-            else if (c.peakHoursData) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData, '', true, true)); hasMainCond = true; }
+              let condList = document.getElementById('dynamic-conditions-list');
+              let hasMainCond = false;
 
+              if (c.rides > 0) {
+                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ', true, true));
+                  hasMainCond = true;
+              } else if (c.likes > 0 || c.stars > 0) { // 🌟 แก้ให้ดึงค่า Likes
+                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('likes', c.likes || c.stars, '', true, true));
+                  hasMainCond = true;
+              } else if (c.onlineHours > 0) {
+                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours, '', true, true));
+                  hasMainCond = true;
+              } else if (c.peakHoursData) {
+                  condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData, '', true, true));
+                  hasMainCond = true;
+              }
             if (c.minAr > 0) condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('ar', c.minAr, '', false, false));
 
             document.getElementById('select-condition-type').disabled = hasMainCond;
@@ -4900,7 +4906,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let type = row.getAttribute('data-type');
             let valInput = row.querySelector('.cond-input-val')?.value;
             if (type === 'rides') { conditions.rides = parseInt(valInput) || 0; conditions.ridesUnit = row.querySelector('.cond-input-unit').value; }
-            else if (type === 'stars') conditions.stars = parseInt(valInput) || 0;
+            else if (type === 'likes') conditions.likes = parseInt(valInput) || 0;
             else if (type === 'online') conditions.onlineHours = parseInt(valInput) || 0;
             else if (type === 'ar') conditions.minAr = parseInt(valInput) || 0;
             else if (type === 'peak') {
