@@ -4357,6 +4357,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     }
 
     let currentWalletDriverId = null;
+    
+    // 🌟 ฟังก์ชันเปิดป๊อปอัป (ปรับแก้ให้ดึงเฉพาะ Social Score)
     window.openAdjustTierRatingModal = function(drvId) {
         currentWalletDriverId = drvId;
         let d = allProfiles[drvId]; if(!d) return;
@@ -4367,49 +4369,54 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         document.getElementById('trm-tier-select').value = cTier;
         document.getElementById('trm-note').value = '';
         
-        let currentRating = d.rating !== undefined ? d.rating : "5.0";
-        if(cTier === 'owner super legend') currentRating = "100";
-        else if(cTier === 'F1 Legend') currentRating = "10";
-        document.getElementById('trm-rating-input').value = currentRating;
+        // ดึงค่า Social Score ของคนขับมาแสดง
+        document.getElementById('edit-likes').value = d.likes || 0;
+        document.getElementById('edit-dislikes').value = d.dislikes || 0;
+        document.getElementById('edit-followers').value = d.followers || 0;
+        document.getElementById('edit-shares').value = d.shares || 0;
 
         openModal('modalAdjustTierRating');
     }
 
     window.closeTierRatingModal = function() { closeModal('modalAdjustTierRating'); currentWalletDriverId = null; }
 
+    // 🌟 ฟังก์ชันล็อกคะแนนดาว (ลบไส้ในทิ้ง เพื่อไม่ให้พัง เพราะเราไม่มีดาวแล้ว โหมดอมตะให้ไปคุมที่ฐานข้อมูลแทน)
     window.autoFillOverrideStars = function() {
-        let tier = document.getElementById('trm-tier-select').value; 
-        let rInput = document.getElementById('trm-rating-input');
+        // ไม่ต้องทำอะไรแล้ว ปล่อยว่างไว้เพื่อป้องกัน Error อนาคต
+    }
+
+    // 🌟 ฟังก์ชันบันทึกข้อมูล (ปรับให้ส่งค่า Social Score ขึ้น Firebase)
+    function submitTierRatingAdjustment() {
+    let newTier = document.getElementById('trm-tier-select').value;
+    let note = document.getElementById('trm-note').value;
+
+    // 🌟 ดึงค่า Social Score ใหม่จากหน้าต่างป๊อปอัปที่เราเพิ่งสร้าง
+    let newLikes = parseInt(document.getElementById('edit-likes').value) || 0;
+    let newDislikes = parseInt(document.getElementById('edit-dislikes').value) || 0;
+    let newFollowers = parseInt(document.getElementById('edit-followers').value) || 0;
+    let newShares = parseInt(document.getElementById('edit-shares').value) || 0;
+
+    // อัปเดตข้อมูลขึ้น Firebase
+    firebase.database().ref('drivers/' + currentDriverFocus).update({
+        tier: newTier,
+        tierNote: note,
+        likes: newLikes,
+        dislikes: newDislikes,
+        followers: newFollowers,
+        shares: newShares
+    }).then(() => {
+        closeTierRatingModal(); // ปิดหน้าต่าง (ใช้ชื่อฟังก์ชันตาม HTML ของคุณแอดมิน)
+        alert('อัปเดตระดับและ Social Score เรียบร้อยแล้ว!');
         
-        if (window.systemTiersMap && window.systemTiersMap[tier]) {
-            let tData = window.systemTiersMap[tier];
-            // 🌟 ถ้าระดับนี้เปิดโหมดอมตะไว้ ให้หยอดคะแนนดาวทะลุหลอดตามที่ตั้งไว้ทันที
-            if(tData.isInvincible) {
-                rInput.value = parseFloat(tData.rating).toFixed(1); 
-            } else {
-                // ถ้าระดับปกติ ก็ให้กลับมาที่ 5.0 ตามเดิม
-                rInput.value = "5.0"; 
-            }
-        } else {
-            rInput.value = "5.0";
+        // รีเฟรชหน้าต่างประวัติคนขับให้โชว์เลขใหม่
+        if(typeof showDriverDetails === 'function') {
+            showDriverDetails(currentDriverFocus); 
         }
-    }
-
-    window.submitTierRatingAdjustment = function() {
-        if(!currentWalletDriverId) return;
-        let newTier = document.getElementById('trm-tier-select').value;
-        let newRating = parseFloat(document.getElementById('trm-rating-input').value) || 5.0;
-        let note = document.getElementById('trm-note').value.trim();
-
-        if(!note) return showCustomAlert('ระบุหมายเหตุ', 'กรุณากรอกเหตุผลเพื่อบันทึกประวัติการปรับสิทธิ์', 'error');
-
-        db.ref('drivers_profile/' + currentWalletDriverId).update({ tier: newTier, rating: newRating.toFixed(1) }).then(() => {
-            db.ref('security_tier_logs/' + currentWalletDriverId).push({ timestamp: firebase.database.ServerValue.TIMESTAMP, newTier: newTier, assignedRating: newRating.toFixed(1), reason: note, adminName: "ผู้บริหารระบบ" });
-            showCustomAlert('สำเร็จ', 'ปรับเปลี่ยนระดับ Tier และคะแนนดาวเรียบร้อยแล้ว', 'success');
-            closeTierRatingModal(); if(typeof renderTiersTab === 'function') renderTiersTab(); 
-        });
-    }
-
+    }).catch(error => {
+        console.error("Error updating Tier/Social Score: ", error);
+        alert('เกิดข้อผิดพลาด: ' + error.message);
+    });
+}
     // 🌟 ฟังก์ชันเปิด-ปิด ช่องกรอกจำกัดสิทธิ์
     window.toggleLimitInputs = function(isChecked) {
         document.getElementById('cond-limit-val').disabled = !isChecked;
@@ -7372,10 +7379,24 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
               </div>
 
               <div>
-                  <label class="block text-[10px] font-bold text-gray-500 mb-1">คะแนนดาวประทับตรา (ล็อกค่า)</label>
-                  <div class="relative">
-                      <input type="number" id="trm-rating-input" step="0.1" min="1" max="100" placeholder="5.0" class="w-full p-2.5 bg-white dark:bg-slate-900 text-yellow-600 dark:text-yellow-400 border border-gray-300 dark:border-slate-600 rounded-xl outline-none text-sm font-black focus:border-amber-500">
-                      <span class="absolute right-3 top-2.5 text-xs font-bold text-gray-400">★ ดวง</span>
+                  <label class="block text-[10px] font-bold text-gray-500 mb-1">แก้ไข Social Score (ระบบแมนนวล)</label>
+                  <div class="grid grid-cols-2 gap-2">
+                      <div>
+                          <label class="block text-[9px] text-gray-500 mb-0.5"><i class="fas fa-thumbs-up text-emerald-500"></i> ถูกใจ</label>
+                          <input type="number" id="edit-likes" min="0" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                      </div>
+                      <div>
+                          <label class="block text-[9px] text-gray-500 mb-0.5"><i class="fas fa-thumbs-down text-red-500"></i> ไม่ถูกใจ</label>
+                          <input type="number" id="edit-dislikes" min="0" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                      </div>
+                      <div>
+                          <label class="block text-[9px] text-gray-500 mb-0.5"><i class="fas fa-heart text-pink-500"></i> ผู้ติดตาม</label>
+                          <input type="number" id="edit-followers" min="0" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                      </div>
+                      <div>
+                          <label class="block text-[9px] text-gray-500 mb-0.5"><i class="fas fa-share text-blue-500"></i> ยอดแชร์</label>
+                          <input type="number" id="edit-shares" min="0" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-xs font-bold focus:border-amber-500">
+                      </div>
                   </div>
               </div>
 
