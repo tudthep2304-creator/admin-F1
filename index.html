@@ -7409,13 +7409,16 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             else if(log.action === 'follower') actionBadge = '<span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold border border-indigo-200 flex items-center justify-center gap-1"><i class="fas fa-user-plus"></i> ติดตาม</span>';
             else if(log.action === 'share') actionBadge = '<span class="bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-200 flex items-center justify-center gap-1"><i class="fas fa-share"></i> แชร์</span>';
 
+            // 🌟 เช็กว่ามี Job ID ไหม ถ้ามีให้แสดง เพื่อให้รู้ว่ามาจากงานรอบไหน
+            let jobIdHtml = log.jobId ? `<p class="text-[9px] text-indigo-500 font-bold mt-0.5"><i class="fas fa-car-side"></i> Job: ${log.jobId}</p>` : '';
+
             html += `
             <tr class="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
                 <td class="py-3 px-4 text-gray-500 dark:text-slate-400">${dateStr}</td>
                 <td class="py-3 px-4">
                     <p class="font-bold text-gray-800 dark:text-white">${log.passengerName || 'สมาชิกลูกค้า'}</p>
                     <p class="text-[9px] text-gray-400 font-mono">UID: ${log.passengerId || '-'}</p>
-                </td>
+                    ${jobIdHtml} </td>
                 <td class="py-3 px-4">${actionBadge}</td>
                 <td class="py-3 px-4 text-right">
                     <button onclick="deleteMaliciousAction('${log.id}', '${log.action}')" class="bg-red-100 dark:bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition flex items-center justify-end gap-1.5 ml-auto">
