@@ -3442,9 +3442,9 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
 let rawBonusVal = parseFloat(d.creditBonus || 0);
 
 let creditDisplay = `
-    <span class="whitespace-nowrap bg-blue-50 dark:bg-slate-800 text-blue-500 border border-blue-100 dark:border-slate-700 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1">฿${rawCashVal.toLocaleString('en-US')}</span>
-    <span class="whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-500 border border-amber-200 dark:border-amber-800/50 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1"><i class="fas fa-star"></i> ${rawBonusVal.toLocaleString('en-US')}</span>
-`;
+       <span class="whitespace-nowrap bg-blue-50 dark:bg-slate-800 text-blue-500 border border-blue-100 dark:border-slate-700 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1">฿${rawCashVal.toLocaleString('en-US')}</span>
+       <span class="whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-500 border border-amber-200 dark:border-amber-800/50 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1">฿${rawBonusVal.toLocaleString('en-US')}</span>
+   `;
                 let profilePicHtml = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
                 
                 html += `
