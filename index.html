@@ -2461,12 +2461,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
             // จัดการคอลัมน์รีวิว / ร้องเรียน
             let reviewHtml = '<span class="text-gray-400">-</span>';
-            if(j.rating) {
-                reviewHtml = `<div class="flex items-center justify-center gap-1 text-yellow-500"><i class="fas fa-star text-[10px]"></i> <span class="font-bold text-xs">${j.rating}</span></div>`;
-                if(j.reviewComment) reviewHtml += `<p class="text-[9px] text-gray-500 dark:text-slate-400 truncate max-w-[100px] mx-auto mt-0.5" title="${j.reviewComment}">"${j.reviewComment}"</p>`;
+            if(j.reviewComment) {
+                reviewHtml = `<p class="text-[9px] text-gray-500 dark:text-slate-400 truncate max-w-[100px] mx-auto mt-0.5" title="${j.reviewComment}">"${j.reviewComment}"</p>`;
             } else if(j.cancelReason) {
-                reviewHtml = `<p class="text-[9px] text-red-500 dark:text-red-400 truncate max-w-[120px] mx-auto" title="${j.cancelReason}"><i class="fas fa-exclamation-circle"></i> ${j.cancelReason}</p>`;
-            }
 
             html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800/40 transition">
                 <td class="py-3 px-2 text-[10px] text-gray-500 dark:text-slate-400">${timeStr}</td>
@@ -2713,7 +2710,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
                 html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition cursor-pointer text-left" onclick="viewPassengerDetails('${pDataStr}')">
                     <td class="py-3 px-3 text-left">
-                        <p class="font-bold text-gray-800 dark:text-white hover:text-blue-500 transition flex items-center gap-2">${p.phone} <span class="bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-500 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></p>
+                        <p class="font-bold text-gray-800 dark:text-white hover:text-blue-500 transition flex items-center gap-2">${p.phone}</p>
                         <p class="text-[10px] text-gray-400 dark:text-slate-500 font-medium truncate max-w-[180px]">${p.name} <span class="text-gray-300 dark:text-slate-600 font-normal">|</span> <span class="font-mono text-gray-400">ID: ${p.userId || '-'}</span></p>
                     </td>
                     <td class="py-3 px-2 text-left">${badge}</td>
@@ -3437,9 +3434,9 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
 let rawBonusVal = parseFloat(d.creditBonus || 0);
 
 let creditDisplay = `
-       <span class="whitespace-nowrap bg-blue-50 dark:bg-slate-800 text-blue-500 border border-blue-100 dark:border-slate-700 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1">฿${rawCashVal.toLocaleString('en-US')}</span>
-       <span class="whitespace-nowrap bg-amber-50 dark:bg-amber-900/20 text-amber-500 border border-amber-200 dark:border-amber-800/50 px-1.5 py-[2px] rounded text-[10px] font-black flex items-center gap-1">฿${rawBonusVal.toLocaleString('en-US')}</span>
-   `;
+                    <span class="whitespace-nowrap bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-money-bill-wave"></i> ${cashVal}</span>
+                    <span class="whitespace-nowrap bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border border-yellow-200 dark:border-yellow-800/50 px-1 py-[1px] rounded text-[9px] font-bold flex items-center gap-1"><i class="fas fa-gift"></i> ${bonusVal}</span>
+                `;
                 let profilePicHtml = d.profilePic ? `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm">` : `<div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0"><i class="fas fa-user text-xs"></i></div>`;
                 
                 html += `
@@ -3548,7 +3545,7 @@ let creditDisplay = `
 
         let driverData = {
             driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
-            creditCash: 0, creditBonus: startBonus, tier: startTier, rating: "5.0", 
+            creditCash: 0, creditBonus: startBonus, tier: startTier, 
             profilePic: finalPicUrl, // 🌟 ใช้ URL สั้นๆ จาก Google Drive
             vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
