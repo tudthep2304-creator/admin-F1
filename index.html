@@ -396,9 +396,10 @@
                   <button onclick="window.openAddDriverModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center shrink-0">
                       <i class="fas fa-user-plus"></i> ลงทะเบียนคนขับใหม่
                   </button>
-                  <button onclick="switchTab('content-social-management'); if(typeof renderSocialLeaderboard === 'function') renderSocialLeaderboard();" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center shrink-0">
+                                    <button onclick="switchTab('social-management'); if(typeof renderSocialLeaderboard === 'function') renderSocialLeaderboard();" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center shrink-0">
                       <i class="fas fa-thumbs-up"></i> กระดานระบบ Social
                   </button>
+
               </div>
           </div>
 
@@ -2241,7 +2242,7 @@ window.uploadImageToDrive = async function(base64Data, prefix = "IMG", folderNam
         windowContext.activeJobToAssign = null; 
     }
 
-const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'แคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'อนุมัติงานร้านค้า', 'driver-banners': 'จัดการโฆษณา (คนขับ)', 'driver-news': 'บอร์ดข่าวสาร (คนขับ)' };    window.adminHistoryStack = ['dashboard'];
+const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'แคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'อนุมัติงานร้านค้า', 'driver-banners': 'จัดการโฆษณา (คนขับ)', 'driver-news': 'บอร์ดข่าวสาร (คนขับ)', 'social-management': 'กระดานผู้นำระบบ Social' };
 
     function switchTab(tabId, isBack = false) {
         document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
