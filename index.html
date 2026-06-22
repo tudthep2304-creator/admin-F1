@@ -919,7 +919,7 @@
                           <label class="text-xs font-bold text-gray-700 dark:text-slate-300">หักคะแนนเมื่อถูกลูกค้า "รีวิว 1 ดาว"</label>
                           <div class="flex items-center gap-2 shrink-0">
                               <span class="text-xs text-orange-500 font-bold">-</span>
-                              <input type="number" id="rule-1star-penalty" step="0.1" placeholder="1.0" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-orange-500">
+                              <input type="number" id="rule-dislike-penalty" step="0.1" placeholder="1.0" class="w-20 p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-600 rounded-lg outline-none text-center text-sm font-bold focus:border-orange-500">
                               <span class="text-xs font-bold text-gray-500">ดาว</span>
                           </div>
                       </div>
@@ -4336,26 +4336,31 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         if(snap.exists()) {
             let rules = snap.val();
             let elC = document.getElementById('rule-cancel-penalty'); if(elC) elC.value = rules.cancelPenalty || '';
-            let el1S = document.getElementById('rule-1star-penalty'); if(el1S) el1S.value = rules.oneStarPenalty || '';
+            
+            // เปลี่ยนจาก 1star เป็น dislike
+            let elDislike = document.getElementById('rule-dislike-penalty'); if(elDislike) elDislike.value = rules.dislikePenalty || '';
+            
             let elDem = document.getElementById('rule-demote-threshold'); if(elDem) elDem.value = rules.demoteThreshold || '';
         }
     });
 
     window.savePenaltyRules = function() {
         let cp = parseFloat(document.getElementById('rule-cancel-penalty').value) || 0;
-        let sp = parseFloat(document.getElementById('rule-1star-penalty').value) || 0;
+        
+        // ดึงค่าบทลงโทษจากการโดน Dislike
+        let dp = parseFloat(document.getElementById('rule-dislike-penalty').value) || 0;
+        
         let dt = parseFloat(document.getElementById('rule-demote-threshold').value) || 0;
 
         db.ref('system_settings/penalties').set({
             cancelPenalty: cp,
-            oneStarPenalty: sp,
+            dislikePenalty: dp, // เซฟลง Firebase ในชื่อ dislikePenalty
             demoteThreshold: dt,
             updatedAt: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
             showCustomAlert('บันทึกสำเร็จ', 'อัปเดตระบบกฎระเบียบและบทลงโทษเรียบร้อยแล้ว', 'success');
         });
     }
-
     let currentWalletDriverId = null;
     
     // 🌟 ฟังก์ชันเปิดป๊อปอัป (ปรับแก้ให้ดึงเฉพาะ Social Score)
@@ -4516,9 +4521,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         } else if (type === 'bonus') {
             title = '<i class="fas fa-coins text-amber-500 mr-1.5"></i> โบนัสเงินสด';
             inputHtml = `<div class="flex items-center w-full mt-2 sm:mt-0 gap-1"><input type="number" class="reward-input-val flex-1 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"> <span class="text-gray-400 text-[10px] w-8">บาท</span></div>`;
-        } else if (type === 'stars') {
-            title = '<i class="fas fa-star-half-alt text-yellow-500 mr-1.5"></i> แต้มดาว';
-            inputHtml = `<div class="flex items-center w-full mt-2 sm:mt-0 gap-1"><input type="number" class="reward-input-val flex-1 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"> <span class="text-gray-400 text-[10px] w-8">คะแนน</span></div>`;
+        } else if (type === 'followers') { // 🌟 เปลี่ยนตรงนี้เป็น followers แล้ว
+            title = '<i class="fas fa-heart text-pink-500 mr-1.5"></i> เพิ่มผู้ติดตามพิเศษ (ดันโปรไฟล์)';
+            inputHtml = `<div class="flex items-center w-full mt-2 sm:mt-0 gap-1"><input type="number" class="reward-input-val flex-1 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"> <span class="text-gray-400 text-[10px] w-8">คน</span></div>`;
         } else if (type === 'tierup') {
             title = '<i class="fas fa-level-up-alt text-emerald-500 mr-1.5"></i> เลื่อนระดับชั้น';
             // ย้ายกล่องเขียวมาขึ้นบรรทัดใหม่ให้เต็มกล่อง
@@ -4626,7 +4631,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let rewardStr = "";
             if (q.rewardCredit > 0) rewardStr += `<span class="text-blue-500 font-bold text-xs">+${q.rewardCredit} เครดิต</span><br>`;
             if (q.rewardBonus > 0) rewardStr += `<span class="text-amber-500 font-bold text-xs">+${q.rewardBonus} บาท</span><br>`;
-            if (q.rewardRating > 0) rewardStr += `<span class="text-yellow-600 font-bold text-xs">+${q.rewardRating} ดาว</span><br>`;
             if (q.rewardTierUp) rewardStr += `<span class="bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-200">อัปเกรด 1 ขั้น</span>`;
             if (rewardStr === "") rewardStr = "-";
 
@@ -4800,7 +4804,9 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let hasMainCond = false;
             
             if (c.rides > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('rides', c.rides, c.ridesUnit || 'รอบ', true, true)); hasMainCond = true; }
-            else if (c.stars > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('stars', c.stars, '', true, true)); hasMainCond = true; }
+            else if (type === 'likes') { // 🌟 เปลี่ยนตรงนี้เป็น likes แล้ว
+            title = '<i class="fas fa-thumbs-up text-emerald-500 mr-1.5"></i> ยอดถูกใจ (Like) สะสม';
+            inputHtml = `<div class="flex items-center gap-1 w-full mt-2 sm:mt-0"><input type="number" class="cond-input-val flex-1 sm:w-20 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="ครั้ง"> <span class="text-gray-500 text-[10px]">ครั้ง</span></div>`;
             else if (c.onlineHours > 0) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('online', c.onlineHours, '', true, true)); hasMainCond = true; }
             else if (c.peakHoursData) { condList.insertAdjacentHTML('beforeend', window.createConditionRowHtml('peak', c.peakHoursData, '', true, true)); hasMainCond = true; }
 
@@ -4813,7 +4819,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let rewList = document.getElementById('dynamic-rewards-list');
             if (q.rewardCredit > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('credit', q.rewardCredit));
             if (q.rewardBonus > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('bonus', q.rewardBonus));
-            if (q.rewardRating > 0) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('stars', q.rewardRating));
             if (q.rewardTierUp) rewList.insertAdjacentHTML('beforeend', window.createRewardRowHtml('tierup'));
         } else {
             document.getElementById('quest-modal-title').innerHTML = '<i class="fas fa-bullseye mr-1"></i> สร้างแคมเปญภารกิจDRV';
@@ -4916,7 +4921,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let val = parseFloat(row.querySelector('.reward-input-val')?.value) || 0;
             if (type === 'credit') payload.rewardCredit = val;
             if (type === 'bonus') payload.rewardBonus = val;
-            if (type === 'stars') payload.rewardRating = val;
             if (type === 'tierup') payload.rewardTierUp = true;
         });
 
@@ -6025,7 +6029,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         campsArr.sort((a, b) => b.timestamp - a.timestamp).forEach(c => {
             let rewardStr = "";
             if (c.rewardBonus > 0) rewardStr += `<span class="text-yellow-600 font-bold text-[10px]">+฿${c.rewardBonus} 🟡</span><br>`;
-            if (c.rewardRating > 0) rewardStr += `<span class="text-amber-500 font-bold text-[10px]">+${c.rewardRating} ⭐</span>`;
             if (rewardStr === "") rewardStr = "-";
             
             let tTiers = c.targetTiers && c.targetTiers.length > 0 ? (c.targetTiers.includes('all') ? 'ทุกระดับ' : c.targetTiers.join(', ')) : 'ทุกระดับ';
@@ -6091,7 +6094,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             document.getElementById('partner-camp-end').value = c.endTime || '';
             document.getElementById('partner-reward-bonus').value = c.rewardBonus || '';
             document.getElementById('partner-reward-expire').value = c.rewardExpireDays || '';
-            document.getElementById('partner-reward-rating').value = c.rewardRating || '';
             
             // 🌟 ดึงข้อมูลจำกัดสิทธิ์มาแสดง
             let lChk = document.getElementById('pc-limit-check');
@@ -6166,13 +6168,13 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let limitUnit = lChkEl && lChkEl.checked && lUnitEl ? lUnitEl.value : 'day';
 
         let rewardBonus = parseInt(document.getElementById('partner-reward-bonus').value) || 0;
-        let rewardRating = parseFloat(document.getElementById('partner-reward-rating').value) || 0;
         
         if(!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาตั้งชื่อแคมเปญร้านค้า', 'error');
         if(targetTiers.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'เลือกเป้าหมายระดับชั้นด้วยครับ', 'error');
         if(targetVehicles.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'เลือกประเภทยานพาหนะด้วยครับ', 'error');
         if(!requireSelfie && !requireReceipt && !requireCode) return showCustomAlert('ข้อผิดพลาด', 'กรุณาเลือกเงื่อนไขหลักฐานอย่างน้อย 1 อย่างครับ', 'error');
-        if(rewardBonus === 0 && rewardRating === 0) return showCustomAlert('ข้อผิดพลาด', 'กรุณาตั้งรางวัลให้คนขับ (เงิน หรือ ดาว)', 'error');
+        
+        if(rewardBonus === 0) return showCustomAlert('ข้อผิดพลาด', 'กรุณาตั้งรางวัลโบนัสเงินสดให้คนขับด้วยครับ', 'error');
 
         let payload = {
             name: name,
@@ -6181,7 +6183,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             startTime: document.getElementById('partner-camp-start').value || null,
             endTime: document.getElementById('partner-camp-end').value || null,
             rewardBonus: rewardBonus, rewardExpireDays: parseInt(document.getElementById('partner-reward-expire').value) || 0,
-            rewardRating: rewardRating, 
             dailyLimit: dailyLimit, limitUnit: limitUnit, // 🌟 เซฟข้อมูลการจำกัดสิทธิ์ลง DB
             isActive: document.getElementById('partner-camp-is-active').checked,
             timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -6230,7 +6231,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
         let html = '';
         filtered.forEach(req => {
-            let c = allPartnerCampaigns[req.campaignId] || { name: 'แคมเปญถูกลบ', rewardBonus: 0, rewardRating: 0 };
+            let c = allPartnerCampaigns[req.campaignId] || { name: 'แคมเปญถูกลบ', rewardBonus: 0 };
+            
             let d = allProfiles[req.driverPin] || {};
             let dName = d.name || 'ไม่ทราบชื่อ';
             let dateStr = new Date(req.timestamp).toLocaleString('th-TH');
@@ -6278,7 +6280,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             let newRating = currentRating;
 
             if(camp.rewardBonus > 0) newBonus += camp.rewardBonus;
-            if(camp.rewardRating > 0) newRating += camp.rewardRating;
             if(newRating > 5.0) newRating = 5.0;
 
             updates[`drivers_profile/${driverPin}/creditBonus`] = newBonus;
@@ -6325,7 +6326,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
         let html = '';
         filtered.forEach(req => {
-            let c = allPartnerCampaigns[req.campaignId] || { name: 'แคมเปญถูกลบ', rewardBonus: 0, rewardRating: 0 };
+            let c = allPartnerCampaigns[req.campaignId] || { name: 'แคมเปญถูกลบ', rewardBonus: 0 };
             let isApprove = req.status === 'approved';
             let statusBadge = isApprove ? '<span class="bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded font-bold border border-emerald-200">อนุมัติแล้ว</span>' : `<span class="bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold border border-red-200" title="${req.rejectReason}">ปฏิเสธ</span>`;
             let dateStr = new Date(req.approvedAt || req.rejectedAt || req.timestamp).toLocaleString('th-TH');
@@ -6334,7 +6335,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             if(isApprove) {
                 rewardStr = "";
                 if(c.rewardBonus > 0) rewardStr += `<span class="text-yellow-600 font-bold">+฿${c.rewardBonus}</span> `;
-                if(c.rewardRating > 0) rewardStr += `<span class="text-amber-500 font-bold">+${c.rewardRating}⭐</span>`;
             }
 
             let proofHtml = '';
@@ -7273,7 +7273,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                       <select id="select-condition-type" class="flex-1 p-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-[11px] focus:border-amber-500 font-bold text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:bg-gray-200">
                           <option value="">-- เลือกเงื่อนไขเพื่อเพิ่ม --</option>
                           <option value="rides">วิ่งสะสมครบ</option>
-                          <option value="stars">รีวิวดาวติดต่อกัน</option>
+                          <option value="likes">👍 ยอดถูกใจ (Like) สะสม</option>
                           <option value="online">ออนไลน์สะสม</option>
                           <option value="peak">วิ่งช่วงเวลาพิเศษ (Peak Hours)</option>
                       </select>
@@ -7328,7 +7328,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
                           <option value="">-- เลือกรางวัลเพื่อเพิ่ม --</option>
                           <option value="credit">เครดิต</option>
                           <option value="bonus">โบนัสเงินสด</option>
-                          <option value="stars">แต้มดาว</option>
+                          <option value="followers">❤️ เพิ่มผู้ติดตามพิเศษ (ดันโปรไฟล์)</option>
                           <option value="tierup">เลื่อนระดับชั้น (อัปเกรด 1 ขั้น)</option>
                       </select>
                       <button type="button" onclick="handleAddRewardRow()" class="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
