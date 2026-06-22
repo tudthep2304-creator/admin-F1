@@ -943,23 +943,24 @@
               </div>
 
               <div class="grid grid-cols-2 gap-2 sm:gap-3 bg-emerald-50/50 dark:bg-emerald-900/10 p-2 sm:p-3 rounded-lg border border-emerald-100 dark:border-emerald-800/30">
-                  <div>
-                      <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">เงินสด (Cash 🟢)</label>
-                      <div class="relative">
-                          <input type="text" id="det-cash" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-green-600 dark:text-green-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed text-center pr-7 truncate">
-                          <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
-                      </div>
-                  </div>
-                  <div class="relative">
-                      <div class="flex justify-between items-center mb-0.5">
-                          <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300">โบนัส (Bonus 🟡)</label>
-                          <button onclick="viewBonusLedger(currentDriverFocus)" class="text-[9px] font-medium text-yellow-600 hover:text-yellow-700 underline absolute top-0 right-1">รายละเอียด</button>
-                      </div>
-                      <div class="relative mt-1.5">
-                          <input type="text" id="det-bonus" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-yellow-600 dark:text-yellow-500 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-bold cursor-not-allowed text-center pr-7 truncate">
-                          <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
-                      </div>
-                  </div>
+    <div>
+        <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">เงินสด (Cash <span class="text-blue-500 font-black">฿</span>)</label>
+        <div class="relative">
+            <input type="text" id="det-cash" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-blue-500 dark:text-blue-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-black cursor-not-allowed text-center pr-7 truncate">
+            <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
+        </div>
+    </div>
+    <div class="relative">
+        <div class="flex justify-between items-center mb-0.5">
+            <label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300">โบนัส (Bonus <span class="text-amber-500 font-black">฿</span>)</label>
+            <button onclick="viewBonusLedger(currentDriverFocus)" class="text-[9px] font-medium text-yellow-600 hover:text-yellow-700 underline absolute top-0 right-1">รายละเอียด</button>
+        </div>
+        <div class="relative mt-1.5">
+            <input type="text" id="det-bonus" readonly class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900/50 text-amber-500 dark:text-amber-400 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-[11px] font-black cursor-not-allowed text-center pr-7 truncate">
+            <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[9px]"></i>
+        </div>
+    </div>
+</div>
                   <div class="col-span-2 mt-1">
                       <button onclick="openAdjustCreditModal(currentDriverFocus, 'driver')" class="w-full bg-emerald-100 dark:bg-emerald-900/40 hover:bg-emerald-200 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700/50 rounded-lg py-1.5 sm:py-2 text-[11px] font-medium transition flex items-center justify-center gap-1.5 shadow-sm">
                           <i class="fas fa-exchange-alt"></i> เติม/หักเครดิต (Adjust)
@@ -3591,20 +3592,23 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         
         document.getElementById('det-reg-date').value = d.registeredAt ? new Date(d.registeredAt).toLocaleDateString('th-TH') : 'ไม่ระบุข้อมูล';
 
-        let cash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0)).toFixed(2);
-        let bonus = parseFloat(d.creditBonus || 0).toFixed(2);
-        if(document.getElementById('det-cash')) document.getElementById('det-cash').value = cash;
-        if(document.getElementById('det-bonus')) document.getElementById('det-bonus').value = bonus;
+        // 🌟 เปลี่ยนจุดนี้: เติม ฿ และใส่จุลภาค (toLocaleString) ให้สวยงาม
+        let rawCash = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0));
+        let rawBonus = parseFloat(d.creditBonus || 0);
+        let cashFormatted = '฿' + rawCash.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        let bonusFormatted = '฿' + rawBonus.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        if(document.getElementById('det-cash')) document.getElementById('det-cash').value = cashFormatted;
+        if(document.getElementById('det-bonus')) document.getElementById('det-bonus').value = bonusFormatted;
 
         let t = d.tier || 'Standard';
         document.getElementById('det-tier-display').value = t;
 
-
         // ดึงค่า Social Score โชว์หน้าโปรไฟล์
-document.getElementById('det-likes').innerText = d.likes || 0;
-document.getElementById('det-dislikes').innerText = d.dislikes || 0;
-document.getElementById('det-followers').innerText = d.followers || 0;
-document.getElementById('det-shares').innerText = d.shares || 0;
+        document.getElementById('det-likes').innerText = d.likes || 0;
+        document.getElementById('det-dislikes').innerText = d.dislikes || 0;
+        document.getElementById('det-followers').innerText = d.followers || 0;
+        document.getElementById('det-shares').innerText = d.shares || 0;
 
         let editPreview = document.getElementById('edit-drv-pic-preview');
         let editPlaceholder = document.getElementById('edit-drv-pic-placeholder');
@@ -3657,8 +3661,6 @@ document.getElementById('det-shares').innerText = d.shares || 0;
             vehicles = JSON.parse(JSON.stringify(d.vehicles)); 
         } else if (d.plate) {
             let vId = 'veh_' + Date.now();
-            
-            // 🌟 จุดที่ 2: เปลี่ยนจากการบังคับเป็น 'car' มาดึงค่าจากระบบส่วนกลางแทน!
             let defaultVType = (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) 
                                ? window.systemVehicleTypes[0].id 
                                : 'unknown';
@@ -3679,7 +3681,6 @@ document.getElementById('det-shares').innerText = d.shares || 0;
         document.getElementById('det-vehicle-count').innerText = Object.keys(window.currentDriverVehicles).length;
         switchTab('driver-details');
     }
-
     // ==========================================
     // 🌟 ระบบจัดการบล็อกคนขับผ่านป๊อปอัป
     // ==========================================
