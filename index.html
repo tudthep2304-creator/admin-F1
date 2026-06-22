@@ -4691,9 +4691,9 @@ let creditDisplay = `
         } else if (type === 'bonus') {
             title = '<i class="fas fa-coins text-amber-500 mr-1.5"></i> โบนัสเงินสด';
             inputHtml = `<div class="flex items-center w-full mt-2 sm:mt-0 gap-1"><input type="number" class="reward-input-val flex-1 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"> <span class="text-gray-400 text-[10px] w-8">บาท</span></div>`;
-        } else if (type === 'followers') { // 🌟 เปลี่ยนตรงนี้เป็น followers แล้ว
-            title = '<i class="fas fa-heart text-pink-500 mr-1.5"></i> เพิ่มผู้ติดตามพิเศษ (ดันโปรไฟล์)';
-            inputHtml = `<div class="flex items-center w-full mt-2 sm:mt-0 gap-1"><input type="number" class="reward-input-val flex-1 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"> <span class="text-gray-400 text-[10px] w-8">คน</span></div>`;
+        } else if (type === 'likes') { 
+    title = '<i class="fas fa-thumbs-up text-emerald-500 mr-1.5"></i> เพิ่มยอดกดไลก์พิเศษ (ดันโปรไฟล์)';
+    inputHtml = `<div class="flex items-center w-full mt-2 sm:mt-0 gap-1"><input type="number" class="reward-input-val flex-1 p-1.5 border dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-center font-bold" value="${value}" placeholder="จำนวน"> <span class="text-gray-400 text-[10px] w-8">ครั้ง</span></div>`;
         } else if (type === 'tierup') {
             title = '<i class="fas fa-level-up-alt text-emerald-500 mr-1.5"></i> เลื่อนระดับชั้น';
             // ย้ายกล่องเขียวมาขึ้นบรรทัดใหม่ให้เต็มกล่อง
