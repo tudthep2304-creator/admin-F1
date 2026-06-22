@@ -4498,11 +4498,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         select.value = '';
     }
 
-    // ==========================================
-    // แทรกโค้ดอัปเดตระบบปลดล็อกในฟังก์ชัน openQuestModal
-    // (ให้หาฟังก์ชัน window.openQuestModal เดิม แล้วเปลี่ยนท่อนดึงเงื่อนไขให้เป็นแบบนี้ครับ)
-    // ==========================================
-
     // 🌟 ฟังก์ชันสร้างแถวรางวัล (Dynamic Rewards) - แก้ไข UI กรอบพัง และให้กล่องสีเขียวลงมาอีกบรรทัดเต็มๆ
     window.createRewardRowHtml = function(type, value = '') {
         let id = 'reward-row-' + Date.now() + Math.floor(Math.random() * 1000);
@@ -4677,9 +4672,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
     // ========================================================
     // 🌟 ระบบเปิดหน้าต่างป๊อปอัป และดึงข้อมูลเก่ามาแสดง
     // ========================================================
-    // ========================================================
-    // 🌟 ระบบเปิดหน้าต่างป๊อปอัป และดึงข้อมูลเก่ามาแสดง
-    // ========================================================
     window.openQuestModal = function(questId = null) {
         // เคลียร์ฟอร์ม
         document.getElementById('quest-id').value = '';
@@ -4696,15 +4688,32 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         document.getElementById('dynamic-conditions-list').innerHTML = '';
         document.getElementById('dynamic-rewards-list').innerHTML = '';
 
+        // 🌟 ล็อกปฏิทินไม่ให้เลือกเวลาในอดีต และ ไม่เกิน 1 ปีข้างหน้า
+        let now = new Date();
+        let tzoffset = now.getTimezoneOffset() * 60000; 
+        
+        // 1. หาเวลาปัจจุบัน (ขั้นต่ำ)
+        let localISOMin = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 16);
+        
+        // 2. คำนวณเวลาสูงสุด (บวกไปอีก 1 ปี หรือ 365 วัน)
+        let maxDate = new Date(now);
+        maxDate.setFullYear(maxDate.getFullYear() + 1);
+        let localISOMax = (new Date(maxDate.getTime() - tzoffset)).toISOString().slice(0, 16);
+        
+        // 3. บังคับใส่ขอบเขตให้ปฏิทินทั้ง 2 ช่อง
+        document.getElementById('quest-start').min = localISOMin;
+        document.getElementById('quest-start').max = localISOMax;
+        
+        document.getElementById('quest-end').min = localISOMin;
+        document.getElementById('quest-end').max = localISOMax;
+
         // 🌟 ดึงข้อมูลจากส่วนกลาง (System Variables) ตัวจริงของระบบ!
         let mainTiers = [];
         if (window.systemTiersMap && Object.keys(window.systemTiersMap).length > 0) {
-            // สูบชื่อระดับทั้งหมดออกมาจาก systemTiersMap
             mainTiers = Object.keys(window.systemTiersMap);
         } else if (window.systemTiers && window.systemTiers.length > 0) {
             mainTiers = window.systemTiers;
         } else {
-            // สำรองให้ตรงกับรูประบบจริง
             mainTiers = ['New', 'Standard', 'Silver', 'Gold', 'Platinum', 'Legend', 'Owner Super Legend'];
         }
 
@@ -4815,6 +4824,40 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         let targetMinRating = parseFloat(document.getElementById('quest-target-rating').value) || 0;
         
         if (!name) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อแคมเปญภารกิจ DRV ด้วยครับ', 'error');
+      
+      // 🌟 ดักเช็คเวลาเริ่มต้นต้องไม่เป็นอดีต (ตรวจสอบเฉพาะกรณีสร้างแคมเปญใหม่เท่านั้น)
+        let isNewQuest = !document.getElementById('quest-id').value;
+        if (isNewQuest && startVal) {
+            // ลบออก 60000 ms (1 นาที) เพื่อเป็นบัฟเฟอร์เผื่อแอดมินใช้เวลาพิมพ์หน้าฟอร์มนานกว่าจะกดเซฟ
+            if (new Date(startVal).getTime() < (Date.now() - 60000)) {
+                return showCustomAlert('ตั้งเวลาผิดพลาด', 'เวลาเริ่มต้นต้องไม่เป็นเวลาในอดีตครับ', 'error');
+            }
+        }
+      // 🌟 2. ดักเช็คเวลา! (ป้องกันเวลาหมดเขต น้อยกว่าเวลาเริ่ม)
+        let startVal = document.getElementById('quest-start').value;
+        let endVal = document.getElementById('quest-end').value;
+        if (startVal && endVal) {
+            if (new Date(startVal) >= new Date(endVal)) {
+                return showCustomAlert('ตั้งเวลาผิดพลาด', 'เวลาหมดเขตต้องอยู่หลังเวลาเริ่มแคมเปญครับ', 'error');
+            }
+        }
+
+        // 🌟 3. ดักเช็คว่าใส่เงื่อนไขและรางวัลหรือยัง?
+        let condRows = document.querySelectorAll('.condition-item-row');
+        let rewRows = document.querySelectorAll('.reward-item-row');
+        if (condRows.length === 0) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาเพิ่ม "เงื่อนไขแคมเปญ" อย่างน้อย 1 อย่างครับ', 'error');
+        if (rewRows.length === 0) return showCustomAlert('ใจร้ายจัง!', 'อย่าลืมเพิ่ม "ของรางวัล" ให้คนขับด้วยนะครับ', 'error');
+
+        // 🌟 4. ดักเช็คกรณีเลือก Peak Hours ว่าใส่เวลาครบไหม?
+        let isPeakError = false;
+        condRows.forEach(row => {
+            if (row.getAttribute('data-type') === 'peak') {
+                let s = row.querySelector('.cond-input-time-start').value; 
+                let e = row.querySelector('.cond-input-time-end').value;
+                if (!s || !e) isPeakError = true;
+            }
+        });
+        if (isPeakError) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาระบุเวลา "จาก-ถึง" ในเงื่อนไขช่วงเวลาพิเศษให้ครบถ้วนครับ', 'error');
 
         // กวาดข้อมูลจาก Custom Checkboxes
         let targetTiers = Array.from(document.querySelectorAll('.tier-checkbox:checked')).map(cb => cb.value);
