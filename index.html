@@ -2712,7 +2712,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
                 html += `<tr class="border-b border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition cursor-pointer text-left" onclick="viewPassengerDetails('${pDataStr}')">
                     <td class="py-3 px-3 text-left">
-                        <p class="font-bold text-gray-800 dark:text-white hover:text-blue-500 transition flex items-center gap-2">${p.phone} <span class="bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-yellow-500 flex items-center gap-1 shrink-0"><i class="fas fa-star"></i> 5.0</span></p>
+                        <p class="font-bold text-gray-800 dark:text-white hover:text-blue-500 transition flex items-center gap-2">${p.phone}</p>
                         <p class="text-[10px] text-gray-400 dark:text-slate-500 font-medium truncate max-w-[180px]">${p.name} <span class="text-gray-300 dark:text-slate-600 font-normal">|</span> <span class="font-mono text-gray-400">ID: ${p.userId || '-'}</span></p>
                     </td>
                     <td class="py-3 px-2 text-left">${badge}</td>
@@ -3547,8 +3547,8 @@ let creditDisplay = `
 
         let driverData = {
             driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
-            creditCash: 0, creditBonus: startBonus, tier: startTier, rating: "5.0", 
-            profilePic: finalPicUrl, // 🌟 ใช้ URL สั้นๆ จาก Google Drive
+            creditCash: 0, creditBonus: startBonus, tier: startTier, 
+            profilePic: finalPicUrl,
             vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
 
