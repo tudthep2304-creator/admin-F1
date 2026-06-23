@@ -603,8 +603,8 @@
                 <table class="w-full text-left border-collapse min-w-[850px]">
                     <thead class="bg-gray-100 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 text-[11px] uppercase font-bold select-none">
                         <tr>
-                            <th class="py-3 px-4 w-20 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('score')">
-                                อันดับ <i id="sort-icon-score" class="fas fa-sort-down text-indigo-500 ml-1"></i>
+                            <th class="py-3 px-4 w-20 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('rank')">
+                                อันดับ <i id="sort-icon-rank" class="fas fa-sort-up text-indigo-500 ml-1"></i>
                             </th>
                             <th class="py-3 px-4">คนขับ</th>
                             <th class="py-3 px-4 text-center text-emerald-600 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('likes')">
@@ -7266,7 +7266,7 @@ let creditDisplay = `
     window.socialDriversData = [];
     window.currentSocialPage = 1;
     window.socialRowsPerPage = 50;
-    window.currentSocialSort = { column: 'score', order: 'desc' }; // เรียงตามคะแนนความนิยมเป็นค่าเริ่มต้น
+    window.currentSocialSort = { column: 'rank', order: 'asc' }; // เริ่มต้นให้เรียงอันดับ 1 ขึ้นก่อน
 
     // 1. ฟังก์ชันหลักสำหรับดึงข้อมูล กำหนดอันดับแท้จริง และเตรียมเรียง
     window.renderSocialLeaderboard = function() {
@@ -7275,7 +7275,6 @@ let creditDisplay = `
         let allTempDrivers = [];
         let totalLikes = 0, totalDislikes = 0, totalFollowers = 0, activeDrivers = 0;
 
-        // ดึงคนขับทุกคนมาคำนวณคะแนนก่อน
         for(let drvId in allProfiles) {
             let d = allProfiles[drvId];
             let l = parseInt(d.likes) || 0;
@@ -7303,16 +7302,16 @@ let creditDisplay = `
             });
         }
 
-        // 🌟 จัดเรียงตามคะแนนเพื่อหา "อันดับที่แท้จริง" (Leaderboard Rank) ก่อน
+        // 🌟 1. คำนวณอันดับที่แท้จริงจากคะแนน
         allTempDrivers.sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            return a.id.localeCompare(b.id);
+            if (b.score !== a.score) return b.score - a.score; // คะแนนมากอยู่บน
+            return a.id.localeCompare(b.id); // คะแนนเท่ากันเอา ID มาเรียง
         });
 
-        // 🌟 มอบป้ายเลขอันดับ (rank) ให้ติดตัวคนขับ แล้วกรองคนที่ค้นหา
+        // 🌟 2. แจกป้ายเลขอันดับ (rank)
         window.socialDriversData = [];
         allTempDrivers.forEach((d, index) => {
-            d.rank = index + 1; // ล็อคเลขอันดับไว้กับตัวเลย
+            d.rank = index + 1; // ล็อกป้ายอันดับติดตัวคนขับไว้เลย
             
             let searchStr = `${d.id} ${d.name}`.toLowerCase();
             if (!keyword || searchStr.includes(keyword)) {
@@ -7320,7 +7319,6 @@ let creditDisplay = `
             }
         });
 
-        // อัปเดตสถิติด้านบน
         let elL = document.getElementById('social-stat-total-likes'); if(elL) elL.innerText = totalLikes.toLocaleString();
         let elD = document.getElementById('social-stat-total-dislikes'); if(elD) elD.innerText = totalDislikes.toLocaleString();
         let elF = document.getElementById('social-stat-total-followers'); if(elF) elF.innerText = totalFollowers.toLocaleString();
@@ -7331,22 +7329,21 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 2. ฟังก์ชันกดคลิกที่หัวตารางเพื่อเรียงลำดับ
+    // 2. ฟังก์ชันกดคลิกที่หัวตาราง
     window.sortSocialLeaderboard = function(column) {
         if(window.currentSocialSort.column === column) {
             window.currentSocialSort.order = window.currentSocialSort.order === 'desc' ? 'asc' : 'desc';
         } else {
             window.currentSocialSort.column = column;
-            window.currentSocialSort.order = 'desc';
+            // ถ้ากดคอลัมน์ "อันดับ" ให้เริ่มที่น้อยไปมาก (1->50) นอกนั้นให้เริ่มจากมากไปน้อย
+            window.currentSocialSort.order = column === 'rank' ? 'asc' : 'desc';
         }
 
-        // รีเซ็ตไอคอน
-        ['score', 'likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
+        ['rank', 'likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
             let icon = document.getElementById('sort-icon-' + col);
             if(icon) icon.className = 'fas fa-sort text-gray-400 ml-1';
         });
 
-        // อัปเดตไอคอนตัวที่กด
         let activeIcon = document.getElementById('sort-icon-' + column);
         if(activeIcon) {
             activeIcon.className = window.currentSocialSort.order === 'desc' ? 'fas fa-sort-down text-indigo-500 ml-1' : 'fas fa-sort-up text-indigo-500 ml-1';
@@ -7357,7 +7354,7 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 3. อัลกอริทึมเรียงลำดับ Array
+    // 3. อัลกอริทึมเรียงลำดับ Array (แก้บั๊กคะแนนเท่ากัน)
     window.sortSocialArray = function() {
         let col = window.currentSocialSort.column;
         let order = window.currentSocialSort.order === 'desc' ? -1 : 1;
@@ -7365,10 +7362,15 @@ let creditDisplay = `
         window.socialDriversData.sort((a, b) => {
             let valA = a[col];
             let valB = b[col];
-            if(valA < valB) return -1 * order;
-            if(valA > valB) return 1 * order;
-            // 🌟 ถ้าคะแนนเท่ากันเป๊ะ ให้เรียงตาม ID ป้องกันการสลับตำแหน่งไปมาแบบสุ่ม
-            return a.id.localeCompare(b.id); 
+            
+            // ถ้าค่าไม่เท่ากัน ให้เรียงสลับบนล่างตามปกติ
+            if(valA !== valB) {
+                return valA < valB ? (-1 * order) : (1 * order);
+            }
+            
+            // 🌟 ไม้ตาย: ถ้าค่าเท่ากันเป๊ะ (เช่น ไลค์ 0 เท่ากัน) 
+            // ให้บังคับเรียงสลับด้วย "เลขอันดับ(rank)" เท่านั้น จะได้สลับด้านได้สมบูรณ์แบบ
+            return order === 1 ? (a.rank - b.rank) : (b.rank - a.rank);
         });
     };
 
