@@ -2461,9 +2461,8 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
 
             // จัดการคอลัมน์รีวิว / ร้องเรียน
             let reviewHtml = '<span class="text-gray-400">-</span>';
-            if(j.rating) {
-                reviewHtml = `<div class="flex items-center justify-center gap-1 text-yellow-500"><i class="fas fa-star text-[10px]"></i> <span class="font-bold text-xs">${j.rating}</span></div>`;
-                if(j.reviewComment) reviewHtml += `<p class="text-[9px] text-gray-500 dark:text-slate-400 truncate max-w-[100px] mx-auto mt-0.5" title="${j.reviewComment}">"${j.reviewComment}"</p>`;
+            if(j.reviewComment) {
+                reviewHtml = `<p class="text-[9px] text-gray-500 dark:text-slate-400 truncate max-w-[100px] mx-auto mt-0.5" title="${j.reviewComment}">"${j.reviewComment}"</p>`;
             } else if(j.cancelReason) {
                 reviewHtml = `<p class="text-[9px] text-red-500 dark:text-red-400 truncate max-w-[120px] mx-auto" title="${j.cancelReason}"><i class="fas fa-exclamation-circle"></i> ${j.cancelReason}</p>`;
             }
