@@ -7353,7 +7353,7 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 3. อัลกอริทึมเรียงลำดับ Array (ครอบคลุม ไลค์, ดิสไลค์, ผู้ติดตาม, เปอร์เซ็นต์)
+    // 3. อัลกอริทึมเรียงลำดับ Array (อัปเกรด: พลิกตารางสมบูรณ์แบบเมื่อคะแนนเท่ากัน)
     window.sortSocialArray = function() {
         let col = window.currentSocialSort.column;
         let order = window.currentSocialSort.order === 'desc' ? -1 : 1;
@@ -7362,14 +7362,15 @@ let creditDisplay = `
             let valA = a[col];
             let valB = b[col];
             
-            // ถ้าค่าไม่เท่ากัน ให้เรียงตามปกติ (มากไปน้อย หรือ น้อยไปมาก)
-            if(valA !== valB) {
+            // 1. ถ้าคะแนนไม่เท่ากัน ให้เรียงตามปกติ (มากไปน้อย หรือ น้อยไปมาก)
+            if (valA !== valB) {
                 return valA < valB ? (-1 * order) : (1 * order);
             }
             
-            // 🌟 ไม้ตายสำหรับทุกปุ่ม: ถ้าคะแนนเท่ากันเป๊ะ (เช่น ไลค์ 0 เท่ากัน) 
-            // ให้เอา "คนที่มีอันดับรวม (Rank) ดีกว่า" ขึ้นก่อนเสมอ! จะได้ไม่มีการสลับมั่ว
-            return a.rank - b.rank;
+            // 🌟 2. ไม้ตาย: ถ้าคะแนนเท่ากันเป๊ะ (เช่น 0 เท่ากัน) ให้ใช้เลขอันดับ (Rank) มาสลับ!
+            // - ถ้าเรียงมากไปน้อย (desc) -> ให้ Rank 1 อยู่บนสุด
+            // - ถ้าเรียงน้อยไปมาก (asc)  -> ให้ Rank สุดท้าย (เช่น 50) ขึ้นมาอยู่บนสุด
+            return order === -1 ? (a.rank - b.rank) : (b.rank - a.rank);
         });
     };
 
