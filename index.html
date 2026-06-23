@@ -14,12 +14,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap');
-    
     /* 🌟 ตั้งค่าระบบสีหลักตามเงื่อนไข (Base Themes) */
     body { 
-        font-family: 'Kanit', sans-serif; 
+        font-family: 'Sarabun', sans-serif; /* 🌟 เปลี่ยนฟอนต์หลักเป็น Sarabun */
         touch-action: pan-y;
         -webkit-text-size-adjust: 100%; 
         overflow-x: hidden;
@@ -86,11 +88,14 @@
   </style>
   
   <script>
-    // 🌟 ตั้งค่าพจนานุกรมสีของ Tailwind ให้แมปกับธีมสีหลัก #1da1f2 ทั้งระบบ
+    // 🌟 ตั้งค่าพจนานุกรมสีของ Tailwind และตั้งค่าฟอนต์
     tailwind.config = { 
         darkMode: 'class',
         theme: {
             extend: {
+                fontFamily: {
+                    sans: ['Sarabun', 'sans-serif'], // 🌟 บังคับใช้ฟอนต์ Sarabun ในคลาส Tailwind ทั้งหมด
+                },
                 colors: {
                     blue: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
                     indigo: { 50: '#e0f2fe', 100: '#e0f2fe', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da', 900: '#0c4d75' },
@@ -108,6 +113,7 @@
     }
   </script>
 </head>
+  
 <body class="h-[100dvh] w-full m-0 flex flex-col overflow-hidden transition-colors duration-300">
 
   <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-4 flex justify-between items-center shadow-sm dark:shadow-lg sticky top-0 z-40 transition-colors duration-300 shrink-0">
