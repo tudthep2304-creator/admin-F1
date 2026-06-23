@@ -60,253 +60,220 @@
   </script>
 </head>
   
-<body class="h-[100dvh] w-full m-0 flex flex-col overflow-hidden transition-colors duration-300">
+<body class="h-[100dvh] w-full m-0 flex overflow-hidden bg-gray-100 text-gray-800 transition-colors duration-300">
 
-  <header class="border-gray-200 bg-white shadow-sm  border-b   px-4 py-4 flex justify-between items-center shadow-sm  sticky top-0 z-40 transition-colors duration-300 shrink-0">
-    <div class="flex items-center gap-2 sm:gap-3">
-        <!-- 🍔 ปุ่ม Hamburger Menu (ย้ายมาซ้ายสุด) -->
-        <button onclick="window.toggleSidebar()" class="w-9 h-9 border-gray-200 bg-white shadow-sm   ] hover: : rounded-xl flex items-center justify-center text-lg transition active:scale-95 shrink-0 shadow-sm cursor-pointer">
-            <i class="fas fa-bars"></i>
-        </button>
+    <div id="sidebar-overlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-black/50 z-[9990] hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+
+    <aside id="sidebar-menu" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-[9999] transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col shadow-[4px_0_20px_rgba(0,0,0,0.05)]">
         
-        <!-- ปุ่ม Back -->
-        <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9   text-black  hover:text-black  rounded-xl flex items-center justify-center text-lg transition active:scale-95 shrink-0">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-       
-        <div class="min-w-0">
-            <h1 class="text-lg sm:text-xl font-black text-black  tracking-wide flex items-center gap-2 truncate">
-                F1 DRIVER <span class="text-black  font-normal hidden sm:inline">|</span> 
-                <span id="current-page-title" class="text-brand text-sm sm:text-base truncate">แดชบอร์ด</span>
-            </h1>
-            <p class="text-[10px] sm:text-xs text-black  font-bold flex items-center gap-1">
-                <span class="w-1.5 h-1.5 bg-brand rounded-full animate-ping"></span> แผงควบคุมส่วนกลาง
-            </p>
+        <div class="h-[73px] flex items-center justify-between px-6 border-b border-gray-200 bg-white shrink-0">
+            <h2 class="text-lg font-black text-gray-800 tracking-tight"><i class="fas fa-rocket text-brand mr-2"></i>F1 DRIVER</h2>
+            <button onclick="window.toggleSidebar()" class="md:hidden w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-brand transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
         </div>
+
+        <div class="flex-1 overflow-y-auto slim-scroll py-4 space-y-1">
+            
+            <a href="javascript:void(0)" onclick="switchTab('dashboard')" class="flex items-center gap-3 px-4 py-2.5 mx-3 text-sm font-bold text-gray-700 rounded-xl hover:bg-brand/10 hover:text-brand transition-all duration-200 group">
+                <i class="fas fa-home w-5 text-center text-gray-400 group-hover:text-brand transition-colors"></i> 
+                <span>หน้าหลัก (Dashboard)</span>
+            </a>
+
+            <div class="h-px bg-gray-100 my-4 mx-4"></div>
+
+            <div>
+                <button onclick="toggleSidebarAccordion('sidebar-driver', this)" class="w-full flex items-center justify-between px-6 py-2 text-xs font-black text-gray-400 uppercase tracking-wider hover:text-gray-800 transition-colors">
+                    <span>จัดการคนขับ</span>
+                    <i class="fas fa-chevron-down transition-transform duration-300 transform rotate-180"></i>
+                </button>
+                <div id="sidebar-driver" class="flex flex-col space-y-0.5 mt-1 overflow-hidden transition-all duration-300">
+                    <a href="javascript:void(0)" onclick="switchTab('drivers')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-motorcycle w-5 text-center"></i> ข้อมูลคนขับ
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('social-management'); renderSocialLeaderboard();" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-thumbs-up w-5 text-center"></i> จัดการโซเชียล DRV
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('wallet'); renderWalletTab();" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-wallet w-5 text-center"></i> กระเป๋าเงิน
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('quests'); renderQuestsTable();" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-bullseye w-5 text-center"></i> ภารกิจแคมเปญ
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('tiers')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-balance-scale w-5 text-center"></i> กฎระเบียบคนขับ
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('commission-settings')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-hand-holding-usd w-5 text-center"></i> ตั้งค่าคอมมิชชัน
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('blockdrivers')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-red-50 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-ban w-5 text-center"></i> บล็อกคนขับ
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('partner-campaigns')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-store w-5 text-center"></i> แคมเปญร้านค้า
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('partner-approvals')" class="flex items-center justify-between px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <div class="flex items-center gap-3"><i class="fas fa-tasks w-5 text-center"></i> ตรวจงานร้านค้า</div>
+                        <span class="bg-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">0</span>
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('driver-banners')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-images w-5 text-center"></i> โฆษณาคนขับ
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('driver-news')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-bullhorn w-5 text-center"></i> ข่าวสารคนขับ
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('driver-privileges')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-gift w-5 text-center"></i> สิทธิพิเศษคนขับ
+                    </a>
+                </div>
+            </div>
+
+            <div class="h-px bg-gray-100 my-4 mx-4"></div>
+
+            <div>
+                <button onclick="toggleSidebarAccordion('sidebar-passenger', this)" class="w-full flex items-center justify-between px-6 py-2 text-xs font-black text-gray-400 uppercase tracking-wider hover:text-gray-800 transition-colors">
+                    <span>จัดการผู้โดยสาร</span>
+                    <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                </button>
+                <div id="sidebar-passenger" class="hidden flex-col space-y-0.5 mt-1 overflow-hidden transition-all duration-300">
+                    <a href="javascript:void(0)" onclick="switchTab('passengers')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-users w-5 text-center"></i> ข้อมูลลูกค้า
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('promos')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-ticket-alt w-5 text-center"></i> คูปองส่วนลด
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('banners')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-images w-5 text-center"></i> โฆษณาลูกค้า
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('news')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-bullhorn w-5 text-center"></i> ข่าวสารลูกค้า
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('blacklist')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-red-50 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-user-slash w-5 text-center"></i> บล็อกลูกค้า
+                    </a>
+                </div>
+            </div>
+
+            <div class="h-px bg-gray-100 my-4 mx-4"></div>
+
+            <div>
+                <button onclick="toggleSidebarAccordion('sidebar-central', this)" class="w-full flex items-center justify-between px-6 py-2 text-xs font-black text-gray-400 uppercase tracking-wider hover:text-gray-800 transition-colors">
+                    <span>ระบบส่วนกลาง</span>
+                    <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                </button>
+                <div id="sidebar-central" class="hidden flex-col space-y-0.5 mt-1 overflow-hidden transition-all duration-300">
+                    <a href="javascript:void(0)" onclick="switchTab('history')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-history w-5 text-center"></i> ประวัติงาน
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('vehicles')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-car w-5 text-center"></i> เรท & ประเภทรถ
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('tier-settings')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-medal w-5 text-center"></i> ตั้งค่าระดับชั้น
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('chatlogs')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-comments w-5 text-center"></i> บันทึกแชท
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('all-wallet-history')" class="flex items-center gap-3 px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <i class="fas fa-file-invoice-dollar w-5 text-center"></i> ประวัติการเงิน
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('topup-approvals')" class="flex items-center justify-between px-4 py-2 mx-3 text-sm font-medium text-gray-600 rounded-xl hover:bg-brand/5 hover:text-brand transition-all duration-200">
+                        <div class="flex items-center gap-3"><i class="fas fa-file-invoice w-5 text-center"></i> อนุมัติสลิป</div>
+                        <span class="bg-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">0</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="p-4 border-t border-gray-200 text-center shrink-0">
+            <p class="text-[10px] text-gray-400 font-bold">F1 DRIVER ADMIN V2.0</p>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-full w-full md:pl-64 transition-all duration-300">
+        
+        <header class="border-b border-gray-200 bg-white px-4 py-4 flex justify-between items-center shadow-sm sticky top-0 z-40 shrink-0">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="window.toggleSidebar()" class="md:hidden w-9 h-9 border border-gray-200 bg-white rounded-xl flex items-center justify-center text-lg text-gray-800 transition hover:border-brand hover:text-brand active:scale-95 shrink-0 shadow-sm cursor-pointer">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9 text-gray-800 hover:text-brand rounded-xl flex items-center justify-center text-lg transition active:scale-95 shrink-0">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+               
+                <div class="min-w-0">
+                    <h1 class="text-lg sm:text-xl font-black text-gray-800 tracking-wide flex items-center gap-2 truncate">
+                        F1 DRIVER <span class="text-gray-300 font-normal hidden sm:inline">|</span> 
+                        <span id="current-page-title" class="text-brand text-sm sm:text-base truncate">แดชบอร์ด</span>
+                    </h1>
+                    <p class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 bg-brand rounded-full animate-ping"></span> แผงควบคุมส่วนกลาง
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 pb-6 max-w-7xl w-full mx-auto hide-scrollbar">
+            
+            <section id="content-dashboard" class="tab-content space-y-6">
+                
+                <div class="border border-gray-200 bg-white p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-800 mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-brand"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
+                        <p class="text-xs text-gray-500 leading-relaxed max-w-md">เลือกโหมดคุมแมนนวลเพื่อกดส่งงานให้คนขับด้วยตัวเอง หรือเลือกออโต้คิวเพื่อให้ระบบกระจายคิวอัตโนมัติ</p>
+                    </div>
+                    <div class="flex p-1 rounded-xl border border-gray-200 bg-gray-50 w-full sm:w-auto shrink-0 relative">
+                        <button onclick="confirmChangeDispatchMode('manual')" id="btn-mode-manual" class="flex-1 sm:w-32 py-2 text-xs font-bold text-gray-800 bg-white rounded-lg shadow-sm transition-all hover:text-brand border border-gray-200">แมนนวล</button>
+                        <button onclick="confirmChangeDispatchMode('auto')" id="btn-mode-auto" class="flex-1 sm:w-32 py-2 text-xs font-bold text-gray-500 hover:text-gray-800 rounded-lg transition-all">ออโต้คิว</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div onclick="openModal('modalPendingJobs')" class="border border-gray-200 bg-white p-5 rounded-2xl shadow-sm cursor-pointer transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
+                                <h3 class="text-3xl font-black text-gray-800" id="stat-pending-count">0 งาน</h3>
+                            </div>
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400"><i class="fas fa-search"></i></div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="openModal('modalOnlineDrivers')" class="border border-gray-200 bg-white p-5 rounded-2xl shadow-sm cursor-pointer transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">คนขับออนไลน์</p>
+                                <h3 class="text-3xl font-black text-brand" id="stat-online-count">0 คน</h3>
+                            </div>
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-brand bg-brand/10"><i class="fas fa-search"></i></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 bg-white p-4 sm:p-5 rounded-2xl shadow-sm transition-colors duration-300">
+                    <h2 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-brand"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
+                    <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+            </section>
+        </main>
     </div>
-  </header>
 
-<!-- 🌟 Sidebar Overlay (พื้นหลังมืดๆ กดบริเวณนอกเมนูเพื่อปิดได้) -->
-  <div id="sidebar-overlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-black/60 z-[9990] hidden opacity-0 transition-opacity duration-300"></div>
-
-  <!-- 🌟 Sidebar Menu (แผงเมนูสไลด์จากซ้าย) -->
-  <div id="sidebar-menu" class="fixed inset-y-0 left-0 w-64 border-gray-200 bg-white shadow-sm  shadow-2xl z-[9999] transform -translate-x-full transition-transform duration-300 flex flex-col">
-      <div class="p-5 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm/50 /50">
-          <h2 class="text-base font-black text-brand flex items-center gap-2"><i class="fas fa-rocket"></i> F1 DRIVER</h2>
-          <button onclick="window.toggleSidebar()" class="w-8 h-8   rounded-full flex items-center justify-center text-black  hover: hover: transition"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="flex-1 overflow-y-auto py-2">
-          <button onclick="switchTab('dashboard'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:border-gray-200 bg-white shadow-sm : hover: ] flex items-center gap-4 border-b   transition text-left">
-              <div class="w-6 text-center"><i class="fas fa-home "></i></div> หน้าหลัก (Dashboard)
-          </button>
-          <button onclick="switchTab('allmenu'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:border-gray-200 bg-white shadow-sm : hover: ] flex items-center gap-4 border-b   transition text-left">
-              <div class="w-6 text-center"><i class="fas fa-th-large text-brand"></i></div> เมนูระบบ (All Menus)
-          </button>
-          <button onclick="switchTab('map'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:border-gray-200 bg-white shadow-sm : hover: ] flex items-center gap-4 transition text-left">
-              <div class="w-6 text-center"><i class="fas fa-map-marked-alt "></i></div> แผนที่รถ (Live Map)
-          </button>
-      </div>
-      <div class="p-4 border-t   text-center">
-          <p class="text-[10px] text-black font-bold">F1 DRIVER ADMIN V2.0</p>
-      </div>
-  </div>
-  
-  <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 pb-6 max-w-7xl w-full mx-auto hide-scrollbar">
-      
-      <section id="content-dashboard" class="tab-content space-y-6">
-          <div class="border-gray-200 bg-white shadow-sm  border   p-4 sm:p-5 rounded-2xl shadow-sm  flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
-              <div>
-                  <h2 class="text-base font-bold text-black  mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-brand"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
-                  <p class="text-xs text-black  leading-relaxed max-w-md">เลือกโหมดคุมแมนนวลเพื่อกดส่งงานให้คนขับด้วยตัวเอง หรือเลือกออโต้คิวเพื่อให้ระบบกระจายคิวอัตโนมัติ</p>
-              </div>
-              <div class="flex   p-1 rounded-xl border   w-full sm:w-auto shrink-0 relative">
-                  <button onclick="confirmChangeDispatchMode('manual')" id="btn-mode-manual" class="flex-1 sm:w-32 py-2 text-xs font-bold  text-black rounded-lg shadow transition">แมนนวล</button>
-                  <button onclick="confirmChangeDispatchMode('auto')" id="btn-mode-auto" class="flex-1 sm:w-32 py-2 text-xs font-bold text-black  hover:text-black  rounded-lg transition">ออโต้คิว</button>
-              </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div onclick="openModal('modalPendingJobs')" class="border-gray-200 bg-white shadow-sm border-gray-200 bg-white shadow-sm shadow-sm  border   p-5 rounded-2xl shadow-sm  cursor-pointer hover: : transition transform hover:-translate-y-1 relative">
-                  <div class="flex justify-between items-start">
-                      <div>
-                          <p class="text-xs font-bold text-black  uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
-                          <h3 class="text-3xl font-black " id="stat-pending-count">0 งาน</h3>
-                      </div>
-                      <div class="w-8 h-8 rounded-full   flex items-center justify-center  "><i class="fas fa-search"></i></div>
-                  </div>
-              </div>
-              
-              <div onclick="openModal('modalOnlineDrivers')" class="border-gray-200 bg-white shadow-sm  border   p-5 rounded-2xl shadow-sm  cursor-pointer hover: : transition transform hover:-translate-y-1">
-                  <div class="flex justify-between items-start">
-                      <div>
-                          <p class="text-xs font-bold text-black  uppercase tracking-wider mb-1">คนขับออนไลน์</p>
-                          <h3 class="text-3xl font-black text-brand" id="stat-online-count">0 คน</h3>
-                      </div>
-                      <div class="w-8 h-8 rounded-full   flex items-center justify-center text-brand"><i class="fas fa-search"></i></div>
-                  </div>
-              </div>
-          </div>
-          <div class="border-gray-200 bg-white shadow-sm p-4 sm:p-5 rounded-2xl shadow-sm  transition-colors duration-300">
-              <h2 class="text-base font-bold text-black  mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-brand"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
-              <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-          </div>
-      </section>
-
-      <!-- ================= หน้าเมนูรวม (แบบพับเก็บได้) ================= -->
-      <section id="content-allmenu" class="tab-content hidden space-y-4 pb-6 mt-2">
-          
-          <div class="flex justify-between items-center border border-gray-200 bg-white p-3 rounded-2xl transition-all duration-300">
-              <p class="text-[11px] sm:text-xs font-bold text-gray-800"><i class="fas fa-magic text-brand"></i> ปรับแต่งเมนูแผงควบคุม</p>
-              <button onclick="openMenuSettingsModal()" class="border border-gray-200 bg-white text-gray-800 px-4 py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-300 flex items-center gap-1.5 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0"><i class="fas fa-sliders-h text-brand"></i> จัดการเมนู</button>
-          </div>
-
-          <div class="border border-gray-200 bg-white rounded-2xl p-4 transition-all duration-300">
-              <div onclick="toggleMenuCategory('menu-group-driver', this)" class="flex items-center justify-between cursor-pointer select-none">
-                  <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <i class="fas fa-id-card text-brand"></i> หมวดหมู่จัดการคนขับ
-                  </h2>
-                  <div class="w-8 h-8 border border-gray-200 bg-white rounded-full flex items-center justify-center text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_10px] hover:shadow-brand/30 hover:text-brand">
-                      <i class="fas fa-chevron-up transition-transform duration-300"></i>
-                  </div>
-              </div>
-              <div id="menu-group-driver" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t border-gray-200 transition-all duration-300">
-                  
-                  <button onclick="switchTab('drivers')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">จัดการคนขับ</span>
-                  </button>
-
-                  <button onclick="switchTab('social-management'); renderSocialLeaderboard();" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-thumbs-up"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">จัดการโซเชียล DRV</span>
-                  </button>
-
-                  <button onclick="switchTab('wallet'); renderWalletTab();" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-wallet"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">กระเป๋าเงิน</span>
-                  </button>
-                  
-                  <button onclick="switchTab('quests'); renderQuestsTable();" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullseye"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ภารกิจแคมเปญ</span>
-                  </button>
-                  
-                  <button onclick="switchTab('tiers'); " class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-balance-scale"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">กฎระเบียบคนขับ</span>
-                  </button>
-                  
-                  <button onclick="switchTab('commission-settings')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-hand-holding-usd"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ตั้งค่าคอมมิชชัน</span>
-                  </button>
-                  
-                  <button onclick="switchTab('blockdrivers')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ban"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">บล็อกคนขับ</span>
-                  </button>
-                  
-                  <button onclick="switchTab('partner-campaigns')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-store"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">แคมเปญร้านค้า</span>
-                  </button>
-                  
-                  <button onclick="switchTab('partner-approvals')" class="relative border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div id="badge-partner-pending" class="hidden absolute -top-2 -right-2 bg-brand text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">0</div>
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-tasks"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ตรวจงานร้านค้า</span>
-                  </button>
-                  
-                  <button onclick="switchTab('driver-banners')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">โฆษณาคนขับ</span>
-                  </button>
-                  
-                  <button onclick="switchTab('driver-news')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ข่าวสารคนขับ</span>
-                  </button>
-                  
-                  <button onclick="switchTab('driver-privileges')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-gift"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">สิทธิพิเศษคนขับ</span>
-                  </button>
-              </div>
-          </div>
-
-          <div class="border border-gray-200 bg-white rounded-2xl p-4 transition-all duration-300">
-              <div onclick="toggleMenuCategory('menu-group-passenger', this)" class="flex items-center justify-between cursor-pointer select-none">
-                  <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <i class="fas fa-user-friends text-brand"></i> หมวดหมู่ผู้โดยสาร
-                  </h2>
-                  <div class="w-8 h-8 border border-gray-200 bg-white rounded-full flex items-center justify-center text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_10px] hover:shadow-brand/30 hover:text-brand">
-                      <i class="fas fa-chevron-up transition-transform duration-300"></i>
-                  </div>
-              </div>
-              <div id="menu-group-passenger" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t border-gray-200 transition-all duration-300">
-                  <button onclick="switchTab('passengers')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-users"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ข้อมูลลูกค้า</span>
-                  </button>
-                  <button onclick="switchTab('promos')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ticket-alt"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">คูปองส่วนลด</span>
-                  </button>
-                  <button onclick="switchTab('banners')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">โฆษลานูกค้า</span>
-                  </button>
-                  <button onclick="switchTab('news')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ข่าวสารลูกค้า</span>
-                  </button>
-                  <button onclick="switchTab('blacklist')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-user-slash"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">บล็อกลูกค้า</span>
-                  </button>
-              </div>
-          </div>
-
-          <div class="border border-gray-200 bg-white rounded-2xl p-4 transition-all duration-300">
-              <div onclick="toggleMenuCategory('menu-group-central', this)" class="flex items-center justify-between cursor-pointer select-none">
-                  <h2 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <i class="fas fa-cogs text-brand"></i> หมวดหมู่ระบบส่วนกลาง
-                  </h2>
-                  <div class="w-8 h-8 border border-gray-200 bg-white rounded-full flex items-center justify-center text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_10px] hover:shadow-brand/30 hover:text-brand">
-                      <i class="fas fa-chevron-up transition-transform duration-300"></i>
-                  </div>
-              </div>
-              <div id="menu-group-central" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t border-gray-200 transition-all duration-300">
-                  <button onclick="switchTab('history')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-history"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ประวัติงาน</span>
-                  </button>
-                  <button onclick="switchTab('vehicles')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">เรท & ประเภท</span>
-                  </button>
-                  
-                  <button onclick="switchTab('tier-settings')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-medal"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ตั้งค่าระดับชั้น</span>
-                  </button>
-
-                  <button onclick="switchTab('chatlogs')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">บันทึกแชท</span>
-                  </button>
-                  <button onclick="switchTab('all-wallet-history')" class="border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-file-invoice-dollar"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">ประวัติการเงิน</span>
-                  </button>
-                  <button onclick="switchTab('topup-approvals')" class="relative border border-gray-200 bg-white rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">
-                      <div id="badge-topup-pending" class="hidden absolute -top-2 -right-2 bg-brand text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">0</div>
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-file-invoice"></i></div>
-                      <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight text-gray-800">อนุมัติสลิปเติมเงิน</span>
-                  </button>
-              </div>
-          </div>
-      </section>
+    <script>
+        function toggleSidebarAccordion(menuId, buttonElement) {
+            const menu = document.getElementById(menuId);
+            const icon = buttonElement.querySelector('.fa-chevron-down');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                menu.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+    </script>
 
       <section id="content-map" class="tab-content hidden flex-1 flex-col pb-2">
           <div class="flex justify-between items-center mb-2 shrink-0">
