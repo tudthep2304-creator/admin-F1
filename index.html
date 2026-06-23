@@ -4530,12 +4530,7 @@ let creditDisplay = `
 
     window.closeTierRatingModal = function() { closeModal('modalAdjustTierRating'); currentWalletDriverId = null; }
 
-    // 🌟 ฟังก์ชันล็อกคะแนนดาว (ลบไส้ในทิ้ง เพื่อไม่ให้พัง เพราะเราไม่มีดาวแล้ว โหมดอมตะให้ไปคุมที่ฐานข้อมูลแทน)
-    window.autoFillOverrideStars = function() {
-        // ไม่ต้องทำอะไรแล้ว ปล่อยว่างไว้เพื่อป้องกัน Error อนาคต
-    }
-
-    // 🌟 ฟังก์ชันบันทึกข้อมูล (ปรับให้ส่งค่า Social Score ขึ้น Firebase ให้ถูกโหนด)
+        // 🌟 ฟังก์ชันบันทึกข้อมูล (ปรับให้ส่งค่า Social Score ขึ้น Firebase ให้ถูกโหนด)
     window.submitTierRatingAdjustment = function() {
         // ดึงรหัสคนขับจากหน้าต่างป๊อปอัปให้ชัวร์ที่สุด
         let drvId = document.getElementById('trm-drv-id').innerText.replace('PIN:', '').trim();
