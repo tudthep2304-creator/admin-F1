@@ -1703,20 +1703,29 @@
               </div>
 
               <div class="bg-gray-50 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-200 dark:border-slate-700">
-                  <h3 class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase mb-2"><i class="fas fa-car text-blue-500"></i> ทะเบียนรถเริ่มต้น (เพิ่ม/แก้ทีหลังได้)</h3>
-                  <div class="grid grid-cols-2 gap-2 mb-2">
-                      <div>
-                          <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ประเภทรถ</label>
-                          <select id="add-drv-vtype" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-blue-500"></select>
-                      </div>
-                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อ</label><input type="text" id="add-drv-vbrand" placeholder="เช่น Honda" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
-                  </div>
-                  <div class="grid grid-cols-3 gap-2">
-                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="add-drv-vcolor" placeholder="เช่น เทา" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
-                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ป้ายทะเบียน</label><input type="text" id="add-drv-vplate" placeholder="กท-1234" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-blue-500"></div>
-                      <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จังหวัด</label><input type="text" id="add-drv-vprovince" placeholder="เชียงราย" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
-                  </div>
-              </div>
+    <h3 class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase mb-2"><i class="fas fa-car text-blue-500"></i> ทะเบียนรถเริ่มต้น (เพิ่ม/แก้ทีหลังได้)</h3>
+    
+    <div class="grid grid-cols-3 gap-2 mb-2">
+        <div>
+            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ประเภทรถ</label>
+            <select id="add-drv-vtype" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-blue-500"></select>
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ยี่ห้อ</label>
+            <input type="text" id="add-drv-vbrand" placeholder="เช่น Honda" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500">
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">รุ่นรถ</label>
+            <input type="text" id="add-drv-vmodel" placeholder="เช่น Civic" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500">
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-3 gap-2">
+        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">สีรถ</label><input type="text" id="add-drv-vcolor" placeholder="เช่น เทา" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
+        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">ป้ายทะเบียน</label><input type="text" id="add-drv-vplate" placeholder="กท-1234" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs font-bold focus:border-blue-500"></div>
+        <div><label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">จังหวัด</label><input type="text" id="add-drv-vprovince" placeholder="เชียงราย" class="w-full p-2 bg-white dark:bg-slate-900 text-gray-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg outline-none text-xs focus:border-blue-500"></div>
+    </div>
+</div>
 
               <button onclick="window.saveNewDriver()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2"><i class="fas fa-save mr-1"></i> บันทึกเข้าระบบ</button>
           </div>
@@ -4063,9 +4072,9 @@ let creditDisplay = `
             <div class="bg-gray-50 dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm relative transition-colors duration-300 min-w-0">
                 <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-100 dark:bg-red-900/20 w-6 h-6 rounded-lg flex items-center justify-center transition shadow-sm border border-red-200 dark:border-red-500/20"><i class="fas fa-trash-alt text-[10px]"></i></button>
                 <div class="space-y-2 pr-6">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ประเภทรถ</label>${selectHtml}</div>
+                    <div class="grid grid-cols-3 gap-2"> <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ประเภทรถ</label>${selectHtml}</div>
                         <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none transition"></div>
+                        <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">รุ่นรถ</label><input type="text" id="v-model-${vId}" value="${v.model||''}" oninput="updateTempVehicle('${vId}')" placeholder="เช่น City" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none transition"></div>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                         <div><label class="block text-[11px] font-medium text-gray-800 dark:text-slate-300 mb-0.5">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white dark:bg-slate-900 text-black dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-[11px] font-normal outline-none transition"></div>
@@ -4081,15 +4090,15 @@ let creditDisplay = `
     window.addDriverVehicle = function() {
         let vId = 'veh_' + Date.now();
         
-        // 🌟 ดึงค่าประเภทรถคันแรกสุดจากระบบส่วนกลางมาเป็นค่าเริ่มต้น
         let defaultVType = (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) 
                            ? window.systemVehicleTypes[0].id 
                            : 'unknown';
 
         window.currentDriverVehicles[vId] = { 
             id: vId, 
-            serviceType: defaultVType, // 🌟 ใช้ค่าจากส่วนกลางแทน 'car'
+            serviceType: defaultVType, 
             brand: '', 
+            model: '', // 🌟 เพิ่ม model ให้ระบบจำค่าได้
             color: '', 
             plate: '', 
             province: '', 
@@ -4099,11 +4108,18 @@ let creditDisplay = `
         renderDriverVehicles();
     }
     window.removeTempVehicle = function(vId) { delete window.currentDriverVehicles[vId]; renderDriverVehicles(); }
+    
     window.updateTempVehicle = function(vId) {
         if(!window.currentDriverVehicles[vId]) return;
-        window.currentDriverVehicles[vId].serviceType = document.getElementById('v-type-' + vId).value; window.currentDriverVehicles[vId].brand = document.getElementById('v-brand-' + vId).value.trim(); window.currentDriverVehicles[vId].color = document.getElementById('v-color-' + vId).value.trim(); window.currentDriverVehicles[vId].plate = document.getElementById('v-plate-' + vId).value.trim(); let pEl = document.getElementById('v-province-' + vId); window.currentDriverVehicles[vId].province = pEl ? pEl.value.trim() : '';
+        window.currentDriverVehicles[vId].serviceType = document.getElementById('v-type-' + vId).value; 
+        window.currentDriverVehicles[vId].brand = document.getElementById('v-brand-' + vId).value.trim(); 
+        window.currentDriverVehicles[vId].model = document.getElementById('v-model-' + vId).value.trim(); // 🌟 ดึงข้อมูลเข้าตัวแปร
+        window.currentDriverVehicles[vId].color = document.getElementById('v-color-' + vId).value.trim(); 
+        window.currentDriverVehicles[vId].plate = document.getElementById('v-plate-' + vId).value.trim(); 
+        let pEl = document.getElementById('v-province-' + vId); 
+        window.currentDriverVehicles[vId].province = pEl ? pEl.value.trim() : '';
     }
-
+    
     window.saveDriverUpdates = async function() {
         let driverId = window.currentDriverFocus; 
         let newPin = document.getElementById('det-pin-input').value.trim(); 
