@@ -7710,6 +7710,7 @@ let creditDisplay = `
     };
 
     // 4. เปิดหน้าต่างแอดมิน เพื่อตั้งค่า
+    // 4. เปิดหน้าต่างแอดมิน เพื่อตั้งค่า (เพิ่มการแสดง ID ดั้งเดิมกันลืม!)
     window.openMenuSettingsModal = function() {
         let container = document.getElementById('menu-settings-container');
         let html = '';
@@ -7733,7 +7734,10 @@ let creditDisplay = `
                         <button onclick="moveMenuItem('${cat}', ${index}, 1)" class="w-6 h-6 bg-gray-100 dark:bg-slate-700 rounded-md text-gray-500 hover:text-blue-500 hover:bg-blue-50 flex items-center justify-center transition disabled:opacity-30" ${index === window.menuConfigState[cat].length - 1 ? 'disabled' : ''}><i class="fas fa-chevron-down text-[10px]"></i></button>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <label class="block text-[9px] font-bold text-gray-500 mb-0.5">แก้ไขชื่อเมนู</label>
+                        <div class="flex justify-between items-end mb-0.5">
+                            <label class="block text-[9px] font-bold text-gray-500">แก้ไขชื่อเมนู</label>
+                            <span class="text-[8px] bg-indigo-50 text-indigo-500 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded border border-indigo-100 dark:border-indigo-800 font-mono">Code ID: ${item.id}</span>
+                        </div>
                         <input type="text" value="${item.name}" oninput="updateMenuNameState('${cat}', ${index}, this.value)" class="w-full bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-gray-800 dark:text-white outline-none focus:border-blue-500 transition">
                     </div>
                     <div class="flex flex-col items-center justify-center pr-1">
