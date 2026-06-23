@@ -603,12 +603,12 @@
                 <table class="w-full text-left border-collapse min-w-[850px]">
                     <thead class="bg-gray-100 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 text-[11px] uppercase font-bold select-none">
                         <tr>
-                            <th class="py-3 px-4 w-20 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('id')">
-                                อันดับ <i id="sort-icon-id" class="fas fa-sort text-gray-400 ml-1"></i>
+                            <th class="py-3 px-4 w-20 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('score')">
+                                อันดับ <i id="sort-icon-score" class="fas fa-sort-down text-indigo-500 ml-1"></i>
                             </th>
                             <th class="py-3 px-4">คนขับ</th>
                             <th class="py-3 px-4 text-center text-emerald-600 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('likes')">
-                                <i class="fas fa-thumbs-up"></i> ไลค์ <i id="sort-icon-likes" class="fas fa-sort-down text-indigo-500 ml-1"></i>
+                                <i class="fas fa-thumbs-up"></i> ไลค์ <i id="sort-icon-likes" class="fas fa-sort text-gray-400 ml-1"></i>
                             </th>
                             <th class="py-3 px-4 text-center text-red-500 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('dislikes')">
                                 <i class="fas fa-thumbs-down"></i> ดิสไลค์ <i id="sort-icon-dislikes" class="fas fa-sort text-gray-400 ml-1"></i>
@@ -7266,7 +7266,7 @@ let creditDisplay = `
     window.socialDriversData = [];
     window.currentSocialPage = 1;
     window.socialRowsPerPage = 50;
-    window.currentSocialSort = { column: 'likes', order: 'desc' }; // เรียงจากไลก์มากสุดเป็นค่าเริ่มต้น
+    window.currentSocialSort = { column: 'score', order: 'desc' }; // เรียงตามคะแนนความนิยมเป็นค่าเริ่มต้น
 
     // 1. ฟังก์ชันหลักสำหรับดึงข้อมูลและเตรียมเรียง
     window.renderSocialLeaderboard = function() {
@@ -7283,6 +7283,7 @@ let creditDisplay = `
             
             let totalVotes = l + dl;
             let popularity = totalVotes > 0 ? ((l / totalVotes) * 100).toFixed(1) : 0;
+            let scoreForSorting = l + (f * 2) - (dl * 2); // 🌟 สูตรคำนวณคะแนนอันดับที่แท้จริง
 
             totalLikes += l;
             totalDislikes += dl;
@@ -7299,7 +7300,8 @@ let creditDisplay = `
                 likes: l,
                 dislikes: dl,
                 followers: f,
-                popularity: parseFloat(popularity)
+                popularity: parseFloat(popularity),
+                score: scoreForSorting // 🌟 ใส่ Score ไว้ให้ระบบจัดอันดับ
             });
         }
 
@@ -7313,7 +7315,7 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 2. ฟังก์ชันกดคลิกที่หัวตารางเพื่อเรียงลำดับ (อัปเดตเพิ่ม ID)
+    // 2. ฟังก์ชันกดคลิกที่หัวตารางเพื่อเรียงลำดับ
     window.sortSocialLeaderboard = function(column) {
         if(window.currentSocialSort.column === column) {
             window.currentSocialSort.order = window.currentSocialSort.order === 'desc' ? 'asc' : 'desc';
@@ -7322,12 +7324,13 @@ let creditDisplay = `
             window.currentSocialSort.order = 'desc';
         }
 
-        // รีเซ็ตไอคอนทั้งหมด (เพิ่ม 'id' เข้าไปในลูป)
-        ['id', 'likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
+        // รีเซ็ตไอคอน
+        ['score', 'likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
             let icon = document.getElementById('sort-icon-' + col);
             if(icon) icon.className = 'fas fa-sort text-gray-400 ml-1';
         });
 
+        // อัปเดตไอคอนตัวที่กด
         let activeIcon = document.getElementById('sort-icon-' + column);
         if(activeIcon) {
             activeIcon.className = window.currentSocialSort.order === 'desc' ? 'fas fa-sort-down text-indigo-500 ml-1' : 'fas fa-sort-up text-indigo-500 ml-1';
@@ -7338,7 +7341,7 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 3. อัลกอริทึมเรียงลำดับ Array (ใช้ของเดิมได้เลย ไม่ต้องแก้)
+    // 3. อัลกอริทึมเรียงลำดับ Array
     window.sortSocialArray = function() {
         let col = window.currentSocialSort.column;
         let order = window.currentSocialSort.order === 'desc' ? -1 : 1;
@@ -7348,7 +7351,8 @@ let creditDisplay = `
             let valB = b[col];
             if(valA < valB) return -1 * order;
             if(valA > valB) return 1 * order;
-            return 0;
+            // 🌟 ถ้าคะแนนเท่ากันเป๊ะ ให้เรียงตาม ID ป้องกันการสลับตำแหน่งไปมาแบบสุ่ม
+            return a.id.localeCompare(b.id); 
         });
     };
 
