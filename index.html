@@ -599,11 +599,13 @@
                 <div class="text-[10px] text-gray-500 font-bold hidden sm:block">เรียงอันดับจาก: <span class="text-indigo-500">คะแนนความนิยม</span></div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse min-w-[800px]">
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse min-w-[850px]">
                     <thead class="bg-gray-100 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 text-[11px] uppercase font-bold select-none">
                         <tr>
-                            <th class="py-3 px-4 w-12 text-center">อันดับ</th>
+                            <th class="py-3 px-4 w-20 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('id')">
+                                อันดับ <i id="sort-icon-id" class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
                             <th class="py-3 px-4">คนขับ</th>
                             <th class="py-3 px-4 text-center text-emerald-600 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('likes')">
                                 <i class="fas fa-thumbs-up"></i> ไลค์ <i id="sort-icon-likes" class="fas fa-sort-down text-indigo-500 ml-1"></i>
@@ -615,9 +617,9 @@
                                 <i class="fas fa-user-plus"></i> ผู้ติดตาม <i id="sort-icon-followers" class="fas fa-sort text-gray-400 ml-1"></i>
                             </th>
                             <th class="py-3 px-4 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('popularity')">
-                                เปอร์เซ็นต์ความนิยม <i id="sort-icon-popularity" class="fas fa-sort text-gray-400 ml-1"></i>
+                                เปอร์เซ็นต์ <i id="sort-icon-popularity" class="fas fa-sort text-gray-400 ml-1"></i>
                             </th>
-                            <th class="py-3 px-4 text-right">จัดการ</th>
+                            <th class="py-3 px-4 text-right w-36">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="social-leaderboard-tbody" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
@@ -7311,7 +7313,7 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 2. ฟังก์ชันกดคลิกที่หัวตารางเพื่อเรียงลำดับ
+    // 2. ฟังก์ชันกดคลิกที่หัวตารางเพื่อเรียงลำดับ (อัปเดตเพิ่ม ID)
     window.sortSocialLeaderboard = function(column) {
         if(window.currentSocialSort.column === column) {
             window.currentSocialSort.order = window.currentSocialSort.order === 'desc' ? 'asc' : 'desc';
@@ -7320,7 +7322,8 @@ let creditDisplay = `
             window.currentSocialSort.order = 'desc';
         }
 
-        ['likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
+        // รีเซ็ตไอคอนทั้งหมด (เพิ่ม 'id' เข้าไปในลูป)
+        ['id', 'likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
             let icon = document.getElementById('sort-icon-' + col);
             if(icon) icon.className = 'fas fa-sort text-gray-400 ml-1';
         });
@@ -7335,7 +7338,7 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 3. อัลกอริทึมเรียงลำดับ Array
+    // 3. อัลกอริทึมเรียงลำดับ Array (ใช้ของเดิมได้เลย ไม่ต้องแก้)
     window.sortSocialArray = function() {
         let col = window.currentSocialSort.column;
         let order = window.currentSocialSort.order === 'desc' ? -1 : 1;
@@ -7349,7 +7352,7 @@ let creditDisplay = `
         });
     };
 
-    // 4. ฟังก์ชันตัดแบ่งหน้า (Pagination) และวาดลงตาราง
+    // 4. ฟังก์ชันตัดแบ่งหน้า (Pagination) และวาดลงตาราง (อัปเดตเอาปุ่มประวัติมาเรียงคู่ & แก้ PIN เป็น ID)
     window.renderSocialTablePage = function() {
         let tbody = document.getElementById('social-leaderboard-tbody');
         if(!tbody) return;
@@ -7377,11 +7380,11 @@ let creditDisplay = `
                 <tr class="border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-[11px] text-left">
                     <td class="py-2.5 px-4 text-center font-bold text-gray-400 dark:text-slate-500">#${actualRank}</td>
                     <td class="py-2.5 px-4">
-                        <p class="font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline transition flex items-center gap-1.5" onclick="openSocialHistoryModal('${d.id}', '${d.name}')">
-                            <i class="fas fa-search-plus text-[10px]"></i> ${d.name}
+                        <p class="font-bold text-gray-800 dark:text-white transition flex items-center gap-1.5">
+                            ${d.name}
                         </p>
                         <div class="flex items-center gap-1.5 mt-0.5">
-                            <span class="text-[9px] text-gray-500 font-mono">PIN: ${d.id}</span>
+                            <span class="text-[9px] text-gray-500 font-mono">ID: ${d.id}</span>
                             ${tierBadgeHtml}
                         </div>
                     </td>
@@ -7392,9 +7395,14 @@ let creditDisplay = `
                         <span class="${ratioColor}">${(d.likes + d.dislikes) > 0 ? d.popularity + '%' : '-'}</span>
                     </td>
                     <td class="py-2.5 px-4 text-right">
-                        <button onclick="openAdjustTierRatingModal('${d.id}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 px-2 py-1 rounded text-[10px] font-bold shadow-sm transition">
-                            <i class="fas fa-edit"></i> แก้ไข
-                        </button>
+                        <div class="flex items-center justify-end gap-1.5">
+                            <button onclick="openSocialHistoryModal('${d.id}', '${d.name}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-blue-400 px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
+                                <i class="fas fa-history"></i> ประวัติ
+                            </button>
+                            <button onclick="openAdjustTierRatingModal('${d.id}')" class="bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white border border-amber-200 dark:border-amber-800/50 dark:bg-amber-900/30 dark:text-amber-400 px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
+                                <i class="fas fa-edit"></i> แก้ไข
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
             });
