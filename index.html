@@ -213,6 +213,12 @@
       <!-- ================= หน้าเมนูรวม (แบบพับเก็บได้) ================= -->
       <section id="content-allmenu" class="tab-content hidden space-y-4 pb-6 mt-2">
           
+          <!-- 🌟 กล่องปุ่มตั้งค่าเมนู (ส่วนที่เพิ่มใหม่) -->
+          <div class="flex justify-between items-center bg-blue-50 dark:bg-slate-800/50 border border-blue-100 dark:border-slate-700 p-3 rounded-2xl shadow-sm transition-colors duration-300">
+              <p class="text-[11px] sm:text-xs font-bold text-blue-600 dark:text-[#1da1f2]"><i class="fas fa-magic"></i> ปรับแต่งเมนูแผงควบคุม</p>
+              <button onclick="openMenuSettingsModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-[11px] sm:text-xs font-bold shadow-sm transition flex items-center gap-1.5 active:scale-95"><i class="fas fa-sliders-h"></i> จัดการเมนู</button>
+          </div>
+
           <!-- 👤 ฝั่งคนขับ -->
           <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm transition-colors duration-300">
               <div onclick="toggleMenuCategory('menu-group-driver', this)" class="flex items-center justify-between cursor-pointer select-none">
@@ -1622,6 +1628,26 @@
           </div>
       </section>
   </main>
+
+  <!-- 🌟 หน้าต่างจัดการตั้งค่าเมนู (Menu Settings Modal) -->
+  <div id="modalMenuSettings" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-blue-500/30 rounded-3xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in">
+           <div class="p-4 sm:p-5 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-blue-50 dark:bg-slate-800/80 shrink-0">
+                <h2 class="text-sm font-black text-blue-600 dark:text-[#1da1f2] flex items-center gap-2">
+                    <i class="fas fa-cogs"></i> ตั้งค่าการแสดงผลเมนู
+                </h2>
+                <button onclick="closeModal('modalMenuSettings')" class="text-gray-400 hover:text-gray-600 dark:text-slate-400 dark:hover:text-white bg-gray-100 dark:bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+           </div>
+           <div class="flex-1 overflow-y-auto p-4 slim-scroll space-y-6" id="menu-settings-container">
+                <!-- ข้อมูลตารางเรียงลำดับจะถูกสร้างที่นี่ด้วย JavaScript -->
+           </div>
+           <div class="p-4 border-t border-gray-200 dark:border-slate-800 shrink-0">
+                <button onclick="saveMenuConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fas fa-save"></i> บันทึกและอัปเดตแผงควบคุม
+                </button>
+           </div>
+      </div>
+  </div>
 
   <div id="adminAlertModal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl transform transition-all animate-fade-in">
@@ -7591,6 +7617,163 @@ let creditDisplay = `
             dd.classList.add('hidden');
         }
     });
+
+    // ========================================================
+    // 🌟 ระบบสมองกลจัดการเมนู (Dynamic Menu Engine)
+    // ========================================================
+    window.menuConfigState = { 'driver': [], 'passenger': [], 'central': [] };
+    let isMenuEngineInitialized = false;
+
+    // 1. ฟังก์ชันติดแท็กให้ปุ่มเดิมอัตโนมัติ (สแกนจาก HTML)
+    window.initDynamicMenus = function() {
+        if(isMenuEngineInitialized) return;
+        
+        let mapping = {
+            'drivers': 'drv_drivers', 'social-management': 'drv_social', 'wallet': 'drv_wallet', 'quests': 'drv_quests', 'tiers': 'drv_tiers', 'commission-settings': 'drv_commission', 'blockdrivers': 'drv_block', 'partner-campaigns': 'drv_campaigns', 'partner-approvals': 'drv_approvals', 'driver-banners': 'drv_banners', 'driver-news': 'drv_news', 'driver-privileges': 'drv_privileges',
+            'passengers': 'pass_passengers', 'promos': 'pass_promos', 'banners': 'pass_banners', 'news': 'pass_news', 'blacklist': 'pass_blacklist',
+            'history': 'cen_history', 'vehicles': 'cen_vehicles', 'tier-settings': 'cen_tiersettings', 'chatlogs': 'cen_chatlogs', 'all-wallet-history': 'cen_wallethistory', 'all-block-history': 'cen_blockhistory', 'topup-approvals': 'cen_topup'
+        };
+
+        ['menu-group-driver', 'menu-group-passenger', 'menu-group-central'].forEach(groupId => {
+             let group = document.getElementById(groupId);
+             if(!group) return;
+             let buttons = group.querySelectorAll('button');
+             buttons.forEach((btn, index) => {
+                 let onclick = btn.getAttribute('onclick') || '';
+                 let matchedId = null;
+                 for(let key in mapping) {
+                     if(onclick.includes("switchTab('"+key+"')")) { matchedId = mapping[key]; break; }
+                 }
+                 // ถ้าเจอเมนูแปลกปลอมที่ไม่มีในระบบ ให้ตั้งชื่ออัตโนมัติ
+                 if(!matchedId) {
+                     let span = btn.querySelector('span');
+                     matchedId = 'custom_' + (span ? span.innerText.trim().replace(/\s+/g, '_') : index);
+                 }
+                 btn.setAttribute('data-menu-id', matchedId);
+                 if(!btn.hasAttribute('data-default-name')) {
+                     let span = btn.querySelector('span');
+                     btn.setAttribute('data-default-name', span ? span.innerText.trim() : matchedId);
+                 }
+             });
+        });
+        isMenuEngineInitialized = true;
+    }
+
+    // 2. ดึงข้อมูลการเรียงจาก Firebase มาวาด
+    db.ref('system_settings/menu_config').on('value', snap => {
+        window.initDynamicMenus();
+        let config = snap.val();
+        
+        if(!config) {
+            // ถ้าไม่เคยตั้งค่าเลย ให้ดูดจากที่วางเรียงไว้ใน HTML เป็นค่าเริ่มต้น
+            ['menu-group-driver', 'menu-group-passenger', 'menu-group-central'].forEach(groupId => {
+                let cat = groupId.replace('menu-group-', '');
+                window.menuConfigState[cat] = [];
+                let buttons = document.getElementById(groupId).querySelectorAll('button[data-menu-id]');
+                buttons.forEach(btn => {
+                    window.menuConfigState[cat].push({ id: btn.getAttribute('data-menu-id'), name: btn.getAttribute('data-default-name'), visible: true });
+                });
+            });
+        } else {
+            // ถ้ามีค่าในฐานข้อมูล ให้ใช้ค่าจากฐานข้อมูล
+            window.menuConfigState = config;
+        }
+        window.applyMenuConfigToDOM();
+    });
+
+    // 3. ฟังก์ชันสลับตำแหน่ง และเปลี่ยนชื่อในหน้า HTML แบบสดๆ
+    window.applyMenuConfigToDOM = function() {
+        ['driver', 'passenger', 'central'].forEach(cat => {
+            let groupId = 'menu-group-' + cat;
+            let group = document.getElementById(groupId);
+            if(!group) return;
+
+            let configItems = window.menuConfigState[cat] || [];
+            
+            // Loop ดึงปุ่มตามออเดอร์ใน Array ย้ายตำแหน่งอัตโนมัติ
+            configItems.forEach(item => {
+                let btn = group.querySelector(`button[data-menu-id="${item.id}"]`);
+                if(btn) {
+                    let span = btn.querySelector('span');
+                    if(span) span.innerText = item.name; // เปลี่ยนชื่อ
+                    
+                    if(item.visible) {
+                        btn.classList.remove('hidden'); btn.classList.add('flex');
+                    } else {
+                        btn.classList.add('hidden'); btn.classList.remove('flex');
+                    }
+                    // การใช้ appendChild กับ element เดิม จะเป็นการ "ย้าย" มันไปต่อท้ายแถวอัตโนมัติ!
+                    group.appendChild(btn);
+                }
+            });
+        });
+    };
+
+    // 4. เปิดหน้าต่างแอดมิน เพื่อตั้งค่า
+    window.openMenuSettingsModal = function() {
+        let container = document.getElementById('menu-settings-container');
+        let html = '';
+
+        const catNames = {
+            'driver': '<i class="fas fa-id-card text-blue-500"></i> หมวดหมู่จัดการคนขับ',
+            'passenger': '<i class="fas fa-user-friends text-[#1da1f2]"></i> หมวดหมู่ผู้โดยสาร',
+            'central': '<i class="fas fa-cogs text-gray-500"></i> หมวดหมู่ระบบส่วนกลาง'
+        };
+
+        ['driver', 'passenger', 'central'].forEach(cat => {
+            if(!window.menuConfigState[cat]) return;
+            html += `<h3 class="font-bold text-xs text-gray-800 dark:text-white mb-2 mt-6 first:mt-0 flex items-center gap-2">${catNames[cat]}</h3>`;
+            html += `<div class="space-y-2 bg-gray-50 dark:bg-slate-800/40 p-3 rounded-xl border border-gray-200 dark:border-slate-700">`;
+            
+            window.menuConfigState[cat].forEach((item, index) => {
+                html += `
+                <div class="flex items-center gap-3 bg-white dark:bg-slate-800 p-2 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm transition hover:border-blue-300">
+                    <div class="flex flex-col gap-0.5">
+                        <button onclick="moveMenuItem('${cat}', ${index}, -1)" class="w-6 h-6 bg-gray-100 dark:bg-slate-700 rounded-md text-gray-500 hover:text-blue-500 hover:bg-blue-50 flex items-center justify-center transition disabled:opacity-30" ${index === 0 ? 'disabled' : ''}><i class="fas fa-chevron-up text-[10px]"></i></button>
+                        <button onclick="moveMenuItem('${cat}', ${index}, 1)" class="w-6 h-6 bg-gray-100 dark:bg-slate-700 rounded-md text-gray-500 hover:text-blue-500 hover:bg-blue-50 flex items-center justify-center transition disabled:opacity-30" ${index === window.menuConfigState[cat].length - 1 ? 'disabled' : ''}><i class="fas fa-chevron-down text-[10px]"></i></button>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-[9px] font-bold text-gray-500 mb-0.5">แก้ไขชื่อเมนู</label>
+                        <input type="text" value="${item.name}" oninput="updateMenuNameState('${cat}', ${index}, this.value)" class="w-full bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-gray-800 dark:text-white outline-none focus:border-blue-500 transition">
+                    </div>
+                    <div class="flex flex-col items-center justify-center pr-1">
+                        <label class="block text-[9px] font-bold text-gray-500 mb-1">ซ่อน/แสดง</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" ${item.visible ? 'checked' : ''} onchange="updateMenuVisibleState('${cat}', ${index}, this.checked)">
+                            <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#1da1f2]"></div>
+                        </label>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+        });
+        
+        container.innerHTML = html;
+        openModal('modalMenuSettings');
+    };
+
+    // 5. ตัวควบคุมการกดลูกศรขึ้นลง
+    window.moveMenuItem = function(cat, index, direction) {
+        let arr = window.menuConfigState[cat];
+        if (index + direction < 0 || index + direction >= arr.length) return;
+        
+        let temp = arr[index];
+        arr[index] = arr[index + direction];
+        arr[index + direction] = temp;
+        
+        window.openMenuSettingsModal(); // รีเฟรชหน้าต่างเพื่อให้ปุ่มสลับตำแหน่ง
+    };
+
+    window.updateMenuNameState = function(cat, index, value) { window.menuConfigState[cat][index].name = value; };
+    window.updateMenuVisibleState = function(cat, index, isVisible) { window.menuConfigState[cat][index].visible = isVisible; };
+
+    // 6. บันทึกลง Firebase แล้วให้ระบบมันอัปเดตหน้าตาเอง
+    window.saveMenuConfig = function() {
+        db.ref('system_settings/menu_config').set(window.menuConfigState).then(() => {
+            showCustomAlert('อัปเดตสำเร็จ', 'ตั้งค่าชื่อ ตำแหน่ง และการแสดงผลเมนูเรียบร้อยแล้ว!', 'success');
+            closeModal('modalMenuSettings');
+        });
+    };
 </script>
 
   <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
