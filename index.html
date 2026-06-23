@@ -19,20 +19,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   
   <style>
-    /* 🌟 ตั้งค่าระบบสีหลักตามเงื่อนไข (Base Themes) */
+    /* 🌟 ตั้งค่าระบบสีหลัก */
     body { 
-        font-family: 'Sarabun', sans-serif; /* 🌟 เปลี่ยนฟอนต์หลักเป็น Sarabun */
+        font-family: 'Sarabun', sans-serif;
         touch-action: pan-y;
         -webkit-text-size-adjust: 100%; 
         overflow-x: hidden;
         background-color: #E0E0E0 !important;
     }
-    
-    html.dark body {
-        background-color: #121212 !important;
-    }
 
-    /* ปรับสีพื้นหลังกล่องข้อความ/การ์ดเนื้อหาโหมดสว่างให้เด่นขึ้นจากพื้นหลัง */
+    /* สีพื้นหลังกล่องข้อความ/การ์ดเนื้อหา */
     .bg-white, .bg-gray-50 {
         background-color: #FFFFFF !important;
         border-color: #CCCCCC !important;
@@ -41,38 +37,15 @@
         background-color: #F0F0F0 !important;
     }
 
-    /* ปรับสีพื้นหลังกล่องข้อความ/การ์ดเนื้อหาโหมดมืดให้สว่างขึ้นกว่าพื้นหลังหลักเล็กน้อยเพื่อให้มีมิติ */
-    html.dark .dark\:bg-slate-900, 
-    html.dark .dark\:bg-slate-800, 
-    html.dark .dark\:bg-slate-800\/50,
-    html.dark .bg-slate-900 {
-        background-color: #1E1E1E !important;
-        border-color: #333333 !important;
-    }
-    html.dark .dark\:bg-slate-800\/40 {
-        background-color: #252525 !important;
-    }
-
-    /* 🌟 จัดการสีตัวอักษรให้รองรับทั้ง โหมดสว่าง/มืด (แก้ไข !important ขัดกัน) */
-    
-    /* 1. สำหรับโหมดสว่าง (Light Mode) */
-    html:not(.dark) .text-gray-500, 
-    html:not(.dark) .text-slate-400 { color: #666666 !important; }
-    html:not(.dark) .text-gray-800 { color: #121212 !important; }
-
-    /* 2. สำหรับโหมดมืด (Dark Mode) */
-    html.dark .dark\:text-slate-400, 
-    html.dark .dark\:text-slate-500,
-    html.dark .text-gray-500 { color: #A0A0A0 !important; }
-    
-    html.dark .dark\:text-white, 
-    html.dark .text-white,
-    html.dark .text-gray-800 { color: #E0E0E0 !important; } /* แปลงข้อความสีดำให้เป็นขาวอัตโนมัติ */
+    /* 🌟 จัดการสีตัวอักษรให้คมชัด */
+    .text-gray-500, .text-slate-400 { color: #666666 !important; }
+    .text-gray-800 { color: #121212 !important; }
 
     .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-out { animation: fadeOut 0.2s ease-in forwards; }
     @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+    
     .cropper-container { width: 100%; max-height: 400px; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -82,20 +55,15 @@
     .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
 
     /* ปรับแต่งความสว่างสวิตช์ Toggle */
-    .peer:checked ~ div {
-        background-color: #1da1f2 !important;
-    }
+    .peer:checked ~ div { background-color: #1da1f2 !important; }
   </style>
   
   <script>
-    // 🌟 ตั้งค่าพจนานุกรมสีของ Tailwind และตั้งค่าฟอนต์
+    // 🌟 ตั้งค่า Tailwind
     tailwind.config = { 
-        darkMode: 'class',
         theme: {
             extend: {
-                fontFamily: {
-                    sans: ['Sarabun', 'sans-serif'], // 🌟 บังคับใช้ฟอนต์ Sarabun ในคลาส Tailwind ทั้งหมด
-                },
+                fontFamily: { sans: ['Sarabun', 'sans-serif'] },
                 colors: {
                     blue: { 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da' },
                     indigo: { 50: '#e0f2fe', 100: '#e0f2fe', 500: '#1da1f2', 600: '#1da1f2', 700: '#1a91da', 900: '#0c4d75' },
@@ -104,13 +72,6 @@
             }
         }
     };
-    
-    // เช็คประวัติการใช้งานก่อนโหลดหน้าจอ ป้องกันจอกระพริบ
-    if (localStorage.getItem('admin_theme') === 'light') {
-        document.documentElement.classList.remove('dark');
-    } else {
-        document.documentElement.classList.add('dark'); // ค่าเริ่มต้นให้เป็นโหมดมืด
-    }
   </script>
 </head>
   
@@ -143,11 +104,6 @@
             </p>
         </div>
     </div>
-    
-    <button onclick="window.toggleAdminTheme()" class="w-9 h-9 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-yellow-400 hover:text-blue-500 dark:hover:text-yellow-300 rounded-xl flex items-center justify-center text-lg border border-gray-200 dark:border-slate-700 transition active:scale-95 shrink-0 shadow-sm cursor-pointer">
-        <i class="fas fa-moon block dark:hidden"></i>
-        <i class="fas fa-sun hidden dark:block"></i>
-    </button>
   </header>
 
 <!-- 🌟 Sidebar Overlay (พื้นหลังมืดๆ กดบริเวณนอกเมนูเพื่อปิดได้) -->
