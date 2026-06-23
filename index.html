@@ -7268,13 +7268,14 @@ let creditDisplay = `
     window.socialRowsPerPage = 50;
     window.currentSocialSort = { column: 'score', order: 'desc' }; // เรียงตามคะแนนความนิยมเป็นค่าเริ่มต้น
 
-    // 1. ฟังก์ชันหลักสำหรับดึงข้อมูลและเตรียมเรียง
+    // 1. ฟังก์ชันหลักสำหรับดึงข้อมูล กำหนดอันดับแท้จริง และเตรียมเรียง
     window.renderSocialLeaderboard = function() {
         let keyword = document.getElementById('social-search-input')?.value.toLowerCase() || '';
         
-        window.socialDriversData = [];
+        let allTempDrivers = [];
         let totalLikes = 0, totalDislikes = 0, totalFollowers = 0, activeDrivers = 0;
 
+        // ดึงคนขับทุกคนมาคำนวณคะแนนก่อน
         for(let drvId in allProfiles) {
             let d = allProfiles[drvId];
             let l = parseInt(d.likes) || 0;
@@ -7283,17 +7284,14 @@ let creditDisplay = `
             
             let totalVotes = l + dl;
             let popularity = totalVotes > 0 ? ((l / totalVotes) * 100).toFixed(1) : 0;
-            let scoreForSorting = l + (f * 2) - (dl * 2); // 🌟 สูตรคำนวณคะแนนอันดับที่แท้จริง
+            let scoreForSorting = l + (f * 2) - (dl * 2);
 
             totalLikes += l;
             totalDislikes += dl;
             totalFollowers += f;
             if(l > 0 || dl > 0 || f > 0) activeDrivers++;
 
-            let searchStr = `${drvId} ${d.name || ''}`.toLowerCase();
-            if (keyword && !searchStr.includes(keyword)) continue;
-
-            window.socialDriversData.push({
+            allTempDrivers.push({
                 id: drvId,
                 name: d.name || 'ไม่ทราบชื่อ',
                 tier: d.tier || 'New',
@@ -7301,10 +7299,28 @@ let creditDisplay = `
                 dislikes: dl,
                 followers: f,
                 popularity: parseFloat(popularity),
-                score: scoreForSorting // 🌟 ใส่ Score ไว้ให้ระบบจัดอันดับ
+                score: scoreForSorting
             });
         }
 
+        // 🌟 จัดเรียงตามคะแนนเพื่อหา "อันดับที่แท้จริง" (Leaderboard Rank) ก่อน
+        allTempDrivers.sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return a.id.localeCompare(b.id);
+        });
+
+        // 🌟 มอบป้ายเลขอันดับ (rank) ให้ติดตัวคนขับ แล้วกรองคนที่ค้นหา
+        window.socialDriversData = [];
+        allTempDrivers.forEach((d, index) => {
+            d.rank = index + 1; // ล็อคเลขอันดับไว้กับตัวเลย
+            
+            let searchStr = `${d.id} ${d.name}`.toLowerCase();
+            if (!keyword || searchStr.includes(keyword)) {
+                window.socialDriversData.push(d);
+            }
+        });
+
+        // อัปเดตสถิติด้านบน
         let elL = document.getElementById('social-stat-total-likes'); if(elL) elL.innerText = totalLikes.toLocaleString();
         let elD = document.getElementById('social-stat-total-dislikes'); if(elD) elD.innerText = totalDislikes.toLocaleString();
         let elF = document.getElementById('social-stat-total-followers'); if(elF) elF.innerText = totalFollowers.toLocaleString();
@@ -7356,7 +7372,7 @@ let creditDisplay = `
         });
     };
 
-    // 4. ฟังก์ชันตัดแบ่งหน้า (Pagination) และวาดลงตาราง (อัปเดตเอาปุ่มประวัติมาเรียงคู่ & แก้ PIN เป็น ID)
+    // 4. ฟังก์ชันตัดแบ่งหน้า (Pagination) และวาดลงตาราง
     window.renderSocialTablePage = function() {
         let tbody = document.getElementById('social-leaderboard-tbody');
         if(!tbody) return;
@@ -7371,8 +7387,8 @@ let creditDisplay = `
         if(pageData.length === 0) {
             html = '<tr><td colspan="7" class="py-10 text-center text-gray-400 text-xs">ไม่พบข้อมูล หรือคนขับที่ค้นหา</td></tr>';
         } else {
-            pageData.forEach((d, index) => {
-                let actualRank = startIndex + index + 1;
+            pageData.forEach((d) => {
+                let actualRank = d.rank; // 🌟 เรียกใช้เลขอันดับแท้จริง แทนการนับแถว
                 let tierBadgeHtml = typeof window.getTierBadgeHtml === 'function' ? window.getTierBadgeHtml(d.tier) : `<span class="text-[9px] border px-1 rounded">${d.tier}</span>`;
                 
                 let ratioColor = 'text-gray-400 font-bold';
