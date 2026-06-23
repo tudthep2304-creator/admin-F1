@@ -90,29 +90,34 @@
   <div id="sidebar-overlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-black/60 z-[9990] hidden opacity-0 transition-opacity duration-300"></div>
 
   <!-- 🌟 Sidebar Menu (แผงเมนูสไลด์จากซ้าย) -->
-  <div id="sidebar-menu" class="fixed inset-y-0 left-0 w-64 border-gray-200 bg-white shadow-sm  shadow-2xl z-[9999] transform -translate-x-full transition-transform duration-300 flex flex-col">
-      <div class="p-5 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm/50 /50">
-          <h2 class="text-base font-black text-brand flex items-center gap-2"><i class="fas fa-rocket"></i> F1 DRIVER</h2>
-          <button onclick="window.toggleSidebar()" class="w-8 h-8   rounded-full flex items-center justify-center text-black  hover: hover: transition"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="flex-1 overflow-y-auto py-2">
-          <button onclick="switchTab('dashboard'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:border-gray-200 bg-white shadow-sm : hover: ] flex items-center gap-4 border-b   transition text-left">
-              <div class="w-6 text-center"><i class="fas fa-home "></i></div> หน้าหลัก (Dashboard)
-          </button>
-          <button onclick="switchTab('allmenu'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:border-gray-200 bg-white shadow-sm : hover: ] flex items-center gap-4 border-b   transition text-left">
-              <div class="w-6 text-center"><i class="fas fa-th-large text-brand"></i></div> เมนูระบบ (All Menus)
-          </button>
-          <button onclick="switchTab('map'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:border-gray-200 bg-white shadow-sm : hover: ] flex items-center gap-4 transition text-left">
-              <div class="w-6 text-center"><i class="fas fa-map-marked-alt "></i></div> แผนที่รถ (Live Map)
-          </button>
-      </div>
-      <div class="p-4 border-t   text-center">
-          <p class="text-[10px] text-black font-bold">F1 DRIVER ADMIN V2.0</p>
-      </div>
-  </div>
+  <div id="sidebar-menu" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 shadow-2xl z-[9999] transform -translate-x-full transition-transform duration-300 flex flex-col">
+    <!-- ส่วนหัวโลโก้ -->
+    <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-white">
+        <h2 class="text-base font-black text-brand flex items-center gap-2"><i class="fas fa-rocket"></i> F1 DRIVER</h2>
+        <button onclick="window.toggleSidebar()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-brand hover:bg-red-50 transition-colors">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <!-- ส่วนปุ่มเมนู -->
+    <div class="flex-1 overflow-y-auto py-2">
+        <button onclick="switchTab('dashboard'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black flex items-center gap-4 border-b border-gray-100 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
+            <div class="w-6 text-center"><i class="fas fa-home text-lg transition-colors group-hover:text-brand"></i></div> หน้าหลัก (Dashboard)
+        </button>
+        <button onclick="switchTab('allmenu'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black flex items-center gap-4 border-b border-gray-100 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
+            <!-- เอา text-brand เดิมออก เพื่อให้มันเป็นสีดำตอนปกติ และเปลี่ยนสีตาม Hover -->
+            <div class="w-6 text-center"><i class="fas fa-th-large text-lg transition-colors group-hover:text-brand"></i></div> เมนูระบบ (All Menus)
+        </button>
+        <button onclick="switchTab('map'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black flex items-center gap-4 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
+            <div class="w-6 text-center"><i class="fas fa-map-marked-alt text-lg transition-colors group-hover:text-brand"></i></div> แผนที่รถ (Live Map)
+        </button>
+    </div>
+    <!-- ส่วนท้าย -->
+    <div class="p-4 border-t border-gray-200 text-center bg-gray-50">
+        <p class="text-[10px] text-gray-500 font-bold tracking-wider">F1 DRIVER ADMIN V2.0</p>
+    </div>
+</div>
   
   <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 pb-6 max-w-7xl w-full mx-auto hide-scrollbar">
-      
       <section id="content-dashboard" class="tab-content space-y-6">
           <div class="border-gray-200 bg-white shadow-sm  border   p-4 sm:p-5 rounded-2xl shadow-sm  flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
               <div>
