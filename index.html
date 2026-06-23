@@ -613,7 +613,7 @@
                         </tr>
                     </thead>
                     <tbody id="social-leaderboard-tbody">
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -3544,7 +3544,7 @@ let creditDisplay = `
         let driverData = {
             driverId: drvId, pin: pin, name: fullName, phone: phone, gender: gender,
             creditCash: 0, creditBonus: startBonus, tier: startTier, 
-            profilePic: finalPicUrl, // 🌟 ใช้ URL สั้นๆ จาก Google Drive
+            profilePic: finalPicUrl,
             vehicles: initialVehicles, registeredAt: firebase.database.ServerValue.TIMESTAMP
         };
 
@@ -4525,11 +4525,6 @@ let creditDisplay = `
     }
 
     window.closeTierRatingModal = function() { closeModal('modalAdjustTierRating'); currentWalletDriverId = null; }
-
-    // 🌟 ฟังก์ชันล็อกคะแนนดาว (ลบไส้ในทิ้ง เพื่อไม่ให้พัง เพราะเราไม่มีดาวแล้ว โหมดอมตะให้ไปคุมที่ฐานข้อมูลแทน)
-    window.autoFillOverrideStars = function() {
-        // ไม่ต้องทำอะไรแล้ว ปล่อยว่างไว้เพื่อป้องกัน Error อนาคต
-    }
 
     // 🌟 ฟังก์ชันบันทึกข้อมูล (ปรับให้ส่งค่า Social Score ขึ้น Firebase ให้ถูกโหนด)
     window.submitTierRatingAdjustment = function() {
