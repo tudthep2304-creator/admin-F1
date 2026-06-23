@@ -601,24 +601,41 @@
 
             <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
                 <table class="w-full text-left border-collapse min-w-[800px]">
-            <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <table class="w-full text-left border-collapse min-w-[800px]">
-                    <thead class="bg-gray-100 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 text-[11px] uppercase font-bold">
+                    <thead class="bg-gray-100 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 text-[11px] uppercase font-bold select-none">
                         <tr>
                             <th class="py-3 px-4 w-12 text-center">อันดับ</th>
                             <th class="py-3 px-4">คนขับ</th>
-                            <th class="py-3 px-4 text-center text-emerald-600"><i class="fas fa-thumbs-up"></i> ไลค์</th>
-                            <th class="py-3 px-4 text-center text-red-500"><i class="fas fa-thumbs-down"></i> ดิสไลค์</th>
-                            <th class="py-3 px-4 text-center text-indigo-500"><i class="fas fa-user-plus"></i> ผู้ติดตาม</th>
-                            <th class="py-3 px-4 text-center">เปอร์เซ็นต์ความนิยม</th>
+                            <th class="py-3 px-4 text-center text-emerald-600 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('likes')">
+                                <i class="fas fa-thumbs-up"></i> ไลค์ <i id="sort-icon-likes" class="fas fa-sort-down text-indigo-500 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 text-center text-red-500 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('dislikes')">
+                                <i class="fas fa-thumbs-down"></i> ดิสไลค์ <i id="sort-icon-dislikes" class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 text-center text-indigo-500 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('followers')">
+                                <i class="fas fa-user-plus"></i> ผู้ติดตาม <i id="sort-icon-followers" class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('popularity')">
+                                เปอร์เซ็นต์ความนิยม <i id="sort-icon-popularity" class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
                             <th class="py-3 px-4 text-right">จัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="social-leaderboard-tbody">
-                        </tbody>
+                    <tbody id="social-leaderboard-tbody" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
+                    </tbody>
                 </table>
             </div>
-        </div>
+
+            <div id="social-pagination-container" class="hidden flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
+                <span class="text-[11px] text-gray-500 font-bold" id="social-page-info">กำลังแสดง 1-50 จากทั้งหมด 0 รายการ</span>
+                <div class="flex gap-2">
+                    <button id="btn-social-prev" onclick="changeSocialPage(-1)" class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-white rounded-lg text-xs font-bold hover:bg-gray-100 dark:hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
+                    </button>
+                    <button id="btn-social-next" onclick="changeSocialPage(1)" class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-white rounded-lg text-xs font-bold hover:bg-gray-100 dark:hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
     </section>
 
     <!-- 🌟 หน้าต่างตรวจสอบประวัติการกด Social ของคนขับ -->
@@ -7241,100 +7258,186 @@ let creditDisplay = `
         let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.setAttribute("download", `AllPrivilegesHistory_Overview_${Date.now()}.csv`);
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
-    // ========================================================
-    // 🌟 ระบบจัดการกระดาน Social (Social Leaderboard) อัปเกรด
-    // ========================================================
-    window.renderSocialLeaderboard = function() {
-        let tbody = document.getElementById('social-leaderboard-tbody');
-        if(!tbody) return;
+    // ==========================================
+    // 🌟 ระบบกระดานผู้นำ Social (ตาราง + เรียงข้อมูล + แบ่งหน้า)
+    // ==========================================
+    window.socialDriversData = [];
+    window.currentSocialPage = 1;
+    window.socialRowsPerPage = 50;
+    window.currentSocialSort = { column: 'likes', order: 'desc' }; // เรียงจากไลก์มากสุดเป็นค่าเริ่มต้น
 
-        let keyword = (document.getElementById('social-search-input')?.value || '').toLowerCase();
-        let driversArray = [];
+    // 1. ฟังก์ชันหลักสำหรับดึงข้อมูลและเตรียมเรียง
+    window.renderSocialLeaderboard = function() {
+        let keyword = document.getElementById('social-search-input')?.value.toLowerCase() || '';
+        
+        window.socialDriversData = [];
         let totalLikes = 0, totalDislikes = 0, totalFollowers = 0, activeDrivers = 0;
 
-        for (let drvId in allProfiles) {
+        for(let drvId in allProfiles) {
             let d = allProfiles[drvId];
             let l = parseInt(d.likes) || 0;
             let dl = parseInt(d.dislikes) || 0;
             let f = parseInt(d.followers) || 0;
-            let s = parseInt(d.shares) || 0;
+            
+            let totalVotes = l + dl;
+            let popularity = totalVotes > 0 ? ((l / totalVotes) * 100).toFixed(1) : 0;
 
-            totalLikes += l; totalDislikes += dl; totalFollowers += f;
+            totalLikes += l;
+            totalDislikes += dl;
+            totalFollowers += f;
             if(l > 0 || dl > 0 || f > 0) activeDrivers++;
 
-            let ratio = 0;
-            if ((l + dl) > 0) ratio = (l / (l + dl)) * 100;
-            let scoreForSorting = l + (f * 2) - (dl * 2);
-
-            // 🌟 ระบบค้นหา
             let searchStr = `${drvId} ${d.name || ''}`.toLowerCase();
             if (keyword && !searchStr.includes(keyword)) continue;
 
-            driversArray.push({
-                id: drvId, name: d.name || 'ไม่ทราบชื่อ', tier: d.tier || 'New',
-                likes: l, dislikes: dl, followers: f, shares: s, ratio: ratio, score: scoreForSorting
+            window.socialDriversData.push({
+                id: drvId,
+                name: d.name || 'ไม่ทราบชื่อ',
+                tier: d.tier || 'New',
+                likes: l,
+                dislikes: dl,
+                followers: f,
+                popularity: parseFloat(popularity)
             });
         }
 
-        // อัปเดตสถิติด้านบน (แสดงยอดรวมทั้งหมด ไม่ใช่แค่ยอดที่ค้นหา)
         let elL = document.getElementById('social-stat-total-likes'); if(elL) elL.innerText = totalLikes.toLocaleString();
         let elD = document.getElementById('social-stat-total-dislikes'); if(elD) elD.innerText = totalDislikes.toLocaleString();
         let elF = document.getElementById('social-stat-total-followers'); if(elF) elF.innerText = totalFollowers.toLocaleString();
         let elA = document.getElementById('social-stat-active-drivers'); if(elA) elA.innerText = activeDrivers.toLocaleString();
 
-        driversArray.sort((a, b) => b.score - a.score);
+        window.currentSocialPage = 1;
+        window.sortSocialArray();
+        window.renderSocialTablePage();
+    };
 
-        let html = '';
-        driversArray.forEach((d, index) => {
-            let ratioColor = 'text-gray-400';
-            if(d.ratio >= 90) ratioColor = 'text-emerald-500 font-bold';
-            else if(d.ratio >= 70) ratioColor = 'text-amber-500 font-bold';
-            else if(d.ratio > 0 || d.dislikes > 0) ratioColor = 'text-red-500 font-bold';
+    // 2. ฟังก์ชันกดคลิกที่หัวตารางเพื่อเรียงลำดับ
+    window.sortSocialLeaderboard = function(column) {
+        if(window.currentSocialSort.column === column) {
+            window.currentSocialSort.order = window.currentSocialSort.order === 'desc' ? 'asc' : 'desc';
+        } else {
+            window.currentSocialSort.column = column;
+            window.currentSocialSort.order = 'desc';
+        }
 
-            // ดึงป้าย Tier สวยๆ มาโชว์
-            let tierBadgeHtml = typeof window.getTierBadgeHtml === 'function' ? window.getTierBadgeHtml(d.tier) : `<span class="text-[9px]">${d.tier}</span>`;
-
-            html += `
-            <tr class="border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-[11px]">
-                <td class="py-2.5 px-4 text-center font-bold text-gray-400">#${index + 1}</td>
-                <td class="py-2.5 px-4">
-                    <p class="font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline transition flex items-center gap-1.5" onclick="openSocialHistoryModal('${d.id}', '${d.name}')">
-                        <i class="fas fa-search-plus text-[10px]"></i> ${d.name}
-                    </p>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="text-[9px] text-gray-500 font-mono">PIN: ${d.id}</span>
-                        ${tierBadgeHtml}
-                    </div>
-                </td>
-                <td class="py-2.5 px-4 text-center font-black text-emerald-600">${d.likes.toLocaleString()}</td>
-                <td class="py-2.5 px-4 text-center font-black text-red-500">${d.dislikes.toLocaleString()}</td>
-                <td class="py-2.5 px-4 text-center font-black text-indigo-500">${d.followers.toLocaleString()}</td>
-                <td class="py-2.5 px-4 text-center">
-                    <span class="${ratioColor}">${d.ratio > 0 ? d.ratio.toFixed(0) + '%' : '-'}</span>
-                </td>
-                <td class="py-2.5 px-4 text-right">
-                    <button onclick="openAdjustTierRatingModal('${d.id}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 px-2 py-1 rounded text-[10px] font-bold shadow-sm transition">
-                        <i class="fas fa-edit"></i> แก้ไข
-                    </button>
-                </td>
-            </tr>`;
+        ['likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
+            let icon = document.getElementById('sort-icon-' + col);
+            if(icon) icon.className = 'fas fa-sort text-gray-400 ml-1';
         });
 
-        tbody.innerHTML = html || `<tr><td colspan="7" class="py-10 text-center text-gray-400">ไม่พบข้อมูลคนที่ค้นหา</td></tr>`;
-    }
+        let activeIcon = document.getElementById('sort-icon-' + column);
+        if(activeIcon) {
+            activeIcon.className = window.currentSocialSort.order === 'desc' ? 'fas fa-sort-down text-indigo-500 ml-1' : 'fas fa-sort-up text-indigo-500 ml-1';
+        }
+
+        window.currentSocialPage = 1;
+        window.sortSocialArray();
+        window.renderSocialTablePage();
+    };
+
+    // 3. อัลกอริทึมเรียงลำดับ Array
+    window.sortSocialArray = function() {
+        let col = window.currentSocialSort.column;
+        let order = window.currentSocialSort.order === 'desc' ? -1 : 1;
+
+        window.socialDriversData.sort((a, b) => {
+            let valA = a[col];
+            let valB = b[col];
+            if(valA < valB) return -1 * order;
+            if(valA > valB) return 1 * order;
+            return 0;
+        });
+    };
+
+    // 4. ฟังก์ชันตัดแบ่งหน้า (Pagination) และวาดลงตาราง
+    window.renderSocialTablePage = function() {
+        let tbody = document.getElementById('social-leaderboard-tbody');
+        if(!tbody) return;
+
+        let totalItems = window.socialDriversData.length;
+        let startIndex = (window.currentSocialPage - 1) * window.socialRowsPerPage;
+        let endIndex = startIndex + window.socialRowsPerPage;
+        let pageData = window.socialDriversData.slice(startIndex, endIndex);
+
+        let html = '';
+
+        if(pageData.length === 0) {
+            html = '<tr><td colspan="7" class="py-10 text-center text-gray-400 text-xs">ไม่พบข้อมูล หรือคนขับที่ค้นหา</td></tr>';
+        } else {
+            pageData.forEach((d, index) => {
+                let actualRank = startIndex + index + 1;
+                let tierBadgeHtml = typeof window.getTierBadgeHtml === 'function' ? window.getTierBadgeHtml(d.tier) : `<span class="text-[9px] border px-1 rounded">${d.tier}</span>`;
+                
+                let ratioColor = 'text-gray-400 font-bold';
+                if(d.popularity >= 90) ratioColor = 'text-emerald-500 font-bold';
+                else if(d.popularity >= 70) ratioColor = 'text-amber-500 font-bold';
+                else if(d.popularity > 0 || d.dislikes > 0) ratioColor = 'text-red-500 font-bold';
+
+                html += `
+                <tr class="border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-[11px] text-left">
+                    <td class="py-2.5 px-4 text-center font-bold text-gray-400 dark:text-slate-500">#${actualRank}</td>
+                    <td class="py-2.5 px-4">
+                        <p class="font-bold text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline transition flex items-center gap-1.5" onclick="openSocialHistoryModal('${d.id}', '${d.name}')">
+                            <i class="fas fa-search-plus text-[10px]"></i> ${d.name}
+                        </p>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-[9px] text-gray-500 font-mono">PIN: ${d.id}</span>
+                            ${tierBadgeHtml}
+                        </div>
+                    </td>
+                    <td class="py-2.5 px-4 text-center font-black text-emerald-600">${d.likes.toLocaleString()}</td>
+                    <td class="py-2.5 px-4 text-center font-black text-red-500">${d.dislikes.toLocaleString()}</td>
+                    <td class="py-2.5 px-4 text-center font-black text-indigo-500">${d.followers.toLocaleString()}</td>
+                    <td class="py-2.5 px-4 text-center">
+                        <span class="${ratioColor}">${(d.likes + d.dislikes) > 0 ? d.popularity + '%' : '-'}</span>
+                    </td>
+                    <td class="py-2.5 px-4 text-right">
+                        <button onclick="openAdjustTierRatingModal('${d.id}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-200 px-2 py-1 rounded text-[10px] font-bold shadow-sm transition">
+                            <i class="fas fa-edit"></i> แก้ไข
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        }
+        tbody.innerHTML = html;
+        window.renderSocialPaginationControls(totalItems, startIndex, endIndex);
+    };
+
+    // 5. ควบคุมปุ่มเปลี่ยนหน้า
+    window.changeSocialPage = function(step) {
+        window.currentSocialPage += step;
+        window.renderSocialTablePage();
+        document.getElementById('content-social-management').querySelector('.overflow-y-auto').scrollTop = 0;
+    };
+
+    window.renderSocialPaginationControls = function(totalItems, startIndex, endIndex) {
+        let container = document.getElementById('social-pagination-container');
+        if(!container) return;
+
+        if(totalItems === 0) {
+            container.classList.add('hidden');
+            return;
+        }
+        
+        container.classList.remove('hidden');
+        let actualEnd = endIndex > totalItems ? totalItems : endIndex;
+        
+        document.getElementById('social-page-info').innerText = `กำลังแสดง ${startIndex + 1}-${actualEnd} จากทั้งหมด ${totalItems.toLocaleString()} รายการ`;
+        
+        document.getElementById('btn-social-prev').disabled = (window.currentSocialPage === 1);
+        document.getElementById('btn-social-next').disabled = (endIndex >= totalItems);
+    };
 
     // ========================================================
     // 🌟 ระบบตรวจสอบประวัติ Social เชิงลึก & ลบการกระทำ
     // ========================================================
     window.currentSocialDriverId = null;
-    let allDriverSocialLogs = []; // เก็บประวัติของคนขับที่กำลังดูอยู่
+    let allDriverSocialLogs = [];
 
-    // 1. ฟังก์ชันเปิดหน้าต่าง
     window.openSocialHistoryModal = function(driverId, driverName) {
         window.currentSocialDriverId = driverId;
         document.getElementById('sh-drv-name').innerText = driverName;
         
-        // รีเซ็ตตัวกรอง
         document.getElementById('sh-filter-start').value = '';
         document.getElementById('sh-filter-end').value = '';
         document.querySelectorAll('.sh-action-cb').forEach(cb => cb.checked = true);
@@ -7342,7 +7445,6 @@ let creditDisplay = `
 
         openModal('modalSocialHistory');
         
-        // สมองกลดึงข้อมูลจาก Firebase (สมมติว่าเก็บบันทึกใน node: social_logs)
         db.ref(`social_logs/${driverId}`).on('value', snap => {
             allDriverSocialLogs = [];
             if(snap.exists()) {
@@ -7354,7 +7456,6 @@ let creditDisplay = `
         });
     }
 
-    // 2. ฟังก์ชันอัปเดตข้อความใน Dropdown
     window.updateSocialActionFilter = function() {
         let checkedBoxes = document.querySelectorAll('.sh-action-cb:checked');
         let textEl = document.getElementById('sh-action-text');
@@ -7369,7 +7470,6 @@ let creditDisplay = `
         renderSocialHistoryTable();
     }
 
-    // 3. ฟังก์ชันวาดตารางและกรองข้อมูล
     window.renderSocialHistoryTable = function() {
         let tbody = document.getElementById('social-history-tbody');
         if(!tbody) return;
@@ -7379,7 +7479,6 @@ let creditDisplay = `
         let startTime = fStart ? new Date(fStart + "T00:00:00").getTime() : 0;
         let endTime = fEnd ? new Date(fEnd + "T23:59:59").getTime() : Number.MAX_SAFE_INTEGER;
 
-        // ดึงค่า Checkbox ที่ถูกติ๊ก
         let allowedActions = Array.from(document.querySelectorAll('.sh-action-cb:checked')).map(cb => cb.value);
 
         let filtered = allDriverSocialLogs.filter(log => {
@@ -7395,24 +7494,23 @@ let creditDisplay = `
         filtered.forEach(log => {
             let dateStr = log.timestamp ? new Date(log.timestamp).toLocaleString('th-TH') : '-';
             
-            // ตั้งค่าสีและไอคอนตามการกระทำ
             let actionBadge = '';
             if(log.action === 'like') actionBadge = '<span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded font-bold border border-emerald-200 flex items-center justify-center gap-1"><i class="fas fa-thumbs-up"></i> ไลก์</span>';
             else if(log.action === 'dislike') actionBadge = '<span class="bg-red-50 text-red-600 px-2 py-1 rounded font-bold border border-red-200 flex items-center justify-center gap-1"><i class="fas fa-thumbs-down"></i> ดิสไลก์</span>';
             else if(log.action === 'follower') actionBadge = '<span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold border border-indigo-200 flex items-center justify-center gap-1"><i class="fas fa-user-plus"></i> ติดตาม</span>';
             else if(log.action === 'share') actionBadge = '<span class="bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold border border-blue-200 flex items-center justify-center gap-1"><i class="fas fa-share"></i> แชร์</span>';
 
-            // 🌟 เช็กว่ามี Job ID ไหม ถ้ามีให้แสดง เพื่อให้รู้ว่ามาจากงานรอบไหน
             let jobIdHtml = log.jobId ? `<p class="text-[9px] text-indigo-500 font-bold mt-0.5"><i class="fas fa-car-side"></i> Job: ${log.jobId}</p>` : '';
 
             html += `
             <tr class="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition">
-                <td class="py-3 px-4 text-gray-500 dark:text-slate-400">${dateStr}</td>
-                <td class="py-3 px-4">
+                <td class="py-3 px-4 text-gray-500 dark:text-slate-400 text-[11px]">${dateStr}</td>
+                <td class="py-3 px-4 text-[11px]">
                     <p class="font-bold text-gray-800 dark:text-white">${log.passengerName || 'สมาชิกลูกค้า'}</p>
                     <p class="text-[9px] text-gray-400 font-mono">UID: ${log.passengerId || '-'}</p>
-                    ${jobIdHtml} </td>
-                <td class="py-3 px-4">${actionBadge}</td>
+                    ${jobIdHtml} 
+                </td>
+                <td class="py-3 px-4 text-[11px]">${actionBadge}</td>
                 <td class="py-3 px-4 text-right">
                     <button onclick="deleteMaliciousAction('${log.id}', '${log.action}')" class="bg-red-100 dark:bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-800/50 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition flex items-center justify-end gap-1.5 ml-auto">
                         <i class="fas fa-trash-alt"></i> ลบ & คืนยอด
@@ -7424,24 +7522,21 @@ let creditDisplay = `
         tbody.innerHTML = html || '<tr><td colspan="4" class="py-10 text-center text-gray-400">ไม่พบประวัติการโต้ตอบในช่วงเวลานี้</td></tr>';
     }
 
-    // 4. ฟังก์ชันลบประวัติและหักยอดดิสไลก์/ไลก์คืนออกจากโปรไฟล์
     window.deleteMaliciousAction = function(logId, actionType) {
         let actionNameTH = actionType === 'dislike' ? 'ดิสไลก์' : (actionType === 'like' ? 'ไลก์' : (actionType === 'follower' ? 'ผู้ติดตาม' : 'แชร์'));
         
         showCustomConfirm('ลบประวัติและหักยอด?', `ระบบจะลบประวัติการกด ${actionNameTH} จากลูกค้ารายนี้ และจะหักยอด ${actionNameTH} ออกจากโปรไฟล์คนขับด้วย ยืนยันหรือไม่?`, () => {
             let driverId = window.currentSocialDriverId;
-            let targetNode = actionType + "s"; // เติม s ต่อท้ายเพื่อให้ตรงกับฐานข้อมูล (likes, dislikes, followers, shares)
+            let targetNode = actionType + "s"; 
 
-            // ดึงยอดยอดปัจจุบันจากโปรไฟล์ แล้วหักลบ 1
             db.ref(`drivers_profile/${driverId}/${targetNode}`).once('value', snap => {
                 let currentCount = parseInt(snap.val()) || 0;
                 let newCount = currentCount > 0 ? currentCount - 1 : 0;
 
                 let updates = {};
-                updates[`drivers_profile/${driverId}/${targetNode}`] = newCount; // หักยอดในโปรไฟล์คนขับ
-                updates[`social_logs/${driverId}/${logId}`] = null; // ลบประวัติทิ้ง
+                updates[`drivers_profile/${driverId}/${targetNode}`] = newCount; 
+                updates[`social_logs/${driverId}/${logId}`] = null; 
 
-                // อัปเดตขึ้นฐานข้อมูลทีเดียว 2 จุด
                 db.ref().update(updates).then(() => {
                     showCustomAlert('สำเร็จ', 'ลบประวัติการกลั่นแกล้งและคืนความยุติธรรมให้คนขับเรียบร้อยแล้ว!', 'success');
                 });
@@ -7449,7 +7544,6 @@ let creditDisplay = `
         }, 'ยืนยันการลบ', 'red');
     }
 
-    // (ลูกเล่นเสริม) ปิด Dropdown ถ้าคลิกที่อื่น
     window.addEventListener('click', function(e) {
         let dd = document.getElementById('sh-action-dd');
         let trigger = document.getElementById('sh-action-text');
