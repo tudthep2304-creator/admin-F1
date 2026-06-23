@@ -336,9 +336,10 @@
       <section id="content-drivers" class="tab-content hidden space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  <button onclick="window.openAddDriverModal()" class=" hover: text-black font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center shrink-0">
-                      <i class="fas fa-user-plus"></i> ลงทะเบียนคนขับใหม่
-                  </button>
+                  <button onclick="openRegisterModal()" class="border border-gray-200 bg-white text-gray-800 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0 w-max">
+    <i class="fas fa-user-plus text-brand"></i>
+    <span>ลงทะเบียนคนขับใหม่</span>
+</button>
               </div>
           </div>
 
@@ -930,20 +931,20 @@
           <div class="border-gray-200 bg-white shadow-sm  border   p-3 sm:p-4 rounded-xl shadow-sm">
               <div class="flex justify-between items-center mb-3 border-b   pb-2">
                   <h3 class="text-[11px] font-medium text-black  uppercase"><i class="fas fa-car  mr-1"></i> ยานพาหนะ (Vehicles)</h3>
-                  <button onclick="addDriverVehicle()" class="border-gray-200 bg-white shadow-sm   ] px-2.5 py-1 rounded-lg text-[10px] font-medium hover: : transition shadow-sm border  "><i class="fas fa-plus"></i> เพิ่มรถ</button>
+                  <button onclick="addDriverVehicle()" class="border border-gray-200 bg-white text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0"><i class="fas fa-plus"></i> เพิ่มรถ</button>
               </div>
               <div id="driver-vehicles-container" class="space-y-3"></div>
           </div>
 
           <div class="grid grid-cols-3 gap-2 pt-2">
-              <button onclick="warpToHistory()" class="border-gray-200 bg-white shadow-sm    hover: border   rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center">ประวัติงาน</button>
-              <button onclick="warpToLogs()" class="border-gray-200 bg-white shadow-sm    hover:border-gray-200 bg-white shadow-sm border   rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center">ดู Log พิกัด</button>
-              <button id="btn-profile-block-action" onclick="openBlockDriverModal(currentDriverFocus)" class="border-gray-200 bg-white shadow-sm    hover: border   rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center">บล็อกคนขับ</button>
+              <button onclick="warpToHistory()" class="border border-gray-200 bg-white text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">ประวัติงาน</button>
+              <button onclick="warpToLogs()" class="border border-gray-200 bg-white text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">ดู Log พิกัด</button>
+              <button id="btn-profile-block-action" onclick="openBlockDriverModal(currentDriverFocus)" class="border border-gray-200 bg-white text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0">บล็อกคนขับ</button>
           </div>
 
           <div class="grid grid-cols-2 gap-2 mt-2">
-              <button onclick="deleteDriverFromModal()" class="w-full py-2.5     font-medium rounded-xl border   hover: hover:text-black transition text-[11px] flex justify-center items-center gap-1.5 shadow-sm"><i class="fas fa-trash-alt"></i> ถอดพนักงาน</button>
-              <button onclick="window.saveDriverUpdates()" class="w-full py-2.5  hover: text-black font-medium rounded-xl shadow-md transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
+              <button onclick="deleteDriverFromModal()" class="border border-gray-200 bg-white text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0"><i class="fas fa-trash-alt"></i> ถอดพนักงาน</button>
+              <button onclick="window.saveDriverUpdates()" class="border border-gray-200 bg-white text-gray-800 transition-all duration-300 hover:border-brand hover:shadow-[0_0_15px] hover:shadow-brand/30 hover:-translate-y-1 active:scale-95 active:shadow-none active:translate-y-0"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
           </div>
       </section>
     
