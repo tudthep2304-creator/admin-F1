@@ -619,7 +619,6 @@
                             <th class="py-3 px-4 text-center cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-600 transition" onclick="sortSocialLeaderboard('popularity')">
                                 เปอร์เซ็นต์ <i id="sort-icon-popularity" class="fas fa-sort text-gray-400 ml-1"></i>
                             </th>
-                            <th class="py-3 px-4 text-right w-36">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="social-leaderboard-tbody" class="text-sm divide-y divide-gray-100 dark:divide-slate-800/50 bg-white dark:bg-slate-900">
@@ -7354,7 +7353,7 @@ let creditDisplay = `
         window.renderSocialTablePage();
     };
 
-    // 3. อัลกอริทึมเรียงลำดับ Array (แก้บั๊กคะแนนเท่ากัน)
+    // 3. อัลกอริทึมเรียงลำดับ Array (ครอบคลุม ไลค์, ดิสไลค์, ผู้ติดตาม, เปอร์เซ็นต์)
     window.sortSocialArray = function() {
         let col = window.currentSocialSort.column;
         let order = window.currentSocialSort.order === 'desc' ? -1 : 1;
@@ -7363,14 +7362,14 @@ let creditDisplay = `
             let valA = a[col];
             let valB = b[col];
             
-            // ถ้าค่าไม่เท่ากัน ให้เรียงสลับบนล่างตามปกติ
+            // ถ้าค่าไม่เท่ากัน ให้เรียงตามปกติ (มากไปน้อย หรือ น้อยไปมาก)
             if(valA !== valB) {
                 return valA < valB ? (-1 * order) : (1 * order);
             }
             
-            // 🌟 ไม้ตาย: ถ้าค่าเท่ากันเป๊ะ (เช่น ไลค์ 0 เท่ากัน) 
-            // ให้บังคับเรียงสลับด้วย "เลขอันดับ(rank)" เท่านั้น จะได้สลับด้านได้สมบูรณ์แบบ
-            return order === 1 ? (a.rank - b.rank) : (b.rank - a.rank);
+            // 🌟 ไม้ตายสำหรับทุกปุ่ม: ถ้าคะแนนเท่ากันเป๊ะ (เช่น ไลค์ 0 เท่ากัน) 
+            // ให้เอา "คนที่มีอันดับรวม (Rank) ดีกว่า" ขึ้นก่อนเสมอ! จะได้ไม่มีการสลับมั่ว
+            return a.rank - b.rank;
         });
     };
 
@@ -7387,10 +7386,11 @@ let creditDisplay = `
         let html = '';
 
         if(pageData.length === 0) {
-            html = '<tr><td colspan="7" class="py-10 text-center text-gray-400 text-xs">ไม่พบข้อมูล หรือคนขับที่ค้นหา</td></tr>';
+            // ลด colspan เหลือ 6 เพราะลบคอลัมน์จัดการออกแล้ว
+            html = '<tr><td colspan="6" class="py-10 text-center text-gray-400 text-xs">ไม่พบข้อมูล หรือคนขับที่ค้นหา</td></tr>';
         } else {
             pageData.forEach((d) => {
-                let actualRank = d.rank; // 🌟 เรียกใช้เลขอันดับแท้จริง แทนการนับแถว
+                let actualRank = d.rank; 
                 let tierBadgeHtml = typeof window.getTierBadgeHtml === 'function' ? window.getTierBadgeHtml(d.tier) : `<span class="text-[9px] border px-1 rounded">${d.tier}</span>`;
                 
                 let ratioColor = 'text-gray-400 font-bold';
@@ -7398,8 +7398,9 @@ let creditDisplay = `
                 else if(d.popularity >= 70) ratioColor = 'text-amber-500 font-bold';
                 else if(d.popularity > 0 || d.dislikes > 0) ratioColor = 'text-red-500 font-bold';
 
+                // 🌟 ใส่ cursor-pointer และ onclick ไว้ที่แท็ก <tr> ทำให้กดเปิดประวัติได้ทั้งบรรทัด!
                 html += `
-                <tr class="border-b border-gray-100 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition text-[11px] text-left">
+                <tr onclick="openSocialHistoryModal('${d.id}', '${d.name}')" class="cursor-pointer border-b border-gray-100 dark:border-slate-700/50 hover:bg-indigo-50 dark:hover:bg-slate-800 transition text-[11px] text-left">
                     <td class="py-2.5 px-4 text-center font-bold text-gray-400 dark:text-slate-500">#${actualRank}</td>
                     <td class="py-2.5 px-4">
                         <p class="font-bold text-gray-800 dark:text-white transition flex items-center gap-1.5">
@@ -7415,16 +7416,6 @@ let creditDisplay = `
                     <td class="py-2.5 px-4 text-center font-black text-indigo-500">${d.followers.toLocaleString()}</td>
                     <td class="py-2.5 px-4 text-center">
                         <span class="${ratioColor}">${(d.likes + d.dislikes) > 0 ? d.popularity + '%' : '-'}</span>
-                    </td>
-                    <td class="py-2.5 px-4 text-right">
-                        <div class="flex items-center justify-end gap-1.5">
-                            <button onclick="openSocialHistoryModal('${d.id}', '${d.name}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-blue-400 px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
-                                <i class="fas fa-history"></i> ประวัติ
-                            </button>
-                            <button onclick="openAdjustTierRatingModal('${d.id}')" class="bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white border border-amber-200 dark:border-amber-800/50 dark:bg-amber-900/30 dark:text-amber-400 px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
-                                <i class="fas fa-edit"></i> แก้ไข
-                            </button>
-                        </div>
                     </td>
                 </tr>`;
             });
