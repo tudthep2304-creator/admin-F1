@@ -37,12 +37,12 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .slim-scroll::-webkit-scrollbar { width: 4px; }
-    .slim-scroll::-webkit-scrollbar-thumb { background: #1da1f2; border-radius: 4px; }
-    .radio-label input[type="radio"]:checked + div { background-color: #1da1f2 !important; border-color: #1da1f2 !important; color: white !important; }
+    .slim-scroll::-webkit-scrollbar-thumb { background: brand; border-radius: 4px; }
+    .radio-label input[type="radio"]:checked + div { background-color: brand !important; border-color: brand !important; color: white !important; }
     .map-label-text { text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; margin-top: 20px; padding: 2px; }
 
     /* ปรับแต่งความสว่างสวิตช์ Toggle */
-    .peer:checked ~ div { background-color: #1da1f2 !important; }
+    .peer:checked ~ div { background-color: brand !important; }
   </style>
   
   <script>
@@ -73,19 +73,14 @@
         <button id="admin-back-btn" onclick="window.goBackAdmin()" class="hidden w-9 h-9   text-black  hover:text-black  rounded-xl flex items-center justify-center text-lg border  dark: transition active:scale-95 shrink-0">
             <i class="fas fa-chevron-left"></i>
         </button>
-
-        <!-- ไอคอนฟันเฟือง (ซ่อนในมือถือเพื่อประหยัดที่) -->
-        <div class="hidden sm:flex w-9 h-9  dark: text-brand rounded-xl items-center justify-center text-lg border   shrink-0">
-            <i class="fas fa-cogs"></i>
-        </div>
-        
+       
         <div class="min-w-0">
             <h1 class="text-lg sm:text-xl font-black text-black  tracking-wide flex items-center gap-2 truncate">
                 F1 DRIVER <span class="text-black  font-normal hidden sm:inline">|</span> 
-                <span id="current-page-title" class="text-[#1da1f2] text-sm sm:text-base truncate">แดชบอร์ด</span>
+                <span id="current-page-title" class="text-brand text-sm sm:text-base truncate">แดชบอร์ด</span>
             </h1>
             <p class="text-[10px] sm:text-xs text-black  font-bold flex items-center gap-1">
-                <span class="w-1.5 h-1.5 bg-[#1da1f2] rounded-full animate-ping"></span> แผงควบคุมส่วนกลาง
+                <span class="w-1.5 h-1.5 bg-brand rounded-full animate-ping"></span> แผงควบคุมส่วนกลาง
             </p>
         </div>
     </div>
@@ -97,7 +92,7 @@
   <!-- 🌟 Sidebar Menu (แผงเมนูสไลด์จากซ้าย) -->
   <div id="sidebar-menu" class="fixed inset-y-0 left-0 w-64 bg-white  shadow-2xl z-[9999] transform -translate-x-full transition-transform duration-300 flex flex-col">
       <div class="p-5 border-b  dark: flex justify-between items-center bg-white/50 /50">
-          <h2 class="text-base font-black text-[#1da1f2] flex items-center gap-2"><i class="fas fa-rocket"></i> F1 DRIVER</h2>
+          <h2 class="text-base font-black text-brand flex items-center gap-2"><i class="fas fa-rocket"></i> F1 DRIVER</h2>
           <button onclick="window.toggleSidebar()" class="w-8 h-8  dark: rounded-full flex items-center justify-center text-black  hover: hover: transition"><i class="fas fa-times"></i></button>
       </div>
       <div class="flex-1 overflow-y-auto py-2">
@@ -105,7 +100,7 @@
               <div class="w-6 text-center"><i class="fas fa-home "></i></div> หน้าหลัก (Dashboard)
           </button>
           <button onclick="switchTab('allmenu'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:bg-white : hover: ] flex items-center gap-4 border-b  dark: transition text-left">
-              <div class="w-6 text-center"><i class="fas fa-th-large text-[#1da1f2]"></i></div> เมนูระบบ (All Menus)
+              <div class="w-6 text-center"><i class="fas fa-th-large text-brand"></i></div> เมนูระบบ (All Menus)
           </button>
           <button onclick="switchTab('map'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black  hover:bg-white : hover: ] flex items-center gap-4 transition text-left">
               <div class="w-6 text-center"><i class="fas fa-map-marked-alt "></i></div> แผนที่รถ (Live Map)
@@ -121,7 +116,7 @@
       <section id="content-dashboard" class="tab-content space-y-6">
           <div class="bg-white  border  dark: p-4 sm:p-5 rounded-2xl shadow-sm  flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
               <div>
-                  <h2 class="text-base font-bold text-black  mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-[#1da1f2]"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
+                  <h2 class="text-base font-bold text-black  mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-brand"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
                   <p class="text-xs text-black  leading-relaxed max-w-md">เลือกโหมดคุมแมนนวลเพื่อกดส่งงานให้คนขับด้วยตัวเอง หรือเลือกออโต้คิวเพื่อให้ระบบกระจายคิวอัตโนมัติ</p>
               </div>
               <div class="flex   p-1 rounded-xl border  dark: w-full sm:w-auto shrink-0 relative">
@@ -145,14 +140,14 @@
                   <div class="flex justify-between items-start">
                       <div>
                           <p class="text-xs font-bold text-black  uppercase tracking-wider mb-1">คนขับออนไลน์</p>
-                          <h3 class="text-3xl font-black text-[#1da1f2]" id="stat-online-count">0 คน</h3>
+                          <h3 class="text-3xl font-black text-brand" id="stat-online-count">0 คน</h3>
                       </div>
-                      <div class="w-8 h-8 rounded-full   flex items-center justify-center text-[#1da1f2]"><i class="fas fa-search"></i></div>
+                      <div class="w-8 h-8 rounded-full   flex items-center justify-center text-brand"><i class="fas fa-search"></i></div>
                   </div>
               </div>
           </div>
           <div class="bg-white  border  dark: p-4 sm:p-5 rounded-2xl shadow-sm  transition-colors duration-300">
-              <h2 class="text-base font-bold text-black  mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-[#1da1f2]"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
+              <h2 class="text-base font-bold text-black  mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-brand"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
               <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
           </div>
       </section>
@@ -179,7 +174,7 @@
               <div id="menu-group-driver" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t  dark: transition-all duration-300">
                   
                   <button onclick="switchTab('drivers')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-motorcycle"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">จัดการคนขับ</span>
                   </button>
 
@@ -225,12 +220,12 @@
                   </button>
                   
                   <button onclick="switchTab('driver-banners')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">โฆษณาคนขับ</span>
                   </button>
                   
                   <button onclick="switchTab('driver-news')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข่าวสารคนขับ</span>
                   </button>
                   
@@ -245,7 +240,7 @@
           <div class="bg-white  border  dark: rounded-2xl p-4 shadow-sm transition-colors duration-300">
               <div onclick="toggleMenuCategory('menu-group-passenger', this)" class="flex items-center justify-between cursor-pointer select-none">
                   <h2 class="text-sm font-bold text-black  flex items-center gap-2">
-                      <i class="fas fa-user-friends text-[#1da1f2]"></i> หมวดหมู่ผู้โดยสาร
+                      <i class="fas fa-user-friends text-brand"></i> หมวดหมู่ผู้โดยสาร
                   </h2>
                   <div class="w-8 h-8 bg-white  rounded-full flex items-center justify-center text-black  transition">
                       <i class="fas fa-chevron-up transition-transform duration-300"></i>
@@ -253,19 +248,19 @@
               </div>
               <div id="menu-group-passenger" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t  dark: transition-all duration-300">
                   <button onclick="switchTab('passengers')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-users"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-users"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข้อมูลลูกค้า</span>
                   </button>
                   <button onclick="switchTab('promos')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ticket-alt"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-ticket-alt"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">คูปองส่วนลด</span>
                   </button>
                   <button onclick="switchTab('banners')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-images"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">โฆษณาลูกค้า</span>
                   </button>
                   <button onclick="switchTab('news')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-bullhorn"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ข่าวสารลูกค้า</span>
                   </button>
                   <button onclick="switchTab('blacklist')" class="bg-white  border  dark: hover:bg-white : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
@@ -287,11 +282,11 @@
               </div>
               <div id="menu-group-central" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4 mt-4 pt-4 border-t  dark: transition-all duration-300">
                   <button onclick="switchTab('history')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-history"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-history"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">ประวัติงาน</span>
                   </button>
                   <button onclick="switchTab('vehicles')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-car"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">เรท & ประเภท</span>
                   </button>
                   
@@ -301,7 +296,7 @@
                   </button>
 
                   <button onclick="switchTab('chatlogs')" class="bg-white  border  dark: hover: : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12  dark: text-brand rounded-full flex items-center justify-center text-lg sm:text-xl"><i class="fas fa-comments"></i></div>
                       <span class="text-[9px] sm:text-[11px] font-bold text-center leading-tight">บันทึกแชท</span>
                   </button>
                   <button onclick="switchTab('all-wallet-history')" class="bg-white  border  dark: hover:bg-white : text-black  rounded-2xl p-2 sm:p-4 flex flex-col items-center justify-center gap-2 transition shadow-sm active:scale-95">
@@ -320,10 +315,10 @@
 
       <section id="content-map" class="tab-content hidden flex-1 flex-col pb-2">
           <div class="flex justify-between items-center mb-2 shrink-0">
-              <h2 class="text-base font-bold text-black "><i class="fas fa-satellite-dish text-[#1da1f2] mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
+              <h2 class="text-base font-bold text-black "><i class="fas fa-satellite-dish text-brand mr-1 animate-pulse"></i> เรดาร์ติดตามเรียลไทม์</h2>
               <div class="flex gap-2">
-                  <span class="text-[10px] bg-white  text-[#1da1f2] px-2 py-1 rounded border  dark: shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
-                  <span class="text-[10px] bg-white  text-[#1da1f2] px-2 py-1 rounded border  dark: shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
+                  <span class="text-[10px] bg-white  text-brand px-2 py-1 rounded border  dark: shadow-inner">ลูกค้า: <b id="map-pass-count">0</b></span>
+                  <span class="text-[10px] bg-white  text-brand px-2 py-1 rounded border  dark: shadow-inner">รถว่าง: <b id="map-drv-count">0</b></span>
               </div>
           </div>
           
@@ -356,8 +351,8 @@
           <div class="bg-white  border  dark: p-4 sm:p-5 rounded-2xl shadow-sm  transition-colors duration-300">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b  dark: pb-4">
                   <div>
-                      <h2 class="text-lg font-bold text-black  flex items-center gap-2"><i class="fas fa-address-book text-[#1da1f2]"></i> ทำเนียบคนขับ</h2>
-                      <p class="text-xs text-black  mt-1">จำนวนคนขับในระบบ: <span id="stat-total-drivers" class="font-bold text-[#1da1f2] text-sm">0</span> คน</p>
+                      <h2 class="text-lg font-bold text-black  flex items-center gap-2"><i class="fas fa-address-book text-brand"></i> ทำเนียบคนขับ</h2>
+                      <p class="text-xs text-black  mt-1">จำนวนคนขับในระบบ: <span id="stat-total-drivers" class="font-bold text-brand text-sm">0</span> คน</p>
                   </div>
                   
                   <div class="relative w-full sm:w-64 shrink-0">
@@ -387,16 +382,16 @@
       <section id="content-passengers" class="tab-content hidden space-y-4">
           <div class="bg-white  border  dark: p-5 rounded-2xl shadow-md">
               <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-                  <div><h2 class="text-lg font-bold text-black "><i class="fas fa-user-friends text-[#1da1f2] mr-1"></i> ระบบรายงานประวัติลูกค้า (CRM)</h2><p class="text-xs text-black  mt-1">คลิกที่รายชื่อลูกค้าเพื่อดูข้อมูลเจาะลึก หรือระงับสิทธิ์</p></div>
+                  <div><h2 class="text-lg font-bold text-black "><i class="fas fa-user-friends text-brand mr-1"></i> ระบบรายงานประวัติลูกค้า (CRM)</h2><p class="text-xs text-black  mt-1">คลิกที่รายชื่อลูกค้าเพื่อดูข้อมูลเจาะลึก หรือระงับสิทธิ์</p></div>
                   <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
                       <select id="filter-passenger" onchange="renderPassengers()" class="w-full sm:w-auto bg-white  text-black  text-xs border  dark: rounded-lg px-3 py-2.5 outline-none font-bold">
                           <option value="all">ลูกค้าทั้งหมด</option><option value="new">ผู้ใช้ใหม่ (0-1 ครั้ง)</option><option value="regular">ลูกค้าประจำ (&gt;1 ครั้ง)</option>
                       </select>
-                      <button onclick="exportPassengersCSV()" class="w-full sm:w-auto bg-[#1da1f2] hover: text-black font-bold text-xs px-4 py-2.5 rounded-lg flex justify-center items-center gap-1.5 transition shadow-sm shrink-0"><i class="fas fa-file-csv"></i> Export</button>
+                      <button onclick="exportPassengersCSV()" class="w-full sm:w-auto bg-brand hover: text-black font-bold text-xs px-4 py-2.5 rounded-lg flex justify-center items-center gap-1.5 transition shadow-sm shrink-0"><i class="fas fa-file-csv"></i> Export</button>
                   </div>
               </div>
               <div class="grid grid-cols-3 gap-3 mb-4">
-                  <div class=" /50 p-3 rounded-xl border  dark: text-center"><p class="text-[10px] sm:text-xs text-black  font-bold mb-1">ทั้งหมด</p><p class="text-xl sm:text-2xl font-black text-[#1da1f2]" id="stat-pass-total">0</p></div>
+                  <div class=" /50 p-3 rounded-xl border  dark: text-center"><p class="text-[10px] sm:text-xs text-black  font-bold mb-1">ทั้งหมด</p><p class="text-xl sm:text-2xl font-black text-brand" id="stat-pass-total">0</p></div>
                   <div class=" /50 p-3 rounded-xl border  dark: text-center"><p class="text-[10px] sm:text-xs text-black  font-bold mb-1">ผู้ใช้ใหม่</p><p class="text-xl sm:text-2xl font-black " id="stat-pass-new">0</p></div>
                   <div class=" /50 p-3 rounded-xl border  dark: text-center"><p class="text-[10px] sm:text-xs text-black  font-bold mb-1">ลูกค้าประจำ</p><p class="text-xl sm:text-2xl font-black " id="stat-pass-vip">0</p></div>
               </div>
@@ -413,8 +408,8 @@
       <section id="content-history" class="tab-content hidden space-y-4">
           <div class="bg-white  border  dark: p-5 rounded-2xl shadow-md">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h2 class="text-lg font-bold text-black "><i class="fas fa-chart-line text-[#1da1f2] mr-1"></i> ศูนย์วิเคราะห์ประวัติงาน (Analytics)</h2>
-                  <button onclick="syncToGoogleSheet(event)" class="bg-[#1da1f2] hover: text-black font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"><i class="fas fa-file-excel"></i> Export (Excel)</button>
+                  <h2 class="text-lg font-bold text-black "><i class="fas fa-chart-line text-brand mr-1"></i> ศูนย์วิเคราะห์ประวัติงาน (Analytics)</h2>
+                  <button onclick="syncToGoogleSheet(event)" class="bg-brand hover: text-black font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-lg shrink-0"><i class="fas fa-file-excel"></i> Export (Excel)</button>
               </div>
 
               <!-- 🌟 แผงตัวกรองข้อมูล -->
@@ -486,7 +481,7 @@
     <section id="content-driverlogs" class="tab-content hidden space-y-4">
           <div class="bg-white  border  dark: p-5 rounded-2xl shadow-md">
               <div class="flex justify-between items-center mb-4 border-b  dark: pb-3">
-                  <h2 class="text-lg font-bold text-black "><i class="fas fa-map-marker-alt text-[#1da1f2] mr-2"></i> ศูนย์ตรวจสอบประวัติพิกัด (Driver Logs)</h2>
+                  <h2 class="text-lg font-bold text-black "><i class="fas fa-map-marker-alt text-brand mr-2"></i> ศูนย์ตรวจสอบประวัติพิกัด (Driver Logs)</h2>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5 bg-white /40 p-4 rounded-xl border  dark:">
@@ -655,7 +650,7 @@
 
       <section id="content-vehicles" class="tab-content hidden space-y-4">
           <div class="flex justify-between items-center bg-white  border  dark: p-4 rounded-2xl shadow-md">
-              <h2 class="text-base font-bold text-black "><i class="fas fa-car-side text-[#1da1f2] mr-2"></i> ประเภทรถทั้งหมด</h2>
+              <h2 class="text-base font-bold text-black "><i class="fas fa-car-side text-brand mr-2"></i> ประเภทรถทั้งหมด</h2>
               <button onclick="window.openManageVehicleModal()" class=" hover: text-black font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm"><i class="fas fa-plus"></i> เพิ่มรถใหม่</button>
           </div>
           <div id="vehicle-types-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -665,11 +660,11 @@
           <div class="flex justify-end"><button onclick="openModal('modalAddPromo')" class=" hover: text-black font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-ticket-alt"></i> เพิ่มโปรโมชั่นใหม่</button></div>
           <div class="bg-white  border  dark: p-5 rounded-2xl shadow-md">
               <div class="flex justify-between items-center mb-4 border-b  dark: pb-3">
-                  <h2 class="text-lg font-bold text-black "><i class="fas fa-list text-[#1da1f2] mr-1"></i> โค้ดส่วนลดในระบบ</h2>
+                  <h2 class="text-lg font-bold text-black "><i class="fas fa-list text-brand mr-1"></i> โค้ดส่วนลดในระบบ</h2>
                   <button onclick="exportRandomCodes()" class="  border  dark: hover: text-black  px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm shrink-0"><i class="fas fa-download"></i> ดาวน์โหลดโค้ดสุ่ม</button>
               </div>
               <div class="flex gap-4 mb-3 border-b  dark: pb-1">
-                  <button onclick="filterPromoList('all')" id="flt-promo-all" class="text-xs font-bold text-[#1da1f2] border-b-2  pb-1 px-1">แคมเปญหลัก</button>
+                  <button onclick="filterPromoList('all')" id="flt-promo-all" class="text-xs font-bold text-brand border-b-2  pb-1 px-1">แคมเปญหลัก</button>
                   <button onclick="filterPromoList('random')" id="flt-promo-random" class="text-xs font-bold text-black hover: border-b-2 border-transparent pb-1 px-1">โค้ดสุ่มใบปลิว</button>
               </div>
               <div class="max-h-[500px] overflow-y-auto pr-2 slim-scroll"><ul id="promo-codes-list" class="divide-y divide-gray-200 dark:"></ul></div>
@@ -679,7 +674,7 @@
       <section id="content-banners" class="tab-content hidden space-y-4">
           <div class="flex justify-end"><button onclick="openModal('modalAddBanner')" class=" hover: text-black font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-images"></i> อัปโหลดแบนเนอร์</button></div>
           <div class="bg-white  border  dark: p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
-              <h2 class="text-lg font-bold text-black  mb-4"><i class="fas fa-list text-[#1da1f2] mr-1"></i> แบนเนอร์โฆษณาในระบบ</h2>
+              <h2 class="text-lg font-bold text-black  mb-4"><i class="fas fa-list text-brand mr-1"></i> แบนเนอร์โฆษณาในระบบ</h2>
               <div id="admin-banners-list" class="space-y-2 max-h-[500px] overflow-y-auto pr-1 slim-scroll"></div>
           </div>
       </section>
@@ -687,14 +682,14 @@
       <section id="content-news" class="tab-content hidden space-y-4">
           <div class="flex justify-end"><button onclick="openModal('modalAddNews')" class=" hover: text-black font-bold text-sm px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2"><i class="fas fa-plus"></i> โพสต์ข่าวสารใหม่</button></div>
           <div class="bg-white  border  dark: p-5 rounded-2xl shadow-md max-w-3xl mx-auto w-full">
-              <h2 class="text-lg font-bold text-black  mb-4"><i class="fas fa-bullhorn text-[#1da1f2] mr-1"></i> บอร์ดข่าวสารที่กำลังแสดง</h2>
+              <h2 class="text-lg font-bold text-black  mb-4"><i class="fas fa-bullhorn text-brand mr-1"></i> บอร์ดข่าวสารที่กำลังแสดง</h2>
               <div id="admin-news-list" class="space-y-2 max-h-[500px] overflow-y-auto pr-1 slim-scroll"></div>
           </div>
       </section>
 
       <section id="content-chatlogs" class="tab-content hidden space-y-4">
           <div class="bg-white  border  dark: p-5 rounded-2xl shadow-md">
-              <h2 class="text-lg font-bold text-black  mb-1"><i class="fas fa-user-secret text-[#1da1f2] mr-1"></i> คลังประวัติแชท (ตรวจสอบย้อนหลัง)</h2>
+              <h2 class="text-lg font-bold text-black  mb-1"><i class="fas fa-user-secret text-brand mr-1"></i> คลังประวัติแชท (ตรวจสอบย้อนหลัง)</h2>
               <p class="text-xs text-black  mb-4">ข้อมูลแชททั้งหมดจะถูกเก็บถาวรที่นี่ เพื่อใช้เป็นหลักฐานเวลามีการร้องเรียน</p>
               <div class="overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[700px]">
@@ -807,7 +802,7 @@
     <!-- ================= หน้าข้อมูลส่วนตัวคนขับ (เปลี่ยนจาก Modal เป็นหน้า Page) ================= -->
       <section id="content-driver-details" class="tab-content hidden space-y-3 pb-8 mt-2">
           <div class="flex justify-between items-center bg-white  border  dark: p-3 sm:p-4 rounded-xl shadow-sm">
-              <h2 class="text-sm font-black text-black  flex items-center gap-2"><i class="fas fa-user-edit text-[#1da1f2]"></i> ข้อมูลพนักงาน</h2>
+              <h2 class="text-sm font-black text-black  flex items-center gap-2"><i class="fas fa-user-edit text-brand"></i> ข้อมูลพนักงาน</h2>
               
               <div class="flex items-center gap-2">
                   <div id="det-online-status"></div>
@@ -1607,7 +1602,7 @@
 
   <div id="adminConfirmModal" class="hidden fixed inset-0 z-[9998] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white  border  dark: rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl animate-fade-in">
-          <div id="adminConfirmIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-[#1da1f2] border  dark:"><i class="fas fa-question-circle"></i></div>
+          <div id="adminConfirmIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-brand border  dark:"><i class="fas fa-question-circle"></i></div>
           <h3 id="adminConfirmTitle" class="text-xl font-black text-black  mb-2"></h3>
           <p id="adminConfirmMessage" class="text-sm text-black  mb-6 leading-relaxed"></p>
           <div class="flex gap-3">
@@ -1620,7 +1615,7 @@
   <div id="modalAddDriver" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white  border  dark: rounded-2xl w-full max-w-lg shadow-2xl flex flex-col animate-fade-in max-h-[90vh]">
           <div class="p-4 border-b  dark: flex justify-between items-center bg-white /50 rounded-t-2xl shrink-0">
-              <h2 class="text-lg font-bold text-[#1da1f2]"><i class="fas fa-user-plus mr-1"></i> ลงทะเบียนพนักงานขับรถ</h2>
+              <h2 class="text-lg font-bold text-brand"><i class="fas fa-user-plus mr-1"></i> ลงทะเบียนพนักงานขับรถ</h2>
               <button onclick="closeModal('modalAddDriver')" class="text-black hover:text-black     rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5 space-y-4 overflow-y-auto slim-scroll">
@@ -1710,7 +1705,7 @@
   <div id="modalAddPromo" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white  border  dark: rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
           <div class="p-4 border-b  dark: flex justify-between items-center bg-white /50 rounded-t-2xl sticky top-0 z-10">
-              <h2 class="text-lg font-bold text-[#1da1f2]"><i class="fas fa-ticket-alt mr-1"></i> ออกแบบโปรโมชั่นระบบ</h2>
+              <h2 class="text-lg font-bold text-brand"><i class="fas fa-ticket-alt mr-1"></i> ออกแบบโปรโมชั่นระบบ</h2>
               <button onclick="closeModal('modalAddPromo')" class="text-black hover:text-black     rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-5">
@@ -2045,7 +2040,7 @@
   <div id="modalOnlineDrivers" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
       <div class="bg-white  border  dark: rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh]">
           <div class="p-4 border-b  dark: flex justify-between items-center bg-white /50 rounded-t-2xl">
-              <h2 class="text-lg font-bold text-[#1da1f2]"><i class="fas fa-radar"></i> คนขับออนไลน์</h2>
+              <h2 class="text-lg font-bold text-brand"><i class="fas fa-radar"></i> คนขับออนไลน์</h2>
               <button onclick="closeModal('modalOnlineDrivers')" class="text-black hover:text-black     rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
           </div>
           <div class="p-4 overflow-y-auto flex-1 hide-scrollbar">
@@ -2061,7 +2056,7 @@
           <div class="p-5 border-b  dark: bg-white /50 relative">
               <button onclick="closeModal('modalPassengerDetails')" class="absolute top-4 right-4 text-black hover:text-black     rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fas fa-times"></i></button>
               <div class="flex items-center gap-4">
-                  <div class="w-14 h-14  dark: text-[#1da1f2] rounded-full flex items-center justify-center text-2xl border  dark: shrink-0"><i class="fas fa-user-astronaut"></i></div>
+                  <div class="w-14 h-14  dark: text-brand rounded-full flex items-center justify-center text-2xl border  dark: shrink-0"><i class="fas fa-user-astronaut"></i></div>
                   <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2"><h2 class="text-lg font-black text-black  truncate" id="pdet-name">ชื่อลูกค้า</h2></div>
                       <p class="text-xs font-bold  ] mt-0.5" id="pdet-phone">เบอร์โทร: -</p>
@@ -2118,7 +2113,7 @@
             loader = document.createElement('div');
             loader.id = 'global-loader';
             loader.className = 'fixed inset-0 z-[99999] bg-black/80 flex flex-col items-center justify-center text-black hidden transition-opacity';
-            loader.innerHTML = '<i class="fas fa-circle-notch fa-spin text-5xl mb-4 text-[#1da1f2]"></i><p id="global-loader-text" class="text-sm font-bold tracking-wide"></p>';
+            loader.innerHTML = '<i class="fas fa-circle-notch fa-spin text-5xl mb-4 text-brand"></i><p id="global-loader-text" class="text-sm font-bold tracking-wide"></p>';
             document.body.appendChild(loader);
         }
         if(isShow) {
@@ -2237,7 +2232,7 @@ window.uploadImageToDrive = async function(base64Data, prefix = "IMG", folderNam
         if(!icon || !btn) return;
 
         if(type === 'success') {
-            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-[#1da1f2] border  dark:';
+            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-brand border  dark:';
             icon.innerHTML = '<i class="fas fa-check"></i>';
             btn.className = 'w-full py-3  text-black font-bold rounded-xl shadow-md hover: transition';
         } else if(type === 'error') {
@@ -2245,7 +2240,7 @@ window.uploadImageToDrive = async function(base64Data, prefix = "IMG", folderNam
             icon.innerHTML = '<i class="fas fa-times"></i>';
             btn.className = 'w-full py-3  text-black font-bold rounded-xl shadow-md hover: transition';
         } else {
-            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-[#1da1f2] border  dark:';
+            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-brand border  dark:';
             icon.innerHTML = '<i class="fas fa-info"></i>';
             btn.className = 'w-full py-3  text-black font-bold rounded-xl shadow-md hover: transition';
         }
@@ -2264,7 +2259,7 @@ window.uploadImageToDrive = async function(base64Data, prefix = "IMG", folderNam
             icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
             btn.className = 'flex-1 py-3  text-black font-bold rounded-xl shadow-md hover: transition';
         } else {
-            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-[#1da1f2] border  dark:';
+            icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-white  text-brand border  dark:';
             icon.innerHTML = '<i class="fas fa-question-circle"></i>';
             btn.className = 'flex-1 py-3  text-black font-bold rounded-xl shadow-md hover: transition';
         }
@@ -2472,7 +2467,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             html += `<tr class="border-b  dark: text-black  hover:bg-white : transition">
                 <td class="py-3 px-2 text-[10px] text-black ">${timeStr}</td>
                 <td class="py-3 px-2 font-bold text-black  text-left text-xs">${j.name || 'ลูกค้า'}<br><span class="text-[9px] text-black  font-normal">${j.phone || '-'}</span></td>
-                <td class="py-3 px-2 font-bold cursor-pointer hover: text-left text-xs" onclick="showDriverDetails('${j.driverPin}')"><span class="text-[#1da1f2] bg-white  px-1.5 py-0.5 rounded">#${j.driverPin || '-'}</span></td>
+                <td class="py-3 px-2 font-bold cursor-pointer hover: text-left text-xs" onclick="showDriverDetails('${j.driverPin}')"><span class="text-brand bg-white  px-1.5 py-0.5 rounded">#${j.driverPin || '-'}</span></td>
                 <td class="py-3 px-2 text-[10px] text-black  max-w-[180px] truncate text-left" title="รับ: ${j.pName} | ส่ง: ${j.dName}">รับ: ${j.pName}<br>ส่ง: ${j.dName}</td>
                 <td class="py-3 px-2 font-black  ] text-right text-xs">฿${j.price}</td>
                 <td class="py-3 px-2 text-center">${reviewHtml}</td>
@@ -2604,7 +2599,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             sizeX = 32; sizeY = 32; 
         }
 
-        let labelColor = '#1da1f2';
+        let labelColor = 'brand';
 
         if(!liveMarkers[id]) {
             let m = new google.maps.Marker({ 
@@ -2709,7 +2704,7 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
         else {
             passArray.forEach(p => {
                 let isNew = p.rides <= 1;
-                let badge = isNew ? `<span class=" text-[#1da1f2] text-[10px] font-bold px-2 py-0.5 rounded border ">ผู้ใช้ใหม่</span>` : `<span class="  text-[10px] font-bold px-2 py-0.5 rounded border ">ลูกค้าประจำ</span>`;
+                let badge = isNew ? `<span class=" text-brand text-[10px] font-bold px-2 py-0.5 rounded border ">ผู้ใช้ใหม่</span>` : `<span class="  text-[10px] font-bold px-2 py-0.5 rounded border ">ลูกค้าประจำ</span>`;
                 let pDataStr = encodeURIComponent(JSON.stringify(p));
 
                 html += `<tr class="border-b  dark: text-black  hover: : transition cursor-pointer text-left" onclick="viewPassengerDetails('${pDataStr}')">
@@ -2812,8 +2807,8 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         currentPromoFilter = type; 
         let a = document.getElementById('flt-promo-all'); let r = document.getElementById('flt-promo-random');
         if(a && r) {
-            a.className = type === 'all' ? "text-xs font-bold text-[#1da1f2] border-b-2  pb-1 px-1 transition" : "text-xs font-bold text-black hover:text-black border-b-2 border-transparent pb-1 px-1 transition";
-            r.className = type === 'random' ? "text-xs font-bold text-[#1da1f2] border-b-2  pb-1 px-1 transition" : "text-xs font-bold text-black hover:text-black border-b-2 border-transparent pb-1 px-1 transition";
+            a.className = type === 'all' ? "text-xs font-bold text-brand border-b-2  pb-1 px-1 transition" : "text-xs font-bold text-black hover:text-black border-b-2 border-transparent pb-1 px-1 transition";
+            r.className = type === 'random' ? "text-xs font-bold text-brand border-b-2  pb-1 px-1 transition" : "text-xs font-bold text-black hover:text-black border-b-2 border-transparent pb-1 px-1 transition";
         }
         renderPromoList(); 
     }
@@ -3058,7 +3053,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         window.activeJobToAssign = jobId; let listContainer = document.getElementById('assign-driver-list'); listContainer.innerHTML = '';
         if(windowContext.onlineDrivers && windowContext.onlineDrivers.length > 0) {
             windowContext.onlineDrivers.forEach(d => {
-                let dName = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงาน"; let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="w-10 h-10 bg-white  text-[#1da1f2] flex items-center justify-center rounded-xl border  dark: hover: hover:text-black transition"><i class="fas fa-phone-alt"></i></a>` : '';
+                let dName = allProfiles[d.pin] ? allProfiles[d.pin].name : "พนักงาน"; let callBtn = d.driverPhone ? `<a href="tel:${d.driverPhone}" class="w-10 h-10 bg-white  text-brand flex items-center justify-center rounded-xl border  dark: hover: hover:text-black transition"><i class="fas fa-phone-alt"></i></a>` : '';
                 listContainer.innerHTML += `<div class="flex items-center justify-between bg-white  border  dark: p-3 rounded-xl mb-2 text-left"><div class="text-left"><p class="font-bold text-black  text-sm">${dName}</p><p class="text-[10px] text-black ">PIN: ${d.pin}</p></div><div class="flex gap-2">${callBtn}<button onclick="confirmAssignDriver('${d.pin}')" class="px-4 py-2  hover: text-black font-bold rounded-xl text-sm shadow-md transition">ส่งงาน</button></div></div>`;
             });
         } else { listContainer.innerHTML = '<p class="text-center text-black py-4 text-sm">ยังไม่มีคนขับออนไลน์ในระบบ</p>'; }
@@ -3238,7 +3233,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                 }
             }
             let isForced = v.forceOnline === true;
-            let badgeColor = online > 0 ? 'text-[#1da1f2]' : 'text-black ';
+            let badgeColor = online > 0 ? 'text-brand' : 'text-black ';
             html += `
             <div class="flex items-center justify-between bg-white /50 p-3 rounded-xl border  dark:">
                 <div class="flex items-center gap-3">
@@ -3250,7 +3245,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer z-10">
                     <input type="checkbox" onchange="window.toggleForceOnline('${v.id}', this.checked)" class="sr-only peer" ${isForced ? 'checked' : ''}>
-                    <div class="w-11 h-6  peer-focus:outline-none rounded-full peer dark: peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after: after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1da1f2]"></div>
+                    <div class="w-11 h-6  peer-focus:outline-none rounded-full peer dark: peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after: after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
                 </label>
             </div>`;
         });
@@ -3338,7 +3333,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         let container = document.getElementById('chatlog-messages-container'); container.innerHTML = '';
         chat.messages.sort((a,b) => a.timestamp - b.timestamp); let html = '';
         chat.messages.forEach(msg => {
-            let isPassenger = (msg.sender === 'passenger'); let align = isPassenger ? 'justify-end' : 'justify-start'; let bg = isPassenger ? 'bg-[#1da1f2] text-black' : '  text-black  border  dark:'; let senderName = isPassenger ? `<span class="text-[10px]  ] font-bold mb-1 mr-1 text-right w-full block">ผู้โดยสาร (${chat.passengerName})</span>` : `<span class="text-[10px] text-black  font-bold mb-1 ml-1 text-left w-full block">คนขับ (${chat.driverPin})</span>`; let timeStr = new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            let isPassenger = (msg.sender === 'passenger'); let align = isPassenger ? 'justify-end' : 'justify-start'; let bg = isPassenger ? 'bg-brand text-black' : '  text-black  border  dark:'; let senderName = isPassenger ? `<span class="text-[10px]  ] font-bold mb-1 mr-1 text-right w-full block">ผู้โดยสาร (${chat.passengerName})</span>` : `<span class="text-[10px] text-black  font-bold mb-1 ml-1 text-left w-full block">คนขับ (${chat.driverPin})</span>`; let timeStr = new Date(msg.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
             html += `<div class="flex w-full ${align} mb-2"><div class="flex flex-col max-w-[80%]">${senderName}<div class="${bg} px-4 py-2.5 rounded-2xl text-[13px] font-normal shadow-sm break-words w-full">${msg.text}</div><span class="text-[9px] text-black  mt-1 ${isPassenger ? 'text-right mr-1' : 'text-left ml-1'}">${timeStr}</span></div></div>`;
         });
         container.innerHTML = html; openModal('modalViewChatLog'); setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
@@ -3445,7 +3440,7 @@ let creditDisplay = `
                 
                 html += `
                 <tr class="driver-row-item cursor-pointer hover:bg-white : transition-colors text-left" onclick="showDriverDetails('${displayId}')">
-                    <td class="py-3 px-3 font-black text-[#1da1f2] w-28 align-middle text-left"><span class="bg-white  border  dark: px-2 py-1 rounded-lg text-xs tracking-wider whitespace-nowrap">${displayId}</span></td>
+                    <td class="py-3 px-3 font-black text-brand w-28 align-middle text-left"><span class="bg-white  border  dark: px-2 py-1 rounded-lg text-xs tracking-wider whitespace-nowrap">${displayId}</span></td>
                     <td class="py-3 px-3 align-middle text-left"><div class="flex items-center gap-3">${profilePicHtml}<div class="flex flex-col min-w-0 text-left"><span class="font-bold text-black  text-sm truncate max-w-[150px] sm:max-w-[250px]">${d.name} ${genderIcon}</span><div class="mt-1 flex flex-wrap items-center gap-1.5">${tierBadgeHtml} ${creditDisplay}</div></div></div></td>
                     <td class="py-3 px-3 text-right text-black  text-xs font-mono align-middle whitespace-nowrap">${d.phone || '-'} <i class="fas fa-chevron-right text-[10px] text-black ml-1"></i></td>
                 </tr>`;
@@ -5339,7 +5334,7 @@ let creditDisplay = `
             <tr class="border-b  dark: text-black  hover:bg-white : transition text-left">
                 <td class="py-2.5 px-3 text-[10px] text-black  align-top whitespace-nowrap">${dateStr}</td>
                 <td class="py-2.5 px-3 align-top">
-                    <p class="font-bold text-[#1da1f2] text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${log.driverId}')">${log.driverId}</p>
+                    <p class="font-bold text-brand text-[11px] cursor-pointer hover:underline" onclick="showDriverDetails('${log.driverId}')">${log.driverId}</p>
                     <p class="text-[10px] text-black  mt-0.5">${name}</p>
                 </td>
                 <td class="py-2.5 px-3 align-top">${tierBadge}</td>
@@ -7664,7 +7659,7 @@ let creditDisplay = `
 
         const catNames = {
             'driver': '<i class="fas fa-id-card "></i> หมวดหมู่จัดการคนขับ',
-            'passenger': '<i class="fas fa-user-friends text-[#1da1f2]"></i> หมวดหมู่ผู้โดยสาร',
+            'passenger': '<i class="fas fa-user-friends text-brand"></i> หมวดหมู่ผู้โดยสาร',
             'central': '<i class="fas fa-cogs text-black"></i> หมวดหมู่ระบบส่วนกลาง'
         };
 
@@ -7691,7 +7686,7 @@ let creditDisplay = `
                         <label class="block text-[9px] font-bold text-black mb-1">ซ่อน/แสดง</label>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="sr-only peer" ${item.visible ? 'checked' : ''} onchange="updateMenuVisibleState('${cat}', ${index}, this.checked)">
-                            <div class="w-8 h-4  peer-focus:outline-none rounded-full peer dark: peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after: after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#1da1f2]"></div>
+                            <div class="w-8 h-4  peer-focus:outline-none rounded-full peer dark: peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after: after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-brand"></div>
                         </label>
                     </div>
                 </div>`;
