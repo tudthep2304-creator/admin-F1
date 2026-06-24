@@ -8543,6 +8543,58 @@ let creditDisplay = `
             alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
         });
     };
+    // ========================================================
+    // 📊 ฟังก์ชัน Export ข้อมูลประวัติภารกิจเป็น CSV (Excel)
+    // ========================================================
+    window.exportAllQuestHistory = function() {
+        const tbody = document.getElementById('all-quest-history-tbody');
+        
+        // เช็คว่ามีข้อมูลในตารางหรือไม่
+        if (!tbody || tbody.rows.length === 0 || tbody.innerText.trim() === '') {
+            alert("ไม่มีข้อมูลประวัติภารกิจสำหรับ Export");
+            return;
+        }
+
+        // 1. ตั้งค่า BOM (\uFEFF) เพื่อให้เปิดใน Excel แล้วภาษาไทยไม่เพี้ยน
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+        
+        // 2. สร้าง Header ของตาราง (อ้างอิงจาก 1.txt)
+        csvContent += "วัน/เวลาที่สำเร็จ,ชื่อแคมเปญภารกิจ,คนขับ (PIN),สถานะ\r\n";
+
+        // 3. วนลูปดึงข้อมูลจากแต่ละแถว (Row) และคอลัมน์ (Column) ในตาราง
+        for (let i = 0; i < tbody.rows.length; i++) {
+            let row = tbody.rows[i];
+            let rowData = [];
+            
+            for (let j = 0; j < row.cells.length; j++) {
+                // ดึงข้อความ ลบช่องว่างหัวท้าย และเอาขึ้นบรรทัดใหม่ออกเพื่อให้ไม่พังใน CSV
+                let cellText = row.cells[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+                
+                // ถ้าในข้อความมีเครื่องหมายลูกน้ำ (,) ให้ครอบด้วยฟันหนู ("") ป้องกันคอลัมน์เลื่อน
+                if (cellText.includes(",")) {
+                    cellText = `"${cellText}"`;
+                }
+                rowData.push(cellText);
+            }
+            // นำแต่ละคอลัมน์มาต่อกันด้วยลูกน้ำ (,) แล้วขึ้นบรรทัดใหม่
+            csvContent += rowData.join(",") + "\r\n";
+        }
+
+        // 4. สร้างลิงก์จำลองสำหรับดาวน์โหลดไฟล์
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        
+        // 5. ตั้งชื่อไฟล์ พร้อมแนบวันที่ปัจจุบัน
+        const date = new Date();
+        const dateString = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}`;
+        link.setAttribute("download", `Quest_History_${dateString}.csv`);
+        
+        // 6. สั่งคลิกดาวน์โหลดและทำลายลิงก์ทิ้ง
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 </script>
 </body>
 </html>
