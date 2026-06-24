@@ -8533,9 +8533,14 @@ let creditDisplay = `
 
     // 6. บันทึกลง Firebase แล้วให้ระบบมันอัปเดตหน้าตาเอง
     window.saveMenuConfig = function() {
-        db.ref('system_settings/menu_config').set(window.menuConfigState).then(() => {
-            showCustomAlert('อัปเดตสำเร็จ', 'ตั้งค่าชื่อ ตำแหน่ง และการแสดงผลเมนูเรียบร้อยแล้ว!', 'success');
-            closeModal('modalMenuSettings');
+        db.ref('system_settings/menu_config').set(window.menuConfigState)
+        .then(() => {
+            alert('บันทึกการตั้งค่าเมนูเรียบร้อยแล้ว');
+            // หรือถ้ามีฟังก์ชันปิด Modal ก็สามารถเรียกตรงนี้ได้เลย
+        })
+        .catch((error) => {
+            console.error('Error saving menu:', error);
+            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
         });
     };
 </script>
