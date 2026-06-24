@@ -606,26 +606,30 @@
                 <input type="date" id="sh-filter-end" onchange="renderSocialHistoryTable()" class="w-full p-2.5 border-gray-200 bg-white border rounded-xl text-xs font-bold focus:outline-none focus:border-brand transition">
             </div>
             
-            <div class="relative w-full col-span-1 md:col-span-2 z-50">
-                <div class="w-full p-2.5 border-gray-200 bg-white border rounded-xl text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm hover:bg-gray-50 transition" onclick="this.nextElementSibling.classList.toggle('hidden')">
-                    <span id="sh-action-text"><i class="fas fa-filter text-brand"></i> แสดงทุกการกระทำ (4)</span>
-                    <i class="fas fa-chevron-down text-black"></i>
-                </div>
-                <div id="sh-action-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white border shadow-2xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
-                        <input type="checkbox" value="like" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-like"> <i class="fas fa-thumbs-up w-4 text-center text-like"></i> กดไลก์ (Like)
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
-                        <input type="checkbox" value="dislike" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-dislike"> <i class="fas fa-thumbs-down w-4 text-center text-dislike"></i> กดดิสไลก์ (Dislike)
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
-                        <input type="checkbox" value="follower" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-follower"> <i class="fas fa-user-plus w-4 text-center text-follower"></i> กดติดตาม (Follow)
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
-                        <input type="checkbox" value="share" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-blue-500"> <i class="fas fa-share w-4 text-center text-blue-500"></i> แชร์โปรไฟล์ (Share)
-                    </label>
-                </div>
-            </div>
+            <!-- 🌟 Custom Multi-Select Dropdown -->
+<div class="relative w-full col-span-1 md:col-span-2 z-50">
+    <!-- เพิ่ม id="sh-action-trigger" และแก้ onclick -->
+    <div id="sh-action-trigger" class="w-full p-2.5 border-gray-200 bg-white border rounded-xl text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm hover:bg-gray-50 transition" onclick="document.getElementById('sh-action-dd').classList.toggle('hidden')">
+        <span id="sh-action-text"><i class="fas fa-filter text-brand"></i> แสดงทุกการกระทำ (4)</span>
+        <i class="fas fa-chevron-down text-black"></i>
+    </div>
+    
+    <!-- ตัวดรอปดาวน์ -->
+    <div id="sh-action-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white border shadow-2xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+        <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+            <input type="checkbox" value="like" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-like"> <i class="fas fa-thumbs-up w-4 text-center text-like"></i> กดไลก์ (Like)
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+            <input type="checkbox" value="dislike" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-dislike"> <i class="fas fa-thumbs-down w-4 text-center text-dislike"></i> กดดิสไลก์ (Dislike)
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+            <input type="checkbox" value="follower" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-follower"> <i class="fas fa-user-plus w-4 text-center text-follower"></i> กดติดตาม (Follow)
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+            <input type="checkbox" value="share" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-blue-500"> <i class="fas fa-share w-4 text-center text-blue-500"></i> แชร์โปรไฟล์ (Share)
+        </label>
+    </div>
+</div>
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm">
@@ -8373,8 +8377,10 @@ let creditDisplay = `
 
     window.addEventListener('click', function(e) {
         let dd = document.getElementById('sh-action-dd');
-        let trigger = document.getElementById('sh-action-text');
-        if (dd && !dd.contains(e.target) && e.target !== trigger && !trigger.contains(e.target)) {
+        // เปลี่ยนมาล็อกเป้าที่ id กล่องคลุม (trigger) แทนตัวหนังสือ
+        let trigger = document.getElementById('sh-action-trigger'); 
+        
+        if (dd && trigger && !dd.contains(e.target) && !trigger.contains(e.target)) {
             dd.classList.add('hidden');
         }
     });
