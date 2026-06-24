@@ -8200,11 +8200,13 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
             
             let totalVotes = l + dl;
             let popularity = totalVotes > 0 ? ((l / totalVotes) * 100).toFixed(1) : 0;
-            let scoreForSorting = l - (dl * 2);
+            let scoreForSorting = l - (dl * 2); // ลบ f ออกจากสูตรแล้ว
 
             totalLikes += l;
             totalDislikes += dl;
-            if(l > 0 || dl > 0 || f > 0) activeDrivers++;
+            
+            // 🌟 จุดที่ 1 ที่แอบมี f ซ่อนอยู่ (ลบออกให้แล้ว)
+            if(l > 0 || dl > 0) activeDrivers++;
 
             allTempDrivers.push({
                 id: drvId,
@@ -8212,12 +8214,11 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                 tier: d.tier || 'New',
                 likes: l,
                 dislikes: dl,
-                followers: f,
+                // 🌟 จุดที่ 2 ที่แอบมี f ซ่อนอยู่ (ลบบรรทัด followers ออกให้แล้ว)
                 popularity: parseFloat(popularity),
                 score: scoreForSorting
             });
         }
-
         // 🌟 1. คำนวณอันดับที่แท้จริงจากคะแนน
         allTempDrivers.sort((a, b) => {
             if (b.score !== a.score) return b.score - a.score; // คะแนนมากอยู่บน
