@@ -1348,48 +1348,46 @@
           </div>
       </div>
     <section id="content-tier-settings" class="tab-content hidden space-y-4 pb-8 mt-2 h-full animate-fade-in">
-          <div class="border-gray-200 bg-white shadow-sm  border   p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col min-h-[calc(100vh-140px)]">
+          <div class="border border-gray-200 bg-white p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col min-h-[calc(100vh-140px)]">
               
-              <div class="flex justify-between items-center mb-6 pb-4 border-b  ">
+              <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
                   <div>
-                      <h2 class="text-base sm:text-lg font-black   flex items-center gap-2"><i class="fas fa-medal"></i> ฐานข้อมูลระดับชั้น (Central Tiers)</h2>
-                      <p class="text-xs text-black mt-1">ทุกระบบในแอปจะอ้างอิงรายชื่อและข้อมูลระดับชั้นจากหน้านี้เท่านั้น</p>
+                      <h2 class="text-base sm:text-lg font-black flex items-center gap-2"><i class="fas fa-medal text-brand"></i> ฐานข้อมูลระดับชั้น (Central Tiers)</h2>
+                      <p class="text-xs text-gray-500 mt-1">ทุกระบบในแอปจะอ้างอิงรายชื่อและข้อมูลระดับชั้นจากหน้านี้เท่านั้น</p>
                   </div>
-                  <button onclick="openTierModal()" class=" hover: text-black font-bold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 shrink-0">
+                  <button onclick="openTierModal()" class="bg-brand hover:bg-brand/80 text-white font-bold text-xs sm:text-sm px-4 py-2 sm:py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 shrink-0">
                       <i class="fas fa-plus"></i> <span class="hidden sm:inline">เพิ่มระดับชั้นใหม่</span>
                   </button>
               </div>
 
               <div id="tier-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  </div>
+              </div>
           </div>
       </section>
 
       <div id="modalTierForm" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
-          <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
-              <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm ">
-                  <h2 id="tier-modal-title" class="text-sm font-black  "><i class="fas fa-edit mr-1"></i> เพิ่มระดับชั้นใหม่</h2>
-                  <button onclick="closeModal('modalTierForm')" class="text-black hover:text-black "><i class="fas fa-times"></i></button>
+          <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+              <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center shrink-0">
+                  <h2 id="tier-modal-title" class="text-sm font-black text-black"><i class="fas fa-edit mr-1 text-brand"></i> เพิ่มระดับชั้นใหม่</h2>
+                  <button onclick="closeModal('modalTierForm')" class="text-gray-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200"><i class="fas fa-times"></i></button>
               </div>
               
               <div class="p-5 space-y-4">
                   <input type="hidden" id="tier-old-id" value="">
                   
                   <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">ชื่อระดับชั้น (Tier Name) <span class="">*</span></label>
-                      <input type="text" id="tier-input-name" placeholder="เช่น Standard, Gold, F1 Legend" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl text-sm font-bold outline-none focus:">
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3">
-                      <div>
-                          <label class="block text-[10px] font-bold text-black mb-1">ลำดับขั้น (1=ต่ำสุด, 2, 3...)</label>
-                          <input type="number" id="tier-input-level" placeholder="เช่น 1, 2, 3" value="1" class="w-full p-2.5 border-gray-200 bg-white shadow-sm   ] border   rounded-xl text-sm font-black text-center outline-none focus: shadow-inner">
-                      </div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ชื่อระดับชั้น (Tier Name) <span class="text-red-500">*</span></label>
+                      <input type="text" id="tier-input-name" placeholder="เช่น Standard, Gold, F1 Legend" class="w-full p-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold outline-none focus:border-brand transition shadow-sm">
                   </div>
 
                   <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">ธีมสีของป้ายระดับ (Badge Theme)</label>
-                      <select id="tier-input-theme" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl text-xs font-bold outline-none focus: shadow-sm cursor-pointer">
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ลำดับขั้น (1=ต่ำสุด, 2, 3...)</label>
+                      <input type="number" id="tier-input-level" placeholder="เช่น 1, 2, 3" value="1" class="w-full p-2.5 bg-white border border-gray-200 rounded-xl text-sm font-black text-center outline-none focus:border-brand transition shadow-inner">
+                  </div>
+
+                  <div>
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">ธีมสีของป้ายระดับ (Badge Theme)</label>
+                      <select id="tier-input-theme" class="w-full p-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none focus:border-brand transition shadow-sm cursor-pointer">
                           <option value="default">⬜ สีเทา (Standard / ทั่วไป)</option>
                           <option value="emerald">🟩 สีเขียว (New / ผู้ใช้ใหม่)</option>
                           <option value="slate">⬜ สีเงิน (Silver)</option>
@@ -1401,19 +1399,11 @@
                   </div>
 
                   <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">คำอธิบายเพิ่มเติม</label>
-                      <input type="text" id="tier-input-desc" placeholder="ใส่หรือไม่ใส่ก็ได้" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl text-xs outline-none focus:">
+                      <label class="block text-[10px] font-bold text-gray-500 mb-1">คำอธิบายเพิ่มเติม</label>
+                      <input type="text" id="tier-input-desc" placeholder="ใส่หรือไม่ใส่ก็ได้" class="w-full p-2.5 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:border-brand transition shadow-sm">
                   </div>
 
-                  <div class="border-gray-200 bg-white shadow-sm /60 p-3 rounded-xl border   space-y-2 text-left">
-                      <h4 class="text-[10px] font-black  ] uppercase"><i class="fas fa-magic"></i> กฎพิเศษสำหรับระดับนี้</h4>
-                      <label class="flex items-start gap-2 cursor-pointer">
-                          <input type="checkbox" id="tier-rule-reset" class="w-4 h-4 mt-0.5 accent-blue-500">
-                          <span class="text-[10px] font-bold text-black  leading-tight">รีเซ็ตคะแนน Social Score อัตโนมัติเมื่อเลื่อนขึ้นมาระดับนี้ (ล้างประวัติการถูกDislikeเดิมทั้งหมดให้เป็น 0)</span>
-                      </label>
-                  </div>
-
-                  <button onclick="saveTierData()" class="w-full py-3  hover: text-black font-bold rounded-xl text-sm shadow-md transition mt-2"><i class="fas fa-save mr-1"></i> บันทึกข้อมูล</button>
+                  <button onclick="saveTierData()" class="w-full py-3 bg-brand hover:bg-brand/80 text-white font-bold rounded-xl text-sm shadow-md transition mt-4"><i class="fas fa-save mr-1"></i> บันทึกข้อมูล</button>
               </div>
           </div>
       </div>
@@ -6870,34 +6860,30 @@ let creditDisplay = `
                     name: child.key, 
                     level: data.rankLevel || 1,
                     theme: data.badgeTheme || 'default', // 🌟 ดึงค่าธีมสี
-                    desc: data.description || 'ไม่มีคำอธิบาย',
-                    resetOnPromote: data.resetOnPromote || false
+                    desc: data.description || 'ไม่มีคำอธิบาย'
                 });
             });
 
             tiersList.sort((a, b) => a.level - b.level);
 
             tiersList.forEach((t) => {
-                // 🌟 เก็บข้อมูลลง RAM (ลบ rating และ isInvincible ออกแล้ว)
-                window.systemTiersMap[t.name] = { desc: t.desc, theme: t.theme, resetOnPromote: t.resetOnPromote };
+                // 🌟 เก็บข้อมูลลง RAM (ลบค่าอื่นๆ ที่ไม่ได้ใช้ออกหมดแล้ว)
+                window.systemTiersMap[t.name] = { desc: t.desc, theme: t.theme };
                 window.tierLevels[t.name] = t.level; 
 
-                let specialBadges = '';
-                if(t.resetOnPromote) specialBadges += `<span class="  px-1 py-0.5 rounded text-[8px] mr-1">รีเซ็ตคะแนน</span>`;
-
                 html += `
-                <div class="border-gray-200 bg-white shadow-sm /40 border   p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
+                <div class="border-gray-200 bg-white shadow-sm border p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400  rounded-full flex items-center justify-center text-lg shadow-sm"><i class="fas fa-medal"></i></div>
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400 rounded-full flex items-center justify-center text-lg shadow-sm"><i class="fas fa-medal"></i></div>
                         <div>
-                            <h3 class="font-black text-black  text-sm">LV.${t.level} : ${t.name}</h3>
+                            <h3 class="font-black text-black text-sm">LV.${t.level} : ${t.name}</h3>
                             <p class="text-[10px] text-black mb-1">${t.desc}</p>
-                            <div>${window.getTierBadgeHtml(t.name)} ${specialBadges}</div>
+                            <div>${window.getTierBadgeHtml(t.name)}</div>
                         </div>
                     </div>
                     <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.level}, '${t.theme}', ${t.resetOnPromote})" class="w-8 h-8   hover: hover:text-black rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
-                        <button onclick="deleteTierData('${t.name}')" class="w-8 h-8   hover: hover:text-black rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.level}, '${t.theme}')" class="w-8 h-8 hover:text-brand rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteTierData('${t.name}')" class="w-8 h-8 hover:text-red-500 rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
 
@@ -6923,28 +6909,26 @@ let creditDisplay = `
         if(typeof window.loadCentralOptionsForCommission === 'function') window.loadCentralOptionsForCommission();
     });
 
-    // 🌟 รับค่าธีมสี (theme) มาโชว์ในป๊อปอัป
-    window.openTierModal = function(id = '', desc = '', rating = 5.0, level = 1, theme = 'default', isReset = false, isInv = false) {
+    // 🌟 รับค่าข้อมูลมาโชว์ในป๊อปอัป (ลบ isReset ออกแล้ว)
+    window.openTierModal = function(id = '', desc = '', level = 1, theme = 'default') {
         document.getElementById('tier-old-id').value = id;
         document.getElementById('tier-input-name').value = id; 
         document.getElementById('tier-input-desc').value = desc;
         document.getElementById('tier-input-level').value = level; 
-        document.getElementById('tier-input-theme').value = theme; // 🌟 หยอดค่าธีม
-        document.getElementById('tier-rule-reset').checked = isReset; 
+        document.getElementById('tier-input-theme').value = theme; 
 
         document.getElementById('tier-modal-title').innerHTML = id ? '<i class="fas fa-edit mr-1"></i> แก้ไขระดับชั้น' : '<i class="fas fa-plus-circle mr-1"></i> เพิ่มระดับชั้นใหม่';
         openModal('modalTierForm');
     }
 
-    // 🌟 เซฟธีมสีลงฐานข้อมูล
+    // 🌟 เซฟข้อมูลลงฐานข้อมูล
     window.saveTierData = function() {
         let oldId = document.getElementById('tier-old-id').value;
         let newName = document.getElementById('tier-input-name').value.trim();
         let desc = document.getElementById('tier-input-desc').value.trim();
         let level = parseInt(document.getElementById('tier-input-level').value) || 1; 
-        let theme = document.getElementById('tier-input-theme').value; // 🌟 อ่านค่าธีม
-        let isReset = document.getElementById('tier-rule-reset').checked; 
-
+        let theme = document.getElementById('tier-input-theme').value; 
+        
         if(!newName) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ชื่อระดับชั้นด้วยครับ', 'error');
         if(/[.#$\[\]]/.test(newName)) return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้น', 'error');
 
@@ -6953,8 +6937,7 @@ let creditDisplay = `
         db.ref('config/tiers/' + newName).set({ 
             description: desc, 
             rankLevel: level, 
-            badgeTheme: theme, // 🌟 เซฟธีมสีลง Firebase!
-            resetOnPromote: isReset, 
+            badgeTheme: theme, 
             updatedAt: firebase.database.ServerValue.TIMESTAMP 
         }).then(() => {
             showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เรียบร้อยแล้ว`, 'success'); 
