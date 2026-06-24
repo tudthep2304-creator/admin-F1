@@ -385,17 +385,21 @@
       <section id="content-drivers" class="tab-content hidden space-y-4">
     <div class="card-container !space-y-0 w-full overflow-hidden">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 border-b border-gray-100 pb-4">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            
+            <div class="flex flex-row justify-between items-center w-full md:w-auto gap-2 sm:gap-4">
                 <div>
                     <h2 class="heading-main"><i class="fas fa-address-book text-brand"></i> ทำเนียบคนขับ</h2>
-                    <p class="text-xs text-gray-500 mt-1">จำนวนคนขับในระบบ: <span id="stat-total-drivers" class="font-bold text-brand text-sm">0</span> คน</p>
+                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1">จำนวนคนขับ: <span id="stat-total-drivers" class="font-bold text-brand text-sm">0</span> คน</p>
                 </div>
                 <div class="hidden sm:block w-px h-8 bg-gray-200"></div> 
-                <button onclick="openRegisterModal()" class="btn-standard !py-2 !px-4 hover:border-brand hover:text-brand hover:-translate-y-1 active:translate-y-0 w-max shrink-0">
+                
+                <button onclick="openRegisterModal()" class="btn-standard !py-1.5 sm:!py-2 !px-2.5 sm:!px-4 hover:border-brand hover:text-brand hover:-translate-y-1 active:translate-y-0 w-max shrink-0">
                     <i class="fas fa-user-plus text-brand"></i>
-                    <span>ลงทะเบียนคนขับใหม่</span>
+                    <span class="hidden sm:inline">ลงทะเบียนคนขับใหม่</span>
+                    <span class="inline sm:hidden text-[11px] font-bold">ลงทะเบียน</span>
                 </button>
             </div>
+            
             <div class="relative w-full md:w-64 shrink-0">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fas fa-search text-gray-400 text-[11px]"></i>
