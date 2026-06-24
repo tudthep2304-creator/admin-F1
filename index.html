@@ -806,138 +806,144 @@
     
     <!-- ================= หน้าข้อมูลส่วนตัวคนขับ (เปลี่ยนจาก Modal เป็นหน้า Page) ================= -->
 <section id="content-driver-details" class="tab-content hidden space-y-3 pb-8 mt-2">
-    <div class="flex justify-between items-center bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm">
-        <h2 class="text-sm font-black text-black flex items-center gap-2"><i class="fas fa-user-edit text-brand"></i> ข้อมูลพนักงาน</h2>
+    <div class="flex justify-between items-center bg-white border border-gray-200 hover:border-brand transition p-3 sm:p-4 rounded-xl shadow-sm">
+        <h2 class="text-[11px] font-medium text-black flex items-center gap-2"><i class="fas fa-user-edit text-brand"></i> ข้อมูลพนักงาน</h2>
         <div class="flex items-center gap-2">
             <div id="det-online-status"></div>
-            <div class="bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg font-medium flex items-center gap-1.5 text-xs sm:text-sm">
-                <i class="fas fa-car-side text-gray-500"></i> มีรถ <span id="det-vehicle-count" class="font-bold text-brand">0</span> คัน
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row gap-4 items-start">
-            <div class="relative w-20 h-20 rounded-xl border border-gray-200 flex items-center justify-center shadow-sm shrink-0 bg-gray-50 mx-auto sm:mx-0">
-                <img id="edit-drv-pic-preview" class="w-full h-full object-cover rounded-xl hidden cursor-pointer hover:opacity-90 transition" onclick="viewFullImage(this.src)" title="ดูรูปเต็ม">
-                <div id="edit-drv-pic-placeholder" class="text-gray-400 flex flex-col items-center">
-                    <i class="fas fa-user text-2xl"></i>
-                </div>
-                <button onclick="document.getElementById('edit-drv-pic-upload').click()" class="absolute -bottom-2 -right-2 bg-white text-gray-600 hover:text-brand w-7 h-7 rounded-full flex items-center justify-center shadow-md border border-gray-200 transition hover:scale-110 z-10" title="เปลี่ยนรูปโปรไฟล์">
-                    <i class="fas fa-camera text-[10px]"></i>
-                </button>
-                <input type="file" id="edit-drv-pic-upload" accept="image/*" class="hidden" onchange="window.processDriverImage(this, 'edit-drv-pic-preview', 'edit-drv-pic-placeholder')">
-            </div>
-            
-            <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3 min-w-0 w-full">
-                <div>
-                    <label class="block text-sm font-medium text-black mb-1">รหัสอ้างอิง (ID)</label>
-                    <input type="text" id="det-sys-id" readonly class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-light cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all text-center">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-black mb-1">วันที่เริ่มงาน</label>
-                    <input type="text" id="det-reg-date" readonly class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-light cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all text-center">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-black mb-1">เพศ (Gender)</label>
-                    <select id="det-gender" class="w-full p-2 bg-white border border-gray-200 rounded-lg outline-none text-sm font-light cursor-pointer hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all">
-                        <option value="male">ชาย</option>
-                        <option value="female">หญิง</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-black mb-1">เบอร์โทรศัพท์</label>
-                    <input type="tel" id="det-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-2 bg-white border border-gray-200 rounded-lg outline-none text-sm font-light cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all text-center">
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 border-t border-gray-100 pt-3 w-full">
-            <div>
-                <label class="block text-sm font-medium text-black mb-1">รหัสผ่านแอป (PIN)</label>
-                <input type="text" id="det-pin-input" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-2 bg-white border border-gray-200 rounded-lg outline-none text-sm font-light tracking-widest text-center cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-black mb-1">ชื่อจริง</label>
-                <input type="text" id="det-firstname" class="w-full p-2 bg-white border border-gray-200 rounded-lg outline-none text-sm font-light cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-black mb-1">นามสกุล</label>
-                <input type="text" id="det-lastname" class="w-full p-2 bg-white border border-gray-200 rounded-lg outline-none text-sm font-light cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all">
+            <div class="bg-gray-50 border border-gray-200 hover:border-brand transition px-2 py-1 rounded-lg font-medium flex items-center gap-1.5 text-[11px] cursor-default">
+                <i class="fas fa-car-side text-gray-500"></i> มีรถ <span id="det-vehicle-count" class="font-medium text-brand">0</span> คัน
             </div>
         </div>
     </div>
 
     <div class="bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm space-y-3">
-        <h3 class="text-sm font-medium text-gray-500 uppercase border-b border-gray-100 pb-2"><i class="fas fa-id-badge mr-1"></i> สถานะและกระเป๋าเงิน</h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="flex gap-4 items-center border-b border-gray-100 pb-3">
+            <div class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl border border-gray-200 hover:border-brand transition flex items-center justify-center shadow-sm shrink-0 bg-gray-50">
+                <img id="edit-drv-pic-preview" class="w-full h-full object-cover rounded-xl hidden cursor-pointer hover:opacity-90 transition" onclick="viewFullImage(this.src)" title="ดูรูปเต็ม">
+                <div id="edit-drv-pic-placeholder" class="text-gray-400 flex flex-col items-center">
+                    <i class="fas fa-user text-[24px]"></i>
+                </div>
+                <button onclick="document.getElementById('edit-drv-pic-upload').click()" class="absolute -bottom-2 -right-2 bg-white text-gray-600 hover:text-brand hover:border-brand w-6 h-6 rounded-full flex items-center justify-center shadow-md border border-gray-200 transition hover:scale-110 z-10" title="เปลี่ยนรูปโปรไฟล์">
+                    <i class="fas fa-camera text-[11px]"></i>
+                </button>
+                <input type="file" id="edit-drv-pic-upload" accept="image/*" class="hidden" onchange="window.processDriverImage(this, 'edit-drv-pic-preview', 'edit-drv-pic-placeholder')">
+            </div>
+            <div class="flex-1 grid grid-cols-2 gap-2 sm:gap-3 min-w-0">
                 <div>
-                    <label class="block text-sm font-medium text-black mb-1">ระดับชั้น (Tier)</label>
+                    <label class="block text-[11px] font-medium text-black mb-0.5">รหัสอ้างอิง (ID)</label>
+                    <input type="text" id="det-sys-id" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 border border-gray-200 rounded-lg outline-none text-[11px] font-medium cursor-text text-center tracking-wide text-gray-600 hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-medium text-black mb-0.5">วันที่เริ่มงาน</label>
+                    <input type="text" id="det-reg-date" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 border border-gray-200 rounded-lg outline-none text-[11px] font-medium cursor-text text-center text-gray-600 hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 sm:gap-3">
+            <div class="col-span-1">
+                <label class="block text-[11px] font-medium text-black mb-0.5">เพศ (Gender)</label>
+                <select id="det-gender" class="w-full p-1.5 sm:p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-[11px] font-medium hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition cursor-pointer">
+                    <option value="male">ชาย</option>
+                    <option value="female">หญิง</option>
+                </select>
+            </div>
+            <div class="col-span-1">
+                <label class="block text-[11px] font-medium text-black mb-0.5">เบอร์โทรศัพท์</label>
+                <input type="tel" id="det-phone" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-[11px] font-medium hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition text-center cursor-text">
+            </div>
+            <div class="col-span-1">
+                <label class="block text-[11px] font-medium text-black mb-0.5">รหัสผ่าน (PIN)</label>
+                <input type="text" id="det-pin-input" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-1.5 sm:p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-[11px] font-medium tracking-widest text-center hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition cursor-text">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+            <div>
+                <label class="block text-[11px] font-medium text-black mb-0.5">ชื่อจริง</label>
+                <input type="text" id="det-firstname" class="w-full p-1.5 sm:p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-[11px] font-medium hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition cursor-text">
+            </div>
+            <div>
+                <label class="block text-[11px] font-medium text-black mb-0.5">นามสกุล</label>
+                <input type="text" id="det-lastname" class="w-full p-1.5 sm:p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-[11px] font-medium hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition cursor-text">
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm space-y-3">
+        <h3 class="text-[11px] font-medium text-gray-500 uppercase border-b border-gray-100 pb-2"><i class="fas fa-id-badge mr-1"></i> สถานะและกระเป๋าเงิน</h3>
+        
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+            <div class="col-span-2 bg-gray-50 border border-gray-200 hover:border-brand transition p-3 rounded-lg grid grid-cols-2 gap-3 cursor-default">
+                <div>
+                    <label class="block text-[11px] font-medium text-black mb-1">ระดับชั้น (Tier)</label>
                     <div class="relative">
-                        <input type="text" id="det-tier-display" readonly class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-light cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all pr-7 text-center">
-                        <i class="fas fa-lock absolute right-3 top-3 text-gray-400 text-[10px]"></i>
+                        <input type="text" id="det-tier-display" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 border border-gray-200 rounded-lg outline-none text-[11px] font-medium cursor-text pr-7 text-center hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition">
+                        <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[11px]"></i>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-black mb-1">คะแนน (Social Score)</label>
-                    <div class="grid grid-cols-4 gap-2 h-[38px]">
-                        <div class="bg-white border border-gray-200 rounded-lg flex items-center justify-center gap-1.5 shadow-sm hover:border-brand transition cursor-pointer" title="Like">
-                            <i class="fas fa-thumbs-up text-[10px] text-like"></i><p id="det-likes" class="text-sm font-light text-like">0</p>
+                    <label class="block text-[11px] font-medium text-black mb-1">ความนิยม (Social Score)</label>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <div class="bg-white border border-gray-200 rounded-lg p-1.5 flex items-center justify-center gap-1 shadow-sm hover:border-brand transition cursor-default" title="Like">
+                            <i class="fas fa-thumbs-up text-[11px] text-like"></i>
+                            <p id="det-likes" class="text-[11px] font-medium text-like">0</p>
                         </div>
-                        <div class="bg-white border border-gray-200 rounded-lg flex items-center justify-center gap-1.5 shadow-sm hover:border-brand transition cursor-pointer" title="Dislike">
-                            <i class="fas fa-thumbs-down text-[10px] text-dislike"></i><p id="det-dislikes" class="text-sm font-light text-dislike">0</p>
+                        <div class="bg-white border border-gray-200 rounded-lg p-1.5 flex items-center justify-center gap-1 shadow-sm hover:border-brand transition cursor-default" title="Dislike">
+                            <i class="fas fa-thumbs-down text-[11px] text-dislike"></i>
+                            <p id="det-dislikes" class="text-[11px] font-medium text-dislike">0</p>
                         </div>
-                        <div class="bg-white border border-gray-200 rounded-lg flex items-center justify-center gap-1.5 shadow-sm hover:border-brand transition cursor-pointer" title="Follower">
-                            <i class="fas fa-user-plus text-[10px] text-follower"></i><p id="det-followers" class="text-sm font-light text-follower">0</p>
+                        <div class="bg-white border border-gray-200 rounded-lg p-1.5 flex items-center justify-center gap-1 shadow-sm hover:border-brand transition cursor-default" title="Follower">
+                            <i class="fas fa-user-plus text-[11px] text-follower"></i>
+                            <p id="det-followers" class="text-[11px] font-medium text-follower">0</p>
                         </div>
-                        <div class="bg-white border border-gray-200 rounded-lg flex items-center justify-center gap-1.5 shadow-sm hover:border-brand transition cursor-pointer" title="Share">
-                            <i class="fas fa-share text-[10px] text-blue-500"></i><p id="det-shares" class="text-sm font-light text-blue-500">0</p>
+                        <div class="bg-white border border-gray-200 rounded-lg p-1.5 flex items-center justify-center gap-1 shadow-sm hover:border-brand transition cursor-default" title="Share">
+                            <i class="fas fa-share text-[11px] text-blue-500"></i>
+                            <p id="det-shares" class="text-[11px] font-medium text-blue-500">0</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg grid grid-cols-2 gap-3">
+            <div class="col-span-2 bg-gray-50 border border-gray-200 hover:border-brand transition p-3 rounded-lg grid grid-cols-2 gap-3 cursor-default">
                 <div>
-                    <label class="block text-sm font-medium text-black mb-1">เงินสด (Cash <span class="text-green-600">฿</span>)</label>
+                    <label class="block text-[11px] font-medium text-black mb-1">เงินสด (Cash <span class="font-medium text-green-600">฿</span>)</label>
                     <div class="relative">
-                        <input type="text" id="det-cash" readonly class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-light text-green-600 cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all text-center pr-7 truncate">
-                        <i class="fas fa-lock absolute right-3 top-3 text-gray-400 text-[10px]"></i>
+                        <input type="text" id="det-cash" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 border border-gray-200 rounded-lg outline-none text-[11px] font-medium cursor-text text-center pr-7 truncate text-green-600 hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition">
+                        <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[11px]"></i>
                     </div>
                 </div>
                 <div class="relative">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-sm font-medium text-black">โบนัส (Bonus <span class="text-amber-500">฿</span>)</label>
-                        <button onclick="viewBonusLedger(currentDriverFocus)" class="text-[10px] font-medium text-gray-500 hover:text-brand hover:underline">รายละเอียด</button>
+                        <label class="block text-[11px] font-medium text-black">โบนัส (Bonus <span class="font-medium text-amber-500">฿</span>)</label>
+                        <button onclick="viewBonusLedger(currentDriverFocus)" class="text-[11px] font-medium text-gray-500 hover:text-brand hover:underline">รายละเอียด</button>
                     </div>
                     <div class="relative">
-                        <input type="text" id="det-bonus" readonly class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm font-light text-amber-500 cursor-text hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition-all text-center pr-7 truncate">
-                        <i class="fas fa-lock absolute right-3 top-3 text-gray-400 text-[10px]"></i>
+                        <input type="text" id="det-bonus" readonly class="w-full p-1.5 sm:p-2 bg-gray-100 border border-gray-200 rounded-lg outline-none text-[11px] font-medium cursor-text text-center pr-7 truncate text-amber-500 hover:border-brand focus:border-brand focus:ring-1 focus:ring-brand transition">
+                        <i class="fas fa-lock absolute right-2.5 top-2.5 text-gray-400 text-[11px]"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm">
+    <div class="bg-white border border-gray-200 hover:border-brand transition p-3 sm:p-4 rounded-xl shadow-sm">
         <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
-            <h3 class="text-sm font-medium text-gray-500 uppercase"><i class="fas fa-car mr-1"></i> ยานพาหนะ (Vehicles)</h3>
-            <button onclick="addDriverVehicle()" class="bg-white border border-gray-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-50 hover:border-brand transition shadow-sm"><i class="fas fa-plus text-brand"></i> เพิ่มรถ</button>
+            <h3 class="text-[11px] font-medium text-gray-500 uppercase"><i class="fas fa-car mr-1"></i> ยานพาหนะ (Vehicles)</h3>
+            <button onclick="addDriverVehicle()" class="bg-white border border-gray-200 px-3 py-1.5 rounded-lg text-[11px] font-medium hover:border-brand hover:text-brand transition shadow-sm"><i class="fas fa-plus text-brand"></i> เพิ่มรถ</button>
         </div>
         <div id="driver-vehicles-container" class="space-y-3"></div>
     </div>
 
     <div class="grid grid-cols-3 gap-2 pt-2">
-        <button onclick="warpToHistory()" class="bg-white border border-gray-200 hover:bg-gray-50 hover:border-brand hover:text-brand rounded-xl py-2.5 text-xs font-medium transition flex items-center justify-center text-gray-700 shadow-sm">ประวัติงาน</button>
-        <button onclick="warpToLogs()" class="bg-white border border-gray-200 hover:bg-gray-50 hover:border-brand hover:text-brand rounded-xl py-2.5 text-xs font-medium transition flex items-center justify-center text-gray-700 shadow-sm">ดู Log พิกัด</button>
-        <button id="btn-profile-block-action" onclick="openBlockDriverModal(currentDriverFocus)" class="bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-xl py-2.5 text-xs font-medium transition flex items-center justify-center text-gray-700 shadow-sm">บล็อกคนขับ</button>
+        <button onclick="warpToHistory()" class="bg-white border border-gray-200 hover:border-brand hover:text-brand rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center text-gray-700 shadow-sm cursor-pointer">ประวัติงาน</button>
+        <button onclick="warpToLogs()" class="bg-white border border-gray-200 hover:border-brand hover:text-brand rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center text-gray-700 shadow-sm cursor-pointer">ดู Log พิกัด</button>
+        <button id="btn-profile-block-action" onclick="openBlockDriverModal(currentDriverFocus)" class="bg-white border border-gray-200 hover:border-red-500 hover:text-red-500 rounded-xl py-2.5 text-[11px] font-medium transition flex items-center justify-center text-gray-700 shadow-sm cursor-pointer">บล็อกคนขับ</button>
     </div>
 
     <div class="grid grid-cols-2 gap-2 mt-2">
-        <button onclick="deleteDriverFromModal()" class="w-full py-3 bg-white border border-red-200 text-red-500 hover:bg-red-50 font-medium rounded-xl transition text-sm flex justify-center items-center gap-1.5 shadow-sm"><i class="fas fa-trash-alt"></i> ถอดพนักงาน</button>
-        <button onclick="window.saveDriverUpdates()" class="w-full py-3 bg-brand hover:bg-brand/90 text-white font-medium rounded-xl shadow-md transition text-sm flex justify-center items-center gap-1.5"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
+        <button onclick="deleteDriverFromModal()" class="w-full py-3 bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-500 font-medium rounded-xl transition text-[11px] flex justify-center items-center gap-1.5 shadow-sm cursor-pointer"><i class="fas fa-trash-alt"></i> ถอดพนักงาน</button>
+        <button onclick="window.saveDriverUpdates()" class="w-full py-3 bg-brand hover:bg-brand/90 text-white font-medium rounded-xl shadow-md transition text-[11px] flex justify-center items-center gap-1.5 cursor-pointer"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
     </div>
 </section>
     
