@@ -81,9 +81,9 @@
         @apply form-input bg-gray-100 text-gray-600;
       }
 
-      /* 5. กรอบข้อมูลหลัก (ชี้แล้วมีกรอบสีแดง) */
+      /* 5. กรอบข้อมูลหลัก (เอากรอบสีแดงตอน Hover ออก) */
       .card-container {
-        @apply bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm hover:border-brand transition-colors space-y-3;
+        @apply bg-white border border-gray-200 p-3 sm:p-4 rounded-xl shadow-sm space-y-3;
       }
 
       /* 6. ปุ่มกดมาตรฐาน */
@@ -94,6 +94,11 @@
       /* 7. กล่องสถิติย่อย (Like, Dislike ชี้แล้วขึ้นกรอบแดง) */
       .stat-box {
         @apply bg-white border border-gray-200 rounded-lg p-1.5 flex items-center justify-center gap-1 shadow-sm hover:border-brand transition-colors cursor-default;
+      }
+
+      /* 8. 🌟 คลาสสำหรับแถวตาราง (ชี้แล้วพื้นหลังเป็นสีแดงอ่อน ตัวหนังสือสีแดงแบรนด์) */
+      .table-row-item {
+        @apply cursor-pointer hover:bg-red-50 hover:text-brand transition-colors text-left border-b border-gray-100 last:border-0;
       }
     }
   </style>
@@ -378,7 +383,7 @@
       </section>
 
       <section id="content-drivers" class="tab-content hidden space-y-4">
-    <div class="card-container !space-y-0">
+    <div class="card-container !space-y-0 w-full overflow-hidden">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 border-b border-gray-100 pb-4">
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div>
@@ -398,8 +403,9 @@
                 <input type="text" id="search-driver-input" onkeyup="window.filterDrivers()" placeholder="ค้นหาพนักงาน..." class="form-input !pl-9">
             </div>
         </div>
-        <div class="w-full overflow-x-auto rounded-xl border border-gray-200 hide-scrollbar">
-            <table class="w-full text-left border-collapse min-w-[600px] sm:min-w-full text-[11px]">
+        
+        <div class="w-full max-w-full overflow-x-auto rounded-xl border border-gray-200 hide-scrollbar">
+            <table class="w-full text-left border-collapse min-w-[600px] text-[11px]">
                 <thead class="bg-gray-50 text-gray-500 uppercase font-bold border-b border-gray-200">
                     <tr>
                         <th class="py-3 px-4 w-32">ไอดีคนขับ</th>
@@ -410,6 +416,14 @@
                 <tbody id="all-drivers-table" class="font-medium divide-y divide-gray-100 bg-white transition-colors">
                 </tbody>
             </table>
+        </div>
+
+        <div class="flex justify-between items-center pt-4 mt-2 border-t border-gray-100">
+            <span id="drivers-page-info" class="text-[11px] text-gray-500 font-bold">กำลังแสดง...</span>
+            <div class="flex gap-2">
+                <button onclick="changeDriverPage(-1)" class="btn-standard !py-1.5 !px-3 shadow-sm">ก่อนหน้า</button>
+                <button onclick="changeDriverPage(1)" class="btn-standard !py-1.5 !px-3 shadow-sm">ถัดไป</button>
+            </div>
         </div>
     </div>
 </section>
@@ -4254,57 +4268,120 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         return themes[theme] || themes['default'];
     }
 
-    window.filterDrivers = function() {
-        let keyword = document.getElementById('search-driver-input').value.toLowerCase();
-        let rows = document.querySelectorAll('.driver-row-item');
-        rows.forEach(row => {
-            let text = row.innerText.toLowerCase();
-            row.style.display = text.includes(keyword) ? '' : 'none';
-        });
-    };
+    // 🌟 ตัวแปรระบบแบ่งหน้า (Pagination)
+    window.allDriversList = [];
+    window.currentDriverPage = 1;
+    window.driversPerPage = 50; // หน้าละ 50 รายการ
 
+    // 🌟 ฟังก์ชันช่วยสร้างป้ายสีระดับชั้น
+    if(typeof window.getTierBadgeHtml !== 'function') {
+        window.getTierBadgeHtml = function(tierName) {
+            let theme = 'default';
+            if(window.systemTiersMap && window.systemTiersMap[tierName]) {
+                theme = window.systemTiersMap[tierName].theme || 'default';
+            }
+            let colorClass = 'bg-gray-100 text-gray-600 border-gray-200'; // สีเทา
+            if(theme === 'emerald') colorClass = 'bg-emerald-50 text-emerald-600 border-emerald-200'; // เขียว
+            else if(theme === 'amber') colorClass = 'bg-amber-50 text-amber-600 border-amber-200'; // ทอง
+            else if(theme === 'blue') colorClass = 'bg-blue-50 text-blue-600 border-blue-200'; // ฟ้า
+            else if(theme === 'legend') colorClass = 'bg-purple-50 text-purple-600 border-purple-200'; // ม่วง
+            else if(theme === 'owner') colorClass = 'bg-gray-900 text-amber-400 border-gray-700'; // ดำ-ทอง
+            
+            return `<span class="border px-2 py-0.5 rounded text-[10px] font-bold shadow-sm ${colorClass}">${tierName}</span>`;
+        };
+    }
+
+    // 🌟 ดึงข้อมูลจากฐานข้อมูลมาเก็บไว้ใน RAM ครั้งเดียว
     db.ref('drivers_profile').on('value', snap => {
-        let table = document.getElementById('all-drivers-table'); 
-        let html = ''; let count = 0; allProfiles = snap.val() || {}; 
+        allProfiles = snap.val() || {};
+        window.allDriversList = [];
         
-        if(snap.exists() && table) {
-            snap.forEach(child => { 
-                count++; let d = child.val(); let displayId = child.key; 
-                
-                // 🌟 ดึงป้ายระดับชั้น
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let d = child.val();
+                d.id = child.key;
+                window.allDriversList.push(d);
+            });
+            // เรียงลำดับคนขับ (ถ้ามีเวลา) หรือปล่อยตามเดิม
+        }
+        window.currentDriverPage = 1;
+        window.renderDriversTable();
+    });
+
+    // 🌟 ฟังก์ชันวาดตาราง และแบ่งหน้า
+    window.renderDriversTable = function() {
+        let table = document.getElementById('all-drivers-table');
+        if(!table) return;
+
+        let keyword = document.getElementById('search-driver-input').value.toLowerCase();
+        let filteredList = window.allDriversList;
+        
+        // 1. กรองคำค้นหา
+        if(keyword) {
+            filteredList = filteredList.filter(d => 
+                (d.name && d.name.toLowerCase().includes(keyword)) ||
+                (d.phone && d.phone.includes(keyword)) ||
+                (d.id && d.id.toLowerCase().includes(keyword)) ||
+                (d.firstname && d.firstname.toLowerCase().includes(keyword))
+            );
+        }
+
+        // อัปเดตตัวเลขจำนวนคน
+        let statTotal = document.getElementById('stat-total-drivers');
+        if(statTotal) statTotal.innerText = filteredList.length;
+
+        // 2. คำนวณการแบ่งหน้า
+        let totalPages = Math.ceil(filteredList.length / window.driversPerPage) || 1;
+        if(window.currentDriverPage > totalPages) window.currentDriverPage = totalPages;
+        if(window.currentDriverPage < 1) window.currentDriverPage = 1;
+
+        let startIndex = (window.currentDriverPage - 1) * window.driversPerPage;
+        let endIndex = startIndex + window.driversPerPage;
+        let paginatedList = filteredList.slice(startIndex, endIndex);
+
+        let html = '';
+        if(paginatedList.length > 0) {
+            paginatedList.forEach(d => {
+                let displayId = d.id;
                 let tierBadgeHtml = window.getTierBadgeHtml(d.tier || 'New');
                 let genderIcon = d.gender === 'female' ? `<i class="fas fa-venus mx-1 text-pink-500" title="หญิง"></i>` : `<i class="fas fa-mars mx-1 text-blue-500" title="ชาย"></i>`;
                 
-                // 🌟 จัดการตัวเลขกระเป๋าเงิน
                 let rawCashVal = parseFloat(d.creditCash !== undefined ? d.creditCash : (d.credit || 0)); 
                 let rawBonusVal = parseFloat(d.creditBonus || 0);
 
-                // 🌟 ใส่สีให้ เครดิต(เขียว) และ โบนัส(ทอง)
-                let cashDisplay = `<span class="bg-green-50 text-green-600 border border-green-200 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 whitespace-nowrap shadow-sm">฿ ${rawCashVal.toLocaleString('en-US')}</span>`;
-                let bonusDisplay = `<span class="bg-amber-50 text-amber-500 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 whitespace-nowrap shadow-sm">★ ${rawBonusVal.toLocaleString('en-US')}</span>`;
+                let cashDisplay = `<span class="bg-green-50 text-green-600 border border-green-200 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 shadow-sm">฿ ${rawCashVal.toLocaleString('en-US')}</span>`;
+                let bonusDisplay = `<span class="bg-amber-50 text-amber-500 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 shadow-sm">★ ${rawBonusVal.toLocaleString('en-US')}</span>`;
                 
-                // 🌟 รูปโปรไฟล์
                 let profilePicHtml = d.profilePic ? 
                     `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border border-gray-200">` : 
                     `<div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 border border-gray-200 flex items-center justify-center shrink-0"><i class="fas fa-user text-[11px]"></i></div>`;
                 
-                // 🌟 สร้างแถวตาราง (Row) แบบใหม่ 3 คอลัมน์
+                // 🌟 แก้บั๊กวันที่เริ่มงาน (รองรับทั้ง regDate, createdAt, timestamp)
+                let regDateRaw = d.regDate || d.createdAt || d.timestamp || '';
+                let regDateDisplay = '-';
+                if(regDateRaw) {
+                    if(typeof regDateRaw === 'number') {
+                        regDateDisplay = new Date(regDateRaw).toLocaleString('th-TH').split(' ')[0]; // เอาเฉพาะวันที่
+                    } else {
+                        regDateDisplay = regDateRaw;
+                    }
+                }
+
+                // 🌟 เรียกใช้คลาส table-row-item ที่ตั้งไว้ใน CSS
                 html += `
-                <tr class="driver-row-item cursor-pointer hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-0" onclick="showDriverDetails('${displayId}')">
+                <tr class="table-row-item" onclick="showDriverDetails('${displayId}')">
                     <td class="py-3 px-4 w-32 align-middle">
                         <span class="bg-gray-50 text-brand border border-gray-200 px-2 py-1 rounded-lg text-[11px] font-black tracking-wider whitespace-nowrap shadow-sm">${displayId}</span>
                     </td>
-                    
                     <td class="py-3 px-4 align-middle">
                         <div class="flex items-center gap-3">
                             ${profilePicHtml}
                             <div class="flex flex-col min-w-0">
-                                <span class="font-bold text-black truncate max-w-[150px] sm:max-w-[250px]">${d.name} ${genderIcon}</span>
-                                <span class="text-gray-400 text-[9px] mt-0.5">วันที่เริ่มงาน: ${d.regDate || '-'}</span>
+                                <span class="font-bold truncate max-w-[150px] sm:max-w-[250px]">${d.name || d.firstname || 'ไม่ระบุชื่อ'} ${genderIcon}</span>
+                                <span class="text-gray-400 text-[9px] mt-0.5">วันที่เริ่มงาน: ${regDateDisplay}</span>
                             </div>
                         </div>
                     </td>
-                    
                     <td class="py-3 px-4 align-middle text-right">
                         <div class="flex flex-col items-end gap-1.5">
                             <div>${tierBadgeHtml}</div>
@@ -4316,14 +4393,32 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                     </td>
                 </tr>`;
             });
-            table.innerHTML = html;
-        } else if(table) { 
-            table.innerHTML = '<tr><td colspan="3" class="py-10 text-center text-gray-400 font-bold bg-gray-50 rounded-b-xl border-t border-gray-100">ยังไม่มีพนักงานในระบบ</td></tr>'; 
+        } else {
+            html = '<tr><td colspan="3" class="py-10 text-center text-gray-400 font-bold bg-gray-50 rounded-b-xl border-t border-gray-100">ไม่พบพนักงานที่ค้นหา</td></tr>';
         }
         
-        let statTotal = document.getElementById('stat-total-drivers'); if(statTotal) statTotal.innerText = count;
-        if(typeof renderSocialLeaderboard === 'function') renderSocialLeaderboard();
-    });
+        table.innerHTML = html;
+
+        // อัปเดตข้อความบอกหน้า
+        let pageInfo = document.getElementById('drivers-page-info');
+        if(pageInfo) {
+            let startText = filteredList.length === 0 ? 0 : startIndex + 1;
+            let endText = Math.min(endIndex, filteredList.length);
+            pageInfo.innerText = `กำลังแสดง ${startText}-${endText} จากทั้งหมด ${filteredList.length} รายการ`;
+        }
+    };
+
+    // 🌟 ระบบค้นหาแบบใหม่ พิมพ์ปุ๊บหาปั๊บ
+    window.filterDrivers = function() {
+        window.currentDriverPage = 1;
+        window.renderDriversTable();
+    };
+
+    // 🌟 กดปุ่มเปลี่ยนหน้า
+    window.changeDriverPage = function(dir) {
+        window.currentDriverPage += dir;
+        window.renderDriversTable();
+    };
 
     window.generateDriverId = function() {
         let rnd = Math.floor(100000 + Math.random() * 900000); 
