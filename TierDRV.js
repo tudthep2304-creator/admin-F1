@@ -7,22 +7,34 @@ window.systemTiersMap = {};
 window.tierLevels = {}; 
 
 // 🌟 ฟังก์ชันช่วยสร้างป้ายสีระดับชั้น
+// 🌟 ฟังก์ชันช่วยสร้างป้ายสีระดับชั้น (คืนชีพสีสันจัดเต็ม)
 window.getTierBadgeHtml = function(currentTier) {
     let tierName = currentTier || 'New';
     
-    // ดึงข้อมูลธีมสีจาก RAM ส่วนกลาง (ถ้าหาไม่เจอให้ใช้ default)
-    let tierData = window.systemTiersMap[tierName] || {};
-    let theme = tierData.theme || 'default';
+    // ดึงข้อมูลธีมสีจาก RAM ส่วนกลาง
+    let tierData = window.systemTiersMap ? window.systemTiersMap[tierName] : null;
+    let theme = tierData ? tierData.theme : 'default';
 
-    // คลังแสงดีไซน์ป้ายกำกับ
+    // ดักไว้: ถ้าเป็นคนขับใหม่ (New) แล้วยังไม่มีการตั้งค่า ให้สาดป้ายสีเขียวเหนี่ยวทรัพย์ใส่เลย
+    if (tierName === 'New' && theme === 'default') {
+        theme = 'emerald';
+    }
+
+    // 🎨 คลังแสงแม่สีป้ายกำกับ (ดีไซน์ใหม่ สีเด้งๆ)
     const themes = {
-        'default': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold text-black border whitespace-nowrap">${tierName}</span>`,
-        'emerald': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold border-gray-200 bg-white shadow-sm border whitespace-nowrap">🔰 ${tierName}</span>`,
-        'slate': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold text-black border whitespace-nowrap">${tierName}</span>`,
-        'amber': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold border-gray-200 bg-white shadow-sm border whitespace-nowrap">${tierName}</span>`,
-        'blue': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-black border border-cyan-300 shadow-sm whitespace-nowrap"><i class="far fa-gem mr-0.5"></i>${tierName}</span>`,
-        'legend': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-black border shadow-[0_0_10px_rgba(219,39,119,0.7)] whitespace-nowrap uppercase tracking-wider"><i class="fas fa-fire mr-1"></i>${tierName}</span>`,
-        'owner': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-gray-900 text-black border shadow-[0_0_12px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap uppercase tracking-wider"><i class="fas fa-crown mr-1"></i>${tierName}</span>`
+        'default': `<span class="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded text-[10px] font-bold shadow-sm whitespace-nowrap">${tierName}</span>`,
+        
+        'emerald': `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold shadow-sm whitespace-nowrap">🔰 ${tierName}</span>`,
+        
+        'slate': `<span class="bg-slate-100 text-slate-600 border border-slate-300 px-2 py-0.5 rounded text-[10px] font-bold shadow-sm whitespace-nowrap">${tierName}</span>`,
+        
+        'amber': `<span class="bg-amber-50 text-amber-600 border border-amber-300 px-2 py-0.5 rounded text-[10px] font-bold shadow-sm whitespace-nowrap">⭐ ${tierName}</span>`,
+        
+        'blue': `<span class="bg-blue-50 text-blue-600 border border-blue-300 px-2 py-0.5 rounded text-[10px] font-bold shadow-sm whitespace-nowrap"><i class="far fa-gem mr-0.5"></i>${tierName}</span>`,
+        
+        'legend': `<span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white border border-pink-400 px-2 py-0.5 rounded text-[10px] font-black shadow-md whitespace-nowrap uppercase tracking-wider"><i class="fas fa-fire mr-1"></i>${tierName}</span>`,
+        
+        'owner': `<span class="bg-gradient-to-r from-gray-900 to-yellow-600 text-yellow-400 border border-yellow-500 px-2 py-0.5 rounded text-[10px] font-black shadow-md whitespace-nowrap uppercase tracking-wider"><i class="fas fa-crown mr-1"></i>${tierName}</span>`
     };
 
     return themes[theme] || themes['default'];
