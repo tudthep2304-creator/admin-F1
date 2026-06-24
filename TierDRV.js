@@ -97,6 +97,8 @@ db.ref('config/tiers').on('value', snap => {
     if(document.getElementById('quest-reward-tier')) document.getElementById('quest-reward-tier').innerHTML = rewardTierHtml;
 
     if(typeof window.loadCentralOptionsForCommission === 'function') window.loadCentralOptionsForCommission();
+    if(typeof window.renderDriversTable === 'function') window.renderDriversTable();
+    if(typeof window.renderSocialLeaderboard === 'function') window.renderSocialLeaderboard();
 });
 
 // 🌟 เปิดป๊อปอัปแก้ไขระดับชั้น
