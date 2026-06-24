@@ -4356,16 +4356,19 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                     `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border border-gray-200">` : 
                     `<div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 border border-gray-200 flex items-center justify-center shrink-0"><i class="fas fa-user text-[11px]"></i></div>`;
                 
-                // 🌟 แก้บั๊กวันที่เริ่มงาน (รองรับทั้ง regDate, createdAt, timestamp)
-                let regDateRaw = d.regDate || d.createdAt || d.timestamp || '';
+                // 🌟 แก้บั๊กวันที่เริ่มงาน (ดึงจาก det-reg-date ตามฐานข้อมูล)
+                let regDateRaw = d['det-reg-date'] || d.regDate || d.createdAt || d.timestamp || '';
                 let regDateDisplay = '-';
+
                 if(regDateRaw) {
-                    if(typeof regDateRaw === 'number') {
-                        regDateDisplay = new Date(regDateRaw).toLocaleString('th-TH').split(' ')[0]; // เอาเฉพาะวันที่
+                if(typeof regDateRaw === 'number') {
+                // กรณีบันทึกเป็นตัวเลข Timestamp
+                regDateDisplay = new Date(regDateRaw).toLocaleString('th-TH').split(' ')[0]; 
                     } else {
-                        regDateDisplay = regDateRaw;
-                    }
-                }
+              // กรณีบันทึกเป็นข้อความ String (เช่น 20/05/2026)
+                    regDateDisplay = regDateRaw;
+                  }
+                 }
 
                 // 🌟 เรียกใช้คลาส table-row-item ที่ตั้งไว้ใน CSS
                 html += `
