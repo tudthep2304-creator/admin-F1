@@ -577,12 +577,16 @@
                 <div><p class="text-[10px] text-gray-500 font-bold">ยอด Like รวมทั้งระบบ</p><p id="social-stat-total-likes" class="text-sm font-black text-like">0</p></div>
             </div>
             <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3 hover:shadow-md transition">
+                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-lg"><i class="fas fa-share"></i></div>
+                <div><p class="text-[10px] text-gray-500 font-bold">ยอด Share รวม</p><p id="social-stat-total-shares" class="text-sm font-black text-blue-500">0</p></div>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3 hover:shadow-md transition">
                 <div class="w-10 h-10 rounded-full bg-dislike/10 text-dislike flex items-center justify-center text-lg"><i class="fas fa-thumbs-down"></i></div>
                 <div><p class="text-[10px] text-gray-500 font-bold">ยอด Dislike รวม</p><p id="social-stat-total-dislikes" class="text-sm font-black text-dislike">0</p></div>
             </div>
             <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3 hover:shadow-md transition">
                 <div class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg"><i class="fas fa-trophy"></i></div>
-                <div><p class="text-[10px] text-gray-500 font-bold">จำนวนคนขับที่มี Like</p><p id="social-stat-active-drivers" class="text-sm font-black text-amber-500">0</p></div>
+                <div><p class="text-[10px] text-gray-500 font-bold">จำนวนคนขับที่มีคะแนน</p><p id="social-stat-active-drivers" class="text-sm font-black text-amber-500">0</p></div>
             </div>
         </div>
 
@@ -608,6 +612,9 @@
                             </th>
                             <th class="py-3 px-4 text-center cursor-pointer hover:opacity-80 transition" onclick="sortSocialLeaderboard('dislikes')">
                                 <i class="fas fa-thumbs-down text-dislike"></i> Dislike <i id="sort-icon-dislikes" class="fas fa-sort text-gray-400 ml-1"></i>
+                            </th>
+                            <th class="py-3 px-4 text-center cursor-pointer hover:opacity-80 transition" onclick="sortSocialLeaderboard('shares')">
+                                <i class="fas fa-share text-blue-500"></i> Share <i id="sort-icon-shares" class="fas fa-sort text-gray-400 ml-1"></i>
                             </th>
                             <th class="py-3 px-4 text-center cursor-pointer hover:text-brand transition" onclick="sortSocialLeaderboard('popularity')">
                                 เปอร์เซ็นต์ <i id="sort-icon-popularity" class="fas fa-sort text-gray-400 ml-1"></i>
@@ -8191,32 +8198,28 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         let keyword = document.getElementById('social-search-input')?.value.toLowerCase() || '';
         
         let allTempDrivers = [];
-        let totalLikes = 0, totalDislikes = 0, totalFollowers = 0, activeDrivers = 0;
+        let totalLikes = 0, totalDislikes = 0, totalShares = 0, activeDrivers = 0;
 
         for(let drvId in allProfiles) {
             let d = allProfiles[drvId];
             let l = parseInt(d.likes) || 0;
             let dl = parseInt(d.dislikes) || 0;
+            let s = parseInt(d.shares) || 0;
             
+            // เปอร์เซ็นต์คิดจากแค่ Like กับ Dislike
             let totalVotes = l + dl;
             let popularity = totalVotes > 0 ? ((l / totalVotes) * 100).toFixed(1) : 0;
-            let scoreForSorting = l - (dl * 2); // ลบ f ออกจากสูตรแล้ว
+            let scoreForSorting = l - (dl * 2); // Share ไม่ส่งผลต่ออันดับ
 
             totalLikes += l;
             totalDislikes += dl;
-            
-            // 🌟 จุดที่ 1 ที่แอบมี f ซ่อนอยู่ (ลบออกให้แล้ว)
-            if(l > 0 || dl > 0) activeDrivers++;
+            totalShares += s;
+            if(l > 0 || dl > 0 || s > 0) activeDrivers++;
 
             allTempDrivers.push({
-                id: drvId,
-                name: d.name || 'ไม่ทราบชื่อ',
-                tier: d.tier || 'New',
-                likes: l,
-                dislikes: dl,
-                // 🌟 จุดที่ 2 ที่แอบมี f ซ่อนอยู่ (ลบบรรทัด followers ออกให้แล้ว)
-                popularity: parseFloat(popularity),
-                score: scoreForSorting
+                id: drvId, name: d.name || 'ไม่ทราบชื่อ', tier: d.tier || 'New',
+                likes: l, dislikes: dl, shares: s,
+                popularity: parseFloat(popularity), score: scoreForSorting
             });
         }
         // 🌟 1. คำนวณอันดับที่แท้จริงจากคะแนน
@@ -8238,6 +8241,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
 
         let elL = document.getElementById('social-stat-total-likes'); if(elL) elL.innerText = totalLikes.toLocaleString();
         let elD = document.getElementById('social-stat-total-dislikes'); if(elD) elD.innerText = totalDislikes.toLocaleString();
+        let elS = document.getElementById('social-stat-total-shares'); if(elS) elS.innerText = totalShares.toLocaleString();
         let elA = document.getElementById('social-stat-active-drivers'); if(elA) elA.innerText = activeDrivers.toLocaleString();
 
         window.currentSocialPage = 1;
@@ -8255,9 +8259,9 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
             window.currentSocialSort.order = column === 'rank' ? 'asc' : 'desc';
         }
 
-        ['rank', 'likes', 'dislikes', 'followers', 'popularity'].forEach(col => {
+        ['rank', 'likes', 'dislikes', 'shares', 'popularity'].forEach(col => {
             let icon = document.getElementById('sort-icon-' + col);
-            if(icon) icon.className = 'fas fa-sort text-black ml-1';
+            if(icon) icon.className = 'fas fa-sort text-gray-400 ml-1';
         });
 
         let activeIcon = document.getElementById('sort-icon-' + column);
@@ -8321,9 +8325,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                 <tr onclick="openSocialHistoryModal('${d.id}', '${d.name}')" class="cursor-pointer border-b   hover:border-gray-200 bg-white shadow-sm : transition text-[11px] text-left">
                     <td class="py-2.5 px-4 text-center font-bold text-black ">#${actualRank}</td>
                     <td class="py-2.5 px-4">
-                        <p class="font-bold text-black  transition flex items-center gap-1.5">
-                            ${d.name}
-                        </p>
+                        <p class="font-bold text-black  transition flex items-center gap-1.5">${d.name}</p>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span class="text-[9px] text-black font-mono">ID: ${d.id}</span>
                             ${tierBadgeHtml}
@@ -8331,6 +8333,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                     </td>
                     <td class="py-2.5 px-4 text-center font-black text-like">${d.likes.toLocaleString()}</td>
                     <td class="py-2.5 px-4 text-center font-black text-dislike">${d.dislikes.toLocaleString()}</td>
+                    <td class="py-2.5 px-4 text-center font-black text-blue-500">${d.shares.toLocaleString()}</td>
                     <td class="py-2.5 px-4 text-center">
                         <span class="${ratioColor}">${(d.likes + d.dislikes) > 0 ? d.popularity + '%' : '-'}</span>
                     </td>
