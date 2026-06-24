@@ -4239,6 +4239,33 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         setTimeout(() => { document.getElementById('fullImageViewerSrc').src = ''; }, 200); 
     }
 
+    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
+    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
+    // ================= 🌟 ระบบการจัดการรายชื่อพนักงาน =================
+    window.getTierBadgeHtml = function(currentTier) {
+        let tierName = currentTier || 'New';
+        
+        // 🌟 ดึงข้อมูลธีมสีจาก RAM ส่วนกลาง (ถ้าหาไม่เจอให้ใช้ default)
+        let tierData = window.systemTiersMap[tierName] || {};
+        let theme = tierData.theme || 'default';
+
+        // 🌟 คลังแสงดีไซน์ป้ายกำกับ (เปลี่ยนชื่อระดับอะไรมา ดีไซน์ก็จะเกาะติดไปตลอด)
+        const themes = {
+            'default': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold  text-black   border   whitespace-nowrap">${tierName}</span>`,
+            
+            'emerald': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold border-gray-200 bg-white shadow-sm  border  whitespace-nowrap">🔰 ${tierName}</span>`,
+            
+            'slate': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold  text-black   border  whitespace-nowrap">${tierName}</span>`,
+            
+            'amber': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold border-gray-200 bg-white shadow-sm    border  whitespace-nowrap">${tierName}</span>`,
+            
+            'blue': `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-black border border-cyan-300 shadow-sm whitespace-nowrap"><i class="far fa-gem mr-0.5"></i>${tierName}</span>`,
+            
+            'legend': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-black border  shadow-[0_0_10px_rgba(219,39,119,0.7)] whitespace-nowrap uppercase tracking-wider"><i class="fas fa-fire  mr-1"></i>${tierName}</span>`,
+            
+            'owner': `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-gradient-to-r from-gray-900 via-yellow-600 to-gray-900 text-black border  shadow-[0_0_12px_rgba(234,179,8,0.8)] animate-pulse whitespace-nowrap uppercase tracking-wider"><i class="fas fa-crown  mr-1"></i>${tierName}</span>`
+        };
+
         return themes[theme] || themes['default'];
     }
 
@@ -6966,6 +6993,124 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
     window.loadCentralOptionsForCommission();
 
     // ========================================================
+    // 🌟 ระบบจัดการระดับชั้นส่วนกลาง (Centralized Tier Management)
+    // ========================================================
+    if(typeof tabTitles !== 'undefined') { tabTitles['tier-settings'] = 'ศูนย์กลางจัดการระดับชั้น (Tiers)'; }
+
+    window.systemTiersMap = {}; 
+    window.tierLevels = {}; 
+
+    db.ref('config/tiers').on('value', snap => {
+        let container = document.getElementById('tier-list-container');
+        if(!container) return;
+        
+        let html = ''; let questTierHtml = ''; let adjustModalHtml = '';
+        let airdropHtml = '<option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>';
+        let filterBlockedHtml = '<option value="all">ทุกระดับชั้น</option>';
+        let filterQuestHtml = '<option value="all">เป้าหมาย: ทุกระดับชั้น</option>';
+        let rewardTierHtml = '<option value="none">-- ไม่เลื่อน --</option>';
+
+        window.systemTiersMap = {}; window.tierLevels = {};
+        let tiersList = [];
+
+        if(snap.exists()) {
+            snap.forEach(child => {
+                let data = child.val();
+                tiersList.push({ 
+                    name: child.key, 
+                    level: data.rankLevel || 1,
+                    theme: data.badgeTheme || 'default', // 🌟 ดึงค่าธีมสี
+                    desc: data.description || 'ไม่มีคำอธิบาย'
+                });
+            });
+
+            tiersList.sort((a, b) => a.level - b.level);
+
+            tiersList.forEach((t) => {
+                // 🌟 เก็บข้อมูลลง RAM (ลบค่าอื่นๆ ที่ไม่ได้ใช้ออกหมดแล้ว)
+                window.systemTiersMap[t.name] = { desc: t.desc, theme: t.theme };
+                window.tierLevels[t.name] = t.level; 
+
+                html += `
+                <div class="border-gray-200 bg-white shadow-sm border p-4 rounded-xl flex justify-between items-center hover:shadow-md transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-400 rounded-full flex items-center justify-center text-lg shadow-sm"><i class="fas fa-medal"></i></div>
+                        <div>
+                            <h3 class="font-black text-black text-sm">LV.${t.level} : ${t.name}</h3>
+                            <p class="text-[10px] text-black mb-1">${t.desc}</p>
+                            <div>${window.getTierBadgeHtml(t.name)}</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="openTierModal('${t.name}', '${t.desc}', ${t.level}, '${t.theme}')" class="w-8 h-8 hover:text-brand rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteTierData('${t.name}')" class="w-8 h-8 hover:text-red-500 rounded-lg transition text-xs flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+
+                questTierHtml += `<label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-black "><input type="checkbox" value="${t.name}" class="quest-target-tier w-4 h-4 accent-amber-500" onchange="updateQuestDropdownText()"> ${t.name}</label>`;
+                adjustModalHtml += `<option value="${t.name}">${t.name}</option>`;
+                airdropHtml += `<option value="${t.name}">🎁 แจกเฉพาะกลุ่ม ${t.name}</option>`;
+                filterBlockedHtml += `<option value="${t.name}">เฉพาะ ${t.name}</option>`;
+                filterQuestHtml += `<option value="${t.name}">เฉพาะ ${t.name}</option>`;
+                rewardTierHtml += `<option value="${t.name}">เลื่อนเป็น ${t.name}</option>`;
+            });
+        }
+        
+        container.innerHTML = html || '<div class="col-span-full py-10 text-center text-black font-bold">ยังไม่มีข้อมูลระดับชั้นในระบบ</div>';
+        
+        if(document.getElementById('quest-target-tier-container')) document.getElementById('quest-target-tier-container').innerHTML = questTierHtml;
+        if(document.getElementById('trm-tier-select')) document.getElementById('trm-tier-select').innerHTML = adjustModalHtml;
+        if(document.getElementById('airdrop-tier-select')) document.getElementById('airdrop-tier-select').innerHTML = airdropHtml;
+        if(document.getElementById('filter-blocked-tier')) document.getElementById('filter-blocked-tier').innerHTML = filterBlockedHtml;
+        if(document.getElementById('abh-filter-tier')) document.getElementById('abh-filter-tier').innerHTML = filterBlockedHtml;
+        if(document.getElementById('filter-quest-tier')) document.getElementById('filter-quest-tier').innerHTML = filterQuestHtml;
+        if(document.getElementById('quest-reward-tier')) document.getElementById('quest-reward-tier').innerHTML = rewardTierHtml;
+
+        if(typeof window.loadCentralOptionsForCommission === 'function') window.loadCentralOptionsForCommission();
+    });
+
+    // 🌟 รับค่าข้อมูลมาโชว์ในป๊อปอัป (ลบ isReset ออกแล้ว)
+    window.openTierModal = function(id = '', desc = '', level = 1, theme = 'default') {
+        document.getElementById('tier-old-id').value = id;
+        document.getElementById('tier-input-name').value = id; 
+        document.getElementById('tier-input-desc').value = desc;
+        document.getElementById('tier-input-level').value = level; 
+        document.getElementById('tier-input-theme').value = theme; 
+
+        document.getElementById('tier-modal-title').innerHTML = id ? '<i class="fas fa-edit mr-1"></i> แก้ไขระดับชั้น' : '<i class="fas fa-plus-circle mr-1"></i> เพิ่มระดับชั้นใหม่';
+        openModal('modalTierForm');
+    }
+
+    // 🌟 เซฟข้อมูลลงฐานข้อมูล
+    window.saveTierData = function() {
+        let oldId = document.getElementById('tier-old-id').value;
+        let newName = document.getElementById('tier-input-name').value.trim();
+        let desc = document.getElementById('tier-input-desc').value.trim();
+        let level = parseInt(document.getElementById('tier-input-level').value) || 1; 
+        let theme = document.getElementById('tier-input-theme').value; 
+        
+        if(!newName) return showCustomAlert('ข้อมูลไม่ครบ', 'กรุณาพิมพ์ชื่อระดับชั้นด้วยครับ', 'error');
+        if(/[.#$\[\]]/.test(newName)) return showCustomAlert('ชื่อไม่ถูกต้อง', 'ห้ามใช้สัญลักษณ์พิเศษ ( . # $ [ ] ) ในชื่อระดับชั้น', 'error');
+
+        if(oldId && oldId !== newName) db.ref('config/tiers/' + oldId).remove();
+
+        db.ref('config/tiers/' + newName).set({ 
+            description: desc, 
+            rankLevel: level, 
+            badgeTheme: theme, 
+            updatedAt: firebase.database.ServerValue.TIMESTAMP 
+        }).then(() => {
+            showCustomAlert('บันทึกสำเร็จ', `อัปเดตระดับชั้น ${newName} เรียบร้อยแล้ว`, 'success'); 
+            closeModal('modalTierForm');
+        });
+    }
+
+    window.deleteTierData = function(tierName) {
+        showCustomConfirm('ยืนยันลบระดับชั้น?', `หากลบระดับ ${tierName} กฎคอมมิชชันที่ผูกกับระดับนี้อาจทำงานผิดพลาดได้!`, () => {
+            db.ref('config/tiers/' + tierName).remove().then(() => { showCustomAlert('ลบสำเร็จ', 'นำระดับชั้นออกจากระบบส่วนกลางแล้ว', 'success'); });
+        }, 'ลบข้อมูล', 'red');
+    }
+    // ========================================================
     // 🌟 ระบบแคมเปญร้านค้าพาร์ทเนอร์ (B2B Partner Campaigns & Approvals) - อัปเกรดจำกัดสิทธิ์
     // ========================================================
     let allPartnerCampaigns = {};
@@ -8552,7 +8697,6 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         });
     };
 </script>
-  <script src="js/TierDRV.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsZ_tbFhH6fUXRz3I6C-tMshNwwrSevd4&libraries=places,geometry&callback=initAdminMap" async defer></script>
 </body>
 </html>
