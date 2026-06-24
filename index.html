@@ -4309,7 +4309,6 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
     });
 
     // 🌟 ฟังก์ชันวาดตาราง และแบ่งหน้า
-    // 🌟 ฟังก์ชันวาดตาราง และแบ่งหน้า
     window.renderDriversTable = function() {
         let table = document.getElementById('all-drivers-table');
         if(!table) return;
@@ -4357,8 +4356,22 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                     `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border border-gray-200">` : 
                     `<div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 border border-gray-200 flex items-center justify-center shrink-0"><i class="fas fa-user text-[11px]"></i></div>`;
                 
-                // 🌟 แก้ไขตรงนี้: ดึงข้อมูลจาก d.registeredAt ที่มีอยู่ในฐานข้อมูลอยู่แล้ว!
-                let regDateDisplay = d.registeredAt ? new Date(d.registeredAt).toLocaleDateString('th-TH') : '-';
+                // 🌟 ระบบแปลงวันที่แบบครอบคลุม: ดึงจาก Firebase ป้องกันค่า NaN 100%
+                let rawDate = d.registeredAt || d.timestamp || d.createdAt || null;
+                let regDateDisplay = '<span class="text-gray-400 font-medium">ไม่ระบุ</span>';
+                
+                if (rawDate) {
+                    let dt = new Date(rawDate);
+                    // เช็คให้ชัวร์ว่าแปลงเป็นเวลาได้สำเร็จ (ไม่เป็น NaN)
+                    if (!isNaN(dt.getTime())) {
+                        let dDay = dt.getDate().toString().padStart(2, '0');
+                        let dMonth = (dt.getMonth() + 1).toString().padStart(2, '0');
+                        let dYear = (dt.getFullYear() + 543).toString().slice(-2); // แปลงเป็น พ.ศ. 2 หลัก
+                        let dHour = dt.getHours().toString().padStart(2, '0');
+                        let dMin = dt.getMinutes().toString().padStart(2, '0');
+                        regDateDisplay = `${dDay}/${dMonth}/${dYear} ${dHour}:${dMin}`;
+                    }
+                }
                 
                 html += `
                 <tr class="table-row-item" onclick="showDriverDetails('${displayId}')">
