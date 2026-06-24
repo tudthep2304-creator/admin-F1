@@ -4309,6 +4309,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
     });
 
     // 🌟 ฟังก์ชันวาดตาราง และแบ่งหน้า
+    // 🌟 ฟังก์ชันวาดตาราง และแบ่งหน้า
     window.renderDriversTable = function() {
         let table = document.getElementById('all-drivers-table');
         if(!table) return;
@@ -4356,21 +4357,9 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                     `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border border-gray-200">` : 
                     `<div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 border border-gray-200 flex items-center justify-center shrink-0"><i class="fas fa-user text-[11px]"></i></div>`;
                 
-                // 🌟 แก้บั๊กวันที่เริ่มงาน (ดึงจาก det-reg-date ตามฐานข้อมูล)
-                let regDateRaw = d['det-reg-date'] || d.regDate || d.createdAt || d.timestamp || '';
-                let regDateDisplay = '-';
-
-                if(regDateRaw) {
-                if(typeof regDateRaw === 'number') {
-                // กรณีบันทึกเป็นตัวเลข Timestamp
-                regDateDisplay = new Date(regDateRaw).toLocaleString('th-TH').split(' ')[0]; 
-                    } else {
-              // กรณีบันทึกเป็นข้อความ String (เช่น 20/05/2026)
-                    regDateDisplay = regDateRaw;
-                  }
-                 }
-
-                // 🌟 เรียกใช้คลาส table-row-item ที่ตั้งไว้ใน CSS
+                // 🌟 แก้ไขตรงนี้: ดึงข้อมูลจาก d.registeredAt ที่มีอยู่ในฐานข้อมูลอยู่แล้ว!
+                let regDateDisplay = d.registeredAt ? new Date(d.registeredAt).toLocaleDateString('th-TH') : '-';
+                
                 html += `
                 <tr class="table-row-item" onclick="showDriverDetails('${displayId}')">
                     <td class="py-3 px-4 w-32 align-middle">
@@ -4402,7 +4391,6 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
         
         table.innerHTML = html;
 
-        // อัปเดตข้อความบอกหน้า
         let pageInfo = document.getElementById('drivers-page-info');
         if(pageInfo) {
             let startText = filteredList.length === 0 ? 0 : startIndex + 1;
