@@ -4840,37 +4840,40 @@ let creditDisplay = `
     window.closeDriverProfilePage = function() { switchTab('drivers', true); }
 
     window.renderDriverVehicles = function() {
-        let container = document.getElementById('driver-vehicles-container'); let html = '';
+        let container = document.getElementById('driver-vehicles-container'), html = '';
         for (let vId in window.currentDriverVehicles) {
             let v = window.currentDriverVehicles[vId];
             
-            let selectHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] font-normal focus: truncate transition">`;
-            
+            let selHtml = `<select id="v-type-${vId}" onchange="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 bg-white border border-gray-200 rounded-lg outline-none text-[11px] text-black transition">`;
             if (window.systemVehicleTypes && window.systemVehicleTypes.length > 0) {
-                window.systemVehicleTypes.forEach(vt => { let sel = (v.serviceType === vt.id) ? 'selected' : ''; selectHtml += `<option value="${vt.id}" ${sel}>${vt.name}</option>`; });
+                window.systemVehicleTypes.forEach(vt => { selHtml += `<option value="${vt.id}" ${(v.serviceType === vt.id) ? 'selected' : ''}>${vt.name}</option>`; });
             } else { 
-                // 🌟 ล้างการฮาร์ดโค้ดออก! เปลี่ยนเป็นข้อความแจ้งเตือนแทน
-                selectHtml += `<option value="" disabled selected>ไม่พบประเภทรถ (กำลังโหลด...)</option>`; 
+                selHtml += `<option value="" disabled selected>ไม่พบประเภทรถ (กำลังโหลด...)</option>`; 
             }
-            selectHtml += `</select>`;
+            selHtml += `</select>`;
+
+            // 🌟 รวบยอดคลาสที่ใช้ซ้ำๆ ให้เป็นตัวแปร เพื่อประหยัดบรรทัดและคลีนโค้ด
+            let lblCls = "block text-[11px] font-medium text-black mb-0.5";
+            let inpCls = "w-full p-1.5 sm:p-2 bg-white border border-gray-200 rounded-lg text-[11px] text-black outline-none transition";
 
             html += `
-            <div class="border-gray-200 bg-white shadow-sm  p-3 rounded-xl border   shadow-sm relative transition-colors duration-300 min-w-0">
-                <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3  hover:   w-6 h-6 rounded-lg flex items-center justify-center transition shadow-sm border  "><i class="fas fa-trash-alt text-[10px]"></i></button>
+            <div class="bg-white border border-gray-200 p-3 rounded-xl shadow-sm relative transition min-w-0">
+                <button onclick="removeTempVehicle('${vId}')" class="absolute top-3 right-3 w-6 h-6 hover:text-red-500 rounded-lg flex items-center justify-center transition"><i class="fas fa-trash-alt text-[10px]"></i></button>
                 <div class="space-y-2 pr-6">
-                    <div class="grid grid-cols-3 gap-2"> <div><label class="block text-[11px] font-medium text-black  mb-0.5">ประเภทรถ</label>${selectHtml}</div>
-                        <div><label class="block text-[11px] font-medium text-black  mb-0.5">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg text-[11px] font-normal outline-none transition"></div>
-                        <div><label class="block text-[11px] font-medium text-black  mb-0.5">รุ่นรถ</label><input type="text" id="v-model-${vId}" value="${v.model||''}" oninput="updateTempVehicle('${vId}')" placeholder="เช่น City" class="w-full p-1.5 sm:p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg text-[11px] font-normal outline-none transition"></div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div><label class="${lblCls}">ประเภทรถ</label>${selHtml}</div>
+                        <div><label class="${lblCls}">ยี่ห้อ</label><input type="text" id="v-brand-${vId}" value="${v.brand||''}" oninput="updateTempVehicle('${vId}')" class="${inpCls}"></div>
+                        <div><label class="${lblCls}">รุ่นรถ</label><input type="text" id="v-model-${vId}" value="${v.model||''}" oninput="updateTempVehicle('${vId}')" class="${inpCls}"></div>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <div><label class="block text-[11px] font-medium text-black  mb-0.5">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg text-[11px] font-normal outline-none transition"></div>
-                        <div><label class="block text-[11px] font-medium text-black  mb-0.5">ป้ายทะเบียน</label><input type="text" id="v-plate-${vId}" value="${v.plate||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg text-[11px] font-normal outline-none transition"></div>
-                        <div><label class="block text-[11px] font-medium text-black  mb-0.5">จังหวัด</label><input type="text" id="v-province-${vId}" value="${v.province||''}" oninput="updateTempVehicle('${vId}')" class="w-full p-1.5 sm:p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg text-[11px] font-normal outline-none transition"></div>
+                        <div><label class="${lblCls}">สีรถ</label><input type="text" id="v-color-${vId}" value="${v.color||''}" oninput="updateTempVehicle('${vId}')" class="${inpCls}"></div>
+                        <div><label class="${lblCls}">ป้ายทะเบียน</label><input type="text" id="v-plate-${vId}" value="${v.plate||''}" oninput="updateTempVehicle('${vId}')" class="${inpCls}"></div>
+                        <div><label class="${lblCls}">จังหวัด</label><input type="text" id="v-province-${vId}" value="${v.province||''}" oninput="updateTempVehicle('${vId}')" class="${inpCls}"></div>
                     </div>
                 </div>
             </div>`;
         }
-        container.innerHTML = html || '<p class="text-center text-[11px] text-black py-4 border-gray-200 bg-white shadow-sm /50 rounded-xl border border-dashed  ">ไม่มีรถที่ลงทะเบียน</p>';
+        container.innerHTML = html || '<p class="text-center text-[11px] text-gray-500 py-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">ไม่มีรถที่ลงทะเบียน</p>';
     }
 
     window.addDriverVehicle = function() {
