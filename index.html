@@ -385,16 +385,15 @@
       <section id="content-drivers" class="tab-content hidden space-y-4">
     <div class="card-container !space-y-0 w-full overflow-hidden">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 border-b border-gray-100 pb-4">
-            <div class="flex flex-row justify-between items-center w-full md:w-auto gap-2 sm:gap-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div>
                     <h2 class="heading-main"><i class="fas fa-address-book text-brand"></i> ทำเนียบคนขับ</h2>
-                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1">จำนวนในระบบ: <span id="stat-total-drivers" class="font-bold text-brand text-[11px] sm:text-sm">0</span> คน</p>
+                    <p class="text-xs text-gray-500 mt-1">จำนวนคนขับในระบบ: <span id="stat-total-drivers" class="font-bold text-brand text-sm">0</span> คน</p>
                 </div>
                 <div class="hidden sm:block w-px h-8 bg-gray-200"></div> 
-                <button onclick="openAddDriverModal()" class="btn-standard !py-1.5 sm:!py-2 !px-2.5 sm:!px-4 hover:border-brand hover:text-brand hover:-translate-y-1 active:translate-y-0 shrink-0 flex items-center gap-1.5">
-                    <i class="fas fa-user-plus text-brand text-sm"></i>
-                    <span class="hidden sm:inline">ลงทะเบียนคนขับใหม่</span>
-                    <span class="inline sm:hidden text-[10px] font-bold">เพิ่มคนขับ</span>
+                <button onclick="openRegisterModal()" class="btn-standard !py-2 !px-4 hover:border-brand hover:text-brand hover:-translate-y-1 active:translate-y-0 w-max shrink-0">
+                    <i class="fas fa-user-plus text-brand"></i>
+                    <span>ลงทะเบียนคนขับใหม่</span>
                 </button>
             </div>
             <div class="relative w-full md:w-64 shrink-0">
@@ -4310,6 +4309,7 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
     });
 
     // 🌟 ฟังก์ชันวาดตาราง และแบ่งหน้า
+    // 🌟 ฟังก์ชันวาดตาราง และแบ่งหน้า
     window.renderDriversTable = function() {
         let table = document.getElementById('all-drivers-table');
         if(!table) return;
@@ -4357,22 +4357,8 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
                     `<img src="${d.profilePic}" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border border-gray-200">` : 
                     `<div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 border border-gray-200 flex items-center justify-center shrink-0"><i class="fas fa-user text-[11px]"></i></div>`;
                 
-                // 🌟 ระบบแปลงวันที่แบบครอบคลุม: ดึงจาก Firebase ป้องกันค่า NaN 100%
-                let rawDate = d.registeredAt || d.timestamp || d.createdAt || null;
-                let regDateDisplay = '<span class="text-gray-400 font-medium">ไม่ระบุ</span>';
-                
-                if (rawDate) {
-                    let dt = new Date(rawDate);
-                    // เช็คให้ชัวร์ว่าแปลงเป็นเวลาได้สำเร็จ (ไม่เป็น NaN)
-                    if (!isNaN(dt.getTime())) {
-                        let dDay = dt.getDate().toString().padStart(2, '0');
-                        let dMonth = (dt.getMonth() + 1).toString().padStart(2, '0');
-                        let dYear = (dt.getFullYear() + 543).toString().slice(-2); // แปลงเป็น พ.ศ. 2 หลัก
-                        let dHour = dt.getHours().toString().padStart(2, '0');
-                        let dMin = dt.getMinutes().toString().padStart(2, '0');
-                        regDateDisplay = `${dDay}/${dMonth}/${dYear} ${dHour}:${dMin}`;
-                    }
-                }
+                // 🌟 แก้ไขตรงนี้: ดึงข้อมูลจาก d.registeredAt ที่มีอยู่ในฐานข้อมูลอยู่แล้ว!
+                let regDateDisplay = d.registeredAt ? new Date(d.registeredAt).toLocaleDateString('th-TH') : '-';
                 
                 html += `
                 <tr class="table-row-item" onclick="showDriverDetails('${displayId}')">
