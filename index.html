@@ -513,122 +513,119 @@
           </div>
       </section>
     <section id="content-social-management" class="tab-content hidden h-full flex flex-col animate-fade-in">
-        <div class="p-4 sm:p-6 border-b   border-gray-200 bg-white shadow-sm  shrink-0">
-            <h1 class="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600   flex items-center gap-2">
-                <i class="fas fa-medal "></i> กระดานผู้นำระบบ Social
-            </h1>
-            <p class="text-[11px] sm:text-xs text-black  mt-1">ตรวจสอบสถิติความนิยม ไลค์ ดิสไลค์ และผู้ติดตามของคนขับทั้งหมด</p>
+    <div class="p-4 sm:p-6 border-b border-gray-200 bg-white shadow-sm shrink-0">
+        <h1 class="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center gap-2">
+            <i class="fas fa-medal"></i> กระดานผู้นำระบบ Social
+        </h1>
+        <p class="text-[11px] sm:text-xs text-black mt-1">ตรวจสอบสถิติความนิยม ไลค์ ดิสไลค์ และผู้ติดตามของคนขับทั้งหมด</p>
+    </div>
+
+    <div class="p-4 shrink-0 grid grid-cols-2 md:grid-cols-4 gap-3 border-gray-200 bg-white shadow-sm">
+        <div class="border-gray-200 bg-white p-3 rounded-xl border shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-like/10 text-like flex items-center justify-center text-lg"><i class="fas fa-thumbs-up"></i></div>
+            <div><p class="text-[10px] text-black">ยอดไลค์รวมทั้งระบบ</p><p id="social-stat-total-likes" class="text-sm font-black text-like">0</p></div>
+        </div>
+        <div class="border-gray-200 bg-white p-3 rounded-xl border shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-follower/10 text-follower flex items-center justify-center text-lg"><i class="fas fa-user-plus"></i></div>
+            <div><p class="text-[10px] text-black">ยอดผู้ติดตามรวม</p><p id="social-stat-total-followers" class="text-sm font-black text-follower">0</p></div>
+        </div>
+        <div class="border-gray-200 bg-white p-3 rounded-xl border shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-dislike/10 text-dislike flex items-center justify-center text-lg"><i class="fas fa-thumbs-down"></i></div>
+            <div><p class="text-[10px] text-black">ยอดดิสไลค์รวม</p><p id="social-stat-total-dislikes" class="text-sm font-black text-dislike">0</p></div>
+        </div>
+        <div class="border-gray-200 bg-white p-3 rounded-xl border shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg"><i class="fas fa-trophy"></i></div>
+            <div><p class="text-[10px] text-black">จำนวนคนขับที่มีไลค์</p><p id="social-stat-active-drivers" class="text-sm font-black text-amber-500">0</p></div>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-4 slim-scroll">
+        <div class="pb-3 flex justify-between items-center shrink-0">
+            <div class="relative w-full sm:w-64">
+                <input type="text" id="social-search-input" onkeyup="renderSocialLeaderboard()" placeholder="ค้นหาชื่อ หรือ รหัส PIN..." class="w-full border-gray-200 bg-white text-black text-xs font-bold border rounded-xl pl-9 pr-4 py-2 outline-none focus:border-brand transition shadow-sm">
+                <i class="fas fa-search absolute left-3 top-2.5 text-black text-[10px]"></i>
+            </div>
+            <div class="text-[10px] text-black font-bold hidden sm:block">เรียงอันดับจาก: <span class="text-brand">คะแนนความนิยม</span></div>
         </div>
 
-        <div class="p-4 shrink-0 grid grid-cols-2 md:grid-cols-4 gap-3 border-gray-200 bg-white shadow-sm ">
-            <div class="border-gray-200 bg-white shadow-sm  p-3 rounded-xl border   shadow-sm flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full   flex items-center justify-center text-lg"><i class="fas fa-thumbs-up"></i></div>
-                <div><p class="text-[10px] text-black">ยอดไลค์รวมทั้งระบบ</p><p id="social-stat-total-likes" class="text-sm font-black text-black ">0</p></div>
-            </div>
-            <div class="border-gray-200 bg-white shadow-sm  p-3 rounded-xl border   shadow-sm flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full   flex items-center justify-center text-lg"><i class="fas fa-user-plus"></i></div>
-                <div><p class="text-[10px] text-black">ยอดผู้ติดตามรวม</p><p id="social-stat-total-followers" class="text-sm font-black text-black ">0</p></div>
-            </div>
-            <div class="border-gray-200 bg-white shadow-sm  p-3 rounded-xl border   shadow-sm flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full   flex items-center justify-center text-lg"><i class="fas fa-thumbs-down"></i></div>
-                <div><p class="text-[10px] text-black">ยอดดิสไลค์รวม</p><p id="social-stat-total-dislikes" class="text-sm font-black text-black ">0</p></div>
-            </div>
-            <div class="border-gray-200 bg-white shadow-sm  p-3 rounded-xl border   shadow-sm flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full   flex items-center justify-center text-lg"><i class="fas fa-trophy"></i></div>
-                <div><p class="text-[10px] text-black">จำนวนคนขับที่มีไลค์</p><p id="social-stat-active-drivers" class="text-sm font-black text-black ">0</p></div>
-            </div>
+        <div class="border-gray-200 bg-white rounded-xl border shadow-sm overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse min-w-[850px]">
+                <thead class="border-b text-black text-[11px] uppercase font-bold select-none">
+                    <tr>
+                        <th class="py-3 px-4 w-20 text-center cursor-pointer hover:opacity-80 transition" onclick="sortSocialLeaderboard('rank')">
+                            อันดับ <i id="sort-icon-rank" class="fas fa-sort-up ml-1"></i>
+                        </th>
+                        <th class="py-3 px-4">คนขับ</th>
+                        <th class="py-3 px-4 text-center cursor-pointer hover:opacity-80 transition" onclick="sortSocialLeaderboard('likes')">
+                            <i class="fas fa-thumbs-up text-like"></i> ไลค์ <i id="sort-icon-likes" class="fas fa-sort text-black ml-1"></i>
+                        </th>
+                        <th class="py-3 px-4 text-center cursor-pointer hover:opacity-80 transition" onclick="sortSocialLeaderboard('dislikes')">
+                            <i class="fas fa-thumbs-down text-dislike"></i> ดิสไลค์ <i id="sort-icon-dislikes" class="fas fa-sort text-black ml-1"></i>
+                        </th>
+                        <th class="py-3 px-4 text-center cursor-pointer hover:opacity-80 transition" onclick="sortSocialLeaderboard('followers')">
+                            <i class="fas fa-user-plus text-follower"></i> ผู้ติดตาม <i id="sort-icon-followers" class="fas fa-sort text-black ml-1"></i>
+                        </th>
+                        <th class="py-3 px-4 text-center cursor-pointer hover:opacity-80 transition" onclick="sortSocialLeaderboard('popularity')">
+                            เปอร์เซ็นต์ <i id="sort-icon-popularity" class="fas fa-sort text-black ml-1"></i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="social-leaderboard-tbody" class="text-sm divide-y divide-gray-100 border-gray-200 bg-white">
+                </tbody>
+            </table>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-4 slim-scroll">
-            <div class="pb-3 flex justify-between items-center shrink-0">
-                <div class="relative w-full sm:w-64">
-                    <input type="text" id="social-search-input" onkeyup="renderSocialLeaderboard()" placeholder="ค้นหาชื่อ หรือ รหัส PIN..." class="w-full border-gray-200 bg-white shadow-sm  text-black  text-xs font-bold border   rounded-xl pl-9 pr-4 py-2 outline-none focus: transition shadow-sm">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-black text-[10px]"></i>
+        <div id="social-pagination-container" class="hidden flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
+            <span class="text-[11px] text-black font-bold" id="social-page-info">กำลังแสดง 1-50 จากทั้งหมด 0 รายการ</span>
+            <div class="flex gap-2">
+                <button id="btn-social-prev" onclick="changeSocialPage(-1)" class="px-3 py-1.5 border-gray-200 bg-white border text-black rounded-lg text-xs font-bold hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
+                </button>
+                <button id="btn-social-next" onclick="changeSocialPage(1)" class="px-3 py-1.5 border-gray-200 bg-white border text-black rounded-lg text-xs font-bold hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    ถัดไป <i class="fas fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="modalSocialHistory" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
+    <div class="border-gray-200 bg-white border rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in">
+        <div class="p-4 border-b flex justify-between items-center border-gray-200 bg-white shrink-0">
+            <h2 class="text-base font-black flex items-center gap-2">
+                <i class="fas fa-list-ul"></i> ประวัติการโต้ตอบ: <span id="sh-drv-name" class="text-brand ml-1">ชื่อคนขับ</span>
+            </h2>
+            <button onclick="closeModal('modalSocialHistory')" class="text-black hover:text-red-500 rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="p-4 border-gray-200 bg-gray-50 border-b grid grid-cols-1 md:grid-cols-3 gap-3 shrink-0">
+            <div class="flex items-center gap-2">
+                <input type="date" id="sh-filter-start" onchange="renderSocialHistoryTable()" class="w-full p-2.5 border-gray-200 bg-white border rounded-xl text-xs font-bold focus:outline-none focus:border-brand transition">
+                <span class="text-black font-bold">-</span>
+                <input type="date" id="sh-filter-end" onchange="renderSocialHistoryTable()" class="w-full p-2.5 border-gray-200 bg-white border rounded-xl text-xs font-bold focus:outline-none focus:border-brand transition">
+            </div>
+            
+            <div class="relative w-full col-span-1 md:col-span-2">
+                <div class="w-full p-2.5 border-gray-200 bg-white border rounded-xl text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('sh-action-dd').classList.toggle('hidden')">
+                    <span id="sh-action-text"><i class="fas fa-filter text-brand"></i> แสดงทุกการกระทำ (4)</span>
+                    <i class="fas fa-chevron-down text-black"></i>
                 </div>
-                <div class="text-[10px] text-black font-bold hidden sm:block">เรียงอันดับจาก: <span class="">คะแนนความนิยม</span></div>
-            </div>
-
-            <div class="border-gray-200 bg-white shadow-sm  rounded-xl border   shadow-sm overflow-x-auto w-full">
-                <table class="w-full text-left border-collapse min-w-[850px]">
-                    <thead class="  border-b   text-black  text-[11px] uppercase font-bold select-none">
-                        <tr>
-                            <th class="py-3 px-4 w-20 text-center cursor-pointer hover: : transition" onclick="sortSocialLeaderboard('rank')">
-                                อันดับ <i id="sort-icon-rank" class="fas fa-sort-up  ml-1"></i>
-                            </th>
-                            <th class="py-3 px-4">คนขับ</th>
-                            <th class="py-3 px-4 text-center  cursor-pointer hover: : transition" onclick="sortSocialLeaderboard('likes')">
-                                <i class="fas fa-thumbs-up"></i> ไลค์ <i id="sort-icon-likes" class="fas fa-sort text-black ml-1"></i>
-                            </th>
-                            <th class="py-3 px-4 text-center  cursor-pointer hover: : transition" onclick="sortSocialLeaderboard('dislikes')">
-                                <i class="fas fa-thumbs-down"></i> ดิสไลค์ <i id="sort-icon-dislikes" class="fas fa-sort text-black ml-1"></i>
-                            </th>
-                            <th class="py-3 px-4 text-center  cursor-pointer hover: : transition" onclick="sortSocialLeaderboard('followers')">
-                                <i class="fas fa-user-plus"></i> ผู้ติดตาม <i id="sort-icon-followers" class="fas fa-sort text-black ml-1"></i>
-                            </th>
-                            <th class="py-3 px-4 text-center cursor-pointer hover: : transition" onclick="sortSocialLeaderboard('popularity')">
-                                เปอร์เซ็นต์ <i id="sort-icon-popularity" class="fas fa-sort text-black ml-1"></i>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="social-leaderboard-tbody" class="text-sm divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="social-pagination-container" class="hidden flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
-                <span class="text-[11px] text-black font-bold" id="social-page-info">กำลังแสดง 1-50 จากทั้งหมด 0 รายการ</span>
-                <div class="flex gap-2">
-                    <button id="btn-social-prev" onclick="changeSocialPage(-1)" class="px-3 py-1.5 border-gray-200 bg-white shadow-sm  border   text-black  rounded-lg text-xs font-bold hover: : transition disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i class="fas fa-chevron-left mr-1"></i> ก่อนหน้า
-                    </button>
-                    <button id="btn-social-next" onclick="changeSocialPage(1)" class="px-3 py-1.5 border-gray-200 bg-white shadow-sm  border   text-black  rounded-lg text-xs font-bold hover: : transition disabled:opacity-50 disabled:cursor-not-allowed">
-                        ถัดไป <i class="fas fa-chevron-right ml-1"></i>
-                    </button>
+                <div id="sh-action-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white border shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+                        <input type="checkbox" value="like" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-like"> <i class="fas fa-thumbs-up w-4 text-center text-like"></i> กดไลก์ (Like)
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+                        <input type="checkbox" value="dislike" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-dislike"> <i class="fas fa-thumbs-down w-4 text-center text-dislike"></i> กดดิสไลก์ (Dislike)
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+                        <input type="checkbox" value="follower" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-follower"> <i class="fas fa-user-plus w-4 text-center text-follower"></i> กดติดตาม (Follow)
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black hover:bg-gray-100 p-1.5 rounded transition">
+                        <input type="checkbox" value="share" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-blue-500"> <i class="fas fa-share w-4 text-center text-blue-500"></i> แชร์โปรไฟล์ (Share)
+                    </label>
                 </div>
             </div>
-          </div>
-    </section>
-
-    <!-- 🌟 หน้าต่างตรวจสอบประวัติการกด Social ของคนขับ -->
-  <div id="modalSocialHistory" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
-              <h2 class="text-base font-black   flex items-center gap-2">
-                  <i class="fas fa-list-ul"></i> ประวัติการโต้ตอบ: <span id="sh-drv-name" class="text-black  ml-1">ชื่อคนขับ</span>
-              </h2>
-              <button onclick="closeModal('modalSocialHistory')" class="text-black hover:text-black     rounded-full w-8 h-8 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
-          </div>
-          
-          <!-- 🌟 แผงตัวกรองข้อมูล (Filters) -->
-          <div class="p-4 border-gray-200 bg-white shadow-sm /40 border-b   grid grid-cols-1 md:grid-cols-3 gap-3 shrink-0">
-              <div class="flex items-center gap-2">
-                  <input type="date" id="sh-filter-start" onchange="renderSocialHistoryTable()" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-xl text-xs font-bold focus: outline-none transition">
-                  <span class="text-black font-bold">-</span>
-                  <input type="date" id="sh-filter-end" onchange="renderSocialHistoryTable()" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-xl text-xs font-bold focus: outline-none transition">
-              </div>
-              
-              <!-- 🌟 Custom Multi-Select Dropdown -->
-              <div class="relative w-full col-span-1 md:col-span-2">
-                  <div class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-xl text-xs font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('sh-action-dd').classList.toggle('hidden')">
-                      <span id="sh-action-text" class=" "><i class="fas fa-filter"></i> แสดงทุกการกระทำ (4)</span>
-                      <i class="fas fa-chevron-down text-black"></i>
-                  </div>
-                  <div id="sh-action-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black  hover:border-gray-200 bg-white shadow-sm : p-1.5 rounded transition">
-                          <input type="checkbox" value="like" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-emerald-500"> <i class="fas fa-thumbs-up  w-4 text-center"></i> กดไลก์ (Like)
-                      </label>
-                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black  hover:border-gray-200 bg-white shadow-sm : p-1.5 rounded transition">
-                          <input type="checkbox" value="dislike" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-red-500"> <i class="fas fa-thumbs-down  w-4 text-center"></i> กดดิสไลก์ (Dislike)
-                      </label>
-                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black  hover:border-gray-200 bg-white shadow-sm : p-1.5 rounded transition">
-                          <input type="checkbox" value="follower" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-indigo-500"> <i class="fas fa-user-plus  w-4 text-center"></i> กดติดตาม (Follow)
-                      </label>
-                      <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-black  hover:border-gray-200 bg-white shadow-sm : p-1.5 rounded transition">
-                          <input type="checkbox" value="share" checked onchange="updateSocialActionFilter()" class="sh-action-cb w-4 h-4 accent-blue-500"> <i class="fas fa-share  w-4 text-center"></i> แชร์โปรไฟล์ (Share)
-                      </label>
-                  </div>
-              </div>
-          </div>
+        </div>
 
           <!-- 🌟 ตารางแสดงประวัติ -->
           <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
@@ -8220,9 +8217,9 @@ let creditDisplay = `
                             ${tierBadgeHtml}
                         </div>
                     </td>
-                    <td class="py-2.5 px-4 text-center font-black ">${d.likes.toLocaleString()}</td>
-                    <td class="py-2.5 px-4 text-center font-black ">${d.dislikes.toLocaleString()}</td>
-                    <td class="py-2.5 px-4 text-center font-black ">${d.followers.toLocaleString()}</td>
+                    <td class="py-2.5 px-4 text-center font-black text-like">${d.likes.toLocaleString()}</td>
+                    <td class="py-2.5 px-4 text-center font-black text-dislike">${d.dislikes.toLocaleString()}</td>
+                    <td class="py-2.5 px-4 text-center font-black text-follower">${d.followers.toLocaleString()}</td>
                     <td class="py-2.5 px-4 text-center">
                         <span class="${ratioColor}">${(d.likes + d.dislikes) > 0 ? d.popularity + '%' : '-'}</span>
                     </td>
