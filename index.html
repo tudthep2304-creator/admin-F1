@@ -8587,7 +8587,6 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
     };
 
     // 4. เปิดหน้าต่างแอดมิน เพื่อตั้งค่า
-    // 4. เปิดหน้าต่างแอดมิน เพื่อตั้งค่า (เพิ่มการแสดง ID ดั้งเดิมกันลืม!)
     window.openMenuSettingsModal = function() {
         let container = document.getElementById('menu-settings-container');
         let html = '';
@@ -8660,6 +8659,63 @@ if(document.getElementById('det-bonus')) document.getElementById('det-bonus').va
             alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
         });
     };
+    // ========================================================
+    // 🌟 ระบบสแกนและดึงโบนัสที่หมดอายุคืนอัตโนมัติ (Auto Background Sweeper)
+    // ========================================================
+    window.autoSweepExpiredBonuses = async function() {
+        // ฟังก์ชันนี้จะทำงานเงียบๆ เบื้องหลัง ไม่มีการเด้งแจ้งเตือนกวนใจแอดมิน
+        let snap = await db.ref('bonus_ledger').once('value');
+        let allLedgers = snap.val() || {};
+        let now = Date.now();
+        let updates = {};
+
+        for(let drvId in allLedgers) {
+            let driverLedger = allLedgers[drvId];
+            let expiredAmountForDriver = 0;
+
+            // 1. หาก้อนที่หมดอายุ
+            for(let key in driverLedger) {
+                let b = driverLedger[key];
+                if(b.remaining > 0 && b.expireAt > 0 && b.expireAt < now) {
+                    expiredAmountForDriver += b.remaining;
+                    updates[`bonus_ledger/${drvId}/${key}/remaining`] = 0; 
+                    updates[`bonus_ledger/${drvId}/${key}/note`] = b.note + " (ดึงคืนอัตโนมัติ)";
+                }
+            }
+
+            // 2. ถ้ามีเงินต้องหัก ให้ดึงออกจากกระเป๋าโปรไฟล์ทันที
+            if(expiredAmountForDriver > 0) {
+                let profileSnap = await db.ref(`drivers_profile/${drvId}/creditBonus`).once('value');
+                let currentBonus = parseFloat(profileSnap.val() || 0);
+                let newBonus = currentBonus - expiredAmountForDriver;
+                if(newBonus < 0) newBonus = 0; 
+
+                updates[`drivers_profile/${drvId}/creditBonus`] = newBonus;
+                
+                // ลงบันทึกประวัติการเงิน
+                let txRef = db.ref(`wallet_transactions/${drvId}`).push();
+                updates[`wallet_transactions/${drvId}/${txRef.key}`] = {
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    role: 'driver', walletType: 'bonus', actionType: 'deduct',
+                    amount: expiredAmountForDriver, note: "ดึงโบนัสหมดอายุคืนอัตโนมัติ",
+                    balanceAfter: newBonus, adminName: "Auto System"
+                };
+            }
+        }
+
+        // 3. สั่งอัปเดตขึ้นฐานข้อมูลทีเดียว
+        if(Object.keys(updates).length > 0) {
+            await db.ref().update(updates);
+            console.log("🧹 [Auto Sweep] ดึงโบนัสหมดอายุคืนเรียบร้อยแล้ว");
+        }
+    };
+
+    // 🌟 สั่งให้ไม้กวาดเริ่มทำงานอัตโนมัติ
+    // ทำงานครั้งแรก หลังจากเปิดเว็บแอดมิน 5 วินาที
+    setTimeout(window.autoSweepExpiredBonuses, 5000); 
+    
+    // สั่งให้ทำงานวนลูปเช็คซ้ำ "ทุกๆ 1 นาที" ตลอดเวลาที่หน้าเว็บแอดมินเปิดอยู่
+    setInterval(window.autoSweepExpiredBonuses, 60000);
 </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsZ_tbFhH6fUXRz3I6C-tMshNwwrSevd4&libraries=places,geometry&callback=initAdminMap" async defer></script>
 </body>
