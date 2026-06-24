@@ -86,76 +86,71 @@
     </div>
   </header>
 
-<!-- 🌟 Sidebar Overlay (พื้นหลังมืดๆ กดบริเวณนอกเมนูเพื่อปิดได้) -->
-  <div id="sidebar-overlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-black/60 z-[9990] hidden opacity-0 transition-opacity duration-300"></div>
+<div id="sidebar-overlay" onclick="window.toggleSidebar()" class="fixed inset-0 bg-black/60 z-[9990] hidden opacity-0 transition-opacity duration-300"></div>
 
-  <!-- 🌟 Sidebar Menu (แผงเมนูสไลด์จากซ้าย) -->
-  <div id="sidebar-menu" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 shadow-2xl z-[9999] transform -translate-x-full transition-transform duration-300 flex flex-col">
-    <!-- ส่วนหัวโลโก้ -->
+<div id="sidebar-menu" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 shadow-2xl z-[9999] transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col hidden md:flex">
     <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-white">
         <h2 class="text-base font-black text-brand flex items-center gap-2"><i class="fas fa-rocket"></i> F1 DRIVER</h2>
-        <button onclick="window.toggleSidebar()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-brand hover:bg-red-50 transition-colors">
+        <button onclick="window.toggleSidebar()" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-brand hover:bg-red-50 transition-colors md:hidden">
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <!-- ส่วนปุ่มเมนู -->
     <div class="flex-1 overflow-y-auto py-2">
-        <button onclick="switchTab('dashboard'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black flex items-center gap-4 border-b border-gray-100 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
-            <div class="w-6 text-center"><i class="fas fa-home text-lg transition-colors group-hover:text-brand"></i></div> หน้าหลัก (Dashboard)
+        <button onclick="switchTab('dashboard'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-gray-800 flex items-center gap-4 border-b border-gray-100 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
+            <div class="w-6 text-center"><i class="fas fa-home text-lg text-gray-400 transition-colors group-hover:text-brand"></i></div> หน้าหลัก (Dashboard)
         </button>
-        <button onclick="switchTab('allmenu'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black flex items-center gap-4 border-b border-gray-100 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
-            <!-- เอา text-brand เดิมออก เพื่อให้มันเป็นสีดำตอนปกติ และเปลี่ยนสีตาม Hover -->
-            <div class="w-6 text-center"><i class="fas fa-th-large text-lg transition-colors group-hover:text-brand"></i></div> เมนูระบบ (All Menus)
+        <button onclick="switchTab('all-menus'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-gray-800 flex items-center gap-4 border-b border-gray-100 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
+            <div class="w-6 text-center"><i class="fas fa-th-large text-lg text-gray-400 transition-colors group-hover:text-brand"></i></div> เมนูระบบ (All Menus)
         </button>
-        <button onclick="switchTab('map'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-black flex items-center gap-4 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
-            <div class="w-6 text-center"><i class="fas fa-map-marked-alt text-lg transition-colors group-hover:text-brand"></i></div> แผนที่รถ (Live Map)
+        <button onclick="switchTab('live-map'); window.toggleSidebar()" class="w-full px-5 py-4 text-sm font-bold text-gray-800 flex items-center gap-4 bg-white transition-all duration-300 hover:text-brand hover:-translate-y-1 active:scale-95 text-left group">
+            <div class="w-6 text-center"><i class="fas fa-map-marked-alt text-lg text-gray-400 transition-colors group-hover:text-brand"></i></div> แผนที่รถ (Live Map)
         </button>
     </div>
-    <!-- ส่วนท้าย -->
     <div class="p-4 border-t border-gray-200 text-center bg-gray-50">
         <p class="text-[10px] text-gray-500 font-bold tracking-wider">F1 DRIVER ADMIN V2.0</p>
     </div>
 </div>
-  
-  <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 pb-6 max-w-7xl w-full mx-auto hide-scrollbar">
-      <section id="content-dashboard" class="tab-content space-y-6">
-          <div class="border-gray-200 bg-white shadow-sm  border   p-4 sm:p-5 rounded-2xl shadow-sm  flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
-              <div>
-                  <h2 class="text-base font-bold text-black  mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-brand"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
-                  <p class="text-xs text-black  leading-relaxed max-w-md">เลือกโหมดคุมแมนนวลเพื่อกดส่งงานให้คนขับด้วยตัวเอง หรือเลือกออโต้คิวเพื่อให้ระบบกระจายคิวอัตโนมัติ</p>
-              </div>
-              <div class="flex   p-1 rounded-xl border   w-full sm:w-auto shrink-0 relative">
-                  <button onclick="confirmChangeDispatchMode('manual')" id="btn-mode-manual" class="flex-1 sm:w-32 py-2 text-xs font-bold  text-black rounded-lg shadow transition">แมนนวล</button>
-                  <button onclick="confirmChangeDispatchMode('auto')" id="btn-mode-auto" class="flex-1 sm:w-32 py-2 text-xs font-bold text-black  hover:text-black  rounded-lg transition">ออโต้คิว</button>
-              </div>
-          </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div onclick="openModal('modalPendingJobs')" class="border-gray-200 bg-white shadow-sm border-gray-200 bg-white shadow-sm shadow-sm  border   p-5 rounded-2xl shadow-sm  cursor-pointer hover: : transition transform hover:-translate-y-1 relative">
-                  <div class="flex justify-between items-start">
-                      <div>
-                          <p class="text-xs font-bold text-black  uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
-                          <h3 class="text-3xl font-black " id="stat-pending-count">0 งาน</h3>
-                      </div>
-                      <div class="w-8 h-8 rounded-full   flex items-center justify-center  "><i class="fas fa-search"></i></div>
-                  </div>
-              </div>
-              
-              <div onclick="openModal('modalOnlineDrivers')" class="border-gray-200 bg-white shadow-sm  border   p-5 rounded-2xl shadow-sm  cursor-pointer hover: : transition transform hover:-translate-y-1">
-                  <div class="flex justify-between items-start">
-                      <div>
-                          <p class="text-xs font-bold text-black  uppercase tracking-wider mb-1">คนขับออนไลน์</p>
-                          <h3 class="text-3xl font-black text-brand" id="stat-online-count">0 คน</h3>
-                      </div>
-                      <div class="w-8 h-8 rounded-full   flex items-center justify-center text-brand"><i class="fas fa-search"></i></div>
-                  </div>
-              </div>
-          </div>
-          <div class="border-gray-200 bg-white shadow-sm p-4 sm:p-5 rounded-2xl shadow-sm  transition-colors duration-300">
-              <h2 class="text-base font-bold text-black  mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-brand"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
-              <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-          </div>
-      </section>
+<main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 pb-20 md:pb-6 max-w-7xl w-full mx-auto md:ml-64 hide-scrollbar min-h-screen">
+    <section id="content-dashboard" class="tab-content space-y-6">
+        <div class="bg-white border border-gray-200 p-4 sm:p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
+            <div>
+                <h2 class="text-base font-bold text-gray-800 mb-1 flex items-center gap-2"><i class="fas fa-shield-alt text-brand"></i> โหมดการจ่ายงาน (Dispatch Mode)</h2>
+                <p class="text-xs text-gray-500 font-medium leading-relaxed max-w-md">เลือกโหมดคุมแมนนวลเพื่อกดส่งงานให้คนขับด้วยตัวเอง หรือเลือกออโต้คิวเพื่อให้ระบบกระจายคิวอัตโนมัติ</p>
+            </div>
+            <div class="flex bg-gray-100 p-1.5 rounded-xl border border-gray-200 w-full sm:w-auto shrink-0 relative shadow-inner">
+                <button onclick="confirmChangeDispatchMode('manual')" id="btn-mode-manual" class="flex-1 sm:w-32 py-2 text-xs font-bold text-gray-700 bg-white rounded-lg shadow-sm transition-all hover:text-brand">แมนนวล</button>
+                <button onclick="confirmChangeDispatchMode('auto')" id="btn-mode-auto" class="flex-1 sm:w-32 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 rounded-lg transition-all hover:bg-white hover:shadow-sm">ออโต้คิว</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div onclick="openModal('modalPendingJobs')" class="bg-white border border-brand p-5 rounded-2xl shadow-md cursor-pointer hover:bg-red-50 hover:border-red-300 transition-all transform hover:-translate-y-1 relative group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-brand uppercase tracking-wider mb-1">งานที่รอดำเนินการ</p>
+                        <h3 class="text-3xl font-black text-gray-800 group-hover:text-brand transition-colors" id="stat-pending-count">0 งาน</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-red-100 text-brand flex items-center justify-center shadow-sm"><i class="fas fa-search"></i></div>
+                </div>
+            </div>
+            
+            <div onclick="openModal('modalOnlineDrivers')" class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-brand hover:shadow-md transition-all transform hover:-translate-y-1 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">คนขับออนไลน์</p>
+                        <h3 class="text-3xl font-black text-brand group-hover:scale-105 transition-transform origin-left" id="stat-online-count">0 คน</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 group-hover:text-brand group-hover:bg-red-50 transition-colors flex items-center justify-center border border-gray-200"><i class="fas fa-search"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white border border-gray-200 p-4 sm:p-5 rounded-2xl shadow-sm transition-colors duration-300">
+            <h2 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-brand"></i> ควบคุมรถเปิดรับงาน (สวิตช์จำลอง)</h2>
+            <div id="dashboard-vehicle-toggles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        </div>
+    </section>
 
       <!-- ================= หน้าเมนูรวม (แบบพับเก็บได้) ================= -->
       <section id="content-allmenu" class="tab-content hidden space-y-4 pb-6 mt-2">
@@ -2092,6 +2087,828 @@
           </div>
       </div>
   </div>
+
+<!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
+  <div id="modalDriverLogs" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
+              <h2 class="text-base font-bold text-black "><i class="fas fa-map-marker-alt  mr-1"></i> ประวัติสถานะ & พิกัด</h2>
+              <button onclick="closeModal('modalDriverLogs')" class="text-black hover:text-black     rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-3 border-b   border-gray-200 bg-white shadow-sm ">
+              <label class="block text-[10px] font-bold text-black  mb-1">ตัวกรองวันที่:</label>
+              <input type="date" id="filter-logs-date" onchange="fetchDriverLogs()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-sm font-bold focus:">
+          </div>
+          <div class="flex-1 overflow-y-auto p-0 slim-scroll">
+              <table class="w-full text-left">
+                  <tbody id="det-logs-table" class="divide-y divide-gray-200 ">
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  <div id="modalCropProfile" class="hidden fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
+              <h2 class="text-base font-bold  ]"><i class="fas fa-crop-alt mr-1"></i> ปรับตำแหน่งรูปภาพให้พอดี</h2>
+              <button onclick="closeProfileCropper()" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 bg-black">
+              <div class="w-full max-h-[300px] overflow-hidden flex justify-center">
+                  <img id="profileImageToCrop" class="max-w-full">
+              </div>
+          </div>
+          <div class="p-4 border-t   flex gap-3 border-gray-200 bg-white shadow-sm /50">
+              <button onclick="closeProfileCropper()" class="flex-1 py-2.5   text-black  font-bold rounded-xl text-sm hover: transition">ยกเลิก</button>
+              <button onclick="confirmProfileCrop()" class="flex-1 py-2.5  text-black font-bold rounded-xl shadow-md hover: transition text-sm">ตัดรูปนี้</button>
+          </div>
+      </div>
+  </div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsZ_tbFhH6fUXRz3I6C-tMshNwwrSevd4&libraries=places,geometry&callback=initAdminMap" async defer></script>
+<div id="modalImageViewer" class="hidden fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 transition-opacity">
+      <button onclick="closeImageViewer()" class="absolute top-4 right-4 text-black hover:text-black border-gray-200 bg-white shadow-sm/50 hover: rounded-full w-10 h-10 flex items-center justify-center z-10 transition"><i class="fas fa-times text-xl"></i></button>
+      <img id="fullImageViewerSrc" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-fade-in" src="">
+  </div>
+  <!-- 🌟 หน้าต่างปรับปรุงยอดเงิน (ซ่อม Layout และปุ่มปิด) -->
+  <div id="modalAdjustCredit" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+          
+          <div class="p-3 sm:p-4 border-b   flex justify-between items-start border-gray-200 bg-white shadow-sm /50">
+              <div class="flex flex-wrap items-center gap-2 pr-4">
+                  <h2 class="text-base font-bold   mt-1"><i class="fas fa-exchange-alt mr-1"></i> ปรับปรุงยอดเงิน</h2>
+                  <button onclick="viewBonusLedger(currentWalletTargetId)" class=" hover:  px-2 py-1 rounded text-[10px] font-bold transition shadow-sm border  mt-1">
+                      <i class="fas fa-history mr-1"></i> เช็คอายุโบนัส
+                  </button>
+              </div>
+              <button onclick="closeAdjustCreditModal()" class="text-black hover:text-black   shrink-0 pt-1"><i class="fas fa-times text-lg"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <div class="flex items-center gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
+                  <div class="w-10 h-10 rounded-full    flex items-center justify-center text-lg shrink-0"><i class="fas fa-user"></i></div>
+                  <div class="min-w-0">
+                      <p id="adj-drv-name" class="font-bold text-sm text-black  truncate">ชื่อคนขับ</p>
+                      <p id="adj-drv-id" class="text-[10px] text-black ">DRV-000000</p>
+                  </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-black  mb-1">เลือกกระเป๋า</label>
+                      <select id="adj-wallet-type" onchange="toggleAdjustColors()" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold focus:">
+                          <option value="cash">🟢 เงินสด (Cash)</option>
+                          <option value="bonus">🟡 โบนัส (Bonus)</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-black  mb-1">ประเภทรายการ</label>
+                      <select id="adj-action-type" onchange="toggleAdjustColors()" class="w-full p-2.5     border   rounded-xl outline-none text-sm font-bold">
+                          <option value="add">➕ เติมเงินเข้า</option>
+                          <option value="deduct">➖ หักเงินออก</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div id="adj-amount-container" class="col-span-2">
+                      <label class="block text-[10px] font-bold text-black  mb-1">จำนวนเงิน (บาท)</label>
+                      <input type="number" id="adj-amount" placeholder="0" min="1" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-base font-black text-center focus: shadow-inner">
+                  </div>
+                  <div id="adj-expire-container" class="hidden col-span-1">
+                      <label class="block text-[10px] font-bold text-black  mb-1">อายุโบนัส (วัน) *0=ถาวร</label>
+                      <input type="number" id="adj-expire-days" placeholder="30" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold text-center focus:">
+                  </div>
+              </div>
+              <div>
+                  <label class="block text-[10px] font-bold text-black  mb-1">หมายเหตุ (จำเป็นต้องระบุ)</label>
+                  <input type="text" id="adj-note" placeholder="เช่น ลูกค้าโอนเงินเข้าบริษัท, หักค่าปรับ..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-xs focus:">
+              </div>
+              <button onclick="submitCreditAdjustment()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> ยืนยันทำรายการ</button>
+          </div>
+      </div>
+  </div>
+  <!-- 🌟 หน้าต่างสร้างแคมเปญ/ภารกิจ (แก้บั๊กกล่องรางวัลเบิ้ล) -->
+  <div id="modalAddQuest" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col h-[90vh] overflow-hidden animate-fade-in">
+          
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
+              <h2 class="text-sm font-bold   pl-2" id="quest-modal-title"><i class="fas fa-bullseye mr-1"></i> สร้างแคมเปญภารกิจDRV</h2>
+              <button onclick="closeModal('modalAddQuest')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+
+          <!-- Form Content (จัด Layout ใหม่) -->
+          <div class="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 md:space-y-5 slim-scroll border-gray-200 bg-white shadow-sm/50  text-xs">
+              <input type="hidden" id="quest-id">
+
+              <!-- ชื่อแคมเปญ -->
+              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm">
+                  <label class="block text-[11px] font-bold text-black  mb-1.5">ชื่อแคมเปญภารกิจ DRV</label>
+                  <input type="text" id="quest-name" placeholder="ตัวอย่าง: ภารกิจนักล่าช่วงเร่งด่วนประจำสัปดาห์" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus: text-black  font-bold">
+              </div>
+
+              <!-- กลุ่มเป้าหมาย -->
+              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm space-y-3">
+                  <h3 class="text-[11px] font-bold   border-b   pb-1.5"><i class="fas fa-users mr-1"></i> กลุ่มเป้าหมาย</h3>
+                  
+                  <div class="grid grid-cols-2 gap-3">
+                      <div class="relative" id="dropdown-tier-container">
+                          <label class="block text-[10px] font-bold text-black mb-1">ระดับชั้น (Tier)</label>
+                          <div class="relative">
+                              <button type="button" onclick="toggleCustomDropdown('tier-options')" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none flex justify-between items-center text-[11px] font-bold text-black  transition hover: :">
+                                  <span id="tier-select-text" class="truncate">-- เลือกกลุ่มเป้าหมาย --</span>
+                                  <i class="fas fa-chevron-down text-black ml-2"></i>
+                              </button>
+                              <div id="tier-options" class="hidden absolute z-[100] w-full mt-1 border-gray-200 bg-white shadow-sm  border   rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                                  </div>
+                          </div>
+                      </div>
+
+                      <div class="relative" id="dropdown-veh-container">
+                          <label class="block text-[10px] font-bold text-black mb-1">ประเภทยานพาหนะ</label>
+                          <div class="relative">
+                              <button type="button" onclick="toggleCustomDropdown('veh-options')" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none flex justify-between items-center text-[11px] font-bold text-black  transition hover: :">
+                                  <span id="veh-select-text" class="truncate">-- เลือกประเภทรถ --</span>
+                                  <i class="fas fa-chevron-down text-black ml-2"></i>
+                              </button>
+                              <div id="veh-options" class="hidden absolute z-[100] w-full mt-1 border-gray-200 bg-white shadow-sm  border   rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                                  </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3 pt-2 border-t  ">
+                      <div>
+                          <label class="block text-[10px] font-bold text-black mb-1"><i class="fas fa-thumbs-up  mr-1"></i> ยอดไลก์สะสมไม่ต่ำกว่า</label>
+                          <div class="relative">
+                              <input type="number" id="quest-target-likes" min="0" placeholder="เช่น 100" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus: font-mono text-center font-bold pr-8">
+                              <span class="absolute right-3 top-2.5 text-[9px] text-black font-bold">ไลก์</span>
+                          </div>
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-black mb-1">อายุสมาชิกครบ</label>
+                          <div class="flex gap-1">
+                              <input type="number" id="cond-days-val" placeholder="ตัวเลข" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-center focus: font-bold">
+                              <select id="cond-days-unit" class="w-16 p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus: font-bold text-black ">
+                                  <option value="days">วัน</option>
+                                  <option value="months">เดือน</option>
+                                  <option value="years">ปี</option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- เงื่อนไขแคมเปญ -->
+              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm space-y-3">
+                  <div class="border-b   pb-2">
+                      <h3 class="text-[11px] font-bold  "><i class="fas fa-list-ul mr-1"></i> เงื่อนไขแคมเปญภารกิจ DRV (เลือกได้ 1 อย่าง)</h3>
+                  </div>
+                  
+                  <!-- 🌟 จัดแถว Dropdown และปุ่มให้อยู่บรรทัดเดียวกันเสมอ -->
+                  <div class="flex items-center gap-2 w-full">
+                      <select id="select-condition-type" class="flex-1 p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-[11px] focus: font-bold text-black  disabled:opacity-50 disabled:">
+                          <option value="">-- เลือกเงื่อนไขเพื่อเพิ่ม --</option>
+                          <option value="rides">วิ่งสะสมครบ</option>
+                          <option value="likes">👍 ยอดถูกใจ (Like) สะสม</option>
+                          <option value="online">ออนไลน์สะสม</option>
+                          <option value="peak">วิ่งช่วงเวลาพิเศษ (Peak Hours)</option>
+                      </select>
+                      <button type="button" id="btn-add-condition" onclick="handleAddConditionRow()" class="shrink-0  hover: text-black px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-plus"></i> เพิ่ม</button>
+                  </div>
+                  
+                  <div id="dynamic-conditions-list" class="space-y-2 min-h-[40px] border-gray-200 bg-white shadow-sm  p-2 rounded-xl border border-dashed  ">
+                      <!-- Dynamic Rows -->
+                  </div>
+              </div>
+            
+              <!-- จำกัดสิทธิ์และเวลา -->
+              <div class="bg-rose-50/50 /80 p-4 rounded-xl border border-rose-100  shadow-sm">
+                  <!-- โซนจำกัดสิทธิ์ (จัดให้อยู่บรรทัดเดียว) -->
+                  <div class="flex items-center flex-nowrap gap-1.5 sm:gap-2 mb-4 pb-4 border-b border-rose-100  w-full overflow-hidden">
+                      <label class="flex items-center gap-1.5 cursor-pointer shrink-0">
+                          <input type="checkbox" id="cond-limit-check" onchange="toggleLimitInputs(this.checked)" class="w-4 h-4 rounded  text-rose-500 focus:ring-rose-500 border-gray-200 bg-white shadow-sm ">
+                          <span class="font-bold text-rose-600  text-[11px]"><i class="fas fa-dot-circle mr-1"></i>จำกัดสิทธิ์รับรางวัล (ต่อคน)</span>
+                      </label>
+                      <input type="number" id="cond-limit-val" placeholder="ครั้ง" class="w-14 sm:w-16 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-center font-bold text-[11px] disabled:opacity-50 disabled: shrink-0" disabled>
+                      <span class="text-black font-bold text-[11px] shrink-0">ต่อ</span>
+                      <select id="cond-limit-unit" class="min-w-0 flex-1 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none font-bold text-[11px] disabled:opacity-50 disabled:" disabled>
+                          <option value="day">วัน</option>
+                          <option value="week">สัปดาห์</option>
+                          <option value="month">เดือน</option>
+                          <option value="all">ตลอดแคมเปญ</option>
+                      </select>
+                  </div>
+
+                  <!-- โซนเวลา -->
+                  <div class="grid grid-cols-2 gap-3">
+                      <div>
+                          <label class="block text-[10px] font-bold text-black mb-1">เวลาเริ่มภารกิจ</label>
+                          <input type="datetime-local" id="quest-start" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus:border-rose-500 font-bold text-[10px] text-black ">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-black mb-1">เวลาหมดเขต</label>
+                          <input type="datetime-local" id="quest-end" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus:border-rose-500 font-bold text-[10px] text-black ">
+                      </div>
+                  </div>
+              </div>
+
+              <!-- รางวัล -->
+              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm space-y-3 mt-4">
+                  <div class="border-b   pb-2">
+                      <h3 class="text-[11px] font-bold  "><i class="fas fa-gift mr-1"></i> รางวัล</h3>
+                  </div>
+
+                  <!-- 🌟 จัดแถว Dropdown และปุ่มให้อยู่บรรทัดเดียวกันเสมอ -->
+                  <div class="flex items-center gap-2 w-full">
+                      <select id="select-reward-type" class="...">
+    <option value="">-- เลือกรางวัลเพื่อเพิ่ม --</option>
+    <option value="credit">💰 เครดิตเข้าระบบ</option>
+    <option value="bonus">🎁 โบนัสเงินสด</option>
+    <option value="tierup">✨ เลื่อนระดับชั้น</option>
+    <option value="likes">👍 เพิ่มยอดกดไลก์พิเศษ</option>
+</select>
+                      <button type="button" onclick="handleAddRewardRow()" class="shrink-0  hover: text-black px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
+                  </div>
+
+                  <div id="dynamic-rewards-list" class="space-y-2 min-h-[40px] border-gray-200 bg-white shadow-sm  p-2 rounded-xl border border-dashed  ">
+                      <!-- Dynamic Rows -->
+                  </div>
+              </div>
+
+              <!-- เปิด/ปิดการใช้งาน -->
+              <div class="flex items-center justify-between border-gray-200 bg-white shadow-sm  p-3 rounded-xl border   shadow-sm">
+                  <span class="font-bold text-black ">สถานะเปิดใช้งานแคมเปญ</span>
+                  <label class="relative inline-flex items-center cursor-pointer select-none">
+                      <input type="checkbox" id="quest-is-active" class="sr-only peer" checked>
+                      <div class="w-9 h-5  peer-focus:outline-none rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:border-gray-200 bg-white shadow-sm after: after:border after:rounded-full after:h-4 after:w-4 after:transition-all  peer-checked:"></div>
+                  </label>
+              </div>
+          </div>
+
+          <div class="p-3 border-t   flex justify-center gap-3 border-gray-200 bg-white shadow-sm  shrink-0">
+              <button onclick="closeModal('modalAddQuest')" class=" hover:  : text-black  px-6 py-2.5 rounded-xl font-bold transition">ยกเลิก</button>
+              <button onclick="saveQuestCampaignDRV()" class=" hover: text-black px-6 py-2.5 rounded-xl font-bold shadow-md transition"><i class="fas fa-save mr-1"></i> บันทึกข้อมูลแคมเปญ</button>
+          </div>
+      </div>
+  </div>
+  
+  <div id="modalAdjustTierRating" class="hidden fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
+              <h2 class="text-base font-bold   pl-2"><i class="fas fa-trophy mr-1"></i> ปรับระดับ & Social Score</h2>
+              <button onclick="closeTierRatingModal()" class="text-black hover:text-black   relative z-50"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4 relative z-40">
+              <div class="flex items-center gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
+                  <div class="w-10 h-10 rounded-full    flex items-center justify-center text-lg shrink-0"><i class="fas fa-id-card"></i></div>
+                  <div class="min-w-0">
+                      <p id="trm-drv-name" class="font-bold text-sm text-black  truncate">ชื่อคนขับ</p>
+                      <p id="trm-drv-id" class="text-[10px] text-black ">DRV-000000</p>
+                  </div>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-black mb-1">ปรับเปลี่ยนระดับชั้น (Driver Tier)</label>
+                  <select id="trm-tier-select" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold focus:">
+                  </select>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-black mb-1">แก้ไข Social Score (ระบบแมนนวล)</label>
+                  <div class="grid grid-cols-2 gap-2">
+                      <div>
+                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-thumbs-up "></i> ถูกใจ</label>
+                          <input type="number" id="edit-likes" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
+                      </div>
+                      <div>
+                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-thumbs-down "></i> ไม่ถูกใจ</label>
+                          <input type="number" id="edit-dislikes" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
+                      </div>
+                      <div>
+                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-user-plus "></i> ผู้ติดตาม</label>
+                          <input type="number" id="edit-followers" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
+                      </div>
+                      <div>
+                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-share "></i> ยอดแชร์</label>
+                          <input type="number" id="edit-shares" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
+                      </div>
+                  </div>
+              </div>
+
+              <div>
+                  <label class="block text-[10px] font-bold text-black mb-1">หมายเหตุการเลื่อนขั้น</label>
+                  <input type="text" id="trm-note" placeholder="เหตุผลการเลื่อนระดับ..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-xs focus:">
+              </div>
+              
+              <button onclick="submitTierRatingAdjustment()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-check"></i> บันทึกข้อมูล</button>
+          </div>
+      </div>
+  </div>
+  <!-- 🌟 หน้าต่างเช็คบัญชีโบนัส (Bonus Ledger) -->
+  <div id="modalBonusLedger" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh] overflow-hidden animate-fade-in">
+          <div class="p-4 border-b   flex justify-between items-center  ">
+              <h2 class="text-base font-bold "><i class="fas fa-history mr-1"></i> รายละเอียดโบนัสคงเหลือ</h2>
+              <button onclick="closeModal('modalBonusLedger')" class="text-black hover:text-black"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-4 overflow-y-auto flex-1 slim-scroll border-gray-200 bg-white shadow-sm ">
+              <ul id="bonus-ledger-list" class="space-y-3">
+                  <!-- JS จะเอาข้อมูลวันหมดอายุมาหยอดใส่ตรงนี้ -->
+              </ul>
+          </div>
+      </div>
+  </div>
+<div id="modalTierAirdrop" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
+          <div class="p-4 border-b   flex justify-between items-center  ">
+              <h2 class="text-base font-bold "><i class="fas fa-gift mr-1"></i> แจกโบนัสกลุ่มพิเศษ (Airdrop)</h2>
+              <button onclick="closeModal('modalTierAirdrop')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-5 space-y-4 text-left">
+              <div>
+                  <label class="block text-[10px] font-bold text-black mb-1">เลือกระดับกลุ่มเป้าหมายที่จะแจกเงิน</label>
+                  <select id="airdrop-tier-select" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold focus:">
+    <option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>
+</select>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-black mb-1">จำนวนเงินโบนัส (บาท)</label>
+                      <input type="number" id="airdrop-amount" placeholder="เช่น 100" min="1" class="w-full p-2.5 border-gray-200 bg-white shadow-sm   border   rounded-xl outline-none text-sm font-black text-center focus:">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-black mb-1">อายุโบนัส (วัน) *0=ถาวร</label>
+                      <input type="number" id="airdrop-expire-days" placeholder="0" min="0" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold text-center focus:">
+                  </div>
+              </div>
+              <div>
+                  <label class="block text-[10px] font-bold text-black mb-1">ชื่อกิจกรรม / หมายเหตุรายการ (จำเป็น)</label>
+                  <input type="text" id="airdrop-note" placeholder="เช่น โบนัสเยียวยาระบบปรับปรุง, แจกปีใหม่..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-xs focus:">
+              </div>
+              <button onclick="submitTierAirdrop()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-paper-plane"></i> อัดฉีดเงินให้กลุ่มเป้าหมาย 🚀</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalSearchToBlock" class="hidden fixed inset-0 z-[350] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
+              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-search mr-1 "></i> ระบุคนขับที่ต้องการบล็อก</h2>
+              <button onclick="closeModal('modalSearchToBlock')" class="text-black hover:text-black   relative z-50"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="p-5 space-y-4 relative z-40">
+              <div>
+                  <label class="block text-[11px] font-medium text-black  mb-1">รหัสอ้างอิงระบบ (Driver ID)</label>
+                  <input type="text" id="search-block-id" placeholder="เช่น DRV-123456" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[12px] font-bold focus: transition tracking-wide text-center uppercase">
+              </div>
+              <button onclick="submitSearchToBlock()" class="w-full py-2.5  hover: text-black font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-arrow-right"></i> ดำเนินการต่อ</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalBlockHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-md shadow-2xl flex flex-col h-[80vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
+              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติการบล็อก/ปลดบล็อก</h2>
+              <button onclick="closeModal('modalBlockHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-3 border-gray-200 bg-white shadow-sm  border-b   shrink-0 flex items-center gap-3">
+              <div class="w-10 h-10   rounded-full flex items-center justify-center text-black"><i class="fas fa-user-shield"></i></div>
+              <div>
+                  <p id="bh-drv-name" class="font-bold text-[12px] text-black ">กำลังโหลด...</p>
+                  <p id="bh-drv-id" class="text-[10px] text-black font-mono">ID: -</p>
+              </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
+              <div id="block-history-timeline" class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-300 : before:to-transparent">
+                  </div>
+          </div>
+      </div>
+  </div>
+
+<!-- 🌟 หน้าต่างระงับสิทธิ์คนขับ (Block / Unblock) -->
+  <div id="modalBlockDriver" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
+              <h2 class="text-sm font-bold   pl-2"><i class="fas fa-ban mr-1"></i> จัดการระงับสิทธิ์คนขับ</h2>
+              <button onclick="closeModal('modalBlockDriver')" class="text-black hover:text-black   relative z-50"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4 relative z-40">
+              <div class="flex items-center gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
+                  <div class="w-10 h-10 rounded-full    flex items-center justify-center text-lg shrink-0"><i class="fas fa-user-slash"></i></div>
+                  <div class="min-w-0">
+                      <p id="block-drv-name" class="font-bold text-sm text-black  truncate">ชื่อคนขับ</p>
+                      <p id="block-drv-id" class="text-[10px] text-black ">PIN: 0000</p>
+                  </div>
+              </div>
+
+              <!-- โซนกรอกข้อมูล (สำหรับคนขับที่ยังไม่ถูกบล็อก) -->
+              <div id="block-input-zone" class="space-y-3">
+                  <div>
+                      <label class="block text-[11px] font-medium text-black  mb-1">ระยะเวลาการระงับสิทธิ์</label>
+                      <div class="flex gap-2">
+                          <input type="number" id="block-duration-num" placeholder="ระบุจำนวน" min="1" class="w-1/2 p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition font-bold text-center">
+                          <select id="block-duration-unit" class="w-1/2 p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition font-bold" onchange="document.getElementById('block-duration-num').disabled = (this.value === 'permanent')">
+                              <option value="minutes">นาที</option>
+                              <option value="hours">ชั่วโมง</option>
+                              <option value="days">วัน</option>
+                              <option value="permanent">ถาวร</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div>
+                      <label class="block text-[11px] font-medium text-black  mb-1">สาเหตุการบล็อกหลัก</label>
+                      <select id="block-reason-dropdown" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition font-bold">
+                          </select>
+                  </div>
+                  <div>
+                      <label class="block text-[11px] font-medium text-black  mb-1">หมายเหตุเพิ่มเติม</label>
+                      <input type="text" id="block-note-input" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)..." class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition">
+                  </div>
+              </div>
+
+              <!-- โซนแสดงสถานะ (สำหรับคนขับที่โดนบล็อกอยู่) -->
+              <div id="blocked-status-zone" class="hidden border-gray-200 bg-white shadow-sm  p-3 rounded-lg border  ">
+                  <p class="text-[11px] font-bold  mb-1.5"><i class="fas fa-lock"></i> สถานะ: ถูกระงับการใช้งาน</p>
+                  <p class="text-[10px] text-black  mb-0.5">เหตุผล: <span id="blocked-reason-display" class="font-bold text-black ">...</span></p>
+                  <p class="text-[10px] text-black  mb-0.5">เริ่มบล็อกเมื่อ: <span id="blocked-start-display" class="font-bold text-black ">...</span></p>
+                  <p class="text-[10px] text-black ">ระงับสิทธิ์ถึง: <span id="blocked-expire-display" class="font-bold ">...</span></p>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-2 pt-2">
+                  <button onclick="viewBlockHistory()" class="w-full py-2.5   text-black  font-medium rounded-lg hover: transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-history"></i> ประวัติการบล็อก</button>
+                  <button id="btn-submit-block" class="w-full py-2.5 font-medium rounded-lg shadow-sm transition text-[11px] flex justify-center items-center gap-1.5"></button>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- 🌟 หน้าต่างสร้างแคมเปญร้านค้าพาร์ทเนอร์ -->
+  <div id="modalPartnerCampaign" class="hidden fixed inset-0 z-[310] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  sticky top-0 z-10">
+              <h2 class="text-base font-bold  " id="partner-modal-title"><i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์</h2>
+              <button onclick="closeModal('modalPartnerCampaign')" class="text-black hover:text-black"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <input type="hidden" id="partner-camp-id">
+              <div>
+                  <label class="block text-[11px] font-bold text-black mb-1">ชื่อแคมเปญ / ชื่อร้านค้า</label>
+                  <input type="text" id="partner-camp-name" placeholder="เช่น แจกโบนัสกินกาแฟร้าน A..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-xl outline-none text-sm font-bold focus:">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
+                  <div class="col-span-1 sm:col-span-2"><h3 class="text-[10px] font-black   mb-1"><i class="fas fa-filter"></i> กำหนดผู้มีสิทธิ์เข้าร่วม</h3></div>
+                  <div class="relative">
+                      <label class="block text-[10px] font-bold text-black mb-1">ระดับชั้น (Tier)</label>
+                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('partner-tier-dd').classList.toggle('hidden')">
+                          <span id="partner-tier-text" class="truncate text-black ">เลือกกลุ่มเป้าหมาย...</span>
+                          <i class="fas fa-chevron-down text-black"></i>
+                      </div>
+                      <div id="partner-tier-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="togglePartnerTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
+                          <div id="partner-target-tier-container" class="flex flex-col gap-2"></div>
+                      </div>
+                  </div>
+                  <div class="relative">
+                      <label class="block text-[10px] font-bold text-black mb-1">ประเภทยานพาหนะ</label>
+                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('partner-veh-dd').classList.toggle('hidden')">
+                          <span id="partner-veh-text" class="truncate text-black ">เลือกรถ...</span>
+                          <i class="fas fa-chevron-down text-black"></i>
+                      </div>
+                      <div id="partner-veh-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="togglePartnerVehs(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
+                          <div id="partner-target-vehicle-container" class="flex flex-col gap-2"></div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="p-3 border-gray-200 bg-white shadow-sm  border   rounded-xl">
+                  <h4 class="text-[10px] font-black   mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> เงื่อนไขรับรางวัล (ระบบยืนยันตัวตนร้านค้า)</h4>
+                  <div class="space-y-2">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" id="pc-proof-selfie" class="w-4 h-4 accent-red-500">
+                          <span class="text-[10px] font-bold text-black ">📸 บังคับเซลฟี่หน้าร้าน หรือถ่ายคู่กับสินค้า</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" id="pc-proof-receipt" class="w-4 h-4 accent-red-500">
+                          <span class="text-[10px] font-bold text-black ">🧾 บังคับแนบใบเสร็จ (เห็นวันที่ + ตราปั๊มร้าน)</span>
+                      </label>
+                      <div class="flex items-center gap-2">
+                          <input type="checkbox" id="pc-proof-code" onchange="document.getElementById('pc-code-amount').disabled = !this.checked; if(this.checked) document.getElementById('pc-code-amount').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="pc-proof-code" class="text-[10px] font-bold text-black  cursor-pointer shrink-0">🎟️ โค้ดลับที่ร้านค้าแจก (สร้างกี่ใบ?)</label>
+                          <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold text-center focus: disabled:opacity-50 disabled:">
+                      </div>
+                      <div class="flex flex-wrap items-center gap-2 pt-2 border-t  mt-2">
+                          <input type="checkbox" id="pc-limit-check" onchange="document.getElementById('pc-limit-val').disabled = !this.checked; document.getElementById('pc-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('pc-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
+                          <label for="pc-limit-check" class="text-[10px] font-bold   cursor-pointer shrink-0">🛑 จำกัดสิทธิ์/คนขับ</label>
+                          <input type="number" id="pc-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold text-center focus: disabled:opacity-50 disabled:">
+                          <span class="text-[10px] font-bold text-black shrink-0">ต่อ</span>
+                          <select id="pc-limit-unit" disabled class="flex-1 min-w-[70px] p-1.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] font-bold focus: disabled:opacity-50 disabled:">
+                              <option value="day">วัน</option>
+                              <option value="week">สัปดาห์</option>
+                              <option value="month">เดือน</option>
+                              <option value="all">แคมเปญ</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-black mb-1">เวลาเริ่ม (ว่าง=เริ่มทันที)</label>
+                      <input type="datetime-local" id="partner-camp-start" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-black mb-1">เวลาหมดเขต (ว่าง=ตลอดไป)</label>
+                      <input type="datetime-local" id="partner-camp-end" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
+                  </div>
+              </div>
+
+              <div class="border-t border-dashed   pt-4">
+                  <h3 class="text-xs font-bold  mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับเมื่อแอดมินอนุมัติ</h3>
+                  <div class="grid grid-cols-2 gap-3 border-gray-200 bg-white shadow-sm  p-3 rounded-xl border  ">
+                      <div>
+                          <label class="block text-[10px] font-bold text-black  mb-1">โบนัสเงิน (🟡)</label>
+                          <input type="number" id="partner-reward-bonus" placeholder="เช่น 50" class="w-full p-2 border-gray-200 bg-white shadow-sm   border   rounded-lg outline-none text-[11px] font-bold text-center focus:">
+                      </div>
+                      <div>
+                          <label class="block text-[10px] font-bold text-black  mb-1">อายุโบนัส (วัน)</label>
+                          <input type="number" id="partner-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 border-gray-200 bg-white shadow-sm   border   rounded-lg outline-none text-[11px] font-bold text-center focus:">
+                      </div>
+                  </div>
+              </div>
+
+              <div class="flex items-center gap-2 mt-2">
+                  <input type="checkbox" id="partner-camp-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                  <label for="partner-camp-is-active" class="text-xs font-bold text-black  cursor-pointer">เปิดใช้งานแคมเปญร้านค้านี้ทันที 🟢</label>
+              </div>
+
+              <button onclick="savePartnerCampaign()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกและสร้างแคมเปญร้านค้า</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- 🌟 หน้าต่างประวัติอนุมัติย้อนหลัง (History) -->
+  <div id="modalPartnerHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
+              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติการอนุมัติแคมเปญร้านค้าย้อนหลัง</h2>
+              <button onclick="closeModal('modalPartnerHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
+              <table class="w-full text-left border-collapse min-w-[700px]">
+                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
+                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
+                          <th class="py-2.5 px-3">วัน/เวลาตัดสิน</th>
+                          <th class="py-2.5 px-3">แคมเปญ / คนขับ</th>
+                          <th class="py-2.5 px-3 text-center">รางวัลที่ได้</th>
+                          <th class="py-2.5 px-3 text-center">หลักฐานอ้างอิง</th>
+                          <th class="py-2.5 px-3 text-right">สถานะ</th>
+                      </tr>
+                  </thead>
+                  <tbody id="partner-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
+                      <tr><td colspan="5" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalDriverBannerHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
+              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติโฆษณาคนขับที่ยกเลิก/หมดอายุ</h2>
+              <button onclick="closeModal('modalDriverBannerHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm " id="driver-banners-history-list">
+              </div>
+      </div>
+  </div>
+
+  <div id="modalDriverNewsHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
+              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติข่าวสารประกาศที่ถูกลบ</h2>
+              <button onclick="closeModal('modalDriverNewsHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm " id="driver-news-history-list">
+              </div>
+      </div>
+  </div>
+
+  <div id="modalAddPrivilege" class="hidden fixed inset-0 z-[320] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  sticky top-0 z-10">
+              <h2 class="text-base font-bold  " id="privilege-modal-title"><i class="fas fa-gift mr-1"></i> เพิ่มสิทธิพิเศษใหม่</h2>
+              <button onclick="closeModal('modalAddPrivilege')" class="text-black hover:text-black"><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="p-5 space-y-4">
+              <input type="hidden" id="priv-id">
+              <div>
+                  <label class="block text-[11px] font-bold text-black mb-1">ชื่อสิทธิพิเศษ / ชื่อร้าน</label>
+                  <input type="text" id="priv-name" placeholder="เช่น ส่วนลด 50% ร้านกาแฟ B..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-xl outline-none text-sm font-bold focus:">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
+                  <div class="col-span-1 sm:col-span-2"><h3 class="text-[10px] font-black   mb-1"><i class="fas fa-filter"></i> กำหนดผู้มีสิทธิ์กดรับ</h3></div>
+                  <div class="relative">
+                      <label class="block text-[10px] font-bold text-black mb-1">ระดับชั้น (Tier)</label>
+                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('priv-tier-dd').classList.toggle('hidden')">
+                          <span id="priv-tier-text" class="truncate text-black ">เลือกกลุ่มเป้าหมาย...</span>
+                          <i class="fas fa-chevron-down text-black"></i>
+                      </div>
+                      <div id="priv-tier-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="toggleAllTargets(this, 'priv-target-tier', 'priv')" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
+                          <div id="priv-tier-container" class="flex flex-col gap-2"></div>
+                      </div>
+                  </div>
+                  <div class="relative">
+                      <label class="block text-[10px] font-bold text-black mb-1">ประเภทยานพาหนะ</label>
+                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('priv-veh-dd').classList.toggle('hidden')">
+                          <span id="priv-veh-text" class="truncate text-black ">เลือกรถ...</span>
+                          <i class="fas fa-chevron-down text-black"></i>
+                      </div>
+                      <div id="priv-veh-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="toggleAllTargets(this, 'priv-target-vehicle', 'priv')" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
+                          <div id="priv-vehicle-container" class="flex flex-col gap-2"></div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="p-3 border-gray-200 bg-white shadow-sm  border   rounded-xl space-y-3">
+                  <div class="flex items-center gap-2">
+                      <label class="text-[10px] font-bold   shrink-0 w-32"><i class="fas fa-ticket-alt"></i> จำนวนโค้ดที่จะแจก (ใบ)</label>
+                      <input type="number" id="priv-code-amount" placeholder="เช่น 100" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold focus: text-center">
+                  </div>
+                  
+                  <div class="flex items-center gap-2 pt-2 border-t ">
+                      <label class="text-[10px] font-bold text-black  shrink-0 w-32">🛑 สิทธิ์การกดรับ / คนขับ</label>
+                      <input type="number" id="priv-limit-val" placeholder="ครั้ง" class="w-16 p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold text-center focus:">
+                      <span class="text-[9px] text-black">/</span>
+                      <select id="priv-limit-unit" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] font-bold focus:">
+                          <option value="day">วัน</option>
+                          <option value="week">สัปดาห์</option>
+                          <option value="month">เดือน</option>
+                          <option value="all">ตลอดแคมเปญ</option>
+                      </select>
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-black mb-1">เริ่มแจก (ว่าง=เริ่มทันที)</label>
+                      <input type="datetime-local" id="priv-start" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-black mb-1">หมดเขต (ว่าง=แจกตลอด)</label>
+                      <input type="datetime-local" id="priv-end" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
+                  </div>
+              </div>
+
+              <div class="flex items-center gap-2 mt-2">
+                  <input type="checkbox" id="priv-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
+                  <label for="priv-is-active" class="text-xs font-bold text-black  cursor-pointer">เปิดให้กดรับสิทธิ์ได้ทันที 🟢</label>
+              </div>
+
+              <button onclick="saveDriverPrivilege()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกสิทธิพิเศษ</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalPrivilegeHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
+              <h2 class="text-sm font-bold   pl-2" id="priv-history-title"><i class="fas fa-history mr-1"></i> ประวัติการกดรับสิทธิ์</h2>
+              <button onclick="closeModal('modalPrivilegeHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
+              <table class="w-full text-left border-collapse min-w-[500px]">
+                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
+                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
+                          <th class="py-2.5 px-3">วัน/เวลาที่กดรับ</th>
+                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
+                          <th class="py-2.5 px-3 text-center">โค้ดที่ได้รับ</th>
+                          <th class="py-2.5 px-3 text-right">สถานะโค้ด</th>
+                      </tr>
+                  </thead>
+                  <tbody id="privilege-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  <div id="modalAllPrivilegeHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
+              <h2 class="text-sm font-bold   pl-2"><i class="fas fa-history mr-1"></i> ภาพรวมประวัติการกดรับสิทธิ์ทั้งหมด</h2>
+              <button onclick="closeModal('modalAllPrivilegeHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 shrink-0 border-gray-200 bg-white shadow-sm /40 p-3 border-b  ">
+              <div>
+                  <label class="block text-[9px] font-bold text-black mb-1">ตั้งแต่วันที่</label>
+                  <input type="date" id="all-priv-start" onchange="renderAllPrivilegeHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
+              </div>
+              <div>
+                  <label class="block text-[9px] font-bold text-black mb-1">ถึงวันที่</label>
+                  <input type="date" id="all-priv-end" onchange="renderAllPrivilegeHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
+              </div>
+              <div>
+                  <label class="block text-[9px] font-bold text-black mb-1">สถานะโค้ด</label>
+                  <select id="all-priv-status" onchange="renderAllPrivilegeHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
+                      <option value="all">ทั้งหมด</option>
+                      <option value="claimed">รอนำไปใช้</option>
+                      <option value="used">ใช้ที่ร้านแล้ว</option>
+                  </select>
+              </div>
+              <div class="flex items-end">
+                  <button onclick="exportAllPrivilegeHistory()" class="w-full border-gray-200 bg-white shadow-sm    hover: border   px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1.5 shadow-sm"><i class="fas fa-file-csv"></i> Export Data</button>
+              </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
+              <table class="w-full text-left border-collapse min-w-[700px]">
+                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
+                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
+                          <th class="py-2.5 px-3">วัน/เวลาที่กดรับ</th>
+                          <th class="py-2.5 px-3">ชื่อสิทธิพิเศษ / แคมเปญ</th>
+                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
+                          <th class="py-2.5 px-3 text-center">โค้ดที่ได้รับ</th>
+                          <th class="py-2.5 px-3 text-right">สถานะโค้ด</th>
+                      </tr>
+                  </thead>
+                  <tbody id="all-privilege-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
+                      <tr><td colspan="5" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  <div id="modalQuestHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
+              <h2 class="text-sm font-bold   pl-2" id="quest-history-title"><i class="fas fa-history mr-1"></i> ประวัติผู้ทำภารกิจสำเร็จ</h2>
+              <button onclick="closeModal('modalQuestHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
+              <table class="w-full text-left border-collapse min-w-[400px]">
+                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
+                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
+                          <th class="py-2.5 px-3">วัน/เวลาที่สำเร็จ</th>
+                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
+                          <th class="py-2.5 px-3 text-right">สถานะ</th>
+                      </tr>
+                  </thead>
+                  <tbody id="quest-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
+                      <tr><td colspan="3" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  <div id="modalAllQuestHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
+      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
+          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
+              <h2 class="text-sm font-bold   pl-2"><i class="fas fa-history mr-1"></i> ภาพรวมผู้ทำภารกิจสำเร็จทั้งหมด</h2>
+              <button onclick="closeModal('modalAllQuestHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-2 shrink-0 border-gray-200 bg-white shadow-sm /40 p-3 border-b  ">
+              <div>
+                  <label class="block text-[9px] font-bold text-black mb-1">ตั้งแต่วันที่</label>
+                  <input type="date" id="all-quest-start" onchange="renderAllQuestHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
+              </div>
+              <div>
+                  <label class="block text-[9px] font-bold text-black mb-1">ถึงวันที่</label>
+                  <input type="date" id="all-quest-end" onchange="renderAllQuestHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
+              </div>
+              <div class="flex items-end">
+                  <button onclick="exportAllQuestHistory()" class="w-full border-gray-200 bg-white shadow-sm    hover: border   px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1.5 shadow-sm"><i class="fas fa-file-csv"></i> Export Data</button>
+              </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
+              <table class="w-full text-left border-collapse min-w-[700px]">
+                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
+                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
+                          <th class="py-2.5 px-3">วัน/เวลาที่สำเร็จ</th>
+                          <th class="py-2.5 px-3">ชื่อแคมเปญภารกิจ</th>
+                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
+                          <th class="py-2.5 px-3 text-right">สถานะ</th>
+                      </tr>
+                  </thead>
+                  <tbody id="all-quest-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
+                      <tr><td colspan="4" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
   
   <script>
     const windowContext = window;
@@ -2293,15 +3110,21 @@ window.uploadImageToDrive = async function(base64Data, prefix = "IMG", folderNam
 
 const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม', 'allmenu': 'เมนูจัดการระบบทั้งหมด', 'map': 'เรดาร์ติดตามเรียลไทม์', 'quests': 'ศูนย์จัดการแคมเปญและภารกิจ', 'drivers': 'ทำเนียบคนขับ', 'passengers':'ฐานข้อมูลลูกค้า', 'promos':'คลังคูปองส่วนลด', 'history': 'ประวัติงานทั้งหมด', 'banners': 'จัดการโฆษณา', 'news': 'บอร์ดประกาศข่าวสาร', 'blacklist': 'แบล็กลิสต์ลูกค้า', 'chatlogs': 'บันทึกแชทระบบ', 'vehicles': 'ตั้งค่าประเภทรถ', 'blockdrivers': 'ระงับการใช้งานคนขับ', 'driver-details': 'ข้อมูลส่วนตัวพนักงาน', 'all-block-history': 'ประวัติการระงับสิทธิ์ทั้งหมด', 'all-wallet-history': 'ประวัติธุรกรรมการเงินทั้งหมด', 'topup-approvals': 'ศูนย์ตรวจสอบการเติมเงิน', 'commission-settings': 'ศูนย์บริหารกฎระเบียบและค่าคอมมิชชัน', 'partner-campaigns': 'แคมเปญร้านค้าพาร์ทเนอร์', 'partner-approvals': 'อนุมัติงานร้านค้า', 'driver-banners': 'จัดการโฆษณา (คนขับ)', 'driver-news': 'บอร์ดข่าวสาร (คนขับ)', 'social-management': 'กระดานผู้นำระบบ Social' };
 
-    function switchTab(tabId, isBack = false) {
-        document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
+    window.switchTab = function(tabId, isBack = false) {
+        // ซ่อนทุกแท็บ
+        document.querySelectorAll('.tab-content').forEach(el => { 
+            el.classList.add('hidden'); 
+            el.classList.remove('flex'); 
+        });
         
+        // แสดงแท็บที่เลือก
         let targetContent = document.getElementById('content-' + tabId);
         if(targetContent) {
             targetContent.classList.remove('hidden');
             if(tabId === 'map') targetContent.classList.add('flex');
         }
 
+        // จัดการประวัติการเปิดหน้า (สำหรับปุ่มย้อนกลับ)
         if(!isBack) {
             if(tabId === 'dashboard' || tabId === 'allmenu' || tabId === 'map') {
                 window.adminHistoryStack = [tabId];
@@ -2312,31 +3135,32 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             }
         }
 
+        // แสดง/ซ่อน ปุ่มย้อนกลับ
         let backBtn = document.getElementById('admin-back-btn');
         if(backBtn) {
             if(window.adminHistoryStack.length > 1) backBtn.classList.remove('hidden');
             else backBtn.classList.add('hidden');
         }
 
+        // เปลี่ยนหัวข้อหน้า
         let titleEl = document.getElementById('current-page-title');
         if(titleEl) titleEl.innerText = tabTitles[tabId] || 'แดชบอร์ด';
 
-        document.querySelectorAll('.nav-bottom-btn').forEach(btn => { btn.classList.remove('', ']'); btn.classList.add('text-black', ''); });
-        
-        let bottomMap = { 'dashboard': 'nav-dashboard', 'map': 'nav-map' };
-        let activeNavId = bottomMap[tabId] || 'nav-allmenu'; 
-        let activeNav = document.getElementById(activeNavId);
-        if(activeNav && activeNavId !== 'nav-allmenu') { activeNav.classList.remove('text-black', ''); activeNav.classList.add('', ']'); }
+        // 🌟 เรียกใช้ฟังก์ชันเปลี่ยนสีเมนูด้านล่างสำหรับมือถือ
+        if(typeof window.updateBottomNav === 'function') {
+            window.updateBottomNav(tabId);
+        }
 
+        // โหลดข้อมูลเฉพาะหน้า
         if(tabId === 'passengers') renderPassengers();
         if(tabId === 'promos') renderPromoList();
         if(tabId === 'history') renderHistoryTab();
         if(tabId === 'quests') renderQuestsTable();
-        if(tabId === 'map') { if(adminMap) google.maps.event.trigger(adminMap, 'resize'); }
+        if(tabId === 'map') { if(typeof adminMap !== 'undefined' && adminMap) google.maps.event.trigger(adminMap, 'resize'); }
         if(tabId === 'all-block-history') { if(typeof renderAllBlockHistory === 'function') renderAllBlockHistory(); }
-      if(tabId === 'all-wallet-history') { if(typeof renderAllWalletHistory === 'function') renderAllWalletHistory(); }
-      if(tabId === 'topup-approvals') { if(typeof renderTopupApprovals === 'function') renderTopupApprovals(); }
-      if(tabId === 'commission-settings') { if(typeof renderCommissionSettings === 'function') renderCommissionSettings(); }
+        if(tabId === 'all-wallet-history') { if(typeof renderAllWalletHistory === 'function') renderAllWalletHistory(); }
+        if(tabId === 'topup-approvals') { if(typeof renderTopupApprovals === 'function') renderTopupApprovals(); }
+        if(tabId === 'commission-settings') { if(typeof renderCommissionSettings === 'function') renderCommissionSettings(); }
     }
 
     window.goBackAdmin = function() {
@@ -2346,7 +3170,6 @@ const tabTitles = { 'dashboard': 'แดชบอร์ดระบบรวม'
             switchTab(prevTab, true);
         }
     }
-
     // ================= โหมดจ่ายงาน (DISPATCH MODE) =================
     db.ref('config/dispatchMode').on('value', snap => {
         if(snap.exists()) {
@@ -7717,827 +8540,5 @@ let creditDisplay = `
         });
     };
 </script>
-
-  <!-- 🌟 หน้าต่างประวัติ Logs (ค้นหาตามวันที่) -->
-  <div id="modalDriverLogs" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
-              <h2 class="text-base font-bold text-black "><i class="fas fa-map-marker-alt  mr-1"></i> ประวัติสถานะ & พิกัด</h2>
-              <button onclick="closeModal('modalDriverLogs')" class="text-black hover:text-black     rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="p-3 border-b   border-gray-200 bg-white shadow-sm ">
-              <label class="block text-[10px] font-bold text-black  mb-1">ตัวกรองวันที่:</label>
-              <input type="date" id="filter-logs-date" onchange="fetchDriverLogs()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-sm font-bold focus:">
-          </div>
-          <div class="flex-1 overflow-y-auto p-0 slim-scroll">
-              <table class="w-full text-left">
-                  <tbody id="det-logs-table" class="divide-y divide-gray-200 ">
-                  </tbody>
-              </table>
-          </div>
-      </div>
-  </div>
-  <div id="modalCropProfile" class="hidden fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
-              <h2 class="text-base font-bold  ]"><i class="fas fa-crop-alt mr-1"></i> ปรับตำแหน่งรูปภาพให้พอดี</h2>
-              <button onclick="closeProfileCropper()" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          <div class="p-4 bg-black">
-              <div class="w-full max-h-[300px] overflow-hidden flex justify-center">
-                  <img id="profileImageToCrop" class="max-w-full">
-              </div>
-          </div>
-          <div class="p-4 border-t   flex gap-3 border-gray-200 bg-white shadow-sm /50">
-              <button onclick="closeProfileCropper()" class="flex-1 py-2.5   text-black  font-bold rounded-xl text-sm hover: transition">ยกเลิก</button>
-              <button onclick="confirmProfileCrop()" class="flex-1 py-2.5  text-black font-bold rounded-xl shadow-md hover: transition text-sm">ตัดรูปนี้</button>
-          </div>
-      </div>
-  </div>
-
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsZ_tbFhH6fUXRz3I6C-tMshNwwrSevd4&libraries=places,geometry&callback=initAdminMap" async defer></script>
-<div id="modalImageViewer" class="hidden fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 transition-opacity">
-      <button onclick="closeImageViewer()" class="absolute top-4 right-4 text-black hover:text-black border-gray-200 bg-white shadow-sm/50 hover: rounded-full w-10 h-10 flex items-center justify-center z-10 transition"><i class="fas fa-times text-xl"></i></button>
-      <img id="fullImageViewerSrc" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-fade-in" src="">
-  </div>
-  <!-- 🌟 หน้าต่างปรับปรุงยอดเงิน (ซ่อม Layout และปุ่มปิด) -->
-  <div id="modalAdjustCredit" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
-          
-          <div class="p-3 sm:p-4 border-b   flex justify-between items-start border-gray-200 bg-white shadow-sm /50">
-              <div class="flex flex-wrap items-center gap-2 pr-4">
-                  <h2 class="text-base font-bold   mt-1"><i class="fas fa-exchange-alt mr-1"></i> ปรับปรุงยอดเงิน</h2>
-                  <button onclick="viewBonusLedger(currentWalletTargetId)" class=" hover:  px-2 py-1 rounded text-[10px] font-bold transition shadow-sm border  mt-1">
-                      <i class="fas fa-history mr-1"></i> เช็คอายุโบนัส
-                  </button>
-              </div>
-              <button onclick="closeAdjustCreditModal()" class="text-black hover:text-black   shrink-0 pt-1"><i class="fas fa-times text-lg"></i></button>
-          </div>
-          
-          <div class="p-5 space-y-4">
-              <div class="flex items-center gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
-                  <div class="w-10 h-10 rounded-full    flex items-center justify-center text-lg shrink-0"><i class="fas fa-user"></i></div>
-                  <div class="min-w-0">
-                      <p id="adj-drv-name" class="font-bold text-sm text-black  truncate">ชื่อคนขับ</p>
-                      <p id="adj-drv-id" class="text-[10px] text-black ">DRV-000000</p>
-                  </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                  <div>
-                      <label class="block text-[10px] font-bold text-black  mb-1">เลือกกระเป๋า</label>
-                      <select id="adj-wallet-type" onchange="toggleAdjustColors()" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold focus:">
-                          <option value="cash">🟢 เงินสด (Cash)</option>
-                          <option value="bonus">🟡 โบนัส (Bonus)</option>
-                      </select>
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-black  mb-1">ประเภทรายการ</label>
-                      <select id="adj-action-type" onchange="toggleAdjustColors()" class="w-full p-2.5     border   rounded-xl outline-none text-sm font-bold">
-                          <option value="add">➕ เติมเงินเข้า</option>
-                          <option value="deduct">➖ หักเงินออก</option>
-                      </select>
-                  </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                  <div id="adj-amount-container" class="col-span-2">
-                      <label class="block text-[10px] font-bold text-black  mb-1">จำนวนเงิน (บาท)</label>
-                      <input type="number" id="adj-amount" placeholder="0" min="1" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-base font-black text-center focus: shadow-inner">
-                  </div>
-                  <div id="adj-expire-container" class="hidden col-span-1">
-                      <label class="block text-[10px] font-bold text-black  mb-1">อายุโบนัส (วัน) *0=ถาวร</label>
-                      <input type="number" id="adj-expire-days" placeholder="30" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold text-center focus:">
-                  </div>
-              </div>
-              <div>
-                  <label class="block text-[10px] font-bold text-black  mb-1">หมายเหตุ (จำเป็นต้องระบุ)</label>
-                  <input type="text" id="adj-note" placeholder="เช่น ลูกค้าโอนเงินเข้าบริษัท, หักค่าปรับ..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-xs focus:">
-              </div>
-              <button onclick="submitCreditAdjustment()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> ยืนยันทำรายการ</button>
-          </div>
-      </div>
-  </div>
-  <!-- 🌟 หน้าต่างสร้างแคมเปญ/ภารกิจ (แก้บั๊กกล่องรางวัลเบิ้ล) -->
-  <div id="modalAddQuest" class="hidden fixed inset-0 z-[500] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col h-[90vh] overflow-hidden animate-fade-in">
-          
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
-              <h2 class="text-sm font-bold   pl-2" id="quest-modal-title"><i class="fas fa-bullseye mr-1"></i> สร้างแคมเปญภารกิจDRV</h2>
-              <button onclick="closeModal('modalAddQuest')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-
-          <!-- Form Content (จัด Layout ใหม่) -->
-          <div class="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 md:space-y-5 slim-scroll border-gray-200 bg-white shadow-sm/50  text-xs">
-              <input type="hidden" id="quest-id">
-
-              <!-- ชื่อแคมเปญ -->
-              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm">
-                  <label class="block text-[11px] font-bold text-black  mb-1.5">ชื่อแคมเปญภารกิจ DRV</label>
-                  <input type="text" id="quest-name" placeholder="ตัวอย่าง: ภารกิจนักล่าช่วงเร่งด่วนประจำสัปดาห์" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus: text-black  font-bold">
-              </div>
-
-              <!-- กลุ่มเป้าหมาย -->
-              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm space-y-3">
-                  <h3 class="text-[11px] font-bold   border-b   pb-1.5"><i class="fas fa-users mr-1"></i> กลุ่มเป้าหมาย</h3>
-                  
-                  <div class="grid grid-cols-2 gap-3">
-                      <div class="relative" id="dropdown-tier-container">
-                          <label class="block text-[10px] font-bold text-black mb-1">ระดับชั้น (Tier)</label>
-                          <div class="relative">
-                              <button type="button" onclick="toggleCustomDropdown('tier-options')" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none flex justify-between items-center text-[11px] font-bold text-black  transition hover: :">
-                                  <span id="tier-select-text" class="truncate">-- เลือกกลุ่มเป้าหมาย --</span>
-                                  <i class="fas fa-chevron-down text-black ml-2"></i>
-                              </button>
-                              <div id="tier-options" class="hidden absolute z-[100] w-full mt-1 border-gray-200 bg-white shadow-sm  border   rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                                  </div>
-                          </div>
-                      </div>
-
-                      <div class="relative" id="dropdown-veh-container">
-                          <label class="block text-[10px] font-bold text-black mb-1">ประเภทยานพาหนะ</label>
-                          <div class="relative">
-                              <button type="button" onclick="toggleCustomDropdown('veh-options')" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none flex justify-between items-center text-[11px] font-bold text-black  transition hover: :">
-                                  <span id="veh-select-text" class="truncate">-- เลือกประเภทรถ --</span>
-                                  <i class="fas fa-chevron-down text-black ml-2"></i>
-                              </button>
-                              <div id="veh-options" class="hidden absolute z-[100] w-full mt-1 border-gray-200 bg-white shadow-sm  border   rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                                  </div>
-                          </div>
-                      </div>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3 pt-2 border-t  ">
-                      <div>
-                          <label class="block text-[10px] font-bold text-black mb-1"><i class="fas fa-thumbs-up  mr-1"></i> ยอดไลก์สะสมไม่ต่ำกว่า</label>
-                          <div class="relative">
-                              <input type="number" id="quest-target-likes" min="0" placeholder="เช่น 100" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus: font-mono text-center font-bold pr-8">
-                              <span class="absolute right-3 top-2.5 text-[9px] text-black font-bold">ไลก์</span>
-                          </div>
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-black mb-1">อายุสมาชิกครบ</label>
-                          <div class="flex gap-1">
-                              <input type="number" id="cond-days-val" placeholder="ตัวเลข" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-center focus: font-bold">
-                              <select id="cond-days-unit" class="w-16 p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus: font-bold text-black ">
-                                  <option value="days">วัน</option>
-                                  <option value="months">เดือน</option>
-                                  <option value="years">ปี</option>
-                              </select>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- เงื่อนไขแคมเปญ -->
-              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm space-y-3">
-                  <div class="border-b   pb-2">
-                      <h3 class="text-[11px] font-bold  "><i class="fas fa-list-ul mr-1"></i> เงื่อนไขแคมเปญภารกิจ DRV (เลือกได้ 1 อย่าง)</h3>
-                  </div>
-                  
-                  <!-- 🌟 จัดแถว Dropdown และปุ่มให้อยู่บรรทัดเดียวกันเสมอ -->
-                  <div class="flex items-center gap-2 w-full">
-                      <select id="select-condition-type" class="flex-1 p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-[11px] focus: font-bold text-black  disabled:opacity-50 disabled:">
-                          <option value="">-- เลือกเงื่อนไขเพื่อเพิ่ม --</option>
-                          <option value="rides">วิ่งสะสมครบ</option>
-                          <option value="likes">👍 ยอดถูกใจ (Like) สะสม</option>
-                          <option value="online">ออนไลน์สะสม</option>
-                          <option value="peak">วิ่งช่วงเวลาพิเศษ (Peak Hours)</option>
-                      </select>
-                      <button type="button" id="btn-add-condition" onclick="handleAddConditionRow()" class="shrink-0  hover: text-black px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-plus"></i> เพิ่ม</button>
-                  </div>
-                  
-                  <div id="dynamic-conditions-list" class="space-y-2 min-h-[40px] border-gray-200 bg-white shadow-sm  p-2 rounded-xl border border-dashed  ">
-                      <!-- Dynamic Rows -->
-                  </div>
-              </div>
-            
-              <!-- จำกัดสิทธิ์และเวลา -->
-              <div class="bg-rose-50/50 /80 p-4 rounded-xl border border-rose-100  shadow-sm">
-                  <!-- โซนจำกัดสิทธิ์ (จัดให้อยู่บรรทัดเดียว) -->
-                  <div class="flex items-center flex-nowrap gap-1.5 sm:gap-2 mb-4 pb-4 border-b border-rose-100  w-full overflow-hidden">
-                      <label class="flex items-center gap-1.5 cursor-pointer shrink-0">
-                          <input type="checkbox" id="cond-limit-check" onchange="toggleLimitInputs(this.checked)" class="w-4 h-4 rounded  text-rose-500 focus:ring-rose-500 border-gray-200 bg-white shadow-sm ">
-                          <span class="font-bold text-rose-600  text-[11px]"><i class="fas fa-dot-circle mr-1"></i>จำกัดสิทธิ์รับรางวัล (ต่อคน)</span>
-                      </label>
-                      <input type="number" id="cond-limit-val" placeholder="ครั้ง" class="w-14 sm:w-16 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-center font-bold text-[11px] disabled:opacity-50 disabled: shrink-0" disabled>
-                      <span class="text-black font-bold text-[11px] shrink-0">ต่อ</span>
-                      <select id="cond-limit-unit" class="min-w-0 flex-1 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none font-bold text-[11px] disabled:opacity-50 disabled:" disabled>
-                          <option value="day">วัน</option>
-                          <option value="week">สัปดาห์</option>
-                          <option value="month">เดือน</option>
-                          <option value="all">ตลอดแคมเปญ</option>
-                      </select>
-                  </div>
-
-                  <!-- โซนเวลา -->
-                  <div class="grid grid-cols-2 gap-3">
-                      <div>
-                          <label class="block text-[10px] font-bold text-black mb-1">เวลาเริ่มภารกิจ</label>
-                          <input type="datetime-local" id="quest-start" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus:border-rose-500 font-bold text-[10px] text-black ">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-black mb-1">เวลาหมดเขต</label>
-                          <input type="datetime-local" id="quest-end" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none focus:border-rose-500 font-bold text-[10px] text-black ">
-                      </div>
-                  </div>
-              </div>
-
-              <!-- รางวัล -->
-              <div class="border-gray-200 bg-white shadow-sm  p-4 rounded-xl border   shadow-sm space-y-3 mt-4">
-                  <div class="border-b   pb-2">
-                      <h3 class="text-[11px] font-bold  "><i class="fas fa-gift mr-1"></i> รางวัล</h3>
-                  </div>
-
-                  <!-- 🌟 จัดแถว Dropdown และปุ่มให้อยู่บรรทัดเดียวกันเสมอ -->
-                  <div class="flex items-center gap-2 w-full">
-                      <select id="select-reward-type" class="...">
-    <option value="">-- เลือกรางวัลเพื่อเพิ่ม --</option>
-    <option value="credit">💰 เครดิตเข้าระบบ</option>
-    <option value="bonus">🎁 โบนัสเงินสด</option>
-    <option value="tierup">✨ เลื่อนระดับชั้น</option>
-    <option value="likes">👍 เพิ่มยอดกดไลก์พิเศษ</option>
-</select>
-                      <button type="button" onclick="handleAddRewardRow()" class="shrink-0  hover: text-black px-4 py-2.5 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition"><i class="fas fa-plus"></i> เพิ่ม</button>
-                  </div>
-
-                  <div id="dynamic-rewards-list" class="space-y-2 min-h-[40px] border-gray-200 bg-white shadow-sm  p-2 rounded-xl border border-dashed  ">
-                      <!-- Dynamic Rows -->
-                  </div>
-              </div>
-
-              <!-- เปิด/ปิดการใช้งาน -->
-              <div class="flex items-center justify-between border-gray-200 bg-white shadow-sm  p-3 rounded-xl border   shadow-sm">
-                  <span class="font-bold text-black ">สถานะเปิดใช้งานแคมเปญ</span>
-                  <label class="relative inline-flex items-center cursor-pointer select-none">
-                      <input type="checkbox" id="quest-is-active" class="sr-only peer" checked>
-                      <div class="w-9 h-5  peer-focus:outline-none rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:border-gray-200 bg-white shadow-sm after: after:border after:rounded-full after:h-4 after:w-4 after:transition-all  peer-checked:"></div>
-                  </label>
-              </div>
-          </div>
-
-          <div class="p-3 border-t   flex justify-center gap-3 border-gray-200 bg-white shadow-sm  shrink-0">
-              <button onclick="closeModal('modalAddQuest')" class=" hover:  : text-black  px-6 py-2.5 rounded-xl font-bold transition">ยกเลิก</button>
-              <button onclick="saveQuestCampaignDRV()" class=" hover: text-black px-6 py-2.5 rounded-xl font-bold shadow-md transition"><i class="fas fa-save mr-1"></i> บันทึกข้อมูลแคมเปญ</button>
-          </div>
-      </div>
-  </div>
-  
-  <div id="modalAdjustTierRating" class="hidden fixed inset-0 z-[250] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
-              <h2 class="text-base font-bold   pl-2"><i class="fas fa-trophy mr-1"></i> ปรับระดับ & Social Score</h2>
-              <button onclick="closeTierRatingModal()" class="text-black hover:text-black   relative z-50"><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="p-5 space-y-4 relative z-40">
-              <div class="flex items-center gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
-                  <div class="w-10 h-10 rounded-full    flex items-center justify-center text-lg shrink-0"><i class="fas fa-id-card"></i></div>
-                  <div class="min-w-0">
-                      <p id="trm-drv-name" class="font-bold text-sm text-black  truncate">ชื่อคนขับ</p>
-                      <p id="trm-drv-id" class="text-[10px] text-black ">DRV-000000</p>
-                  </div>
-              </div>
-
-              <div>
-                  <label class="block text-[10px] font-bold text-black mb-1">ปรับเปลี่ยนระดับชั้น (Driver Tier)</label>
-                  <select id="trm-tier-select" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold focus:">
-                  </select>
-              </div>
-
-              <div>
-                  <label class="block text-[10px] font-bold text-black mb-1">แก้ไข Social Score (ระบบแมนนวล)</label>
-                  <div class="grid grid-cols-2 gap-2">
-                      <div>
-                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-thumbs-up "></i> ถูกใจ</label>
-                          <input type="number" id="edit-likes" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
-                      </div>
-                      <div>
-                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-thumbs-down "></i> ไม่ถูกใจ</label>
-                          <input type="number" id="edit-dislikes" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
-                      </div>
-                      <div>
-                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-user-plus "></i> ผู้ติดตาม</label>
-                          <input type="number" id="edit-followers" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
-                      </div>
-                      <div>
-                          <label class="block text-[9px] text-black mb-0.5"><i class="fas fa-share "></i> ยอดแชร์</label>
-                          <input type="number" id="edit-shares" min="0" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-xs font-bold focus:">
-                      </div>
-                  </div>
-              </div>
-
-              <div>
-                  <label class="block text-[10px] font-bold text-black mb-1">หมายเหตุการเลื่อนขั้น</label>
-                  <input type="text" id="trm-note" placeholder="เหตุผลการเลื่อนระดับ..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-xs focus:">
-              </div>
-              
-              <button onclick="submitTierRatingAdjustment()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-check"></i> บันทึกข้อมูล</button>
-          </div>
-      </div>
-  </div>
-  <!-- 🌟 หน้าต่างเช็คบัญชีโบนัส (Bonus Ledger) -->
-  <div id="modalBonusLedger" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-sm shadow-2xl flex flex-col max-h-[80vh] overflow-hidden animate-fade-in">
-          <div class="p-4 border-b   flex justify-between items-center  ">
-              <h2 class="text-base font-bold "><i class="fas fa-history mr-1"></i> รายละเอียดโบนัสคงเหลือ</h2>
-              <button onclick="closeModal('modalBonusLedger')" class="text-black hover:text-black"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="p-4 overflow-y-auto flex-1 slim-scroll border-gray-200 bg-white shadow-sm ">
-              <ul id="bonus-ledger-list" class="space-y-3">
-                  <!-- JS จะเอาข้อมูลวันหมดอายุมาหยอดใส่ตรงนี้ -->
-              </ul>
-          </div>
-      </div>
-  </div>
-<div id="modalTierAirdrop" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden">
-          <div class="p-4 border-b   flex justify-between items-center  ">
-              <h2 class="text-base font-bold "><i class="fas fa-gift mr-1"></i> แจกโบนัสกลุ่มพิเศษ (Airdrop)</h2>
-              <button onclick="closeModal('modalTierAirdrop')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          <div class="p-5 space-y-4 text-left">
-              <div>
-                  <label class="block text-[10px] font-bold text-black mb-1">เลือกระดับกลุ่มเป้าหมายที่จะแจกเงิน</label>
-                  <select id="airdrop-tier-select" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold focus:">
-    <option value="all">🌐 แจกทุกคนในระบบ (ทุกระดับชั้น)</option>
-</select>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                  <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">จำนวนเงินโบนัส (บาท)</label>
-                      <input type="number" id="airdrop-amount" placeholder="เช่น 100" min="1" class="w-full p-2.5 border-gray-200 bg-white shadow-sm   border   rounded-xl outline-none text-sm font-black text-center focus:">
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">อายุโบนัส (วัน) *0=ถาวร</label>
-                      <input type="number" id="airdrop-expire-days" placeholder="0" min="0" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-sm font-bold text-center focus:">
-                  </div>
-              </div>
-              <div>
-                  <label class="block text-[10px] font-bold text-black mb-1">ชื่อกิจกรรม / หมายเหตุรายการ (จำเป็น)</label>
-                  <input type="text" id="airdrop-note" placeholder="เช่น โบนัสเยียวยาระบบปรับปรุง, แจกปีใหม่..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-xl outline-none text-xs focus:">
-              </div>
-              <button onclick="submitTierAirdrop()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm"><i class="fas fa-paper-plane"></i> อัดฉีดเงินให้กลุ่มเป้าหมาย 🚀</button>
-          </div>
-      </div>
-  </div>
-
-  <div id="modalSearchToBlock" class="hidden fixed inset-0 z-[350] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
-              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-search mr-1 "></i> ระบุคนขับที่ต้องการบล็อก</h2>
-              <button onclick="closeModal('modalSearchToBlock')" class="text-black hover:text-black   relative z-50"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="p-5 space-y-4 relative z-40">
-              <div>
-                  <label class="block text-[11px] font-medium text-black  mb-1">รหัสอ้างอิงระบบ (Driver ID)</label>
-                  <input type="text" id="search-block-id" placeholder="เช่น DRV-123456" class="w-full p-2.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[12px] font-bold focus: transition tracking-wide text-center uppercase">
-              </div>
-              <button onclick="submitSearchToBlock()" class="w-full py-2.5  hover: text-black font-medium rounded-lg shadow-md transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-arrow-right"></i> ดำเนินการต่อ</button>
-          </div>
-      </div>
-  </div>
-
-  <div id="modalBlockHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-md shadow-2xl flex flex-col h-[80vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
-              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติการบล็อก/ปลดบล็อก</h2>
-              <button onclick="closeModal('modalBlockHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="p-3 border-gray-200 bg-white shadow-sm  border-b   shrink-0 flex items-center gap-3">
-              <div class="w-10 h-10   rounded-full flex items-center justify-center text-black"><i class="fas fa-user-shield"></i></div>
-              <div>
-                  <p id="bh-drv-name" class="font-bold text-[12px] text-black ">กำลังโหลด...</p>
-                  <p id="bh-drv-id" class="text-[10px] text-black font-mono">ID: -</p>
-              </div>
-          </div>
-
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
-              <div id="block-history-timeline" class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-300 : before:to-transparent">
-                  </div>
-          </div>
-      </div>
-  </div>
-
-<!-- 🌟 หน้าต่างระงับสิทธิ์คนขับ (Block / Unblock) -->
-  <div id="modalBlockDriver" class="hidden fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-sm shadow-2xl flex flex-col animate-fade-in overflow-hidden relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50">
-              <h2 class="text-sm font-bold   pl-2"><i class="fas fa-ban mr-1"></i> จัดการระงับสิทธิ์คนขับ</h2>
-              <button onclick="closeModal('modalBlockDriver')" class="text-black hover:text-black   relative z-50"><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="p-5 space-y-4 relative z-40">
-              <div class="flex items-center gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
-                  <div class="w-10 h-10 rounded-full    flex items-center justify-center text-lg shrink-0"><i class="fas fa-user-slash"></i></div>
-                  <div class="min-w-0">
-                      <p id="block-drv-name" class="font-bold text-sm text-black  truncate">ชื่อคนขับ</p>
-                      <p id="block-drv-id" class="text-[10px] text-black ">PIN: 0000</p>
-                  </div>
-              </div>
-
-              <!-- โซนกรอกข้อมูล (สำหรับคนขับที่ยังไม่ถูกบล็อก) -->
-              <div id="block-input-zone" class="space-y-3">
-                  <div>
-                      <label class="block text-[11px] font-medium text-black  mb-1">ระยะเวลาการระงับสิทธิ์</label>
-                      <div class="flex gap-2">
-                          <input type="number" id="block-duration-num" placeholder="ระบุจำนวน" min="1" class="w-1/2 p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition font-bold text-center">
-                          <select id="block-duration-unit" class="w-1/2 p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition font-bold" onchange="document.getElementById('block-duration-num').disabled = (this.value === 'permanent')">
-                              <option value="minutes">นาที</option>
-                              <option value="hours">ชั่วโมง</option>
-                              <option value="days">วัน</option>
-                              <option value="permanent">ถาวร</option>
-                          </select>
-                      </div>
-                  </div>
-                  <div>
-                      <label class="block text-[11px] font-medium text-black  mb-1">สาเหตุการบล็อกหลัก</label>
-                      <select id="block-reason-dropdown" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition font-bold">
-                          </select>
-                  </div>
-                  <div>
-                      <label class="block text-[11px] font-medium text-black  mb-1">หมายเหตุเพิ่มเติม</label>
-                      <input type="text" id="block-note-input" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)..." class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[11px] focus: transition">
-                  </div>
-              </div>
-
-              <!-- โซนแสดงสถานะ (สำหรับคนขับที่โดนบล็อกอยู่) -->
-              <div id="blocked-status-zone" class="hidden border-gray-200 bg-white shadow-sm  p-3 rounded-lg border  ">
-                  <p class="text-[11px] font-bold  mb-1.5"><i class="fas fa-lock"></i> สถานะ: ถูกระงับการใช้งาน</p>
-                  <p class="text-[10px] text-black  mb-0.5">เหตุผล: <span id="blocked-reason-display" class="font-bold text-black ">...</span></p>
-                  <p class="text-[10px] text-black  mb-0.5">เริ่มบล็อกเมื่อ: <span id="blocked-start-display" class="font-bold text-black ">...</span></p>
-                  <p class="text-[10px] text-black ">ระงับสิทธิ์ถึง: <span id="blocked-expire-display" class="font-bold ">...</span></p>
-              </div>
-              
-              <div class="grid grid-cols-2 gap-2 pt-2">
-                  <button onclick="viewBlockHistory()" class="w-full py-2.5   text-black  font-medium rounded-lg hover: transition text-[11px] flex justify-center items-center gap-1.5"><i class="fas fa-history"></i> ประวัติการบล็อก</button>
-                  <button id="btn-submit-block" class="w-full py-2.5 font-medium rounded-lg shadow-sm transition text-[11px] flex justify-center items-center gap-1.5"></button>
-              </div>
-          </div>
-      </div>
-  </div>
-  <!-- 🌟 หน้าต่างสร้างแคมเปญร้านค้าพาร์ทเนอร์ -->
-  <div id="modalPartnerCampaign" class="hidden fixed inset-0 z-[310] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  sticky top-0 z-10">
-              <h2 class="text-base font-bold  " id="partner-modal-title"><i class="fas fa-store mr-1"></i> สร้างแคมเปญร้านค้าพาร์ทเนอร์</h2>
-              <button onclick="closeModal('modalPartnerCampaign')" class="text-black hover:text-black"><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="p-5 space-y-4">
-              <input type="hidden" id="partner-camp-id">
-              <div>
-                  <label class="block text-[11px] font-bold text-black mb-1">ชื่อแคมเปญ / ชื่อร้านค้า</label>
-                  <input type="text" id="partner-camp-name" placeholder="เช่น แจกโบนัสกินกาแฟร้าน A..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-xl outline-none text-sm font-bold focus:">
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
-                  <div class="col-span-1 sm:col-span-2"><h3 class="text-[10px] font-black   mb-1"><i class="fas fa-filter"></i> กำหนดผู้มีสิทธิ์เข้าร่วม</h3></div>
-                  <div class="relative">
-                      <label class="block text-[10px] font-bold text-black mb-1">ระดับชั้น (Tier)</label>
-                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('partner-tier-dd').classList.toggle('hidden')">
-                          <span id="partner-tier-text" class="truncate text-black ">เลือกกลุ่มเป้าหมาย...</span>
-                          <i class="fas fa-chevron-down text-black"></i>
-                      </div>
-                      <div id="partner-tier-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="togglePartnerTiers(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
-                          <div id="partner-target-tier-container" class="flex flex-col gap-2"></div>
-                      </div>
-                  </div>
-                  <div class="relative">
-                      <label class="block text-[10px] font-bold text-black mb-1">ประเภทยานพาหนะ</label>
-                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('partner-veh-dd').classList.toggle('hidden')">
-                          <span id="partner-veh-text" class="truncate text-black ">เลือกรถ...</span>
-                          <i class="fas fa-chevron-down text-black"></i>
-                      </div>
-                      <div id="partner-veh-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="togglePartnerVehs(this)" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
-                          <div id="partner-target-vehicle-container" class="flex flex-col gap-2"></div>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="p-3 border-gray-200 bg-white shadow-sm  border   rounded-xl">
-                  <h4 class="text-[10px] font-black   mb-2 flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> เงื่อนไขรับรางวัล (ระบบยืนยันตัวตนร้านค้า)</h4>
-                  <div class="space-y-2">
-                      <label class="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" id="pc-proof-selfie" class="w-4 h-4 accent-red-500">
-                          <span class="text-[10px] font-bold text-black ">📸 บังคับเซลฟี่หน้าร้าน หรือถ่ายคู่กับสินค้า</span>
-                      </label>
-                      <label class="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" id="pc-proof-receipt" class="w-4 h-4 accent-red-500">
-                          <span class="text-[10px] font-bold text-black ">🧾 บังคับแนบใบเสร็จ (เห็นวันที่ + ตราปั๊มร้าน)</span>
-                      </label>
-                      <div class="flex items-center gap-2">
-                          <input type="checkbox" id="pc-proof-code" onchange="document.getElementById('pc-code-amount').disabled = !this.checked; if(this.checked) document.getElementById('pc-code-amount').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="pc-proof-code" class="text-[10px] font-bold text-black  cursor-pointer shrink-0">🎟️ โค้ดลับที่ร้านค้าแจก (สร้างกี่ใบ?)</label>
-                          <input type="number" id="pc-code-amount" disabled placeholder="เช่น 100" class="w-20 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold text-center focus: disabled:opacity-50 disabled:">
-                      </div>
-                      <div class="flex flex-wrap items-center gap-2 pt-2 border-t  mt-2">
-                          <input type="checkbox" id="pc-limit-check" onchange="document.getElementById('pc-limit-val').disabled = !this.checked; document.getElementById('pc-limit-unit').disabled = !this.checked; if(this.checked) document.getElementById('pc-limit-val').focus();" class="w-4 h-4 accent-red-500 cursor-pointer shrink-0">
-                          <label for="pc-limit-check" class="text-[10px] font-bold   cursor-pointer shrink-0">🛑 จำกัดสิทธิ์/คนขับ</label>
-                          <input type="number" id="pc-limit-val" disabled placeholder="ครั้ง" class="w-16 p-1.5 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold text-center focus: disabled:opacity-50 disabled:">
-                          <span class="text-[10px] font-bold text-black shrink-0">ต่อ</span>
-                          <select id="pc-limit-unit" disabled class="flex-1 min-w-[70px] p-1.5 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] font-bold focus: disabled:opacity-50 disabled:">
-                              <option value="day">วัน</option>
-                              <option value="week">สัปดาห์</option>
-                              <option value="month">เดือน</option>
-                              <option value="all">แคมเปญ</option>
-                          </select>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                  <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">เวลาเริ่ม (ว่าง=เริ่มทันที)</label>
-                      <input type="datetime-local" id="partner-camp-start" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">เวลาหมดเขต (ว่าง=ตลอดไป)</label>
-                      <input type="datetime-local" id="partner-camp-end" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
-                  </div>
-              </div>
-
-              <div class="border-t border-dashed   pt-4">
-                  <h3 class="text-xs font-bold  mb-2"><i class="fas fa-gift"></i> รางวัลที่คนขับจะได้รับเมื่อแอดมินอนุมัติ</h3>
-                  <div class="grid grid-cols-2 gap-3 border-gray-200 bg-white shadow-sm  p-3 rounded-xl border  ">
-                      <div>
-                          <label class="block text-[10px] font-bold text-black  mb-1">โบนัสเงิน (🟡)</label>
-                          <input type="number" id="partner-reward-bonus" placeholder="เช่น 50" class="w-full p-2 border-gray-200 bg-white shadow-sm   border   rounded-lg outline-none text-[11px] font-bold text-center focus:">
-                      </div>
-                      <div>
-                          <label class="block text-[10px] font-bold text-black  mb-1">อายุโบนัส (วัน)</label>
-                          <input type="number" id="partner-reward-expire" placeholder="0 = ถาวร" class="w-full p-2 border-gray-200 bg-white shadow-sm   border   rounded-lg outline-none text-[11px] font-bold text-center focus:">
-                      </div>
-                  </div>
-              </div>
-
-              <div class="flex items-center gap-2 mt-2">
-                  <input type="checkbox" id="partner-camp-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                  <label for="partner-camp-is-active" class="text-xs font-bold text-black  cursor-pointer">เปิดใช้งานแคมเปญร้านค้านี้ทันที 🟢</label>
-              </div>
-
-              <button onclick="savePartnerCampaign()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกและสร้างแคมเปญร้านค้า</button>
-          </div>
-      </div>
-  </div>
-
-  <!-- 🌟 หน้าต่างประวัติอนุมัติย้อนหลัง (History) -->
-  <div id="modalPartnerHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
-              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติการอนุมัติแคมเปญร้านค้าย้อนหลัง</h2>
-              <button onclick="closeModal('modalPartnerHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
-              <table class="w-full text-left border-collapse min-w-[700px]">
-                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
-                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
-                          <th class="py-2.5 px-3">วัน/เวลาตัดสิน</th>
-                          <th class="py-2.5 px-3">แคมเปญ / คนขับ</th>
-                          <th class="py-2.5 px-3 text-center">รางวัลที่ได้</th>
-                          <th class="py-2.5 px-3 text-center">หลักฐานอ้างอิง</th>
-                          <th class="py-2.5 px-3 text-right">สถานะ</th>
-                      </tr>
-                  </thead>
-                  <tbody id="partner-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
-                      <tr><td colspan="5" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
-                  </tbody>
-              </table>
-          </div>
-      </div>
-  </div>
-
-  <div id="modalDriverBannerHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
-              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติโฆษณาคนขับที่ยกเลิก/หมดอายุ</h2>
-              <button onclick="closeModal('modalDriverBannerHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm " id="driver-banners-history-list">
-              </div>
-      </div>
-  </div>
-
-  <div id="modalDriverNewsHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border   rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm /50 shrink-0">
-              <h2 class="text-sm font-bold text-black  pl-2"><i class="fas fa-history mr-1 "></i> ประวัติข่าวสารประกาศที่ถูกลบ</h2>
-              <button onclick="closeModal('modalDriverNewsHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm " id="driver-news-history-list">
-              </div>
-      </div>
-  </div>
-
-  <div id="modalAddPrivilege" class="hidden fixed inset-0 z-[320] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in slim-scroll">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  sticky top-0 z-10">
-              <h2 class="text-base font-bold  " id="privilege-modal-title"><i class="fas fa-gift mr-1"></i> เพิ่มสิทธิพิเศษใหม่</h2>
-              <button onclick="closeModal('modalAddPrivilege')" class="text-black hover:text-black"><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="p-5 space-y-4">
-              <input type="hidden" id="priv-id">
-              <div>
-                  <label class="block text-[11px] font-bold text-black mb-1">ชื่อสิทธิพิเศษ / ชื่อร้าน</label>
-                  <input type="text" id="priv-name" placeholder="เช่น ส่วนลด 50% ร้านกาแฟ B..." class="w-full p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-xl outline-none text-sm font-bold focus:">
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-gray-200 bg-white shadow-sm /50 p-3 rounded-xl border  ">
-                  <div class="col-span-1 sm:col-span-2"><h3 class="text-[10px] font-black   mb-1"><i class="fas fa-filter"></i> กำหนดผู้มีสิทธิ์กดรับ</h3></div>
-                  <div class="relative">
-                      <label class="block text-[10px] font-bold text-black mb-1">ระดับชั้น (Tier)</label>
-                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('priv-tier-dd').classList.toggle('hidden')">
-                          <span id="priv-tier-text" class="truncate text-black ">เลือกกลุ่มเป้าหมาย...</span>
-                          <i class="fas fa-chevron-down text-black"></i>
-                      </div>
-                      <div id="priv-tier-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="toggleAllTargets(this, 'priv-target-tier', 'priv')" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
-                          <div id="priv-tier-container" class="flex flex-col gap-2"></div>
-                      </div>
-                  </div>
-                  <div class="relative">
-                      <label class="block text-[10px] font-bold text-black mb-1">ประเภทยานพาหนะ</label>
-                      <div class="p-2.5 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[11px] font-bold cursor-pointer flex justify-between items-center shadow-sm" onclick="document.getElementById('priv-veh-dd').classList.toggle('hidden')">
-                          <span id="priv-veh-text" class="truncate text-black ">เลือกรถ...</span>
-                          <i class="fas fa-chevron-down text-black"></i>
-                      </div>
-                      <div id="priv-veh-dd" class="hidden absolute w-full mt-1 border-gray-200 bg-white shadow-sm  border   shadow-xl rounded-xl p-3 z-50 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                          <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold  border-b  pb-2 mb-1"><input type="checkbox" onchange="toggleAllTargets(this, 'priv-target-vehicle', 'priv')" class="w-4 h-4 accent-blue-500"> เลือกทั้งหมด</label>
-                          <div id="priv-vehicle-container" class="flex flex-col gap-2"></div>
-                      </div>
-                  </div>
-              </div>
-
-              <div class="p-3 border-gray-200 bg-white shadow-sm  border   rounded-xl space-y-3">
-                  <div class="flex items-center gap-2">
-                      <label class="text-[10px] font-bold   shrink-0 w-32"><i class="fas fa-ticket-alt"></i> จำนวนโค้ดที่จะแจก (ใบ)</label>
-                      <input type="number" id="priv-code-amount" placeholder="เช่น 100" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold focus: text-center">
-                  </div>
-                  
-                  <div class="flex items-center gap-2 pt-2 border-t ">
-                      <label class="text-[10px] font-bold text-black  shrink-0 w-32">🛑 สิทธิ์การกดรับ / คนขับ</label>
-                      <input type="number" id="priv-limit-val" placeholder="ครั้ง" class="w-16 p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg outline-none text-xs font-bold text-center focus:">
-                      <span class="text-[9px] text-black">/</span>
-                      <select id="priv-limit-unit" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] font-bold focus:">
-                          <option value="day">วัน</option>
-                          <option value="week">สัปดาห์</option>
-                          <option value="month">เดือน</option>
-                          <option value="all">ตลอดแคมเปญ</option>
-                      </select>
-                  </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                  <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">เริ่มแจก (ว่าง=เริ่มทันที)</label>
-                      <input type="datetime-local" id="priv-start" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
-                  </div>
-                  <div>
-                      <label class="block text-[10px] font-bold text-black mb-1">หมดเขต (ว่าง=แจกตลอด)</label>
-                      <input type="datetime-local" id="priv-end" class="w-full p-2 border-gray-200 bg-white shadow-sm  border   rounded-lg text-[10px] outline-none focus:">
-                  </div>
-              </div>
-
-              <div class="flex items-center gap-2 mt-2">
-                  <input type="checkbox" id="priv-is-active" checked class="w-4 h-4 accent-emerald-500 cursor-pointer">
-                  <label for="priv-is-active" class="text-xs font-bold text-black  cursor-pointer">เปิดให้กดรับสิทธิ์ได้ทันที 🟢</label>
-              </div>
-
-              <button onclick="saveDriverPrivilege()" class="w-full py-3  hover: text-black font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2"><i class="fas fa-save"></i> บันทึกสิทธิพิเศษ</button>
-          </div>
-      </div>
-  </div>
-
-  <div id="modalPrivilegeHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
-              <h2 class="text-sm font-bold   pl-2" id="priv-history-title"><i class="fas fa-history mr-1"></i> ประวัติการกดรับสิทธิ์</h2>
-              <button onclick="closeModal('modalPrivilegeHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
-              <table class="w-full text-left border-collapse min-w-[500px]">
-                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
-                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
-                          <th class="py-2.5 px-3">วัน/เวลาที่กดรับ</th>
-                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
-                          <th class="py-2.5 px-3 text-center">โค้ดที่ได้รับ</th>
-                          <th class="py-2.5 px-3 text-right">สถานะโค้ด</th>
-                      </tr>
-                  </thead>
-                  <tbody id="privilege-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
-                  </tbody>
-              </table>
-          </div>
-      </div>
-  </div>
-  <div id="modalAllPrivilegeHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
-              <h2 class="text-sm font-bold   pl-2"><i class="fas fa-history mr-1"></i> ภาพรวมประวัติการกดรับสิทธิ์ทั้งหมด</h2>
-              <button onclick="closeModal('modalAllPrivilegeHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 shrink-0 border-gray-200 bg-white shadow-sm /40 p-3 border-b  ">
-              <div>
-                  <label class="block text-[9px] font-bold text-black mb-1">ตั้งแต่วันที่</label>
-                  <input type="date" id="all-priv-start" onchange="renderAllPrivilegeHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
-              </div>
-              <div>
-                  <label class="block text-[9px] font-bold text-black mb-1">ถึงวันที่</label>
-                  <input type="date" id="all-priv-end" onchange="renderAllPrivilegeHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
-              </div>
-              <div>
-                  <label class="block text-[9px] font-bold text-black mb-1">สถานะโค้ด</label>
-                  <select id="all-priv-status" onchange="renderAllPrivilegeHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
-                      <option value="all">ทั้งหมด</option>
-                      <option value="claimed">รอนำไปใช้</option>
-                      <option value="used">ใช้ที่ร้านแล้ว</option>
-                  </select>
-              </div>
-              <div class="flex items-end">
-                  <button onclick="exportAllPrivilegeHistory()" class="w-full border-gray-200 bg-white shadow-sm    hover: border   px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1.5 shadow-sm"><i class="fas fa-file-csv"></i> Export Data</button>
-              </div>
-          </div>
-
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
-              <table class="w-full text-left border-collapse min-w-[700px]">
-                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
-                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
-                          <th class="py-2.5 px-3">วัน/เวลาที่กดรับ</th>
-                          <th class="py-2.5 px-3">ชื่อสิทธิพิเศษ / แคมเปญ</th>
-                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
-                          <th class="py-2.5 px-3 text-center">โค้ดที่ได้รับ</th>
-                          <th class="py-2.5 px-3 text-right">สถานะโค้ด</th>
-                      </tr>
-                  </thead>
-                  <tbody id="all-privilege-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
-                      <tr><td colspan="5" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
-                  </tbody>
-              </table>
-          </div>
-      </div>
-  </div>
-  <div id="modalQuestHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
-              <h2 class="text-sm font-bold   pl-2" id="quest-history-title"><i class="fas fa-history mr-1"></i> ประวัติผู้ทำภารกิจสำเร็จ</h2>
-              <button onclick="closeModal('modalQuestHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
-              <table class="w-full text-left border-collapse min-w-[400px]">
-                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
-                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
-                          <th class="py-2.5 px-3">วัน/เวลาที่สำเร็จ</th>
-                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
-                          <th class="py-2.5 px-3 text-right">สถานะ</th>
-                      </tr>
-                  </thead>
-                  <tbody id="quest-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
-                      <tr><td colspan="3" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
-                  </tbody>
-              </table>
-          </div>
-      </div>
-  </div>
-  <div id="modalAllQuestHistory" class="hidden fixed inset-0 z-[400] bg-black/80 flex items-center justify-center p-4">
-      <div class="border-gray-200 bg-white shadow-sm  border  rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[85vh] overflow-hidden animate-fade-in relative">
-          <div class="p-4 border-b   flex justify-between items-center border-gray-200 bg-white shadow-sm  shrink-0">
-              <h2 class="text-sm font-bold   pl-2"><i class="fas fa-history mr-1"></i> ภาพรวมผู้ทำภารกิจสำเร็จทั้งหมด</h2>
-              <button onclick="closeModal('modalAllQuestHistory')" class="text-black hover:text-black  "><i class="fas fa-times"></i></button>
-          </div>
-          
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-2 shrink-0 border-gray-200 bg-white shadow-sm /40 p-3 border-b  ">
-              <div>
-                  <label class="block text-[9px] font-bold text-black mb-1">ตั้งแต่วันที่</label>
-                  <input type="date" id="all-quest-start" onchange="renderAllQuestHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
-              </div>
-              <div>
-                  <label class="block text-[9px] font-bold text-black mb-1">ถึงวันที่</label>
-                  <input type="date" id="all-quest-end" onchange="renderAllQuestHistory()" class="w-full p-2 border-gray-200 bg-white shadow-sm  text-black  border   rounded-lg outline-none text-[10px] focus: font-bold">
-              </div>
-              <div class="flex items-end">
-                  <button onclick="exportAllQuestHistory()" class="w-full border-gray-200 bg-white shadow-sm    hover: border   px-3 py-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1.5 shadow-sm"><i class="fas fa-file-csv"></i> Export Data</button>
-              </div>
-          </div>
-
-          <div class="flex-1 overflow-y-auto p-4 slim-scroll border-gray-200 bg-white shadow-sm ">
-              <table class="w-full text-left border-collapse min-w-[700px]">
-                  <thead class="sticky top-0 z-10   shadow-sm border-b  ">
-                      <tr class="text-black  text-[10px] uppercase font-bold select-none">
-                          <th class="py-2.5 px-3">วัน/เวลาที่สำเร็จ</th>
-                          <th class="py-2.5 px-3">ชื่อแคมเปญภารกิจ</th>
-                          <th class="py-2.5 px-3">คนขับ (PIN)</th>
-                          <th class="py-2.5 px-3 text-right">สถานะ</th>
-                      </tr>
-                  </thead>
-                  <tbody id="all-quest-history-tbody" class="text-[11px] divide-y divide-gray-100  border-gray-200 bg-white shadow-sm ">
-                      <tr><td colspan="4" class="py-10 text-center text-black text-xs">กำลังโหลดข้อมูล...</td></tr>
-                  </tbody>
-              </table>
-          </div>
-      </div>
-  </div>
 </body>
 </html>
