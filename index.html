@@ -1664,7 +1664,7 @@
                   <div class="flex flex-wrap items-end gap-3 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
                       <div class="flex-1 min-w-[150px]">
                           <label class="block text-[9px] font-bold text-gray-500 mb-1">🔍 ค้นหารายการ</label>
-                          <input type="text" onkeyup="/* ฟังก์ชันกรองอัตโนมัติ */" placeholder="รหัสงาน, แคมเปญ..." class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-[11px] outline-none focus:border-amber-500 bg-white">
+                          <input type="text" onkeyup="/* ฟังก์ชันกรองอัตโนมัติ */" placeholder="รหัสงาน, แคมเปญ, ชื่อบุคคล..." class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-[11px] outline-none focus:border-amber-500 bg-white">
                       </div>
                       <div class="w-[100px]">
                           <label class="block text-[9px] font-bold text-gray-500 mb-1">📅 ตั้งแต่วันที่</label>
@@ -1674,25 +1674,28 @@
                           <label class="block text-[9px] font-bold text-gray-500 mb-1">📅 ถึงวันที่</label>
                           <input type="date" onchange="/* ฟังก์ชันกรองอัตโนมัติ */" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-[11px] outline-none focus:border-amber-500 text-gray-600 bg-white">
                       </div>
+                      
                       <div class="w-[110px]">
-                          <label class="block text-[9px] font-bold text-gray-500 mb-1">ประเภท</label>
+                          <label class="block text-[9px] font-bold text-gray-500 mb-1">📌 ประเภทรายการ</label>
                           <select onchange="/* ฟังก์ชันกรองอัตโนมัติ */" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-[11px] outline-none focus:border-amber-500 bg-white">
                               <option value="all">ทั้งหมด</option>
-                              <option value="income">🟢 รายรับ</option>
-                              <option value="expense">🔴 รายจ่าย</option>
                               <option value="topup">💰 เติมเงิน</option>
+                              <option value="income">🟢 รายรับ GP</option>
+                              <option value="expense">🔴 รายจ่าย</option>
                               <option value="withdraw">💳 ถอนเงิน</option>
                           </select>
                       </div>
-                      <div class="w-[110px]">
-                          <label class="block text-[9px] font-bold text-gray-500 mb-1">กลุ่มเป้าหมาย</label>
+                      
+                      <div class="w-[120px]">
+                          <label class="block text-[9px] font-bold text-gray-500 mb-1">🪣 กระเป๋าปลายทาง</label>
                           <select onchange="/* ฟังก์ชันกรองอัตโนมัติ */" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-[11px] outline-none focus:border-amber-500 bg-white">
                               <option value="all">ทั้งหมด</option>
-                              <option value="driver">🚗 คนขับ</option>
-                              <option value="passenger">🧍 ลูกค้า</option>
-                              <option value="company">🏢 บริษัท</option>
+                              <option value="driver">🚗 งบคนขับ</option>
+                              <option value="passenger">🧍 งบลูกค้า</option>
+                              <option value="company">🏢 รายได้บริษัท</option>
                           </select>
                       </div>
+
                       <button class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-[11px] font-bold hover:bg-emerald-700 transition shadow-sm h-[28px] shrink-0 flex items-center gap-1.5">
                           <i class="fas fa-file-excel"></i> Export ข้อมูล
                       </button>
@@ -1700,80 +1703,86 @@
 
                   <div class="flex items-center gap-3 mb-4 px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg overflow-x-auto slim-scroll">
                       <div class="text-[11px] font-bold text-blue-800 whitespace-nowrap"><i class="fas fa-calculator text-blue-500"></i> สรุปยอดตามช่วงเวลาที่เลือก:</div>
-                      <div class="text-[11px] font-bold text-emerald-600 bg-white px-2.5 py-1 rounded border border-emerald-200 shadow-sm whitespace-nowrap">รายรับ: +฿15.00</div>
-                      <div class="text-[11px] font-bold text-red-600 bg-white px-2.5 py-1 rounded border border-red-200 shadow-sm whitespace-nowrap">รายจ่าย: -฿50.00</div>
+                      <div class="text-[11px] font-bold text-emerald-600 bg-white px-2.5 py-1 rounded border border-emerald-200 shadow-sm whitespace-nowrap">รายรับรวม: +฿15.00</div>
+                      <div class="text-[11px] font-bold text-red-600 bg-white px-2.5 py-1 rounded border border-red-200 shadow-sm whitespace-nowrap">รายจ่ายรวม: -฿50.00</div>
                   </div>
 
                   <div class="flex-1 border rounded-t-xl border-gray-200 bg-white shadow-sm/50 overflow-hidden flex flex-col">
                       <div class="overflow-y-auto overflow-x-auto slim-scroll flex-1">
-                          <table class="w-full text-left border-collapse min-w-[1000px] text-[11px]">
+                          <table class="w-full text-left border-collapse min-w-[1050px] text-[11px]">
+                              
                               <thead class="sticky top-0 bg-gray-100 text-gray-600 uppercase font-bold border-b border-gray-200 z-10 cursor-pointer">
                                   <tr>
                                       <th class="py-3 px-2 w-[5%] hover:bg-gray-200 transition text-center">ลำดับ <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                      <th class="py-3 px-2 w-[12%] hover:bg-gray-200 transition">วัน/เวลา <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                      <th class="py-3 px-2 w-[10%] hover:bg-gray-200 transition">กลุ่มเป้าหมาย <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                      <th class="py-3 px-2 w-[10%] hover:bg-gray-200 transition">ประเภท <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                      <th class="py-3 px-2 w-[15%] hover:bg-gray-200 transition text-blue-800">👤 บุคคลที่เกี่ยวข้อง</th>
-                                      <th class="py-3 px-2 w-[12%] hover:bg-gray-200 transition text-blue-800">📄 รหัสอ้างอิง</th>
-                                      <th class="py-3 px-3 text-right w-[12%] hover:bg-gray-200 transition">จำนวนเงิน <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                      <th class="py-3 px-3 text-left w-[24%]">รายละเอียด</th>
+                                      <th class="py-3 px-2 w-[13%] hover:bg-gray-200 transition">วัน/เวลา <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                      <th class="py-3 px-2 w-[12%] hover:bg-gray-200 transition text-amber-700">📌 ประเภท <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                      <th class="py-3 px-2 w-[12%] hover:bg-gray-200 transition">🪣 กระเป๋าปลายทาง <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                      <th class="py-3 px-2 w-[15%] hover:bg-gray-200 transition text-blue-800">👤 แหล่งที่มา / บุคคล</th>
+                                      <th class="py-3 px-2 w-[10%] hover:bg-gray-200 transition text-blue-800">📄 รหัสอ้างอิง</th>
+                                      <th class="py-3 px-2 text-right w-[11%] hover:bg-gray-200 transition">จำนวนเงิน <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                      <th class="py-3 px-3 text-left w-[22%]">รายละเอียด</th>
                                   </tr>
                               </thead>
+                              
                               <tbody id="treasury-history-tbody" class="font-medium divide-y divide-white">
                                   
                                   <tr class="bg-amber-50/70 hover:bg-amber-100 transition-colors text-amber-900 border-b border-white">
                                       <td class="py-3 px-2 text-center text-amber-700/70">1</td>
-                                      <td class="py-3 px-2">25 มิ.ย. 2026 09:00</td>
-                                      <td class="py-3 px-2 font-bold"><i class="fas fa-building opacity-50"></i> บริษัท</td>
+                                      <td class="py-3 px-2">25 มิ.ย. 2026 10:00</td>
                                       <td class="py-3 px-2 font-bold"><i class="fas fa-coins opacity-50"></i> เติมเงิน</td>
-                                      <td class="py-3 px-2">-</td>
+                                      <td class="py-3 px-2 font-bold"><i class="fas fa-user opacity-50"></i> งบลูกค้า</td>
                                       <td class="py-3 px-2">
-                                          <a href="#" onclick="alert('เปิดดูสลิปธนาคารของบริษัท'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> KBNK-123</a>
+                                          <a href="#" onclick="alert('ดูข้อมูลสปอนเซอร์'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-handshake text-[9px]"></i> สปอนเซอร์ (ร้าน A)</a>
                                       </td>
-                                      <td class="py-3 px-3 text-right font-black">+฿10,000.00</td>
-                                      <td class="py-3 px-3 truncate max-w-[150px]" title="CEO โอนเติมงบการตลาดประจำเดือน">CEO โอนเติมงบการตลาดประจำเดือน</td>
+                                      <td class="py-3 px-2">
+                                          <a href="#" onclick="alert('เปิดสลิปอ้างอิง'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> SPON-001</a>
+                                      </td>
+                                      <td class="py-3 px-2 text-right font-black">+฿300.00</td>
+                                      <td class="py-3 px-3 truncate max-w-[150px]" title="ร้านกาแฟ A อัดฉีดงบทำคูปองส่วนลดลูกค้า">เงินอัดฉีดทำคูปองส่วนลด</td>
                                   </tr>
 
                                   <tr class="bg-emerald-50/70 hover:bg-emerald-100 transition-colors text-emerald-900 border-b border-white">
                                       <td class="py-3 px-2 text-center text-emerald-700/70">2</td>
                                       <td class="py-3 px-2">25 มิ.ย. 2026 14:30</td>
-                                      <td class="py-3 px-2 font-bold"><i class="fas fa-car opacity-50"></i> คนขับ</td>
                                       <td class="py-3 px-2 font-bold"><i class="fas fa-plus opacity-50"></i> รายรับ GP</td>
+                                      <td class="py-3 px-2 font-bold"><i class="fas fa-building opacity-50"></i> รายได้บริษัท</td>
                                       <td class="py-3 px-2">
-                                          <a href="#" onclick="alert('เด้งไปหน้าโปรไฟล์คนขับ'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-search text-[9px]"></i> สมชาย ใจดี</a>
+                                          <a href="#" onclick="alert('ดูโปรไฟล์คนขับ'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-car text-[9px]"></i> สมชาย ใจดี</a>
                                       </td>
                                       <td class="py-3 px-2">
-                                          <a href="#" onclick="alert('เด้งไปดูแผนที่ประวัติงานนี้'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> #TRX-9981</a>
+                                          <a href="#" onclick="alert('ดูรายละเอียดงานวิ่ง'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> #TRX-9981</a>
                                       </td>
-                                      <td class="py-3 px-3 text-right font-black">+฿15.00</td>
-                                      <td class="py-3 px-3 truncate max-w-[150px]" title="หัก GP 10% จากงานรหัส #TRX-9981">หัก GP 10% จากค่าโดยสาร 150 บาท</td>
+                                      <td class="py-3 px-2 text-right font-black">+฿15.00</td>
+                                      <td class="py-3 px-3 truncate max-w-[150px]" title="หัก GP 10% จากค่าโดยสาร 150 บาท">หัก GP 10% จากงานรหัส #TRX-9981</td>
                                   </tr>
 
                                   <tr class="bg-red-50/70 hover:bg-red-100 transition-colors text-red-900 border-b border-white">
                                       <td class="py-3 px-2 text-center text-red-700/70">3</td>
                                       <td class="py-3 px-2">25 มิ.ย. 2026 15:15</td>
-                                      <td class="py-3 px-2 font-bold"><i class="fas fa-user opacity-50"></i> ลูกค้า</td>
-                                      <td class="py-3 px-2 font-bold"><i class="fas fa-minus opacity-50"></i> งบการตลาด</td>
+                                      <td class="py-3 px-2 font-bold"><i class="fas fa-minus opacity-50"></i> รายจ่าย</td>
+                                      <td class="py-3 px-2 font-bold"><i class="fas fa-user opacity-50"></i> งบลูกค้า</td>
                                       <td class="py-3 px-2">
-                                          <a href="#" onclick="alert('เด้งไปหน้าโปรไฟล์ลูกค้า'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-search text-[9px]"></i> สมหญิง รักดี</a>
+                                          <a href="#" onclick="alert('ดูโปรไฟล์ลูกค้า'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-user-circle text-[9px]"></i> สมหญิง รักดี</a>
                                       </td>
                                       <td class="py-3 px-2">
-                                          <a href="#" onclick="alert('เด้งไปดูแผนที่ประวัติงานนี้'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> #TRX-9980</a>
+                                          <a href="#" onclick="alert('ดูรายละเอียดงานวิ่ง'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> #TRX-9980</a>
                                       </td>
-                                      <td class="py-3 px-3 text-right font-black">-฿50.00</td>
-                                      <td class="py-3 px-3 truncate max-w-[150px]" title="ชดเชยค่าโดยสาร ลูกค้าใช้คูปอง SONGKRAN50">ลูกค้าใช้คูปอง SONGKRAN50</td>
+                                      <td class="py-3 px-2 text-right font-black">-฿50.00</td>
+                                      <td class="py-3 px-3 truncate max-w-[150px]" title="ลูกค้าใช้คูปอง SONGKRAN50">ชดเชยค่าโดยสาร (คูปอง SONGKRAN)</td>
                                   </tr>
 
                                   <tr class="bg-blue-50/70 hover:bg-blue-100 transition-colors text-blue-900 border-b border-white">
                                       <td class="py-3 px-2 text-center text-blue-700/70">4</td>
                                       <td class="py-3 px-2">25 มิ.ย. 2026 17:00</td>
-                                      <td class="py-3 px-2 font-bold"><i class="fas fa-building opacity-50"></i> บริษัท</td>
                                       <td class="py-3 px-2 font-bold"><i class="fas fa-money-check-alt opacity-50"></i> ถอนเงิน</td>
-                                      <td class="py-3 px-2">-</td>
+                                      <td class="py-3 px-2 font-bold"><i class="fas fa-building opacity-50"></i> รายได้บริษัท</td>
                                       <td class="py-3 px-2">
-                                          <a href="#" onclick="alert('เปิดดูสลิปโอนเงินออก'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> WD-555</a>
+                                          <a href="#" onclick="alert('ดูประวัติผู้บริหาร'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-user-shield text-[9px]"></i> CEO (Owner)</a>
                                       </td>
-                                      <td class="py-3 px-3 text-right font-black text-blue-700">-฿5,000.00</td>
+                                      <td class="py-3 px-2">
+                                          <a href="#" onclick="alert('ดูหลักฐานการโอนเงินเข้าบริษัทหลัก'); return false;" class="text-blue-600 hover:text-blue-800 hover:underline font-bold transition flex items-center gap-1"><i class="fas fa-external-link-alt text-[9px]"></i> WD-555</a>
+                                      </td>
+                                      <td class="py-3 px-2 text-right font-black text-blue-700">-฿5,000.00</td>
                                       <td class="py-3 px-3 truncate max-w-[150px]" title="CEO ถอนรายได้ GP เข้าบัญชีบริษัทหลัก">ถอนรายได้ GP เข้าบัญชีกสิกรไทย</td>
                                   </tr>
 
