@@ -1824,6 +1824,29 @@
                   }
               }
           </script>
+
+          <script>
+              function switchTreasuryTab(tabName) {
+                  const opsTable = document.getElementById('treasury-table-ops');
+                  const capitalTable = document.getElementById('treasury-table-capital');
+                  const btnOps = document.getElementById('btn-tab-ops');
+                  const btnCapital = document.getElementById('btn-tab-capital');
+
+                  if (tabName === 'ops') {
+                      opsTable.classList.remove('hidden');
+                      capitalTable.classList.add('hidden');
+                      // เปลี่ยนสีปุ่มไฮไลท์
+                      btnOps.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5";
+                      btnCapital.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5";
+                  } else {
+                      opsTable.classList.add('hidden');
+                      capitalTable.classList.remove('hidden');
+                      // เปลี่ยนสีปุ่มไฮไลท์
+                      btnCapital.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5";
+                      btnOps.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5";
+                  }
+              }
+          </script>
   </main>
 
   <!-- 🌟 หน้าต่างจัดการตั้งค่าเมนู (Menu Settings Modal) -->
