@@ -1868,27 +1868,54 @@
           </section>
 
           <script>
-              function switchTreasuryTab(tabName) {
-                  const opsTable = document.getElementById('treasury-table-ops');
-                  const capitalTable = document.getElementById('treasury-table-capital');
-                  const btnOps = document.getElementById('btn-tab-ops');
-                  const btnCapital = document.getElementById('btn-tab-capital');
+    function switchTreasuryTab(tabName) {
+        // 1. ดึง Element ตารางทั้ง 3
+        const opsTable = document.getElementById('treasury-table-ops');
+        const capitalTable = document.getElementById('treasury-table-capital');
+        const tripsTable = document.getElementById('treasury-table-trips');
 
-                  if (tabName === 'ops') {
-                      opsTable.classList.remove('hidden');
-                      capitalTable.classList.add('hidden');
-                      // เปลี่ยนสีปุ่มไฮไลท์
-                      btnOps.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5";
-                      btnCapital.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5";
-                  } else {
-                      opsTable.classList.add('hidden');
-                      capitalTable.classList.remove('hidden');
-                      // เปลี่ยนสีปุ่มไฮไลท์
-                      btnCapital.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5";
-                      btnOps.className = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5";
-                  }
-              }
-          </script>
+        // 2. ดึง Element ปุ่มทั้ง 3
+        const btnOps = document.getElementById('btn-tab-ops');
+        const btnCapital = document.getElementById('btn-tab-capital');
+        const btnTrips = document.getElementById('btn-tab-trips');
+
+        // 3. กำหนดสีปุ่ม (สถานะถูกเลือก กับ ไม่ถูกเลือก)
+        const activeClass = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap border border-gray-200";
+        const inactiveClass = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5 whitespace-nowrap border border-transparent hover:border-gray-300";
+
+        // 4. เงื่อนไขการสลับหน้า
+        if (tabName === 'ops') {
+            // เปิดหน้า 1, ซ่อนหน้า 2 และ 3
+            opsTable.classList.remove('hidden');
+            capitalTable.classList.add('hidden');
+            tripsTable.classList.add('hidden');
+
+            btnOps.className = activeClass;
+            btnCapital.className = inactiveClass;
+            btnTrips.className = inactiveClass;
+
+        } else if (tabName === 'capital') {
+            // เปิดหน้า 2, ซ่อนหน้า 1 และ 3
+            opsTable.classList.add('hidden');
+            capitalTable.classList.remove('hidden');
+            tripsTable.classList.add('hidden');
+
+            btnOps.className = inactiveClass;
+            btnCapital.className = activeClass;
+            btnTrips.className = inactiveClass;
+
+        } else if (tabName === 'trips') {
+            // เปิดหน้า 3, ซ่อนหน้า 1 และ 2
+            opsTable.classList.add('hidden');
+            capitalTable.classList.add('hidden');
+            tripsTable.classList.remove('hidden');
+
+            btnOps.className = inactiveClass;
+            btnCapital.className = inactiveClass;
+            btnTrips.className = activeClass;
+        }
+    }
+</script>
   </main>
 
   <!-- 🌟 หน้าต่างจัดการตั้งค่าเมนู (Menu Settings Modal) -->
