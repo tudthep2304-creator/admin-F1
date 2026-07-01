@@ -1606,9 +1606,11 @@
               </div>
           </div>
       </section>
-    <section id="content-treasury" class="tab-content hidden space-y-4 pb-8 mt-2 h-full animate-fade-in">
+    <!-- ================= หน้าบัญชีบริษัท (Treasury / CEO Dashboard) ================= -->
+      <section id="content-treasury" class="tab-content hidden space-y-4 pb-8 mt-2 h-full animate-fade-in">
           <div class="border border-gray-200 bg-white p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col min-h-[calc(100vh-140px)]">
               
+              <!-- 👑 ส่วนหัวหน้าจอ -->
               <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 shrink-0">
                   <div>
                       <h2 class="text-base sm:text-lg font-black flex items-center gap-2"><i class="fas fa-chart-pie text-amber-500"></i> ศูนย์จัดการบัญชีบริษัท (Treasury)</h2>
@@ -1619,11 +1621,13 @@
                   </div>
               </div>
 
+              <!-- 🪣 โซนตะกร้า 3 ใบ (The 3 Buckets) -->
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 shrink-0">
                   
+                  <!-- ตะกร้าที่ 1: หนี้สิน (ผ่าครึ่ง คนขับ/ลูกค้า) -->
                   <div class="p-4 sm:p-5 rounded-2xl border border-gray-200 bg-gray-50 shadow-sm relative overflow-hidden flex flex-col justify-between">
                       <div>
-                          <p class="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase mb-1 flex items-center gap-1"><i class="fas fa-lock"></i> ตะกร้าที่ 1: เงินฝากในระบบ</p>
+                          <p class="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase mb-1 flex items-center gap-1"><i class="fas fa-lock"></i> ตะกร้า 1: เงินฝากในระบบ (หนี้สิน)</p>
                           <h3 class="text-2xl sm:text-3xl font-black text-gray-800" id="treasury-liabilities">฿0</h3>
                           <div class="flex items-center gap-3 mt-3 pt-3 border-t border-gray-200">
                               <div class="flex-1 text-[10px] text-gray-600"><span class="font-bold text-blue-600"><i class="fas fa-car text-[9px]"></i> ฝั่งคนขับ:</span> ฿0</div>
@@ -1633,20 +1637,22 @@
                       </div>
                   </div>
 
+                  <!-- ตะกร้าที่ 2: รายได้แอป -->
                   <div class="p-4 sm:p-5 rounded-2xl border border-emerald-200 bg-emerald-50 shadow-sm relative overflow-hidden flex flex-col justify-between">
                       <div>
-                          <p class="text-[10px] sm:text-[11px] font-bold text-emerald-600 uppercase mb-1 flex items-center gap-1"><i class="fas fa-chart-line"></i> ตะกร้าที่ 2: รายได้บริษัท (GP)</p>
+                          <p class="text-[10px] sm:text-[11px] font-bold text-emerald-600 uppercase mb-1 flex items-center gap-1"><i class="fas fa-chart-line"></i> ตะกร้า 2: รายได้บริษัท (GP)</p>
                           <h3 class="text-2xl sm:text-3xl font-black text-emerald-600" id="treasury-revenue">฿0</h3>
                           <div class="mt-3 pt-3 border-t border-emerald-200 text-[9px] text-emerald-700 leading-relaxed">
-                              * กำไรสุทธิของบริษัทจากค่าคอมมิชชันและค่าบริการ
+                              * กำไรสุทธิของบริษัทจากค่าคอมมิชชัน
                           </div>
                       </div>
                       <button onclick="alert('ถอนเงินเข้าบัญชีธนาคารบริษัท')" class="mt-3 w-full py-2 bg-white border border-emerald-200 text-emerald-600 rounded-lg text-[10px] font-bold hover:bg-emerald-100 transition shadow-sm"><i class="fas fa-money-check-alt"></i> ถอนกำไรเข้าบริษัท</button>
                   </div>
 
+                  <!-- ตะกร้าที่ 3: งบการตลาด -->
                   <div class="p-4 sm:p-5 rounded-2xl border border-brand/30 bg-red-50 shadow-sm relative overflow-hidden flex flex-col justify-between">
                       <div>
-                          <p class="text-[10px] sm:text-[11px] font-bold text-brand uppercase mb-1 flex items-center gap-1"><i class="fas fa-gift"></i> ตะกร้าที่ 3: งบการตลาด</p>
+                          <p class="text-[10px] sm:text-[11px] font-bold text-brand uppercase mb-1 flex items-center gap-1"><i class="fas fa-gift"></i> ตะกร้า 3: งบการตลาด (กันวงเงิน)</p>
                           <h3 class="text-2xl sm:text-3xl font-black text-brand" id="treasury-marketing">฿0</h3>
                           <div class="flex items-center gap-3 mt-3 pt-3 border-t border-red-200">
                               <div class="flex-1 text-[10px] text-red-600"><span class="font-bold"><i class="fas fa-car text-[9px]"></i> งบคนขับ:</span> ฿0</div>
@@ -1654,20 +1660,24 @@
                               <div class="flex-1 text-[10px] text-red-600"><span class="font-bold"><i class="fas fa-user text-[9px]"></i> งบลูกค้า:</span> ฿0</div>
                           </div>
                       </div>
-                      <button onclick="openTreasuryTopupModal('หน้าต่างเติมงบการตลาด')" class="mt-3 w-full py-2 bg-brand text-white rounded-lg text-[10px] font-bold hover:bg-brand/90 transition shadow-sm"><i class="fas fa-plus-circle"></i> เติมงบประมาณ (Top-up)</button>
+                      <!-- ปุ่มนี้เรียก Modal -->
+                      <button onclick="openTreasuryTopupModal()" class="mt-3 w-full py-2 bg-brand text-white rounded-lg text-[10px] font-bold hover:bg-brand/90 transition shadow-sm"><i class="fas fa-plus-circle"></i> เติมงบประมาณ (Top-up)</button>
                   </div>
 
               </div>
-    <div class="flex-1 flex flex-col mt-2 border-t border-gray-200 pt-5">
+
+              <!-- 🌟 ประวัติและตัวกรอง (History & Filters - 3 แท็บ) -->
+              <div class="flex-1 flex flex-col mt-2 border-t border-gray-200 pt-5">
                   
+                  <!-- หัวข้อ และ แถบสลับแท็บตาราง 3 แท็บ -->
                   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                       <h3 class="text-sm font-black text-gray-800 flex items-center gap-2"><i class="fas fa-book-open text-gray-400"></i> สมุดบันทึกบัญชีบริษัท (Treasury Ledgers)</h3>
                       
                       <div class="flex bg-gray-100 p-1 rounded-xl border border-gray-200 shadow-inner overflow-x-auto slim-scroll max-w-full">
-                          <button onclick="switchTreasuryTab('ops')" id="btn-tab-ops" class="px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                          <button onclick="switchTreasuryTab('ops')" id="btn-tab-ops" class="px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap border border-gray-200">
                               <i class="fas fa-chart-line"></i> 1. บัญชีรายได้/โปรโมชัน
                           </button>
-                          <button onclick="switchTreasuryTab('capital')" id="btn-tab-capital" class="px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5 whitespace-nowrap">
+                          <button onclick="switchTreasuryTab('capital')" id="btn-tab-capital" class="px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5 whitespace-nowrap border border-transparent hover:border-gray-300">
                               <i class="fas fa-wallet"></i> 2. บัญชีเงินทุน/ถอนเงิน
                           </button>
                           <button onclick="switchTreasuryTab('trips')" id="btn-tab-trips" class="px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5 whitespace-nowrap border border-transparent hover:border-gray-300">
@@ -1676,6 +1686,7 @@
                       </div>
                   </div>
 
+                  <!-- แถบตัวกรองส่วนกลาง (ใช้ร่วมกันทั้ง 3 แท็บ) -->
                   <div class="flex flex-wrap items-end gap-3 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
                       <div class="flex-1 min-w-[150px]">
                           <label class="block text-[9px] font-bold text-gray-500 mb-1">🔍 ค้นหาในตาราง</label>
@@ -1690,13 +1701,14 @@
                           <input type="date" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-[11px] outline-none focus:border-amber-500 text-gray-600 bg-white">
                       </div>
                       <button class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-[11px] font-bold hover:bg-emerald-700 transition shadow-sm h-[28px] shrink-0 flex items-center gap-1.5">
-                          <i class="fas fa-file-excel"></i> Export ข้อมูล (.xlsx)
+                          <i class="fas fa-file-excel"></i> Export (.xlsx)
                       </button>
                   </div>
 
+                  <!-- ================= แท็บ 1: บัญชีรายได้และโปรโมชันระบบ (Operations) ================= -->
                   <div id="treasury-table-ops" class="flex-1 border rounded-t-xl border-gray-200 bg-white shadow-sm/50 overflow-hidden flex flex-col">
                       <div class="flex items-center gap-3 p-3 bg-emerald-50/40 border-b border-gray-100 overflow-x-auto slim-scroll">
-                          <div class="text-[10px] font-bold text-emerald-800 whitespace-nowrap"><i class="fas fa-calculator"></i> สรุปผลการดำเนินงานช่วงเวลานี้:</div>
+                          <div class="text-[10px] font-bold text-emerald-800 whitespace-nowrap"><i class="fas fa-calculator"></i> สรุปผลดำเนินงาน:</div>
                           <div class="text-[10px] font-bold text-emerald-600 bg-white px-2 py-0.5 rounded border border-emerald-200 shadow-sm">รายรับ (GP): +฿15.00</div>
                           <div class="text-[10px] font-bold text-red-600 bg-white px-2 py-0.5 rounded border border-red-200 shadow-sm">รายจ่ายโปรโมชัน: -฿50.00</div>
                           <div class="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded">ผลประกอบการสุทธิ: -฿35.00</div>
@@ -1741,9 +1753,10 @@
                       </div>
                   </div>
 
+                  <!-- ================= แท็บ 2: บัญชีเงินทุนและการถอนเงินบริษัท (Capital) ================= -->
                   <div id="treasury-table-capital" class="flex-1 border rounded-t-xl border-gray-200 bg-white shadow-sm/50 overflow-hidden flex flex-col hidden">
                       <div class="flex items-center gap-3 p-3 bg-amber-50/30 border-b border-gray-100 overflow-x-auto slim-scroll">
-                          <div class="text-[10px] font-bold text-amber-800 whitespace-nowrap"><i class="fas fa-calculator"></i> สรุปกระแสเงินสดบริษัทช่วงเวลานี้:</div>
+                          <div class="text-[10px] font-bold text-amber-800 whitespace-nowrap"><i class="fas fa-calculator"></i> สรุปกระแสเงินสด:</div>
                           <div class="text-[10px] font-bold text-amber-600 bg-white px-2 py-0.5 rounded border border-amber-200 shadow-sm">ยอดเติมเงินเข้า: +฿10,300.00</div>
                           <div class="text-[10px] font-bold text-blue-600 bg-white px-2 py-0.5 rounded border border-blue-200 shadow-sm">ยอดถอนเงินออก: -฿5,000.00</div>
                           <div class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">กระแสเงินสดสุทธิ: +฿5,300.00</div>
@@ -1778,6 +1791,7 @@
                       </div>
                   </div>
 
+                  <!-- ================= แท็บ 3: สรุปกำไรรายเที่ยว (Unit Economics) ================= -->
                   <div id="treasury-table-trips" class="flex-1 flex flex-col hidden bg-gray-50 border rounded-t-xl border-gray-200 overflow-hidden">
                       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 border-b border-gray-200 bg-white">
                           <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100 shadow-sm relative overflow-hidden">
@@ -1853,6 +1867,7 @@
                       </div>
                   </div>
                   
+                  <!-- 🌟 แถบแบ่งหน้า (Pagination) แสดง 50 รายการ/หน้า -->
                   <div class="flex flex-col sm:flex-row justify-between items-center px-4 py-3 border border-t-0 border-gray-200 bg-gray-50 rounded-b-xl gap-3">
                       <div class="text-[10px] sm:text-[11px] text-gray-500 font-medium">
                           แสดงรายการที่ <span class="font-bold text-gray-800">1</span> ถึง <span class="font-bold text-gray-800">2</span> จากทั้งหมด <span class="font-bold text-gray-800">1,250</span> รายการ <span class="text-gray-400">(สูงสุด 50 รายการ/หน้า)</span>
@@ -1865,57 +1880,126 @@
                   </div>
 
               </div>
-          </section>
+          </div>
+      </section>
 
-          <script>
-    function switchTreasuryTab(tabName) {
-        // 1. ดึง Element ตารางทั้ง 3
-        const opsTable = document.getElementById('treasury-table-ops');
-        const capitalTable = document.getElementById('treasury-table-capital');
-        const tripsTable = document.getElementById('treasury-table-trips');
+      <!-- ================= หน้าต่างป๊อปอัป: เติมงบการตลาด (Top-up Modal) ================= -->
+      <div id="modal-treasury-topup" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+          <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300" id="modal-treasury-topup-content">
+              <div class="bg-brand text-white px-5 py-4 flex justify-between items-center">
+                  <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-coins"></i> เติมงบการตลาด (Marketing Budget)</h3>
+                  <button onclick="closeTreasuryTopupModal()" class="text-white/80 hover:text-white transition"><i class="fas fa-times text-xl"></i></button>
+              </div>
+              <div class="p-5 space-y-4">
+                  <div class="bg-blue-50 text-blue-800 p-3 rounded-lg text-[11px] flex items-start gap-2 border border-blue-100">
+                      <i class="fas fa-info-circle mt-0.5 text-blue-500"></i>
+                      <p>เงินกองกลางนี้จะถูกใช้เป็นกระเป๋าพักเงิน สำหรับระบบตัดยอดเวลาแจกโบนัสคนขับ หรือลูกค้านำโค้ดส่วนลดมาใช้งาน (Reserve Mode)</p>
+                  </div>
+                  <div>
+                      <label class="block text-xs font-bold text-gray-700 mb-1.5">1. เลือกฝั่งที่ต้องการเติมงบ <span class="text-red-500">*</span></label>
+                      <div class="grid grid-cols-2 gap-3">
+                          <label class="border border-gray-200 rounded-xl p-3 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition peer-checked:border-amber-500 relative">
+                              <input type="radio" name="topup_target" value="driver" class="absolute top-2 right-2 text-amber-500 focus:ring-amber-500" checked>
+                              <i class="fas fa-car text-2xl text-gray-400"></i>
+                              <span class="text-xs font-bold text-gray-700">ฝั่งคนขับ</span>
+                          </label>
+                          <label class="border border-gray-200 rounded-xl p-3 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition relative">
+                              <input type="radio" name="topup_target" value="passenger" class="absolute top-2 right-2 text-amber-500 focus:ring-amber-500">
+                              <i class="fas fa-user text-2xl text-gray-400"></i>
+                              <span class="text-xs font-bold text-gray-700">ฝั่งลูกค้า</span>
+                          </label>
+                      </div>
+                  </div>
+                  <div>
+                      <label class="block text-xs font-bold text-gray-700 mb-1.5">2. แหล่งที่มาของเงิน (Source of Fund) <span class="text-red-500">*</span></label>
+                      <select class="form-input text-sm">
+                          <option value="company">🏢 เงินอัดฉีดจากบริษัท (Company Fund)</option>
+                          <option value="partner">🤝 เงินอัดฉีดจากสปอนเซอร์ (Sponsor)</option>
+                      </select>
+                  </div>
+                  <div>
+                      <label class="block text-xs font-bold text-gray-700 mb-1.5">3. จำนวนเงินที่ต้องการเติม (บาท) <span class="text-red-500">*</span></label>
+                      <div class="relative">
+                          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                              <span class="text-gray-500 font-bold">฿</span>
+                          </div>
+                          <input type="number" placeholder="0.00" class="form-input !pl-8 text-lg font-black text-amber-600">
+                      </div>
+                  </div>
+                  <div>
+                      <label class="block text-xs font-bold text-gray-700 mb-1.5">4. หมายเหตุ / รหัสอ้างอิง <span class="text-gray-400 font-normal">(ออพชั่นเสริม)</span></label>
+                      <input type="text" placeholder="เช่น: งบสปอนเซอร์จากร้าน A..." class="form-input text-sm">
+                  </div>
+              </div>
+              <div class="bg-gray-50 px-5 py-4 border-t border-gray-100 flex justify-end gap-3">
+                  <button onclick="closeTreasuryTopupModal()" class="px-4 py-2 rounded-lg text-xs font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 transition">ยกเลิก</button>
+                  <button onclick="closeTreasuryTopupModal()" class="px-5 py-2 rounded-lg text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 transition shadow-sm flex items-center gap-2">
+                      <i class="fas fa-check-circle"></i> ยืนยันการเติมเงิน
+                  </button>
+              </div>
+          </div>
+      </div>
 
-        // 2. ดึง Element ปุ่มทั้ง 3
-        const btnOps = document.getElementById('btn-tab-ops');
-        const btnCapital = document.getElementById('btn-tab-capital');
-        const btnTrips = document.getElementById('btn-tab-trips');
+      <!-- ================= Scripts จัดการ UI บัญชี ================= -->
+      <script>
+          // สคริปต์สลับ 3 แท็บ
+          function switchTreasuryTab(tabName) {
+              const opsTable = document.getElementById('treasury-table-ops');
+              const capitalTable = document.getElementById('treasury-table-capital');
+              const tripsTable = document.getElementById('treasury-table-trips');
 
-        // 3. กำหนดสีปุ่ม (สถานะถูกเลือก กับ ไม่ถูกเลือก)
-        const activeClass = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap border border-gray-200";
-        const inactiveClass = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5 whitespace-nowrap border border-transparent hover:border-gray-300";
+              const btnOps = document.getElementById('btn-tab-ops');
+              const btnCapital = document.getElementById('btn-tab-capital');
+              const btnTrips = document.getElementById('btn-tab-trips');
 
-        // 4. เงื่อนไขการสลับหน้า
-        if (tabName === 'ops') {
-            // เปิดหน้า 1, ซ่อนหน้า 2 และ 3
-            opsTable.classList.remove('hidden');
-            capitalTable.classList.add('hidden');
-            tripsTable.classList.add('hidden');
+              const activeClass = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 bg-white text-gray-800 shadow-sm flex items-center gap-1.5 whitespace-nowrap border border-gray-200";
+              const inactiveClass = "px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 text-gray-500 hover:text-gray-800 flex items-center gap-1.5 whitespace-nowrap border border-transparent hover:border-gray-300";
 
-            btnOps.className = activeClass;
-            btnCapital.className = inactiveClass;
-            btnTrips.className = inactiveClass;
+              if (tabName === 'ops') {
+                  opsTable.classList.remove('hidden');
+                  capitalTable.classList.add('hidden');
+                  tripsTable.classList.add('hidden');
+                  btnOps.className = activeClass;
+                  btnCapital.className = inactiveClass;
+                  btnTrips.className = inactiveClass;
+              } else if (tabName === 'capital') {
+                  opsTable.classList.add('hidden');
+                  capitalTable.classList.remove('hidden');
+                  tripsTable.classList.add('hidden');
+                  btnOps.className = inactiveClass;
+                  btnCapital.className = activeClass;
+                  btnTrips.className = inactiveClass;
+              } else if (tabName === 'trips') {
+                  opsTable.classList.add('hidden');
+                  capitalTable.classList.add('hidden');
+                  tripsTable.classList.remove('hidden');
+                  btnOps.className = inactiveClass;
+                  btnCapital.className = inactiveClass;
+                  btnTrips.className = activeClass;
+              }
+          }
 
-        } else if (tabName === 'capital') {
-            // เปิดหน้า 2, ซ่อนหน้า 1 และ 3
-            opsTable.classList.add('hidden');
-            capitalTable.classList.remove('hidden');
-            tripsTable.classList.add('hidden');
+          // สคริปต์เปิดปิดหน้าต่างป๊อปอัปเติมเงิน
+          function openTreasuryTopupModal() {
+              const modal = document.getElementById('modal-treasury-topup');
+              const content = document.getElementById('modal-treasury-topup-content');
+              modal.classList.remove('hidden');
+              setTimeout(() => {
+                  modal.classList.remove('opacity-0');
+                  content.classList.remove('scale-95');
+              }, 10);
+          }
 
-            btnOps.className = inactiveClass;
-            btnCapital.className = activeClass;
-            btnTrips.className = inactiveClass;
-
-        } else if (tabName === 'trips') {
-            // เปิดหน้า 3, ซ่อนหน้า 1 และ 2
-            opsTable.classList.add('hidden');
-            capitalTable.classList.add('hidden');
-            tripsTable.classList.remove('hidden');
-
-            btnOps.className = inactiveClass;
-            btnCapital.className = inactiveClass;
-            btnTrips.className = activeClass;
-        }
-    }
-</script>
+          function closeTreasuryTopupModal() {
+              const modal = document.getElementById('modal-treasury-topup');
+              const content = document.getElementById('modal-treasury-topup-content');
+              modal.classList.add('opacity-0');
+              content.classList.add('scale-95');
+              setTimeout(() => {
+                  modal.classList.add('hidden');
+              }, 300);
+          }
+      </script>
   </main>
 
   <!-- 🌟 หน้าต่างจัดการตั้งค่าเมนู (Menu Settings Modal) -->
